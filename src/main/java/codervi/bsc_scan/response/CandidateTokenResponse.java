@@ -13,6 +13,13 @@ public class CandidateTokenResponse {
     private String name;
     private String volumn_div_marketcap;
     private String pre_4h_total_volume_up;
+
+    private String vol_now;
+    private String vol_pre_1h;
+    private String vol_pre_2h;
+    private String vol_pre_3h;
+    private String vol_pre_4h;
+
     private String market_cap ;
     private String current_price;
     private String gecko_total_volume;

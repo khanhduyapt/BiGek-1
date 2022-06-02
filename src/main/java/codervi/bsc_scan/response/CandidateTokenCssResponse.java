@@ -14,7 +14,10 @@ public class CandidateTokenCssResponse {
 
     private String volumn_div_marketcap;
     private String volumn_div_marketcap_css = "";
+
     private String pre_4h_total_volume_up;
+    private String pre_4h_total_volume_up_css;
+    private String pre_vol_history;
 
     private String market_cap;
     private String current_price;

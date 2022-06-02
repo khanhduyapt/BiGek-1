@@ -167,12 +167,18 @@ public class BinanceServiceImpl implements BinanceService {
                     "   can.name,                                                                               \n" +
                     "                                                                                           \n" +
                     "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n" +
-                    "   (cur.total_volume / COALESCE (                                                          \n" +
-                    "       (SELECT pre.total_volume                                                            \n" +
-                    "        FROM public.binance_volumn_day pre                                                 \n" +
-                    "        WHERE cur.gecko_id = pre.gecko_id                                                  \n" +
-                    "          AND cur.symbol = pre.symbol                                                      \n" +
-                    "          AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), cur.total_volume) * 100) pre_4h_total_volume_up, \n"
+
+                    " ROUND((cur.total_volume / COALESCE ((SELECT pre.total_volume FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), cur.total_volume) * 100), 0) pre_4h_total_volume_up, \n"
+                    +
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0) as vol_now, \n"
+                    +
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as vol_pre_1h, \n"
+                    +
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as vol_pre_2h, \n"
+                    +
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0) as vol_pre_3h, \n"
+                    +
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as vol_pre_4h, \n"
                     +
                     "                                                                                           \n" +
                     "   can.market_cap ,                                                                        \n" +
@@ -242,6 +248,19 @@ public class BinanceServiceImpl implements BinanceService {
             for (CandidateTokenResponse dto : results) {
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
                 mapper.map(dto, css);
+
+                css.setPre_4h_total_volume_up(dto.getPre_4h_total_volume_up() + "%");
+
+                if (Long.valueOf(dto.getPre_4h_total_volume_up()) > Long.valueOf(200)) {
+                    css.setPre_4h_total_volume_up_css("text-primary font-weight-bold");
+                }
+
+                String pre_vol_history = dto.getVol_now() +
+                        "←" + dto.getVol_pre_1h() +
+                        "← " + dto.getVol_pre_2h() +
+                        "←" + dto.getVol_pre_3h() +
+                        "←" + dto.getVol_pre_4h() + "M";
+                css.setPre_vol_history(pre_vol_history);
 
                 if (Long.valueOf(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
                     css.setVolumn_div_marketcap_css("text-primary bg-light");

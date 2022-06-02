@@ -28,6 +28,13 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "name", type = String.class),
                 @ColumnResult(name = "volumn_div_marketcap", type = String.class),
                 @ColumnResult(name = "pre_4h_total_volume_up", type = String.class),
+
+                @ColumnResult(name = "vol_now", type = String.class),
+                @ColumnResult(name = "vol_pre_1h", type = String.class),
+                @ColumnResult(name = "vol_pre_2h", type = String.class),
+                @ColumnResult(name = "vol_pre_3h", type = String.class),
+                @ColumnResult(name = "vol_pre_4h", type = String.class),
+
                 @ColumnResult(name = "market_cap ", type = String.class),
                 @ColumnResult(name = "current_price", type = String.class),
                 @ColumnResult(name = "gecko_total_volume", type = String.class),
