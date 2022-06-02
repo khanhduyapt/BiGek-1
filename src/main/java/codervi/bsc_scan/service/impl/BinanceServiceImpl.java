@@ -55,6 +55,9 @@ public class BinanceServiceImpl implements BinanceService {
                 + "&interval=1d&limit="
                 + String.valueOf(limit);
 
+        final String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
+        BigDecimal price_at_binance = getBinancePrice(url_price);
+
         List<Object> result_usdt = getBinanceData(url_usdt, limit);
         List<Object> result_busd = getBinanceData(url_busd, limit);
 
@@ -101,7 +104,7 @@ public class BinanceServiceImpl implements BinanceService {
                             Utils.convertDateToString("HH", calendar.getTime())));
                     day.setTotalVolume(total_volume);
                     day.setTotalTrasaction(total_trans);
-
+                    day.setPriceAtBinance(price_at_binance);
                     list_day.add(day);
                 }
 
@@ -116,6 +119,18 @@ public class BinanceServiceImpl implements BinanceService {
 
         binanceVolumnDayRepository.saveAll(list_day);
         binanceVolumnWeekRepository.saveAll(list_week);
+    }
+
+    private BigDecimal getBinancePrice(String url) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            Object result = restTemplate.getForObject(url, Object.class);
+
+            return Utils.getBigDecimal(Utils.getLinkedHashMapValue(result, Arrays.asList("price")));
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+
     }
 
     private List<Object> getBinanceData(String url, int limit) {
@@ -168,9 +183,9 @@ public class BinanceServiceImpl implements BinanceService {
                     "                                                                                           \n" +
                     "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n" +
 
-                    " ROUND((cur.total_volume / COALESCE ((SELECT pre.total_volume FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), cur.total_volume) * 100), 0) pre_4h_total_volume_up, \n"
+                    " ROUND((cur.total_volume / COALESCE ((SELECT pre.total_volume FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), cur.total_volume) * 100 - 100), 0) pre_4h_total_volume_up, \n"
                     +
-                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0) as vol_now, \n"
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                      as vol_now, \n"
                     +
                     " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as vol_pre_1h, \n"
                     +
@@ -180,6 +195,18 @@ public class BinanceServiceImpl implements BinanceService {
                     +
                     " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as vol_pre_4h, \n"
                     +
+
+                    "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                      as price_now, \n"
+                    +
+                    "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as price_pre_1h, \n"
+                    +
+                    "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as price_pre_2h, \n"
+                    +
+                    "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0) as price_pre_3h, \n"
+                    +
+                    "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as price_pre_4h, \n"
+                    +
+
                     "                                                                                           \n" +
                     "   can.market_cap ,                                                                        \n" +
                     "   can.current_price,                                                                      \n" +
@@ -261,6 +288,13 @@ public class BinanceServiceImpl implements BinanceService {
                         "←" + dto.getVol_pre_3h() +
                         "←" + dto.getVol_pre_4h() + "M";
                 css.setPre_vol_history(pre_vol_history);
+
+                String pre_price_history = removeLastZero(dto.getPrice_now()) +
+                        "←" + removeLastZero(dto.getPrice_pre_1h()) +
+                        "← " + removeLastZero(dto.getPrice_pre_2h()) +
+                        "←" + removeLastZero(dto.getPrice_pre_3h()) +
+                        "←" + removeLastZero(dto.getPrice_pre_4h());
+                css.setPre_price_history(pre_price_history);
 
                 if (Long.valueOf(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
                     css.setVolumn_div_marketcap_css("text-primary bg-light");

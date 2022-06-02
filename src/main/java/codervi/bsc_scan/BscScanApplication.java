@@ -24,12 +24,12 @@ public class BscScanApplication {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()) + " ---->");
 
             ApplicationContext applicationContext = SpringApplication.run(BscScanApplication.class, args);
-            CoinGeckoService service = applicationContext.getBean(CoinGeckoService.class);
+            CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
 
-            List<CandidateCoin> list = service.getList();
+            List<CandidateCoin> list = gecko_service.getList();
             if (CollectionUtils.isEmpty(list)) {
-                service.initCandidateCoin();
+                gecko_service.initCandidateCoin();
             }
             ////debug
             //service.loadData("origin-protocol", true);
@@ -45,9 +45,9 @@ public class BscScanApplication {
                 CandidateCoin coin = list.get(idx);
 
                 if (Objects.equals(null, coin.getCoinGeckoLink())) {
-                    service.loadData(coin.getGeckoid(), true);
+                    gecko_service.loadData(coin.getGeckoid(), true);
                 } else {
-                    service.loadData(coin.getGeckoid(), false);
+                    gecko_service.loadData(coin.getGeckoid(), false);
                 }
 
                 binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
@@ -59,7 +59,7 @@ public class BscScanApplication {
 
                 if (Objects.equals(idx, size - 1)) {
                     idx = 0;
-                    list = service.getList();
+                    list = gecko_service.getList();
                     size = list.size();
                 } else {
                     idx += 1;

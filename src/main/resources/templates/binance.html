@@ -113,7 +113,7 @@ p {
 					<td style="text-align: center;" th:text="${iter.index + 1}">
 					<td><a th:target="_blank" th:href="${token.binance_trade}"><span
 							th:text="${token.symbol}"></a></td>
-					<td><a th:target="_blank" th:href="${token.coin_gecko_link}"><span
+					<td style="max-width: 150px !important;"><a th:target="_blank" th:href="${token.coin_gecko_link}"><span
 							th:text="${token.name}"></a></td>
 
 					<td style="text-align: right;"
@@ -128,9 +128,12 @@ p {
 							th:text="${token.pre_4h_total_volume_up}">
 						<p style="font-size: 0.8rem !important;" th:text="${token.pre_vol_history}">
 					</td>
-					<td style="text-align: right;">
-						<p class="font-weight-bold" th:text="${token.current_price}">
+
+					<td style="text-align: right; max-width: 150px !important;">
+						<p th:text="${token.current_price}">
+                        <p style="font-size: 0.7rem !important;" th:text="${token.pre_price_history}">
 					</td>
+
 					<td style="text-align: right;"
 						th:classappend="${token.price_change_24h_css}"
 						th:text="${#numbers.formatDecimal(token.price_change_percentage_24h, 1, 'COMMA', 1, 'POINT') + '%'}">

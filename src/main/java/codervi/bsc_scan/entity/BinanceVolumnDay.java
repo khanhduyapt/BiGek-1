@@ -26,4 +26,7 @@ public class BinanceVolumnDay {
     @Column(name = "total_trasaction")
     private BigDecimal totalTrasaction;
 
+    @Column(name = "price_at_binance")
+    private BigDecimal priceAtBinance;
+
 }
