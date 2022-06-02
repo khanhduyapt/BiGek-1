@@ -238,7 +238,6 @@ public class BinanceServiceImpl implements BinanceService {
             List<CandidateTokenResponse> results = query.getResultList();
 
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
-            List<CandidateTokenCssResponse> priority_list = new ArrayList<CandidateTokenCssResponse>();
             ModelMapper mapper = new ModelMapper();
             for (CandidateTokenResponse dto : results) {
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
@@ -370,20 +369,12 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar_css("bg-light text-primary font-weight-bold");
                 }
 
-                if (!org.thymeleaf.util.StringUtils.isEmpty(css.getStar())
-                        && Long.valueOf(css.getVolumn_div_marketcap()) > Long.valueOf(40)) {
-                    priority_list.add(css);
-                } else {
-                    list.add(css);
-                }
+                list.add(css);
             }
 
             log.info("End getList <--");
 
-            for (CandidateTokenCssResponse dto : list) {
-                priority_list.add(dto);
-            }
-            return priority_list;
+            return list;
         } catch (Exception e) {
             log.info("Get list Inquiry Consigned Delivery error ------->");
             log.error(e.getMessage());

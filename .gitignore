@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+bsc_scan.log
+desktop.ini
+.checkstyle
