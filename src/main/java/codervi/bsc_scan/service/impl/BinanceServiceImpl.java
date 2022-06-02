@@ -278,7 +278,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 css.setPre_4h_total_volume_up(dto.getPre_4h_total_volume_up() + "%");
 
-                if (Long.valueOf(dto.getPre_4h_total_volume_up()) > Long.valueOf(200)) {
+                if (getValue(dto.getPre_4h_total_volume_up()) > Long.valueOf(200)) {
                     css.setPre_4h_total_volume_up_css("text-primary font-weight-bold");
                 }
 
@@ -296,7 +296,7 @@ public class BinanceServiceImpl implements BinanceService {
                         "←" + removeLastZero(dto.getPrice_pre_4h());
                 css.setPre_price_history(pre_price_history);
 
-                if (Long.valueOf(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
+                if (getValue(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
                     css.setVolumn_div_marketcap_css("text-primary bg-light");
                 }
                 css.setCurrent_price(removeLastZero(dto.getCurrent_price()));
@@ -429,10 +429,19 @@ public class BinanceServiceImpl implements BinanceService {
 
             return list;
         } catch (Exception e) {
+            e.printStackTrace();
             log.info("Get list Inquiry Consigned Delivery error ------->");
             log.error(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
+    }
+
+    private Long getValue(String value) {
+        if (Objects.equals(null, value) || Objects.equals("", value))
+            return Long.valueOf(0);
+
+        return Long.valueOf(value);
+
     }
 
     private int getIndexMax(List<String> list) {

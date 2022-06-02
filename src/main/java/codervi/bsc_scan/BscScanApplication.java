@@ -31,13 +31,6 @@ public class BscScanApplication {
             if (CollectionUtils.isEmpty(list)) {
                 gecko_service.initCandidateCoin();
             }
-            ////debug
-            //service.loadData("origin-protocol", true);
-            //binance_service.loadData("origin-protocol", "OGN");
-            {
-                //list.clear();
-                //list.add(new CandidateCoin("jasmycoin", "JASMY", "JasmyCoin"));
-            }
 
             int size = list.size();
             int idx = 0;

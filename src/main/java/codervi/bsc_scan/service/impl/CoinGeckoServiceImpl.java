@@ -17,7 +17,9 @@ import org.springframework.web.client.RestTemplate;
 
 import codervi.bsc_scan.entity.CandidateCoin;
 import codervi.bsc_scan.repository.CandidateCoinRepository;
+import codervi.bsc_scan.request.CoinGeckoTokenRequest;
 import codervi.bsc_scan.service.CoinGeckoService;
+import codervi.bsc_scan.utils.Response;
 import codervi.bsc_scan.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,11 +82,16 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         coin.setPriceChangePercentage30D(Utils.getBigDecimal(priceChangePercentage30d));
 
         if (Objects.equals(BigDecimal.ZERO, market_cap)) {
-            coin.setVolumnDivMarketcap(BigDecimal.valueOf(0.1));
+            coin.setVolumnDivMarketcap(BigDecimal.valueOf(0));
+
+        } else if (Objects.equals(gecko_id.toLowerCase(), "bitcoin")) {
+            coin.setVolumnDivMarketcap(BigDecimal.valueOf(999));
+
         } else {
             coin.setVolumnDivMarketcap(total_volume.divide(market_cap, 3,
                     java.math.RoundingMode.CEILING));
         }
+
         //is_get_new
         if (true) {
 
@@ -448,6 +455,44 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             log.info("end CoinGeckoServiceImpl.initCandidateCoin error --->");
             log.error(e.getMessage());
             return new ArrayList<CandidateCoin>();
+        }
+    }
+
+    @Override
+    @Transactional
+    public Response add(CoinGeckoTokenRequest request) {
+        try {
+            log.info("Start add  --->");
+
+            CandidateCoin entity = new CandidateCoin(request.getId(), request.getSymbol(), request.getName());
+            candidateCoinRepository.save(entity);
+
+            log.info("End add success <---");
+            return new Response("200", "Ok", null, entity);
+        } catch (Exception e) {
+            log.info("Add token  error --->");
+            log.error(e.getMessage());
+            return new Response("500", "Error", e.toString());
+        }
+    }
+
+    @Override
+    @Transactional
+    public Response delete(CoinGeckoTokenRequest request) {
+        try {
+            log.info("Start delete  --->");
+
+            CandidateCoin entity = candidateCoinRepository.findById(request.getId()).orElse(null);
+            if (!Objects.equals(null, entity)) {
+                candidateCoinRepository.delete(entity);
+            }
+
+            log.info("End delete success <---");
+            return new Response("200", "Delete", null, request.getId());
+        } catch (Exception e) {
+            log.info("Add token  error --->");
+            log.error(e.getMessage());
+            return new Response("500", "Error", e.toString());
         }
     }
 
