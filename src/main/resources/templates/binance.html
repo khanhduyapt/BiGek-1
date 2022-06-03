@@ -118,8 +118,10 @@ p {
 
 					<td style="text-align: right;"
 						th:text="${#numbers.formatDecimal(token.market_cap, 0, 'COMMA', 0, 'POINT') + '$'}">
-					<td style="text-align: right;"
-						th:text="${#numbers.formatDecimal(token.gecko_total_volume, 0, 'COMMA', 0, 'POINT') + '$'}">
+					<td style="text-align: right;" >
+                        <p th:text="${#numbers.formatDecimal(token.gecko_total_volume, 0, 'COMMA', 0, 'POINT') + '$'}">
+                        <p style="font-size: 0.7rem !important;" th:text="${token.gecko_volumn_history}">
+                    </td>
 					<td style="text-align: right;"
 						th:classappend="${token.volumn_div_marketcap_css}"
 						th:text="${token.volumn_div_marketcap}">
@@ -130,7 +132,7 @@ p {
 					</td>
 
 					<td style="text-align: right; max-width: 150px !important;">
-						<p th:text="${token.current_price}">
+						<p th:text="${token.current_price} + '$'">
                         <p style="font-size: 0.7rem !important;" th:text="${token.pre_price_history}">
 					</td>
 

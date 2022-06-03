@@ -28,7 +28,13 @@ public class CandidateTokenResponse {
 
     private String market_cap;
     private String current_price;
+
     private String gecko_total_volume;
+    private String gec_vol_pre_1h;
+    private String gec_vol_pre_2h;
+    private String gec_vol_pre_3h;
+    private String gec_vol_pre_4h;
+
     private String price_change_percentage_24h;
     private String price_change_percentage_7d;
     private String price_change_percentage_14d;

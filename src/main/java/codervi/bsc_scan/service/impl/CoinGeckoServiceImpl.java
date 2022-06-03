@@ -3,6 +3,7 @@ package codervi.bsc_scan.service.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import codervi.bsc_scan.entity.CandidateCoin;
+import codervi.bsc_scan.entity.GeckoVolumnDay;
+import codervi.bsc_scan.entity.GeckoVolumnDayKey;
 import codervi.bsc_scan.repository.CandidateCoinRepository;
+import codervi.bsc_scan.repository.GeckoVolumnDayRepository;
 import codervi.bsc_scan.request.CoinGeckoTokenRequest;
 import codervi.bsc_scan.service.CoinGeckoService;
 import codervi.bsc_scan.utils.Response;
@@ -35,12 +39,15 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Autowired
     private CandidateCoinRepository candidateCoinRepository;
 
+    @Autowired
+    private GeckoVolumnDayRepository geckoVolumnDayRepository;
+
     @Override
     public List<CandidateCoin> getList() {
         return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
     }
 
-    public CandidateCoin loadData(String gecko_id, boolean is_get_new) {
+    public CandidateCoin loadData(String gecko_id) {
         final String url = "https://api.coingecko.com/api/v3/coins/" + gecko_id
                 + "?localization=false&tickers=true&market_data=true&community_data=false&developer_data=false&sparkline=false";
 
@@ -50,6 +57,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         LinkedHashMap<String, Object> result = restTemplate.getForObject(url, LinkedHashMap.class);
 
         CandidateCoin coin = new CandidateCoin();
+        GeckoVolumnDay geckoDay = new GeckoVolumnDay();
 
         Object id = Utils.getLinkedHashMapValue(result, Arrays.asList("id"));
         Object symbol = Utils.getLinkedHashMapValue(result, Arrays.asList("symbol"));
@@ -92,8 +100,14 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                     java.math.RoundingMode.CEILING));
         }
 
-        //is_get_new
-        if (true) {
+        Calendar calendar = Calendar.getInstance();
+        String hh = Utils.convertDateToString("HH", calendar.getTime());
+        geckoDay.setId(
+                new GeckoVolumnDayKey(String.valueOf(id).toLowerCase(), String.valueOf(symbol).toUpperCase(), hh));
+        geckoDay.setTotalVolume(total_volume);
+        geckoVolumnDayRepository.save(geckoDay);
+
+        {
 
             Object total_supply = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "total_supply"));
             Object max_supply = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "max_supply"));

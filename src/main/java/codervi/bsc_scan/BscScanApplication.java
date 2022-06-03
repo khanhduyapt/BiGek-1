@@ -37,12 +37,7 @@ public class BscScanApplication {
             while (idx < size) {
                 CandidateCoin coin = list.get(idx);
 
-                if (Objects.equals(null, coin.getCoinGeckoLink())) {
-                    gecko_service.loadData(coin.getGeckoid(), true);
-                } else {
-                    gecko_service.loadData(coin.getGeckoid(), false);
-                }
-
+                gecko_service.loadData(coin.getGeckoid());
                 binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
 
                 wait(2000);
@@ -51,6 +46,7 @@ public class BscScanApplication {
                         + coin.getSymbol());
 
                 if (Objects.equals(idx, size - 1)) {
+                    log.info("reload: " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()));
                     idx = 0;
                     list = gecko_service.getList();
                     size = list.size();

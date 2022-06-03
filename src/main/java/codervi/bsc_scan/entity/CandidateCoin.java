@@ -43,7 +43,13 @@ import lombok.NoArgsConstructor;
 
                 @ColumnResult(name = "market_cap ", type = String.class),
                 @ColumnResult(name = "current_price", type = String.class),
+
                 @ColumnResult(name = "gecko_total_volume", type = String.class),
+                @ColumnResult(name = "gec_vol_pre_1h", type = String.class),
+                @ColumnResult(name = "gec_vol_pre_2h", type = String.class),
+                @ColumnResult(name = "gec_vol_pre_3h", type = String.class),
+                @ColumnResult(name = "gec_vol_pre_4h", type = String.class),
+
                 @ColumnResult(name = "price_change_percentage_24h", type = String.class),
                 @ColumnResult(name = "price_change_percentage_7d", type = String.class),
                 @ColumnResult(name = "price_change_percentage_14d", type = String.class),

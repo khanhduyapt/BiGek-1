@@ -16,5 +16,5 @@ public interface CoinGeckoService {
 
     public List<CandidateCoin> getList();
 
-    public CandidateCoin loadData(String gecko_id, boolean is_get_new);
+    public CandidateCoin loadData(String gecko_id);
 }

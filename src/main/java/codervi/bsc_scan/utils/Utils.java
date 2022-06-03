@@ -40,6 +40,17 @@ public class Utils {
         return ret;
     }
 
+    public static String getValue(Object value) {
+        if (Objects.equals(null, value)) {
+            return "";
+        }
+        if (Objects.equals("", value.toString())) {
+            return "";
+        }
+
+        return value.toString();
+    }
+
     public static String getTextCss(String value) {
         if (Objects.equals(null, value)) {
             return "";

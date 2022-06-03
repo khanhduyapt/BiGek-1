@@ -211,6 +211,16 @@ public class BinanceServiceImpl implements BinanceService {
                     "   can.market_cap ,                                                                        \n" +
                     "   can.current_price,                                                                      \n" +
                     "   can.total_volume                as gecko_total_volume,                                  \n" +
+
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as gec_vol_pre_1h, \n"
+                    +
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as gec_vol_pre_2h, \n"
+                    +
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0) as gec_vol_pre_3h, \n"
+                    +
+                    " coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as gec_vol_pre_4h, \n"
+                    +
+
                     "   can.price_change_percentage_24h,                                                        \n" +
                     "   can.price_change_percentage_7d,                                                         \n" +
                     "   can.price_change_percentage_14d,                                                        \n" +
@@ -304,6 +314,12 @@ public class BinanceServiceImpl implements BinanceService {
                 css.setPrice_change_07d_css(Utils.getTextCss(css.getPrice_change_percentage_7d()));
                 css.setPrice_change_14d_css(Utils.getTextCss(css.getPrice_change_percentage_14d()));
                 css.setPrice_change_30d_css(Utils.getTextCss(css.getPrice_change_percentage_30d()));
+
+                String gecko_volumn_history = dto.getGec_vol_pre_1h() +
+                        "←" + dto.getGec_vol_pre_2h() +
+                        " ←" + dto.getGec_vol_pre_3h() +
+                        "←" + dto.getGec_vol_pre_4h() + "M";
+                css.setGecko_volumn_history(gecko_volumn_history);
 
                 List<String> volList = new ArrayList<String>();
                 List<String> priceList = new ArrayList<String>();

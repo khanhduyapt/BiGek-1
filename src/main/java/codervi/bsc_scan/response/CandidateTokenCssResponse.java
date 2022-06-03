@@ -23,6 +23,7 @@ public class CandidateTokenCssResponse {
     private String current_price;
     private String pre_price_history;
     private String gecko_total_volume;
+    private String gecko_volumn_history;
 
     private String price_change_percentage_24h;
     private String price_change_percentage_7d;
