@@ -330,6 +330,7 @@ public class BinanceServiceImpl implements BinanceService {
                 volList.add("");
                 priceList.add(temp.get(1));
                 BigDecimal vol_today = Utils.getBigDecimal(temp.get(0).replace(",", ""));
+                BigDecimal price_today = Utils.getBigDecimal(temp.get(1));
 
                 temp = splitVolAndPrice(css.getDay_0());
                 css.setDay_0_vol(temp.get(0));
@@ -428,6 +429,9 @@ public class BinanceServiceImpl implements BinanceService {
                 setVolumnDayCss(css, idx_vol_min, "text-danger"); //      Min Volumn
                 setPriceDayCss(css, idx_price_min, "text-danger"); //     Min Price
 
+                BigDecimal min_add_10_percent = Utils.getBigDecimal(priceList.get(idx_price_min));
+                min_add_10_percent = min_add_10_percent.multiply(BigDecimal.valueOf(Double.valueOf(1.05)));
+
                 if (idx_price_min == 0) {
                     setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold"); //     Min Price
                     if (!Objects.equals(null, css.getStar()) && !Objects.equals("", String.valueOf(css.getStar()))) {
@@ -436,6 +440,16 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar("※Sale※");
                     }
                     css.setStar_css("bg-light text-primary font-weight-bold");
+
+                } else if (price_today.compareTo(min_add_10_percent) < 0) {
+
+                    css.setStar("Sale5%");
+                    css.setStar_css("bg-light");
+
+                } else if (idx_price_min == 1) {
+
+                    setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold"); //     Min Price
+
                 }
 
                 list.add(css);

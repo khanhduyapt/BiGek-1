@@ -22,6 +22,14 @@ import org.springframework.web.servlet.LocaleResolver;
 public class Utils {
 
     public static BigDecimal getBigDecimal(Object value) {
+        if (Objects.equals(null, value)) {
+            return BigDecimal.ZERO;
+        }
+
+        if (Objects.equals("", value.toString())) {
+            return BigDecimal.ZERO;
+        }
+
         BigDecimal ret = null;
         if (value != null) {
             if (value instanceof BigDecimal) {
