@@ -12,6 +12,8 @@ public interface CoinGeckoService {
 
     public Response delete(CoinGeckoTokenRequest request);
 
+    public Response note(CoinGeckoTokenRequest request);
+
     public List<CandidateCoin> initCandidateCoin();
 
     public List<CandidateCoin> getList();

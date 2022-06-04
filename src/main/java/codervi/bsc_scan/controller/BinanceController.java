@@ -39,4 +39,9 @@ public class BinanceController {
     public ResponseEntity<Response> delete(@RequestBody CoinGeckoTokenRequest request) {
         return new ResponseEntity<>(geckoService.delete(request), HttpStatus.OK);
     }
+
+    @PostMapping("/note")
+    public ResponseEntity<Response> note(@RequestBody CoinGeckoTokenRequest request) {
+        return new ResponseEntity<>(geckoService.note(request), HttpStatus.OK);
+    }
 }

@@ -215,6 +215,7 @@ public class BinanceServiceImpl implements BinanceService {
 					+ "   can.binance_trade,                                                                      \n"
 					+ "   can.coin_gecko_link,                                                                    \n"
 					+ "   can.backer,                                                                             \n"
+					+ "   can.note,                                                                               \n"
 					+ "                                                                                           \n"
 					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() + interval '1 days', 'yyyyMMdd')) as today, \n"
 					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as day_0, \n"
@@ -264,6 +265,14 @@ public class BinanceServiceImpl implements BinanceService {
 					if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(30)) > 0) {
 						volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
 						css.setVolumn_binance_div_marketcap_css("font-weight-bold");
+
+					} else if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(20)) > 0) {
+						volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
+						css.setVolumn_binance_div_marketcap_css("text-primary");
+
+					} else if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(10)) > 0) {
+						volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
+
 					} else {
 						volumn_binance_div_marketcap_str = volumn_binance_div_marketcap.toString();
 					}

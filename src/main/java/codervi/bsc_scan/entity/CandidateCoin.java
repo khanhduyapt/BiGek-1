@@ -62,6 +62,8 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "binance_trade", type = String.class),
                 @ColumnResult(name = "coin_gecko_link", type = String.class),
                 @ColumnResult(name = "backer", type = String.class),
+                @ColumnResult(name = "note", type = String.class),
+
                 @ColumnResult(name = "today", type = String.class),
                 @ColumnResult(name = "day_0", type = String.class),
                 @ColumnResult(name = "day_1", type = String.class),

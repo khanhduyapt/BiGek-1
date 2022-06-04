@@ -7,4 +7,5 @@ public class CoinGeckoTokenRequest {
     private String id;
     private String symbol;
     private String name;
+    private String note;
 }

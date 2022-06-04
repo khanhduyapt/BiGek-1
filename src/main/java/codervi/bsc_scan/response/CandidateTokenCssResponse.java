@@ -45,6 +45,7 @@ public class CandidateTokenCssResponse {
     private String binance_trade;
     private String coin_gecko_link;
     private String backer;
+    private String note;
 
     private String star = "";
     private String star_css = "";

@@ -512,4 +512,32 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 		}
 	}
 
+	@Override
+	@Transactional
+	public Response note(CoinGeckoTokenRequest request) {
+		try {
+			log.info("Start note  --->");
+
+			if (!Objects.equals(null, request.getId())) {
+				String sql = " Update candidate_coin set note=:note WHERE gecko_id=:gecko_id ;";
+				String note = request.getNote();
+				if (note.length() > 200) {
+					note = note.substring(0, 200);
+				}
+				Query query = entityManager.createNativeQuery(sql);
+				query.setParameter("note", note);
+				query.setParameter("gecko_id", request.getId());
+				query.executeUpdate();
+
+				log.info(request.getId() + "=" + request.getNote());
+			}
+			log.info("End note success <---");
+			return new Response("200", "Ok");
+		} catch (Exception e) {
+			log.info("Add note error --->");
+			log.error(e.getMessage());
+			return new Response("500", "Error", e.toString());
+		}
+	}
+
 }
