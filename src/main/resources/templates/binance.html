@@ -127,9 +127,9 @@ p {
 					</td>
 					<td style="text-align: right;"
 						th:classappend="${token.volumn_div_marketcap_css}">
-						<p th:text="${'G:' + token.volumn_div_marketcap} + '%'">
+						<p th:text="${token.volumn_div_marketcap} + '%'">
 						<p th:classappend="${token.volumn_binance_div_marketcap_css}"
-							th:text="${'B:' + token.volumn_binance_div_marketcap}">
+							th:text="${token.volumn_binance_div_marketcap}">
 					</td>
 					<td style="text-align: right; max-width: 150px !important;">
 						<p th:classappend="${token.pre_4h_total_volume_up_css}"

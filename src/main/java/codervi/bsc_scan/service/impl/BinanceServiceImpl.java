@@ -254,19 +254,22 @@ public class BinanceServiceImpl implements BinanceService {
 				mapper.map(dto, css);
 
 				BigDecimal volumn_binance_div_marketcap = BigDecimal.ZERO;
-
+				String volumn_binance_div_marketcap_str = "";
 				if (Utils.getBigDecimal(dto.getMarket_cap()).compareTo(BigDecimal.ZERO) > 0) {
 					volumn_binance_div_marketcap = Utils.getBigDecimal(dto.getVol_now())
 							.divide(Utils.getBigDecimal(dto.getMarket_cap()).divide(BigDecimal.valueOf(100000000), 5,
 									RoundingMode.CEILING), 1, RoundingMode.CEILING);
 
 					if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(30)) > 0) {
+						volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
 						css.setVolumn_binance_div_marketcap_css("font-weight-bold");
+					} else {
+						volumn_binance_div_marketcap_str = volumn_binance_div_marketcap.toString();
 					}
 				}
 
-				css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap.toString() + "%");
-				css.setPre_4h_total_volume_up(dto.getPre_4h_total_volume_up() + "%");
+				css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap_str);
+				css.setPre_4h_total_volume_up(dto.getPre_4h_total_volume_up());
 
 				if (getValue(dto.getPre_4h_total_volume_up()) > Long.valueOf(200)) {
 					css.setPre_4h_total_volume_up_css("text-primary font-weight-bold");
