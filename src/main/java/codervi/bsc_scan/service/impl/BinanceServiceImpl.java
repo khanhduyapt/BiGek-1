@@ -187,6 +187,7 @@ public class BinanceServiceImpl implements BinanceService {
 					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as vol_pre_2h, \n"
 					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0) as vol_pre_3h, \n"
 					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as vol_pre_4h, \n"
+					+ "                                                                                           \n"
 					+ "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                      as price_now,    \n"
 					+ "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as price_pre_1h, \n"
 					+ "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as price_pre_2h, \n"
@@ -252,6 +253,19 @@ public class BinanceServiceImpl implements BinanceService {
 				CandidateTokenCssResponse css = new CandidateTokenCssResponse();
 				mapper.map(dto, css);
 
+				BigDecimal volumn_binance_div_marketcap = BigDecimal.ZERO;
+
+				if (Utils.getBigDecimal(dto.getMarket_cap()).compareTo(BigDecimal.ZERO) > 0) {
+					volumn_binance_div_marketcap = Utils.getBigDecimal(dto.getVol_now())
+							.divide(Utils.getBigDecimal(dto.getMarket_cap()).divide(BigDecimal.valueOf(100000000), 5,
+									RoundingMode.CEILING), 1, RoundingMode.CEILING);
+
+					if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(30)) > 0) {
+						css.setVolumn_binance_div_marketcap_css("font-weight-bold");
+					}
+				}
+
+				css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap.toString() + "%");
 				css.setPre_4h_total_volume_up(dto.getPre_4h_total_volume_up() + "%");
 
 				if (getValue(dto.getPre_4h_total_volume_up()) > Long.valueOf(200)) {
