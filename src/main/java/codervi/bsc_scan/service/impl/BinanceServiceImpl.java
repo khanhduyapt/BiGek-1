@@ -240,6 +240,7 @@ public class BinanceServiceImpl implements BinanceService {
 					+ "   and can.gecko_id = cur.gecko_id                                                         \n"
 					+ "   and can.symbol = cur.symbol                                                             \n"
 					+ " order by                                                                                  \n"
+					+ "   coalesce(can.priority, 3) asc,                                            			  \n"
 					+ "   can.volumn_div_marketcap desc                                                           \n";
 
 			Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
