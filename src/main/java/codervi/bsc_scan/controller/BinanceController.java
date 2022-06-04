@@ -44,4 +44,9 @@ public class BinanceController {
     public ResponseEntity<Response> note(@RequestBody CoinGeckoTokenRequest request) {
         return new ResponseEntity<>(geckoService.note(request), HttpStatus.OK);
     }
+
+    @PostMapping("/priority")
+    public ResponseEntity<Response> priority(@RequestBody CoinGeckoTokenRequest request) {
+        return new ResponseEntity<>(geckoService.priority(request), HttpStatus.OK);
+    }
 }

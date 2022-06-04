@@ -518,7 +518,9 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 		try {
 			log.info("Start note  --->");
 
-			if (!Objects.equals(null, request.getId())) {
+			if (!Objects.equals("", Utils.getValue(request.getId()))
+					&& !Objects.equals("", Utils.getValue(request.getNote()))) {
+
 				String sql = " Update candidate_coin set note=:note WHERE gecko_id=:gecko_id ;";
 				String note = request.getNote();
 				if (note.length() > 200) {
@@ -532,6 +534,30 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 				log.info(request.getId() + "=" + request.getNote());
 			}
 			log.info("End note success <---");
+			return new Response("200", "Ok");
+		} catch (Exception e) {
+			log.info("Add note error --->");
+			log.error(e.getMessage());
+			return new Response("500", "Error", e.toString());
+		}
+	}
+
+	@Override
+	@Transactional
+	public Response priority(CoinGeckoTokenRequest request) {
+		try {
+			log.info("Start priority  --->");
+
+			if (!Objects.equals("", Utils.getValue(request.getId()))) {
+				String sql = " Update candidate_coin set priority=:priority WHERE gecko_id=:gecko_id ;";
+				Query query = entityManager.createNativeQuery(sql);
+				query.setParameter("priority", request.getPriority());
+				query.setParameter("gecko_id", request.getId());
+				query.executeUpdate();
+
+				log.info(request.getId() + "=" + request.getNote());
+			}
+			log.info("End priority success <---");
 			return new Response("200", "Ok");
 		} catch (Exception e) {
 			log.info("Add note error --->");

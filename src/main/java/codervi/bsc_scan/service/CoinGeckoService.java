@@ -8,15 +8,17 @@ import codervi.bsc_scan.utils.Response;
 
 public interface CoinGeckoService {
 
-    public Response add(CoinGeckoTokenRequest request);
+	public Response add(CoinGeckoTokenRequest request);
 
-    public Response delete(CoinGeckoTokenRequest request);
+	public Response delete(CoinGeckoTokenRequest request);
 
-    public Response note(CoinGeckoTokenRequest request);
+	public Response note(CoinGeckoTokenRequest request);
 
-    public List<CandidateCoin> initCandidateCoin();
+	public Response priority(CoinGeckoTokenRequest request);
 
-    public List<CandidateCoin> getList();
+	public List<CandidateCoin> initCandidateCoin();
 
-    public CandidateCoin loadData(String gecko_id);
+	public List<CandidateCoin> getList();
+
+	public CandidateCoin loadData(String gecko_id);
 }

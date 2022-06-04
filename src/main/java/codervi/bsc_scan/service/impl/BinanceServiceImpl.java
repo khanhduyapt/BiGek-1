@@ -295,7 +295,7 @@ public class BinanceServiceImpl implements BinanceService {
 				css.setPre_price_history(pre_price_history);
 
 				if (getValue(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
-					css.setVolumn_div_marketcap_css("text-primary bg-light");
+					css.setVolumn_div_marketcap_css("text-primary");
 				}
 				css.setCurrent_price(removeLastZero(dto.getCurrent_price()));
 				css.setPrice_change_24h_css(Utils.getTextCss(css.getPrice_change_percentage_24h()));
@@ -419,8 +419,10 @@ public class BinanceServiceImpl implements BinanceService {
 				// dto.setSymbol(dto.getSymbol());
 				// }
 				BigDecimal price_now = Utils.getBigDecimal(dto.getPrice_now());
-				BigDecimal min_add_10_percent = Utils.getBigDecimal(priceList.get(idx_price_min));
-				min_add_10_percent = min_add_10_percent.multiply(BigDecimal.valueOf(Double.valueOf(1.05)));
+				BigDecimal min_add_5_percent = Utils.getBigDecimal(priceList.get(idx_price_min));
+				min_add_5_percent = min_add_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(1.05)));
+				BigDecimal max_subtract_5_percent = Utils.getBigDecimal(priceList.get(idx_price_max));
+				max_subtract_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(0.95)));
 
 				if (idx_price_min == 0) {
 					setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold"); // Min Price
@@ -429,13 +431,18 @@ public class BinanceServiceImpl implements BinanceService {
 					} else {
 						css.setStar("※Sale※");
 					}
-					css.setStar_css("bg-light text-primary font-weight-bold");
+					css.setStar_css("bg-white text-primary font-weight-bold");
 
 				} else if ((price_now.compareTo(BigDecimal.ZERO) > 0)
-						&& (price_now.compareTo(min_add_10_percent) < 0)) {
+						&& (max_subtract_5_percent.compareTo(price_now) < 0)) {
+
+					css.setStar("!Max5%");
+					css.setStar_css("bg-warning");
+
+				} else if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (price_now.compareTo(min_add_5_percent) < 0)) {
 
 					css.setStar("Sale5%");
-					css.setStar_css("bg-light");
+					css.setStar_css("bg-white text-primary font-weight-bold");
 
 				} else if (idx_price_min == 1) {
 

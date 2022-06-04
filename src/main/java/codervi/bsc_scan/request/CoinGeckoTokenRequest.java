@@ -8,4 +8,5 @@ public class CoinGeckoTokenRequest {
     private String symbol;
     private String name;
     private String note;
+    private Integer priority;
 }
