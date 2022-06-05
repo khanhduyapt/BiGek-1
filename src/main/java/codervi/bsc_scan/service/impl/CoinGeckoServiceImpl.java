@@ -17,9 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import codervi.bsc_scan.entity.BinanceVolumnDay;
+import codervi.bsc_scan.entity.BinanceVolumnDayKey;
 import codervi.bsc_scan.entity.CandidateCoin;
 import codervi.bsc_scan.entity.GeckoVolumnDay;
 import codervi.bsc_scan.entity.GeckoVolumnDayKey;
+import codervi.bsc_scan.repository.BinanceVolumnDayRepository;
 import codervi.bsc_scan.repository.CandidateCoinRepository;
 import codervi.bsc_scan.repository.GeckoVolumnDayRepository;
 import codervi.bsc_scan.request.CoinGeckoTokenRequest;
@@ -39,6 +42,9 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
 	@Autowired
 	private CandidateCoinRepository candidateCoinRepository;
+
+	@Autowired
+	private BinanceVolumnDayRepository binanceVolumnDayRepository;
 
 	@Autowired
 	private GeckoVolumnDayRepository geckoVolumnDayRepository;
@@ -477,6 +483,18 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
 			CandidateCoin entity = new CandidateCoin(request.getId(), request.getSymbol(), request.getName());
 			candidateCoinRepository.save(entity);
+
+			List<BinanceVolumnDay> days = new ArrayList<BinanceVolumnDay>();
+			for (int index = 1; index < 24; index++) {
+				String dd = String.valueOf(index);
+				if (dd.length() < 2) {
+					dd = "0" + dd;
+				}
+				BinanceVolumnDayKey id = new BinanceVolumnDayKey(request.getId(), request.getSymbol(), dd);
+				days.add(new BinanceVolumnDay(id, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
+			}
+
+			binanceVolumnDayRepository.saveAll(days);
 
 			log.info("End add success <---");
 			return new Response("200", "Ok", null, entity);

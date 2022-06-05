@@ -181,7 +181,7 @@ public class BinanceServiceImpl implements BinanceService {
 					+ "                                                                                           \n"
 					+ "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n"
 					+ "                                                                                           \n"
-					+ "   ROUND((cur.total_volume / COALESCE ((SELECT pre.total_volume FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 1000000000) * 100 - 100), 0) pre_4h_total_volume_up, \n"
+					+ "   ROUND((cur.total_volume / COALESCE ((SELECT (case when pre.total_volume = 0.0 then 1000000000 else pre.total_volume end) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 1000000000) * 100 - 100), 0) pre_4h_total_volume_up, \n"
 					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                      as vol_now, 	\n"
 					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as vol_pre_1h, \n"
 					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as vol_pre_2h, \n"
@@ -257,27 +257,44 @@ public class BinanceServiceImpl implements BinanceService {
 				CandidateTokenCssResponse css = new CandidateTokenCssResponse();
 				mapper.map(dto, css);
 
+				BigDecimal market_cap = Utils.getBigDecimal(dto.getMarket_cap());
+				BigDecimal gecko_total_volume = Utils.getBigDecimal(dto.getGecko_total_volume());
+
+				if (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0) {
+					css.setMarket_cap(
+							market_cap.divide(BigDecimal.valueOf(1000000000), 2, RoundingMode.CEILING).toString());
+				}
+
+				if (gecko_total_volume.compareTo(BigDecimal.valueOf(1000000000)) > 0) {
+					css.setGecko_total_volume(gecko_total_volume
+							.divide(BigDecimal.valueOf(1000000000), 2, RoundingMode.CEILING).toString());
+				}
+
 				BigDecimal volumn_binance_div_marketcap = BigDecimal.ZERO;
 				String volumn_binance_div_marketcap_str = "";
-				if (Utils.getBigDecimal(dto.getMarket_cap()).compareTo(BigDecimal.ZERO) > 0) {
-					volumn_binance_div_marketcap = Utils.getBigDecimal(dto.getVol_now())
-							.divide(Utils.getBigDecimal(dto.getMarket_cap()).divide(BigDecimal.valueOf(100000000), 5,
-									RoundingMode.CEILING), 1, RoundingMode.CEILING);
+				if (market_cap.compareTo(BigDecimal.ZERO) > 0) {
+					volumn_binance_div_marketcap = Utils.getBigDecimal(dto.getVol_now()).divide(
+							market_cap.divide(BigDecimal.valueOf(100000000), 5, RoundingMode.CEILING), 1,
+							RoundingMode.CEILING);
+				} else {
+					volumn_binance_div_marketcap = Utils.getBigDecimal(dto.getVol_now()).divide(
+							gecko_total_volume.divide(BigDecimal.valueOf(100000000), 5, RoundingMode.CEILING), 1,
+							RoundingMode.CEILING);
+				}
 
-					if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(30)) > 0) {
-						volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
-						css.setVolumn_binance_div_marketcap_css("font-weight-bold");
+				if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(30)) > 0) {
+					volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
+					css.setVolumn_binance_div_marketcap_css("font-weight-bold");
 
-					} else if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(20)) > 0) {
-						volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
-						css.setVolumn_binance_div_marketcap_css("text-primary");
+				} else if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(20)) > 0) {
+					volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
+					css.setVolumn_binance_div_marketcap_css("text-primary");
 
-					} else if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(10)) > 0) {
-						volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
+				} else if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(10)) > 0) {
+					volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
 
-					} else {
-						volumn_binance_div_marketcap_str = volumn_binance_div_marketcap.toString();
-					}
+				} else {
+					volumn_binance_div_marketcap_str = volumn_binance_div_marketcap.toString();
 				}
 
 				css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap_str);
@@ -286,14 +303,21 @@ public class BinanceServiceImpl implements BinanceService {
 				if (getValue(dto.getPre_4h_total_volume_up()) > Long.valueOf(200)) {
 					css.setPre_4h_total_volume_up_css("text-primary font-weight-bold");
 				}
-
+				// Volume
 				String pre_vol_history = dto.getVol_now() + "←" + dto.getVol_pre_1h() + "← " + dto.getVol_pre_2h() + "←"
 						+ dto.getVol_pre_3h() + "←" + dto.getVol_pre_4h() + "M";
+				if (pre_vol_history.length() > 35) {
+					pre_vol_history = pre_vol_history.substring(0, 35);
+				}
 				css.setPre_vol_history(pre_vol_history);
 
+				// Price
 				String pre_price_history = removeLastZero(dto.getPrice_now()) + "←"
 						+ removeLastZero(dto.getPrice_pre_1h()) + "← " + removeLastZero(dto.getPrice_pre_2h()) + "←"
 						+ removeLastZero(dto.getPrice_pre_3h()) + "←" + removeLastZero(dto.getPrice_pre_4h());
+				if (pre_price_history.length() > 35) {
+					pre_price_history = pre_price_history.substring(0, 35);
+				}
 				css.setPre_price_history(pre_price_history);
 
 				if (getValue(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
@@ -307,6 +331,9 @@ public class BinanceServiceImpl implements BinanceService {
 
 				String gecko_volumn_history = dto.getGec_vol_pre_1h() + "←" + dto.getGec_vol_pre_2h() + " ←"
 						+ dto.getGec_vol_pre_3h() + "←" + dto.getGec_vol_pre_4h() + "M";
+				if (gecko_volumn_history.length() > 35) {
+					gecko_volumn_history = gecko_volumn_history.substring(0, 35);
+				}
 				css.setGecko_volumn_history(gecko_volumn_history);
 
 				List<String> volList = new ArrayList<String>();
