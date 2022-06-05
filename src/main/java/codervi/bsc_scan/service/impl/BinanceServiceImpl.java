@@ -188,19 +188,20 @@ public class BinanceServiceImpl implements BinanceService {
 					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0) as vol_pre_3h, \n"
 					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as vol_pre_4h, \n"
 					+ "                                                                                           \n"
-					+ "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                      as price_now,    \n"
-					+ "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as price_pre_1h, \n"
-					+ "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as price_pre_2h, \n"
-					+ "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0) as price_pre_3h, \n"
-					+ "   coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as price_pre_4h, \n"
+					+ "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                     , 3) as price_now,    \n"
+					+ "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0), 3) as price_pre_1h, \n"
+					+ "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0), 3) as price_pre_2h, \n"
+					+ "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0), 3) as price_pre_3h, \n"
+					+ "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0), 3) as price_pre_4h, \n"
 					+ "                                                                                           \n"
 					+ "   can.market_cap ,                                                                        \n"
 					+ "   can.current_price,                                                                      \n"
 					+ "   can.total_volume                as gecko_total_volume,                                  \n"
-					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as gec_vol_pre_1h, \n"
-					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as gec_vol_pre_2h, \n"
-					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0) as gec_vol_pre_3h, \n"
-					+ "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as gec_vol_pre_4h, \n"
+					+ "                                                                                           \n"
+					+ "   ROUND(coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0), 3) as gec_vol_pre_1h, \n"
+					+ "   ROUND(coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0), 3) as gec_vol_pre_2h, \n"
+					+ "   ROUND(coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0), 3) as gec_vol_pre_3h, \n"
+					+ "   ROUND(coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0), 3) as gec_vol_pre_4h, \n"
 					+ "                                                                                           \n"
 					+ "   can.price_change_percentage_24h,                                                        \n"
 					+ "   can.price_change_percentage_7d,                                                         \n"
@@ -217,20 +218,20 @@ public class BinanceServiceImpl implements BinanceService {
 					+ "   can.backer,                                                                             \n"
 					+ "   can.note,                                                                               \n"
 					+ "                                                                                           \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() + interval '1 days', 'yyyyMMdd')) as today, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as day_0, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '1 days', 'yyyyMMdd')) as day_1, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '2 days', 'yyyyMMdd')) as day_2, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '3 days', 'yyyyMMdd')) as day_3, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '4 days', 'yyyyMMdd')) as day_4, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '5 days', 'yyyyMMdd')) as day_5, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '6 days', 'yyyyMMdd')) as day_6, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '7 days', 'yyyyMMdd')) as day_7, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '8 days', 'yyyyMMdd')) as day_8, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '9 days', 'yyyyMMdd')) as day_9, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '10 days', 'yyyyMMdd')) as day_10, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '11 days', 'yyyyMMdd')) as day_11, \n"
-					+ "   (select concat(w.total_volume, '~', w.avg_price) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '12 days', 'yyyyMMdd')) as day_12 \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() + interval '1 days', 'yyyyMMdd')) as today, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as day_0, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '1 days', 'yyyyMMdd')) as day_1, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '2 days', 'yyyyMMdd')) as day_2, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '3 days', 'yyyyMMdd')) as day_3, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '4 days', 'yyyyMMdd')) as day_4, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '5 days', 'yyyyMMdd')) as day_5, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '6 days', 'yyyyMMdd')) as day_6, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '7 days', 'yyyyMMdd')) as day_7, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '8 days', 'yyyyMMdd')) as day_8, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '9 days', 'yyyyMMdd')) as day_9, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '10 days', 'yyyyMMdd')) as day_10, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '11 days', 'yyyyMMdd')) as day_11, \n"
+					+ "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 3)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '12 days', 'yyyyMMdd')) as day_12 \n"
 					+ "                                                                                           \n"
 					+ " from                                                                                      \n"
 					+ "   candidate_coin can,                                                                     \n"
@@ -238,6 +239,7 @@ public class BinanceServiceImpl implements BinanceService {
 					+ "                                                                                           \n"
 					+ " where                                                                                     \n"
 					+ "       cur.hh = TO_CHAR(NOW(), 'HH24')                                                     \n"
+					+ "   AND ( ((can.market_cap > 0) AND (ROUND(can.volumn_div_marketcap * 100, 0) > 10)) OR (can.market_cap = 0) OR (coalesce(can.priority, 3) < 3)) \n"
 					+ "   and can.gecko_id = cur.gecko_id                                                         \n"
 					+ "   and can.symbol = cur.symbol                                                             \n"
 					+ " order by                                                                                  \n"
@@ -312,14 +314,14 @@ public class BinanceServiceImpl implements BinanceService {
 
 				List<String> temp = splitVolAndPrice(css.getToday());
 				css.setToday_vol(temp.get(0));
-				css.setToday_price(temp.get(1));
+				css.setToday_price(removeLastZero(temp.get(1)));
 				volList.add("");
 				priceList.add(temp.get(1));
 				BigDecimal vol_today = Utils.getBigDecimal(temp.get(0).replace(",", ""));
 
 				temp = splitVolAndPrice(css.getDay_0());
 				css.setDay_0_vol(temp.get(0));
-				css.setDay_0_price(temp.get(1));
+				css.setDay_0_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 				BigDecimal vol_yesterday = Utils.getBigDecimal(temp.get(0).replace(",", ""));
@@ -334,73 +336,73 @@ public class BinanceServiceImpl implements BinanceService {
 
 				temp = splitVolAndPrice(css.getDay_1());
 				css.setDay_1_vol(temp.get(0));
-				css.setDay_1_price(temp.get(1));
+				css.setDay_1_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_2());
 				css.setDay_2_vol(temp.get(0));
-				css.setDay_2_price(temp.get(1));
+				css.setDay_2_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_3());
 				css.setDay_3_vol(temp.get(0));
-				css.setDay_3_price(temp.get(1));
+				css.setDay_3_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_4());
 				css.setDay_4_vol(temp.get(0));
-				css.setDay_4_price(temp.get(1));
+				css.setDay_4_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_5());
 				css.setDay_5_vol(temp.get(0));
-				css.setDay_5_price(temp.get(1));
+				css.setDay_5_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_6());
 				css.setDay_6_vol(temp.get(0));
-				css.setDay_6_price(temp.get(1));
+				css.setDay_6_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_7());
 				css.setDay_7_vol(temp.get(0));
-				css.setDay_7_price(temp.get(1));
+				css.setDay_7_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_8());
 				css.setDay_8_vol(temp.get(0));
-				css.setDay_8_price(temp.get(1));
+				css.setDay_8_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_9());
 				css.setDay_9_vol(temp.get(0));
-				css.setDay_9_price(temp.get(1));
+				css.setDay_9_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_10());
 				css.setDay_10_vol(temp.get(0));
-				css.setDay_10_price(temp.get(1));
+				css.setDay_10_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_11());
 				css.setDay_11_vol(temp.get(0));
-				css.setDay_11_price(temp.get(1));
+				css.setDay_11_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
 				temp = splitVolAndPrice(css.getDay_12());
 				css.setDay_12_vol(temp.get(0));
-				css.setDay_12_price(temp.get(1));
+				css.setDay_12_price(removeLastZero(temp.get(1)));
 				volList.add(temp.get(0));
 				priceList.add(temp.get(1));
 
@@ -409,23 +411,29 @@ public class BinanceServiceImpl implements BinanceService {
 				int idx_vol_min = getIndexMin(volList);
 				int idx_price_min = getIndexMin(priceList);
 
-				setVolumnDayCss(css, idx_vol_max, "text-primary"); // Max Volumn
-				setPriceDayCss(css, idx_price_max, "text-primary"); // Max Price
-				setVolumnDayCss(css, idx_vol_min, "text-danger"); // Min Volumn
-				setPriceDayCss(css, idx_price_min, "text-danger"); // Min Price
+				String str_down = "";
 
-				// Debug
-				// if (Objects.equals("PSG", dto.getSymbol())) {
-				// dto.setSymbol(dto.getSymbol());
-				// }
+				if (Utils.getBigDecimal(priceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
+					BigDecimal down = Utils.getBigDecimal(priceList.get(idx_price_max))
+							.divide(Utils.getBigDecimal(priceList.get(idx_price_min)), 2, RoundingMode.CEILING)
+							.multiply(BigDecimal.valueOf(100));
+					str_down = "(" + down.subtract(BigDecimal.valueOf(100)).toString().replace(".00", "") + "%)";
+				}
+				setVolumnDayCss(css, idx_vol_max, "text-primary"); // Max Volumn
+				setPriceDayCss(css, idx_price_max, "text-primary", ""); // Max Price
+				setVolumnDayCss(css, idx_vol_min, "text-danger"); // Min Volumn
+				setPriceDayCss(css, idx_price_min, "text-danger", str_down); // Min Price
+
 				BigDecimal price_now = Utils.getBigDecimal(dto.getPrice_now());
+
 				BigDecimal min_add_5_percent = Utils.getBigDecimal(priceList.get(idx_price_min));
 				min_add_5_percent = min_add_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(1.05)));
+
 				BigDecimal max_subtract_5_percent = Utils.getBigDecimal(priceList.get(idx_price_max));
 				max_subtract_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(0.95)));
 
 				if (idx_price_min == 0) {
-					setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold"); // Min Price
+					setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
 					if (!Objects.equals(null, css.getStar()) && !Objects.equals("", String.valueOf(css.getStar()))) {
 						css.setStar("※Sale※" + " " + css.getStar());
 					} else {
@@ -444,9 +452,13 @@ public class BinanceServiceImpl implements BinanceService {
 					css.setStar("Sale5%");
 					css.setStar_css("bg-white text-primary font-weight-bold");
 
+				} else if (idx_vol_min == 1) {
+
+					css.setStar("Sale Yesterday");
+
 				} else if (idx_price_min == 1) {
 
-					setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold"); // Min Price
+					setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
 
 				}
 
@@ -563,49 +575,63 @@ public class BinanceServiceImpl implements BinanceService {
 		}
 	}
 
-	private void setPriceDayCss(CandidateTokenCssResponse css, int index, String css_class) {
+	private void setPriceDayCss(CandidateTokenCssResponse css, int index, String css_class, String percent) {
 		switch (index) {
 		case 0:
 			css.setToday_price_css(css_class);
+			css.setToday_price(css.getToday_price() + percent);
 			break;
 		case 1:
 			css.setDay_0_price_css(css_class);
+			css.setDay_0_price(css.getDay_0_price() + percent);
 			break;
 		case 2:
 			css.setDay_1_price_css(css_class);
+			css.setDay_1_price(css.getDay_1_price() + percent);
 			break;
 		case 3:
 			css.setDay_2_price_css(css_class);
+			css.setDay_2_price(css.getDay_2_price() + percent);
 			break;
 		case 4:
 			css.setDay_3_price_css(css_class);
+			css.setDay_3_price(css.getDay_3_price() + percent);
 			break;
 		case 5:
 			css.setDay_4_price_css(css_class);
+			css.setDay_4_price(css.getDay_4_price() + percent);
 			break;
 		case 6:
 			css.setDay_5_price_css(css_class);
+			css.setDay_5_price(css.getDay_5_price() + percent);
 			break;
 		case 7:
 			css.setDay_6_price_css(css_class);
+			css.setDay_6_price(css.getDay_6_price() + percent);
 			break;
 		case 8:
 			css.setDay_7_price_css(css_class);
+			css.setDay_7_price(css.getDay_7_price() + percent);
 			break;
 		case 9:
 			css.setDay_8_price_css(css_class);
+			css.setDay_8_price(css.getDay_8_price() + percent);
 			break;
 		case 10:
 			css.setDay_9_price_css(css_class);
+			css.setDay_9_price(css.getDay_9_price() + percent);
 			break;
 		case 11:
 			css.setDay_10_price_css(css_class);
+			css.setDay_10_price(css.getDay_10_price() + percent);
 			break;
 		case 12:
 			css.setDay_11_price_css(css_class);
+			css.setDay_11_price(css.getDay_11_price() + percent);
 			break;
 		case 13:
 			css.setDay_12_price_css(css_class);
+			css.setDay_12_price(css.getDay_12_price() + percent);
 			break;
 		}
 	}
@@ -632,8 +658,12 @@ public class BinanceServiceImpl implements BinanceService {
 		if (Objects.equals("0", value.subSequence(value.length() - 1, value.length()))) {
 			String str = value.substring(0, value.length() - 1);
 			return removeLastZero(str);
-		} else {
-			return value;
 		}
+
+		if (value.indexOf(".") == value.length() - 1) {
+			return value + "0";
+		}
+
+		return value;
 	}
 }
