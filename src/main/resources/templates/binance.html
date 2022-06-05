@@ -44,7 +44,7 @@ p {
 }
 
 .table td, .table th {
-	padding: 0.5rem !important;
+	padding: 0.25rem !important;
 	vertical-align: middle !important;
 }
 </style>
@@ -115,7 +115,7 @@ p {
 							th:text="${token.symbol}"></span></a>
 						<p style="font-size: 0.7rem !important;" th:text="${token.trend}"></td>
 
-					<td style="max-width: 125px !important;"><a th:target="_blank"
+					<td style="width: 150px; max-width: 150px !important;"><a th:target="_blank"
 						th:href="${token.coin_gecko_link}"> <span
 							th:text="${token.name}"></span></a>
 						<p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
