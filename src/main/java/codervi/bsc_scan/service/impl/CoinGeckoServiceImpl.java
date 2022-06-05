@@ -167,11 +167,9 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 			if (String.valueOf(str_categories).toLowerCase().indexOf("gaming") > 0) {
 				trend = "Game";
 			} else if (String.valueOf(str_categories).toLowerCase().indexOf("earn") > 0) {
-				trend = "Game";
+				trend = "Earn";
 			} else if (String.valueOf(str_categories).toLowerCase().indexOf("nft") > 0) {
-				trend = "Game";
-			} else if (String.valueOf(str_categories).toLowerCase().indexOf("metaverse") > 0) {
-				trend = "Game";
+				trend = "NFT";
 			} else if (String.valueOf(str_categories).toLowerCase().indexOf("fan") > 0) {
 				trend = "Fan Token";
 			} else if (String.valueOf(str_categories).toLowerCase().indexOf("lending") > 0) {
@@ -198,6 +196,8 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 				trend = "Platform";
 			} else if (String.valueOf(str_categories).toLowerCase().indexOf("web3") > 0) {
 				trend = "Web3";
+			} else if (String.valueOf(str_categories).toLowerCase().indexOf("metaverse") > 0) {
+				trend = "Metaverse";
 			}
 
 			String backer = "";

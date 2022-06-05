@@ -68,7 +68,7 @@ p {
 					<th class="text-center" scope="col">Volume</th>
 
 					<th class="text-center text-primary" scope="col">v/mc</th>
-					<th class="text-center" scope="col">v4h</th>
+					<th class="text-center" scope="col">V4h Binance</th>
 
 					<th class="text-center" scope="col">Price</th>
 					<th class="text-center" scope="col">%24h</th>
@@ -113,12 +113,12 @@ p {
 					<td style="max-width: 80px !important;"><a th:target="_blank"
 						th:href="${token.binance_trade}"><span
 							th:text="${token.symbol}"></span></a>
-						<p style="font-size: 0.8rem !important;" th:text="${token.trend}"></td>
+						<p style="font-size: 0.7rem !important;" th:text="${token.trend}"></td>
 
 					<td style="max-width: 125px !important;"><a th:target="_blank"
 						th:href="${token.coin_gecko_link}"> <span
 							th:text="${token.name}"></span></a>
-						<p style="font-size: 0.8rem !important;" th:text="${token.note}"></p>
+						<p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
 					</td>
 
 					<td style="text-align: right; max-width: 110px !important;"
@@ -140,7 +140,7 @@ p {
 					<td style="text-align: right; max-width: 120px !important;">
 						<p th:classappend="${token.pre_4h_total_volume_up_css}"
 							th:text="${token.pre_4h_total_volume_up}">
-						<p style="font-size: 0.8rem !important;"
+						<p style="font-size: 0.7rem !important;"
 							th:text="${token.pre_vol_history}">
 					</td>
 
