@@ -357,7 +357,7 @@ public class BinanceServiceImpl implements BinanceService {
 					BigDecimal vol_up = vol_today.divide(vol_yesterday, 1, RoundingMode.CEILING);
 					if (BigDecimal.valueOf(1).compareTo(vol_up) == -1) {
 						css.setStar("※Up:" + String.valueOf(vol_up));
-						css.setStar_css("bg-light");
+						css.setStar_css("text-primary");
 					}
 				}
 
@@ -466,22 +466,22 @@ public class BinanceServiceImpl implements BinanceService {
 					} else {
 						css.setStar("※Sale※");
 					}
-					css.setStar_css("bg-white text-primary font-weight-bold");
+					css.setStar_css("text-primary font-weight-bold");
 
 				} else if ((price_now.compareTo(BigDecimal.ZERO) > 0)
 						&& (max_subtract_5_percent.compareTo(price_now) < 0)) {
 
 					css.setStar("!Max5%");
-					css.setStar_css("bg-warning");
+					css.setStar_css("bg-warning rounded-lg");
 
 				} else if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (price_now.compareTo(min_add_5_percent) < 0)) {
 
 					css.setStar("Sale5%");
-					css.setStar_css("bg-white text-primary font-weight-bold");
+					css.setStar_css("text-primary font-weight-bold");
 
 				} else if (idx_vol_min == 1) {
 
-					css.setStar("Sale Yesterday");
+					css.setStar("Vol min Yesterday");
 
 				} else if (idx_price_min == 1) {
 
