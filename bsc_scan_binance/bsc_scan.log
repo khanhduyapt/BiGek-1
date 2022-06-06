@@ -1786,3 +1786,37 @@
 2022-06-06 21:47:12.263  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:77/227; id:republic-protocol; Symbol:REN
 2022-06-06 21:47:12.857  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:78/227; id:ocean-protocol; Symbol:OCEAN
 2022-06-06 21:47:13.433  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:79/227; id:dent; Symbol:DENT
+2022-06-06 21:47:13.986  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:80/227; id:league-of-kingdoms; Symbol:LOKA
+2022-06-06 21:47:14.560  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:81/227; id:spell-token; Symbol:SPELL
+2022-06-06 21:47:15.131  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:82/227; id:frontier-token; Symbol:FRONT
+2022-06-06 21:47:15.694  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:83/227; id:omisego; Symbol:OMG
+2022-06-06 21:47:16.271  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:84/227; id:chromaway; Symbol:CHR
+2022-06-06 21:47:16.816  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:85/227; id:benqi; Symbol:QI
+2022-06-06 21:47:17.394  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:86/227; id:just; Symbol:JST
+2022-06-06 21:47:17.984  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:87/227; id:nuls; Symbol:NULS
+2022-06-06 21:47:18.546  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:88/227; id:fetch-ai; Symbol:FET
+2022-06-06 21:47:19.118  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:89/227; id:request-network; Symbol:REQ
+2022-06-06 21:47:19.681  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:90/227; id:dego-finance; Symbol:DEGO
+2022-06-06 21:47:20.258  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:91/227; id:tellor; Symbol:TRB
+2022-06-06 21:47:20.848  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:92/227; id:selfkey; Symbol:KEY
+2022-06-06 21:47:21.423  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:93/227; id:atletico-madrid; Symbol:ATM
+2022-06-06 21:47:21.984  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:94/227; id:utrust; Symbol:UTK
+2022-06-06 21:47:22.548  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:95/227; id:swipe; Symbol:SXP
+2022-06-06 21:47:23.125  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:96/227; id:concentrated-voting-power; Symbol:CVP
+2022-06-06 21:47:23.698  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:97/227; id:alpine-f1-team-fan-token; Symbol:ALPINE
+2022-06-06 21:47:24.270  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:98/227; id:curve-dao-token; Symbol:CRV
+2022-06-06 21:47:24.847  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:99/227; id:mantra-dao; Symbol:OM
+2022-06-06 21:47:25.422  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:100/227; id:serum; Symbol:SRM
+2022-06-06 21:47:25.984  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:101/227; id:coin98; Symbol:C98
+2022-06-06 21:47:26.506  INFO 4348 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-06-06 21:47:26.515  INFO 4348 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-06-06 21:47:26.575  INFO 4348 --- [main] b.BscScanBinanceApplication              : idx:102/227; id:ooki; Symbol:OOKI
+2022-06-06 21:47:26.837 ERROR 4348 --- [main] b.BscScanBinanceApplication              : dkd error LoadData:Error creating bean with name 'spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties': Could not bind properties to 'DataSourceProperties' : prefix=spring.datasource, ignoreInvalidFields=false, ignoreUnknownFields=true; nested exception is java.lang.IllegalStateException: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@78ffe6dc has been closed already
+2022-06-06 21:52:10.586  INFO 220 --- [main] b.BscScanBinanceApplicationTests         : Starting BscScanBinanceApplicationTests using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 220 (started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 21:52:10.589  INFO 220 --- [main] b.BscScanBinanceApplicationTests         : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 21:52:13.398  INFO 220 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 21:52:13.497  INFO 220 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 21:52:13.964  INFO 220 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 21:52:14.343  INFO 220 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 21:52:15.436  INFO 220 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 21:52:18.553  INFO 220 --- [main] b.BscScanBinanceApplicationTests         : Started BscScanBinanceApplicationTests in 8.615 seconds (JVM running for 10.537)

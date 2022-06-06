@@ -15,7 +15,7 @@
 	<name>bsc_scan_binance</name>
 	<description>get price from binance</description>
 	<properties>
-		<java.version>18</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
