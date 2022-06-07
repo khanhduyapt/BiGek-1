@@ -1820,3 +1820,1214 @@
 2022-06-06 21:52:14.343  INFO 220 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
 2022-06-06 21:52:15.436  INFO 220 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
 2022-06-06 21:52:18.553  INFO 220 --- [main] b.BscScanBinanceApplicationTests         : Started BscScanBinanceApplicationTests in 8.615 seconds (JVM running for 10.537)
+2022-06-06 23:28:43.774  INFO 11240 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 11240 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:28:43.776  INFO 11240 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:28:45.160  INFO 11240 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:28:45.161  INFO 11240 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:28:45.343  INFO 11240 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:28:45.548  INFO 11240 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:28:45.599  INFO 11240 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:28:45.836  INFO 11240 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:28:46.101  INFO 11240 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:28:46.837  INFO 11240 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:28:47.838  INFO 11240 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 4.808 seconds (JVM running for 5.975)
+2022-06-06 23:28:48.006  INFO 11240 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:28:48.400  INFO 11240 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:28:49.353  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:28:50.039  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:28:50.572  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:28:51.084  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:28:51.585  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:ramp; Symbol:RAMP
+2022-06-06 23:28:52.148  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:28:52.631  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:28:53.142  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:28:53.625  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:28:54.056  INFO 11240 --- [http-nio-8090-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:28:54.090  INFO 11240 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:28:54.112  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:28:54.672  INFO 11240 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : End getList <--
+2022-06-06 23:28:54.734  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:28:55.218  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:28:55.725  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:28:56.208  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:28:56.679  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:28:57.152  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:28:57.665  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:dexe; Symbol:DEXE
+2022-06-06 23:28:58.153  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:optimism; Symbol:OP
+2022-06-06 23:28:58.636  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:28:59.131  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:28:59.597  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:waves; Symbol:WAVES
+2022-06-06 23:29:00.064  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:29:00.548  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:29:01.046  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:balancer; Symbol:BAL
+2022-06-06 23:29:01.531  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:steem; Symbol:STEEM
+2022-06-06 23:29:02.012  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:29:02.498  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:29:02.997  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:gifto; Symbol:GTO
+2022-06-06 23:29:03.250  INFO 11240 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:29:03.293  WARN 11240 --- [http-nio-8090-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42703
+2022-06-06 23:29:03.293 ERROR 11240 --- [http-nio-8090-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: column can.priority does not exist
+  Position: 10391
+2022-06-06 23:29:03.306  INFO 11240 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:29:03.307 ERROR 11240 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:29:03.609  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:29:04.094  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:linear; Symbol:LINA
+2022-06-06 23:29:04.578  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:29:05.059  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:29:05.546  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:29:06.013  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:29:06.512  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:29:06.990  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:29:07.474  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:29:07.994  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:29:08.017  INFO 11240 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-06-06 23:29:08.030  INFO 11240 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-06-06 23:29:08.271 ERROR 11240 --- [main] b.BscScanBinanceApplication              : dkd error LoadData:Error creating bean with name 'spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties': Could not bind properties to 'DataSourceProperties' : prefix=spring.datasource, ignoreInvalidFields=false, ignoreUnknownFields=true; nested exception is java.lang.IllegalStateException: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@78ffe6dc has been closed already
+2022-06-06 23:35:04.902  INFO 6480 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 6480 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:35:04.905  INFO 6480 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:35:06.308  INFO 6480 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:35:06.309  INFO 6480 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:35:06.477  INFO 6480 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:35:06.659  INFO 6480 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:35:06.709  INFO 6480 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:35:06.939  INFO 6480 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:35:07.170  INFO 6480 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:35:07.779  INFO 6480 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:35:08.731  INFO 6480 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 4.338 seconds (JVM running for 5.386)
+2022-06-06 23:35:08.886  INFO 6480 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:35:09.303  INFO 6480 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:35:10.449  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:35:10.961  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:35:11.442  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:35:11.943  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:35:12.469  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:ramp; Symbol:RAMP
+2022-06-06 23:35:12.969  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:35:13.548  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:35:14.045  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:35:14.531  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:35:14.616  INFO 6480 --- [http-nio-8090-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:35:14.678  INFO 6480 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:35:14.785  WARN 6480 --- [http-nio-8090-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42883
+2022-06-06 23:35:14.785 ERROR 6480 --- [http-nio-8090-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: function conat(numeric, unknown, numeric) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Position: 9082
+2022-06-06 23:35:15.044  INFO 6480 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:35:15.045 ERROR 6480 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:35:15.263  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:35:15.735  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:35:16.224  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:35:16.708  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:35:17.189  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:35:17.676  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:35:18.174  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:35:18.675  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:optimism; Symbol:OP
+2022-06-06 23:35:19.158  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:dexe; Symbol:DEXE
+2022-06-06 23:35:19.638  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:35:20.124  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:35:20.606  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:waves; Symbol:WAVES
+2022-06-06 23:35:21.106  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:35:21.590  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:35:22.070  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:balancer; Symbol:BAL
+2022-06-06 23:35:22.551  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:steem; Symbol:STEEM
+2022-06-06 23:35:23.034  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:35:23.517  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:35:23.983  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:gifto; Symbol:GTO
+2022-06-06 23:35:24.481  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:35:24.949  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:linear; Symbol:LINA
+2022-06-06 23:35:25.420  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:35:25.933  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:35:26.418  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:35:26.901  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:35:26.976  INFO 6480 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:35:26.981  WARN 6480 --- [http-nio-8090-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42883
+2022-06-06 23:35:26.981 ERROR 6480 --- [http-nio-8090-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: function conat(numeric, unknown, numeric) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Position: 9082
+2022-06-06 23:35:26.987  INFO 6480 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:35:26.988 ERROR 6480 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:35:27.385  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:35:27.886  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:35:28.365  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:35:28.865  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:mirror-protocol; Symbol:MIR
+2022-06-06 23:35:29.346  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:38/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:35:29.830  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:39/227; id:santos-fc-fan-token; Symbol:SANTOS
+2022-06-06 23:35:30.330  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:40/227; id:reef-finance; Symbol:REEF
+2022-06-06 23:35:30.826  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:41/227; id:storj; Symbol:STORJ
+2022-06-06 23:35:31.308  INFO 6480 --- [main] b.BscScanBinanceApplication              : idx:42/227; id:cortex; Symbol:CTXC
+2022-06-06 23:35:31.464  INFO 6480 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-06-06 23:35:31.473  INFO 6480 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-06-06 23:35:31.564 ERROR 6480 --- [main] b.BscScanBinanceApplication              : dkd error LoadData:Error creating bean with name 'spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties': Could not bind properties to 'DataSourceProperties' : prefix=spring.datasource, ignoreInvalidFields=false, ignoreUnknownFields=true; nested exception is java.lang.IllegalStateException: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@78ffe6dc has been closed already
+2022-06-06 23:35:34.141  INFO 4960 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 4960 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:35:34.144  INFO 4960 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:35:35.835  INFO 4960 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:35:35.835  INFO 4960 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:35:35.984  INFO 4960 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:35:36.228  INFO 4960 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:35:36.294  INFO 4960 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:35:36.537  INFO 4960 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:35:36.791  INFO 4960 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:35:37.555  INFO 4960 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:35:38.661  INFO 4960 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.133 seconds (JVM running for 6.606)
+2022-06-06 23:35:38.852  INFO 4960 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:35:39.234  INFO 4960 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:35:40.233  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:35:40.747  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:35:41.290  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:35:41.819  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:35:42.304  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:ramp; Symbol:RAMP
+2022-06-06 23:35:42.804  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:35:43.299  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:35:43.820  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:35:44.305  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:35:44.819  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:35:45.487  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:35:45.996  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:35:46.517  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:35:47.011  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:35:47.493  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:35:47.765  INFO 4960 --- [http-nio-8090-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:35:47.810  INFO 4960 --- [http-nio-8090-exec-3] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:35:48.276  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:35:48.920  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:optimism; Symbol:OP
+2022-06-06 23:35:49.631  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:dexe; Symbol:DEXE
+2022-06-06 23:35:50.109  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:35:50.591  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:35:51.087  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:waves; Symbol:WAVES
+2022-06-06 23:35:51.570  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:35:52.053  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:35:52.538  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:balancer; Symbol:BAL
+2022-06-06 23:35:53.017  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:steem; Symbol:STEEM
+2022-06-06 23:35:53.515  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:35:53.983  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:35:54.465  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:gifto; Symbol:GTO
+2022-06-06 23:35:54.942  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:35:55.423  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:linear; Symbol:LINA
+2022-06-06 23:35:55.908  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:35:56.389  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:35:57.044  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:35:57.527  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:35:58.022  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:35:58.493  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:35:58.985  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:35:59.484  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:mirror-protocol; Symbol:MIR
+2022-06-06 23:35:59.964  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:38/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:36:00.519  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:39/227; id:santos-fc-fan-token; Symbol:SANTOS
+2022-06-06 23:36:00.563  WARN 4960 --- [http-nio-8090-exec-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42883
+2022-06-06 23:36:00.564 ERROR 4960 --- [http-nio-8090-exec-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: function conat(numeric, unknown, numeric) does not exist
+  Hint: No function matches the given name and argument types. You might need to add explicit type casts.
+  Position: 9082
+2022-06-06 23:36:00.584  INFO 4960 --- [http-nio-8090-exec-3] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:36:00.585 ERROR 4960 --- [http-nio-8090-exec-3] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:36:00.999  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:40/227; id:reef-finance; Symbol:REEF
+2022-06-06 23:36:01.469  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:41/227; id:cortex; Symbol:CTXC
+2022-06-06 23:36:01.871  INFO 4960 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-06-06 23:36:01.885  INFO 4960 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-06-06 23:36:01.949  INFO 4960 --- [main] b.BscScanBinanceApplication              : idx:42/227; id:storj; Symbol:STORJ
+2022-06-06 23:36:02.196 ERROR 4960 --- [main] b.BscScanBinanceApplication              : dkd error LoadData:Error creating bean with name 'spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties': Could not bind properties to 'DataSourceProperties' : prefix=spring.datasource, ignoreInvalidFields=false, ignoreUnknownFields=true; nested exception is java.lang.IllegalStateException: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@246f8b8b has been closed already
+2022-06-06 23:36:41.937  INFO 12048 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 12048 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:36:41.939  INFO 12048 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:36:43.671  INFO 12048 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:36:43.672  INFO 12048 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:36:43.817  INFO 12048 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:36:44.035  INFO 12048 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:36:44.102  INFO 12048 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:36:44.368  INFO 12048 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:36:44.627  INFO 12048 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:36:45.433  INFO 12048 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:36:46.548  INFO 12048 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.206 seconds (JVM running for 6.451)
+2022-06-06 23:36:46.740  INFO 12048 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:36:47.120  INFO 12048 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:36:48.143  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:36:48.625  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:36:49.141  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:36:49.840  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:36:50.666  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:ramp; Symbol:RAMP
+2022-06-06 23:36:51.168  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:36:51.668  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:36:52.165  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:36:52.818  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:36:53.301  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:36:53.784  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:36:54.363  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:36:55.080  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:36:55.117  INFO 12048 --- [http-nio-8090-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:36:55.178  INFO 12048 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:36:55.589  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:36:56.071  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:36:56.556  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:36:57.038  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:optimism; Symbol:OP
+2022-06-06 23:36:57.515  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:dexe; Symbol:DEXE
+2022-06-06 23:36:57.997  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:36:58.480  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:36:58.964  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:waves; Symbol:WAVES
+2022-06-06 23:36:59.446  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:36:59.879  WARN 12048 --- [http-nio-8090-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42883
+2022-06-06 23:36:59.879 ERROR 12048 --- [http-nio-8090-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: operator does not exist: numeric = money
+  Hint: No operator matches the given name and argument types. You might need to add explicit type casts.
+  Position: 10601
+2022-06-06 23:36:59.903  INFO 12048 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:36:59.903 ERROR 12048 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:36:59.945  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:37:00.429  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:balancer; Symbol:BAL
+2022-06-06 23:37:00.916  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:steem; Symbol:STEEM
+2022-06-06 23:37:01.397  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:37:01.867  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:37:02.337  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:gifto; Symbol:GTO
+2022-06-06 23:37:02.803  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:37:03.271  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:linear; Symbol:LINA
+2022-06-06 23:37:03.770  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:37:04.269  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:37:04.800  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:37:05.284  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:37:05.602  INFO 12048 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-06-06 23:37:05.614  INFO 12048 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-06-06 23:37:05.765  INFO 12048 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:37:06.049 ERROR 12048 --- [main] b.BscScanBinanceApplication              : dkd error LoadData:Error creating bean with name 'spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties': Could not bind properties to 'DataSourceProperties' : prefix=spring.datasource, ignoreInvalidFields=false, ignoreUnknownFields=true; nested exception is java.lang.IllegalStateException: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@246f8b8b has been closed already
+2022-06-06 23:38:33.657  INFO 2816 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 2816 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:38:33.658  INFO 2816 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:38:35.299  INFO 2816 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:38:35.299  INFO 2816 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:38:35.440  INFO 2816 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:38:35.656  INFO 2816 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:38:35.723  INFO 2816 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:38:35.979  INFO 2816 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:38:36.225  INFO 2816 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:38:37.010  INFO 2816 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:38:38.107  INFO 2816 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.047 seconds (JVM running for 6.214)
+2022-06-06 23:38:38.289  INFO 2816 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:38:38.680  INFO 2816 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:38:39.839  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:38:40.488  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:38:41.126  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:38:41.750  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:38:42.378  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:ramp; Symbol:RAMP
+2022-06-06 23:38:43.002  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:38:43.608  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:38:44.234  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:38:44.871  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:38:45.510  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:38:46.119  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:38:46.722  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:38:47.330  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:38:47.938  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:38:48.544  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:38:49.155  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:38:49.763  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:optimism; Symbol:OP
+2022-06-06 23:38:50.383  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:dexe; Symbol:DEXE
+2022-06-06 23:38:50.995  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:38:51.882  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:38:52.479  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:waves; Symbol:WAVES
+2022-06-06 23:38:53.090  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:38:53.670  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:38:54.482  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:balancer; Symbol:BAL
+2022-06-06 23:38:55.072  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:steem; Symbol:STEEM
+2022-06-06 23:38:55.681  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:38:56.463  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:38:57.084  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:gifto; Symbol:GTO
+2022-06-06 23:38:57.688  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:38:58.280  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:linear; Symbol:LINA
+2022-06-06 23:38:58.873  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:38:59.464  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:39:00.039  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:39:00.632  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:39:01.240  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:39:01.833  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:39:02.440  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:39:03.050  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:mirror-protocol; Symbol:MIR
+2022-06-06 23:39:03.659  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:38/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:39:04.248  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:39/227; id:santos-fc-fan-token; Symbol:SANTOS
+2022-06-06 23:39:04.873  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:40/227; id:reef-finance; Symbol:REEF
+2022-06-06 23:39:05.494  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:41/227; id:cortex; Symbol:CTXC
+2022-06-06 23:39:06.105  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:42/227; id:storj; Symbol:STORJ
+2022-06-06 23:39:06.681  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:43/227; id:harvest-finance; Symbol:FARM
+2022-06-06 23:39:07.272  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:44/227; id:clover-finance; Symbol:CLV
+2022-06-06 23:39:07.877  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:45/227; id:lazio-fan-token; Symbol:LAZIO
+2022-06-06 23:39:08.469  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:46/227; id:mask-network; Symbol:MASK
+2022-06-06 23:39:09.011  INFO 2816 --- [http-nio-8090-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:39:09.055  INFO 2816 --- [http-nio-8090-exec-3] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:39:09.155  WARN 2816 --- [http-nio-8090-exec-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42601
+2022-06-06 23:39:09.156 ERROR 2816 --- [http-nio-8090-exec-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: syntax error at or near "end"
+  Position: 10689
+2022-06-06 23:39:09.174  INFO 2816 --- [http-nio-8090-exec-3] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:39:09.174 ERROR 2816 --- [http-nio-8090-exec-3] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:39:09.247  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:47/227; id:radicle; Symbol:RAD
+2022-06-06 23:39:09.825  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:48/227; id:band-protocol; Symbol:BAND
+2022-06-06 23:39:10.425  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:49/227; id:tokenclub; Symbol:TCT
+2022-06-06 23:39:11.008  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:50/227; id:dydx; Symbol:DYDX
+2022-06-06 23:39:11.590  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:51/227; id:mainframe; Symbol:MFT
+2022-06-06 23:39:12.180  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:52/227; id:reserve-rights-token; Symbol:RSR
+2022-06-06 23:39:12.803  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:53/227; id:marlin; Symbol:POND
+2022-06-06 23:39:13.411  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:54/227; id:sushi; Symbol:SUSHI
+2022-06-06 23:39:14.016  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:55/227; id:aragon; Symbol:ANT
+2022-06-06 23:39:14.623  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:56/227; id:litentry; Symbol:LIT
+2022-06-06 23:39:15.245  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:57/227; id:wing-finance; Symbol:WING
+2022-06-06 23:39:15.837  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:58/227; id:terra-virtua-kolect; Symbol:TVK
+2022-06-06 23:39:16.443  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:59/227; id:coin98; Symbol:C98
+2022-06-06 23:39:17.051  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:60/227; id:yield-guild-games; Symbol:YGG
+2022-06-06 23:39:17.612  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:61/227; id:celer-network; Symbol:CELR
+2022-06-06 23:39:18.189  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:62/227; id:oasis-network; Symbol:ROSE
+2022-06-06 23:39:18.780  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:63/227; id:beefy-finance; Symbol:BIFI
+2022-06-06 23:39:19.375  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:64/227; id:ethernity-chain; Symbol:ERN
+2022-06-06 23:39:19.982  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:65/227; id:stratis; Symbol:STRAX
+2022-06-06 23:39:20.550  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:66/227; id:troy; Symbol:TROY
+2022-06-06 23:39:21.130  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:67/227; id:aurora-dao; Symbol:IDEX
+2022-06-06 23:39:21.723  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:68/227; id:qtum; Symbol:QTUM
+2022-06-06 23:39:22.331  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:69/227; id:raydium; Symbol:RAY
+2022-06-06 23:39:22.925  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:70/227; id:biconomy; Symbol:BICO
+2022-06-06 23:39:23.517  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:71/227; id:arpa-chain; Symbol:ARPA
+2022-06-06 23:39:24.126  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:72/227; id:immutable-x; Symbol:IMX
+2022-06-06 23:39:24.702  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:73/227; id:akropolis; Symbol:AKRO
+2022-06-06 23:39:25.293  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:74/227; id:manchester-city-fan-token; Symbol:CITY
+2022-06-06 23:39:25.887  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:75/227; id:keep3rv1; Symbol:KP3R
+2022-06-06 23:39:26.509  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:76/227; id:league-of-kingdoms; Symbol:LOKA
+2022-06-06 23:39:27.088  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:77/227; id:frontier-token; Symbol:FRONT
+2022-06-06 23:39:27.677  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:78/227; id:request-network; Symbol:REQ
+2022-06-06 23:39:28.269  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:79/227; id:republic-protocol; Symbol:REN
+2022-06-06 23:39:28.859  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:80/227; id:beam; Symbol:BEAM
+2022-06-06 23:39:29.482  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:81/227; id:aergo; Symbol:AERGO
+2022-06-06 23:39:30.089  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:82/227; id:spell-token; Symbol:SPELL
+2022-06-06 23:39:30.666  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:83/227; id:dent; Symbol:DENT
+2022-06-06 23:39:31.272  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:84/227; id:ocean-protocol; Symbol:OCEAN
+2022-06-06 23:39:31.881  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:85/227; id:chromaway; Symbol:CHR
+2022-06-06 23:39:32.504  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:86/227; id:omisego; Symbol:OMG
+2022-06-06 23:39:33.097  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:87/227; id:benqi; Symbol:QI
+2022-06-06 23:39:33.700  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:88/227; id:dego-finance; Symbol:DEGO
+2022-06-06 23:39:34.308  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:89/227; id:tellor; Symbol:TRB
+2022-06-06 23:39:34.910  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:90/227; id:just; Symbol:JST
+2022-06-06 23:39:35.504  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:91/227; id:nuls; Symbol:NULS
+2022-06-06 23:39:36.094  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:92/227; id:atletico-madrid; Symbol:ATM
+2022-06-06 23:39:36.698  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:93/227; id:swipe; Symbol:SXP
+2022-06-06 23:39:37.289  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:94/227; id:fetch-ai; Symbol:FET
+2022-06-06 23:39:37.880  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:95/227; id:selfkey; Symbol:KEY
+2022-06-06 23:39:38.458  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:96/227; id:alpine-f1-team-fan-token; Symbol:ALPINE
+2022-06-06 23:39:39.067  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:97/227; id:utrust; Symbol:UTK
+2022-06-06 23:39:39.660  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:98/227; id:concentrated-voting-power; Symbol:CVP
+2022-06-06 23:39:40.248  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:99/227; id:vulcan-forged; Symbol:PYR
+2022-06-06 23:39:40.828  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:100/227; id:curve-dao-token; Symbol:CRV
+2022-06-06 23:39:41.403  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:101/227; id:gitcoin; Symbol:GTC
+2022-06-06 23:39:41.994  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:102/227; id:mantra-dao; Symbol:OM
+2022-06-06 23:39:42.570  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:103/227; id:serum; Symbol:SRM
+2022-06-06 23:39:43.160  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:104/227; id:yearn-finance; Symbol:YFI
+2022-06-06 23:39:43.770  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:105/227; id:rei-network; Symbol:REI
+2022-06-06 23:39:44.395  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:106/227; id:safepal; Symbol:SFP
+2022-06-06 23:39:44.987  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:107/227; id:ooki; Symbol:OOKI
+2022-06-06 23:39:45.613  INFO 2816 --- [main] b.BscScanBinanceApplication              : idx:108/227; id:tranchess; Symbol:CHESS
+2022-06-06 23:39:48.754  INFO 11240 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 11240 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:39:48.757  INFO 11240 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:39:50.392  INFO 11240 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:39:50.392  INFO 11240 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:39:50.536  INFO 11240 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:39:50.748  INFO 11240 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:39:50.817  INFO 11240 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:39:51.075  INFO 11240 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:39:51.325  INFO 11240 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:39:52.163  INFO 11240 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:39:53.271  INFO 11240 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.129 seconds (JVM running for 6.268)
+2022-06-06 23:39:53.458  INFO 11240 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:39:53.839  INFO 11240 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:39:55.003  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:39:55.639  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:39:56.262  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:39:56.885  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:39:57.509  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:ramp; Symbol:RAMP
+2022-06-06 23:39:58.147  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:39:58.758  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:39:59.261  INFO 11240 --- [http-nio-8090-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:39:59.306  INFO 11240 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:39:59.399  WARN 11240 --- [http-nio-8090-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42601
+2022-06-06 23:39:59.400 ERROR 11240 --- [http-nio-8090-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: syntax error at or near "end"
+  Position: 10689
+2022-06-06 23:39:59.415  INFO 11240 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:39:59.415 ERROR 11240 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:39:59.553  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:40:00.148  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:40:00.748  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:40:01.390  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:40:01.973  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:40:02.551  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:40:03.169  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:40:03.778  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:40:04.315  INFO 11240 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-06-06 23:40:04.329  INFO 11240 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-06-06 23:40:04.392  INFO 11240 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:40:04.675 ERROR 11240 --- [main] b.BscScanBinanceApplication              : dkd error LoadData:Error creating bean with name 'spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties': Could not bind properties to 'DataSourceProperties' : prefix=spring.datasource, ignoreInvalidFields=false, ignoreUnknownFields=true; nested exception is java.lang.IllegalStateException: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@246f8b8b has been closed already
+2022-06-06 23:41:42.884  INFO 10180 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 10180 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:41:42.886  INFO 10180 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:41:44.515  INFO 10180 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:41:44.516  INFO 10180 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:41:44.661  INFO 10180 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:41:44.892  INFO 10180 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:41:44.977  INFO 10180 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:41:45.252  INFO 10180 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:41:45.513  INFO 10180 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:41:46.355  INFO 10180 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:41:47.601  INFO 10180 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.318 seconds (JVM running for 6.486)
+2022-06-06 23:41:47.807  INFO 10180 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:41:48.204  INFO 10180 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:41:49.353  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:41:49.989  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:41:50.629  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:41:51.262  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:41:51.899  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:41:52.536  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:41:53.142  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:ramp; Symbol:RAMP
+2022-06-06 23:41:54.170  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:41:55.258  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:41:55.298  INFO 10180 --- [http-nio-8090-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:41:55.357  INFO 10180 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:41:55.449  WARN 10180 --- [http-nio-8090-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42883
+2022-06-06 23:41:55.449 ERROR 10180 --- [http-nio-8090-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: operator does not exist: numeric = money
+  Hint: No operator matches the given name and argument types. You might need to add explicit type casts.
+  Position: 10601
+2022-06-06 23:41:55.470  INFO 10180 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:41:55.470 ERROR 10180 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:41:55.876  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:41:56.504  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:41:57.088  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:41:57.745  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:41:58.356  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:41:58.935  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:41:59.541  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:42:00.160  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:dexe; Symbol:DEXE
+2022-06-06 23:42:00.769  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:42:01.392  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:42:02.020  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:waves; Symbol:WAVES
+2022-06-06 23:42:02.628  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:42:03.223  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:balancer; Symbol:BAL
+2022-06-06 23:42:03.844  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:42:04.452  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:steem; Symbol:STEEM
+2022-06-06 23:42:05.249  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:42:05.872  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:42:06.479  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:optimism; Symbol:OP
+2022-06-06 23:42:07.086  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:linear; Symbol:LINA
+2022-06-06 23:42:07.694  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:gifto; Symbol:GTO
+2022-06-06 23:42:08.302  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:42:08.939  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:42:09.524  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:42:10.272  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:42:10.877  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:42:11.504  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:42:12.097  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:42:12.702  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:42:13.309  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:mirror-protocol; Symbol:MIR
+2022-06-06 23:42:13.934  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:38/227; id:santos-fc-fan-token; Symbol:SANTOS
+2022-06-06 23:42:14.543  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:39/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:42:15.136  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:40/227; id:reef-finance; Symbol:REEF
+2022-06-06 23:42:15.758  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:41/227; id:storj; Symbol:STORJ
+2022-06-06 23:42:16.349  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:42/227; id:clover-finance; Symbol:CLV
+2022-06-06 23:42:16.972  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:43/227; id:cortex; Symbol:CTXC
+2022-06-06 23:42:17.565  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:44/227; id:harvest-finance; Symbol:FARM
+2022-06-06 23:42:18.145  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:45/227; id:lazio-fan-token; Symbol:LAZIO
+2022-06-06 23:42:18.763  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:46/227; id:radicle; Symbol:RAD
+2022-06-06 23:42:19.385  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:47/227; id:mask-network; Symbol:MASK
+2022-06-06 23:42:20.007  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:48/227; id:band-protocol; Symbol:BAND
+2022-06-06 23:42:20.629  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:49/227; id:tokenclub; Symbol:TCT
+2022-06-06 23:42:21.250  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:50/227; id:dydx; Symbol:DYDX
+2022-06-06 23:42:21.863  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:51/227; id:mainframe; Symbol:MFT
+2022-06-06 23:42:22.472  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:52/227; id:reserve-rights-token; Symbol:RSR
+2022-06-06 23:42:23.067  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:53/227; id:marlin; Symbol:POND
+2022-06-06 23:42:23.688  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:54/227; id:sushi; Symbol:SUSHI
+2022-06-06 23:42:24.308  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:55/227; id:aragon; Symbol:ANT
+2022-06-06 23:42:24.916  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:56/227; id:litentry; Symbol:LIT
+2022-06-06 23:42:25.498  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:57/227; id:wing-finance; Symbol:WING
+2022-06-06 23:42:26.092  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:58/227; id:terra-virtua-kolect; Symbol:TVK
+2022-06-06 23:42:26.699  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:59/227; id:coin98; Symbol:C98
+2022-06-06 23:42:27.322  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:60/227; id:yield-guild-games; Symbol:YGG
+2022-06-06 23:42:27.930  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:61/227; id:celer-network; Symbol:CELR
+2022-06-06 23:42:28.539  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:62/227; id:oasis-network; Symbol:ROSE
+2022-06-06 23:42:29.151  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:63/227; id:beefy-finance; Symbol:BIFI
+2022-06-06 23:42:29.762  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:64/227; id:ethernity-chain; Symbol:ERN
+2022-06-06 23:42:30.341  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:65/227; id:stratis; Symbol:STRAX
+2022-06-06 23:42:30.921  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:66/227; id:troy; Symbol:TROY
+2022-06-06 23:42:31.526  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:67/227; id:aurora-dao; Symbol:IDEX
+2022-06-06 23:42:32.134  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:68/227; id:qtum; Symbol:QTUM
+2022-06-06 23:42:32.738  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:69/227; id:biconomy; Symbol:BICO
+2022-06-06 23:42:33.331  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:70/227; id:raydium; Symbol:RAY
+2022-06-06 23:42:33.939  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:71/227; id:arpa-chain; Symbol:ARPA
+2022-06-06 23:42:34.562  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:72/227; id:immutable-x; Symbol:IMX
+2022-06-06 23:42:35.182  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:73/227; id:akropolis; Symbol:AKRO
+2022-06-06 23:42:35.789  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:74/227; id:manchester-city-fan-token; Symbol:CITY
+2022-06-06 23:42:36.398  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:75/227; id:keep3rv1; Symbol:KP3R
+2022-06-06 23:42:36.990  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:76/227; id:league-of-kingdoms; Symbol:LOKA
+2022-06-06 23:42:37.616  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:77/227; id:frontier-token; Symbol:FRONT
+2022-06-06 23:42:38.242  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:78/227; id:request-network; Symbol:REQ
+2022-06-06 23:42:38.863  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:79/227; id:republic-protocol; Symbol:REN
+2022-06-06 23:42:39.471  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:80/227; id:beam; Symbol:BEAM
+2022-06-06 23:42:40.111  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:81/227; id:aergo; Symbol:AERGO
+2022-06-06 23:42:40.703  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:82/227; id:dent; Symbol:DENT
+2022-06-06 23:42:41.285  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:83/227; id:spell-token; Symbol:SPELL
+2022-06-06 23:42:41.883  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:84/227; id:ocean-protocol; Symbol:OCEAN
+2022-06-06 23:42:42.511  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:85/227; id:omisego; Symbol:OMG
+2022-06-06 23:42:43.117  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:86/227; id:chromaway; Symbol:CHR
+2022-06-06 23:42:43.726  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:87/227; id:benqi; Symbol:QI
+2022-06-06 23:42:44.339  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:88/227; id:dego-finance; Symbol:DEGO
+2022-06-06 23:42:44.929  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:89/227; id:tellor; Symbol:TRB
+2022-06-06 23:42:45.511  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:90/227; id:nuls; Symbol:NULS
+2022-06-06 23:42:46.122  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:91/227; id:just; Symbol:JST
+2022-06-06 23:42:46.729  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:92/227; id:swipe; Symbol:SXP
+2022-06-06 23:42:47.413  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:93/227; id:atletico-madrid; Symbol:ATM
+2022-06-06 23:42:48.055  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:94/227; id:fetch-ai; Symbol:FET
+2022-06-06 23:42:48.631  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:95/227; id:alpine-f1-team-fan-token; Symbol:ALPINE
+2022-06-06 23:42:49.225  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:96/227; id:selfkey; Symbol:KEY
+2022-06-06 23:42:49.804  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:97/227; id:utrust; Symbol:UTK
+2022-06-06 23:42:50.398  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:98/227; id:concentrated-voting-power; Symbol:CVP
+2022-06-06 23:42:50.996  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:99/227; id:vulcan-forged; Symbol:PYR
+2022-06-06 23:42:51.590  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:100/227; id:curve-dao-token; Symbol:CRV
+2022-06-06 23:42:52.169  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:101/227; id:gitcoin; Symbol:GTC
+2022-06-06 23:42:52.765  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:102/227; id:mantra-dao; Symbol:OM
+2022-06-06 23:42:53.516  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:103/227; id:serum; Symbol:SRM
+2022-06-06 23:42:54.278  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:104/227; id:yearn-finance; Symbol:YFI
+2022-06-06 23:42:55.187  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:105/227; id:rei-network; Symbol:REI
+2022-06-06 23:42:55.935  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:106/227; id:ooki; Symbol:OOKI
+2022-06-06 23:42:56.605  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:107/227; id:safepal; Symbol:SFP
+2022-06-06 23:42:57.184  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:108/227; id:tranchess; Symbol:CHESS
+2022-06-06 23:42:57.808  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:109/227; id:waltonchain; Symbol:WTC
+2022-06-06 23:42:58.387  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:110/227; id:coti; Symbol:COTI
+2022-06-06 23:42:58.978  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:111/227; id:illuvium; Symbol:ILV
+2022-06-06 23:42:59.586  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:112/227; id:contentos; Symbol:COS
+2022-06-06 23:43:00.178  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:113/227; id:dock; Symbol:DOCK
+2022-06-06 23:43:00.744  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:114/227; id:wax; Symbol:WAXP
+2022-06-06 23:43:01.383  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:115/227; id:biswap; Symbol:BSW
+2022-06-06 23:43:01.991  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:116/227; id:mobox; Symbol:MBOX
+2022-06-06 23:43:02.581  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:117/227; id:ankr; Symbol:ANKR
+2022-06-06 23:43:03.171  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:118/227; id:pnetwork; Symbol:PNT
+2022-06-06 23:43:03.751  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:119/227; id:perpetual-protocol; Symbol:PERP
+2022-06-06 23:43:04.355  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:120/227; id:new-bitshares; Symbol:NBS
+2022-06-06 23:43:04.962  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:121/227; id:uma; Symbol:UMA
+2022-06-06 23:43:05.539  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:122/227; id:dose-token; Symbol:DOSE
+2022-06-06 23:43:06.130  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:123/227; id:ampleforth-governance-token; Symbol:FORTH
+2022-06-06 23:43:06.738  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:124/227; id:woo-network; Symbol:WOO
+2022-06-06 23:43:07.331  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:125/227; id:alchemy-pay; Symbol:ACH
+2022-06-06 23:43:07.923  INFO 10180 --- [main] b.BscScanBinanceApplication              : idx:126/227; id:lisk; Symbol:LSK
+2022-06-06 23:43:11.031  INFO 10112 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 10112 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:43:11.033  INFO 10112 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:43:12.656  INFO 10112 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:43:12.656  INFO 10112 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:43:12.806  INFO 10112 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:43:13.041  INFO 10112 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:43:13.121  INFO 10112 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:43:13.374  INFO 10112 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:43:13.609  INFO 10112 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:43:14.597  INFO 10112 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:43:15.911  INFO 10112 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.473 seconds (JVM running for 6.68)
+2022-06-06 23:43:16.123  INFO 10112 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:43:16.547  INFO 10112 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:43:17.243  INFO 10112 --- [http-nio-8090-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:43:17.323  INFO 10112 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:43:17.964  INFO 10112 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : End getList <--
+2022-06-06 23:43:18.086  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:43:18.667  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:43:19.277  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:43:19.871  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:43:20.428  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:43:21.020  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:43:21.633  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:ramp; Symbol:RAMP
+2022-06-06 23:43:22.225  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:43:22.818  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:43:23.397  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:43:24.000  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:43:24.623  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:43:25.216  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:43:25.795  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:43:26.531  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:43:27.126  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:43:27.734  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:dexe; Symbol:DEXE
+2022-06-06 23:43:28.311  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:43:28.887  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:43:29.466  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:waves; Symbol:WAVES
+2022-06-06 23:43:30.245  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:43:30.837  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:balancer; Symbol:BAL
+2022-06-06 23:43:31.430  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:43:32.037  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:steem; Symbol:STEEM
+2022-06-06 23:43:32.603  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:43:33.179  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:43:33.754  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:optimism; Symbol:OP
+2022-06-06 23:43:34.332  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:linear; Symbol:LINA
+2022-06-06 23:43:34.941  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:gifto; Symbol:GTO
+2022-06-06 23:43:35.534  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:43:36.114  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:43:36.704  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:43:37.300  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:43:37.876  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:43:38.453  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:43:39.063  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:43:39.670  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:43:40.247  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:santos-fc-fan-token; Symbol:SANTOS
+2022-06-06 23:43:40.825  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:38/227; id:mirror-protocol; Symbol:MIR
+2022-06-06 23:43:41.406  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:39/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:43:42.019  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:40/227; id:reef-finance; Symbol:REEF
+2022-06-06 23:43:42.596  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:41/227; id:storj; Symbol:STORJ
+2022-06-06 23:43:43.206  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:42/227; id:clover-finance; Symbol:CLV
+2022-06-06 23:43:43.797  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:43/227; id:cortex; Symbol:CTXC
+2022-06-06 23:43:44.391  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:44/227; id:harvest-finance; Symbol:FARM
+2022-06-06 23:43:44.983  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:45/227; id:lazio-fan-token; Symbol:LAZIO
+2022-06-06 23:43:45.574  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:46/227; id:radicle; Symbol:RAD
+2022-06-06 23:43:46.157  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:47/227; id:mask-network; Symbol:MASK
+2022-06-06 23:43:46.737  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:48/227; id:band-protocol; Symbol:BAND
+2022-06-06 23:43:47.331  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:49/227; id:tokenclub; Symbol:TCT
+2022-06-06 23:43:47.927  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:50/227; id:dydx; Symbol:DYDX
+2022-06-06 23:43:48.498  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:51/227; id:mainframe; Symbol:MFT
+2022-06-06 23:43:49.077  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:52/227; id:reserve-rights-token; Symbol:RSR
+2022-06-06 23:43:49.659  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:53/227; id:marlin; Symbol:POND
+2022-06-06 23:43:50.236  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:54/227; id:sushi; Symbol:SUSHI
+2022-06-06 23:43:50.826  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:55/227; id:coin98; Symbol:C98
+2022-06-06 23:43:51.408  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:56/227; id:wing-finance; Symbol:WING
+2022-06-06 23:43:51.988  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:57/227; id:aragon; Symbol:ANT
+2022-06-06 23:43:52.566  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:58/227; id:litentry; Symbol:LIT
+2022-06-06 23:43:53.159  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:59/227; id:terra-virtua-kolect; Symbol:TVK
+2022-06-06 23:43:53.736  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:60/227; id:yield-guild-games; Symbol:YGG
+2022-06-06 23:43:54.311  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:61/227; id:celer-network; Symbol:CELR
+2022-06-06 23:43:54.906  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:62/227; id:oasis-network; Symbol:ROSE
+2022-06-06 23:43:55.483  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:63/227; id:beefy-finance; Symbol:BIFI
+2022-06-06 23:43:56.080  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:64/227; id:ethernity-chain; Symbol:ERN
+2022-06-06 23:43:56.802  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:65/227; id:stratis; Symbol:STRAX
+2022-06-06 23:43:57.605  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:66/227; id:troy; Symbol:TROY
+2022-06-06 23:43:58.477  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:67/227; id:aurora-dao; Symbol:IDEX
+2022-06-06 23:43:59.073  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:68/227; id:qtum; Symbol:QTUM
+2022-06-06 23:43:59.650  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:69/227; id:biconomy; Symbol:BICO
+2022-06-06 23:44:00.371  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:70/227; id:raydium; Symbol:RAY
+2022-06-06 23:44:00.962  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:71/227; id:arpa-chain; Symbol:ARPA
+2022-06-06 23:44:01.538  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:72/227; id:immutable-x; Symbol:IMX
+2022-06-06 23:44:02.130  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:73/227; id:akropolis; Symbol:AKRO
+2022-06-06 23:44:02.706  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:74/227; id:manchester-city-fan-token; Symbol:CITY
+2022-06-06 23:44:03.300  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:75/227; id:keep3rv1; Symbol:KP3R
+2022-06-06 23:44:03.864  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:76/227; id:league-of-kingdoms; Symbol:LOKA
+2022-06-06 23:44:04.474  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:77/227; id:frontier-token; Symbol:FRONT
+2022-06-06 23:44:05.052  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:78/227; id:request-network; Symbol:REQ
+2022-06-06 23:44:05.645  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:79/227; id:republic-protocol; Symbol:REN
+2022-06-06 23:44:06.270  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:80/227; id:beam; Symbol:BEAM
+2022-06-06 23:44:06.864  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:81/227; id:aergo; Symbol:AERGO
+2022-06-06 23:44:07.458  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:82/227; id:dent; Symbol:DENT
+2022-06-06 23:44:08.035  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:83/227; id:spell-token; Symbol:SPELL
+2022-06-06 23:44:08.627  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:84/227; id:ocean-protocol; Symbol:OCEAN
+2022-06-06 23:44:09.218  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:85/227; id:chromaway; Symbol:CHR
+2022-06-06 23:44:09.797  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:86/227; id:omisego; Symbol:OMG
+2022-06-06 23:44:10.376  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:87/227; id:benqi; Symbol:QI
+2022-06-06 23:44:10.942  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:88/227; id:dego-finance; Symbol:DEGO
+2022-06-06 23:44:11.517  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:89/227; id:tellor; Symbol:TRB
+2022-06-06 23:44:12.064  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:90/227; id:nuls; Symbol:NULS
+2022-06-06 23:44:12.638  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:91/227; id:just; Symbol:JST
+2022-06-06 23:44:13.211  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:92/227; id:swipe; Symbol:SXP
+2022-06-06 23:44:13.942  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:93/227; id:atletico-madrid; Symbol:ATM
+2022-06-06 23:44:14.522  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:94/227; id:fetch-ai; Symbol:FET
+2022-06-06 23:44:15.244  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:95/227; id:alpine-f1-team-fan-token; Symbol:ALPINE
+2022-06-06 23:44:15.821  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:96/227; id:selfkey; Symbol:KEY
+2022-06-06 23:44:16.413  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:97/227; id:concentrated-voting-power; Symbol:CVP
+2022-06-06 23:44:16.988  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:98/227; id:utrust; Symbol:UTK
+2022-06-06 23:44:17.551  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:99/227; id:vulcan-forged; Symbol:PYR
+2022-06-06 23:44:18.111  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:100/227; id:curve-dao-token; Symbol:CRV
+2022-06-06 23:44:18.671  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:101/227; id:mantra-dao; Symbol:OM
+2022-06-06 23:44:19.218  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:102/227; id:gitcoin; Symbol:GTC
+2022-06-06 23:44:19.799  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:103/227; id:serum; Symbol:SRM
+2022-06-06 23:44:20.360  INFO 10112 --- [http-nio-8090-exec-4] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:44:20.362  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:104/227; id:yearn-finance; Symbol:YFI
+2022-06-06 23:44:20.572  INFO 10112 --- [http-nio-8090-exec-4] b.service.impl.BinanceServiceImpl        : End getList <--
+2022-06-06 23:44:20.929  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:105/227; id:rei-network; Symbol:REI
+2022-06-06 23:44:21.541  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:106/227; id:safepal; Symbol:SFP
+2022-06-06 23:44:22.095  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:107/227; id:ooki; Symbol:OOKI
+2022-06-06 23:44:22.678  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:108/227; id:tranchess; Symbol:CHESS
+2022-06-06 23:44:23.240  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:109/227; id:waltonchain; Symbol:WTC
+2022-06-06 23:44:23.801  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:110/227; id:coti; Symbol:COTI
+2022-06-06 23:44:24.361  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:111/227; id:illuvium; Symbol:ILV
+2022-06-06 23:44:24.935  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:112/227; id:contentos; Symbol:COS
+2022-06-06 23:44:25.501  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:113/227; id:dock; Symbol:DOCK
+2022-06-06 23:44:26.078  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:114/227; id:wax; Symbol:WAXP
+2022-06-06 23:44:26.652  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:115/227; id:biswap; Symbol:BSW
+2022-06-06 23:44:27.228  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:116/227; id:mobox; Symbol:MBOX
+2022-06-06 23:44:27.801  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:117/227; id:ankr; Symbol:ANKR
+2022-06-06 23:44:28.374  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:118/227; id:perpetual-protocol; Symbol:PERP
+2022-06-06 23:44:28.968  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:119/227; id:pnetwork; Symbol:PNT
+2022-06-06 23:44:29.546  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:120/227; id:new-bitshares; Symbol:NBS
+2022-06-06 23:44:30.131  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:121/227; id:uma; Symbol:UMA
+2022-06-06 23:44:30.722  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:122/227; id:ampleforth-governance-token; Symbol:FORTH
+2022-06-06 23:44:31.270  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:123/227; id:dose-token; Symbol:DOSE
+2022-06-06 23:44:31.847  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:124/227; id:woo-network; Symbol:WOO
+2022-06-06 23:44:32.579  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:125/227; id:alchemy-pay; Symbol:ACH
+2022-06-06 23:44:33.138  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:126/227; id:lisk; Symbol:LSK
+2022-06-06 23:44:33.703  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:127/227; id:superrare; Symbol:RARE
+2022-06-06 23:44:34.277  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:128/227; id:bitshares; Symbol:BTS
+2022-06-06 23:44:34.839  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:129/227; id:kava-lend; Symbol:HARD
+2022-06-06 23:44:35.415  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:130/227; id:dforce-token; Symbol:DF
+2022-06-06 23:44:35.989  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:131/227; id:unlend-finance; Symbol:UFT
+2022-06-06 23:44:36.563  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:132/227; id:dia-data; Symbol:DIA
+2022-06-06 23:44:37.143  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:133/227; id:playdapp; Symbol:PLA
+2022-06-06 23:44:37.724  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:134/227; id:automata; Symbol:ATA
+2022-06-06 23:44:38.302  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:135/227; id:beta-finance; Symbol:BETA
+2022-06-06 23:44:38.868  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:136/227; id:measurable-data-token; Symbol:MDT
+2022-06-06 23:44:39.442  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:137/227; id:kava; Symbol:KAVA
+2022-06-06 23:44:40.001  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:138/227; id:superfarm; Symbol:SUPER
+2022-06-06 23:44:40.580  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:139/227; id:kyber-network-crystal; Symbol:KNC
+2022-06-06 23:44:41.155  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:140/227; id:syscoin; Symbol:SYS
+2022-06-06 23:44:41.722  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:141/227; id:iostoken; Symbol:IOST
+2022-06-06 23:44:42.316  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:142/227; id:moonriver; Symbol:MOVR
+2022-06-06 23:44:42.893  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:143/227; id:iotex; Symbol:IOTX
+2022-06-06 23:44:43.493  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:144/227; id:livepeer; Symbol:LPT
+2022-06-06 23:44:44.041  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:145/227; id:aion; Symbol:AION
+2022-06-06 23:44:44.597  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:146/227; id:melon; Symbol:MLN
+2022-06-06 23:44:45.174  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:147/227; id:tomochain; Symbol:TOMO
+2022-06-06 23:44:45.750  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:148/227; id:compound-governance-token; Symbol:COMP
+2022-06-06 23:44:46.315  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:149/227; id:adex; Symbol:ADX
+2022-06-06 23:44:46.876  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:150/227; id:api3; Symbol:API3
+2022-06-06 23:44:47.469  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:151/227; id:moonbeam; Symbol:GLMR
+2022-06-06 23:44:48.046  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:152/227; id:bonfida; Symbol:FIDA
+2022-06-06 23:44:48.606  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:153/227; id:skale; Symbol:SKL
+2022-06-06 23:44:49.180  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:154/227; id:audius; Symbol:AUDIO
+2022-06-06 23:44:49.761  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:155/227; id:hive; Symbol:HIVE
+2022-06-06 23:44:50.336  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:156/227; id:orion-protocol; Symbol:ORN
+2022-06-06 23:44:50.899  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:157/227; id:alchemix; Symbol:ALCX
+2022-06-06 23:44:51.460  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:158/227; id:zencash; Symbol:ZEN
+2022-06-06 23:44:52.048  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:159/227; id:concierge-io; Symbol:AVA
+2022-06-06 23:44:52.624  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:160/227; id:joe; Symbol:JOE
+2022-06-06 23:44:53.198  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:161/227; id:pha; Symbol:PHA
+2022-06-06 23:44:53.790  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:162/227; id:tornado-cash; Symbol:TORN
+2022-06-06 23:44:54.352  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:163/227; id:astar; Symbol:ASTR
+2022-06-06 23:44:54.918  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:164/227; id:holotoken; Symbol:HOT
+2022-06-06 23:44:55.480  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:165/227; id:render-token; Symbol:RNDR
+2022-06-06 23:44:56.056  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:166/227; id:ardor; Symbol:ARDR
+2022-06-06 23:44:56.633  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:167/227; id:everipedia; Symbol:IQ
+2022-06-06 23:44:57.210  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:168/227; id:kadena; Symbol:KDA
+2022-06-06 23:44:58.205  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:169/227; id:icon; Symbol:ICX
+2022-06-06 23:44:58.936  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:170/227; id:alpha-finance; Symbol:ALPHA
+2022-06-06 23:44:59.517  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:171/227; id:acala; Symbol:ACA
+2022-06-06 23:45:00.388  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:172/227; id:badger-dao; Symbol:BADGER
+2022-06-06 23:45:00.951  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:173/227; id:zelcash; Symbol:FLUX
+2022-06-06 23:45:01.312  INFO 10112 --- [http-nio-8090-exec-5] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:45:01.444  INFO 10112 --- [http-nio-8090-exec-5] b.service.impl.BinanceServiceImpl        : End getList <--
+2022-06-06 23:45:01.518  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:174/227; id:bitcoin; Symbol:BTC
+2022-06-06 23:45:02.127  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:175/227; id:fio-protocol; Symbol:FIO
+2022-06-06 23:45:02.679  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:176/227; id:dusk-network; Symbol:DUSK
+2022-06-06 23:45:03.247  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:177/227; id:numeraire; Symbol:NMR
+2022-06-06 23:45:03.825  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:178/227; id:alpaca-finance; Symbol:ALPACA
+2022-06-06 23:45:04.399  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:179/227; id:digibyte; Symbol:DGB
+2022-06-06 23:45:04.961  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:180/227; id:btc-standard-hashrate-token; Symbol:BTCST
+2022-06-06 23:45:05.537  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:181/227; id:bancor; Symbol:BNT
+2022-06-06 23:45:06.115  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:182/227; id:iexec-rlc; Symbol:RLC
+2022-06-06 23:45:06.708  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:183/227; id:nkn; Symbol:NKN
+2022-06-06 23:45:07.274  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:184/227; id:celo; Symbol:CELO
+2022-06-06 23:45:07.870  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:185/227; id:flamingo-finance; Symbol:FLM
+2022-06-06 23:45:08.461  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:186/227; id:orchid-protocol; Symbol:OXT
+2022-06-06 23:45:09.020  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:187/227; id:injective-protocol; Symbol:INJ
+2022-06-06 23:45:09.597  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:188/227; id:iris-network; Symbol:IRIS
+2022-06-06 23:45:10.186  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:189/227; id:cream-2; Symbol:CREAM
+2022-06-06 23:45:10.758  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:190/227; id:algorand; Symbol:ALGO
+2022-06-06 23:45:11.320  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:191/227; id:vite; Symbol:VITE
+2022-06-06 23:45:11.868  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:192/227; id:polkastarter; Symbol:POLS
+2022-06-06 23:45:12.445  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:193/227; id:zcoin; Symbol:FIRO
+2022-06-06 23:45:13.052  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:194/227; id:mdex; Symbol:MDX
+2022-06-06 23:45:13.628  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:195/227; id:rif-token; Symbol:RIF
+2022-06-06 23:45:14.204  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:196/227; id:verge; Symbol:XVG
+2022-06-06 23:45:14.780  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:197/227; id:nem; Symbol:XEM
+2022-06-06 23:45:15.342  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:198/227; id:frax-share; Symbol:FXS
+2022-06-06 23:45:15.903  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:199/227; id:komodo; Symbol:KMD
+2022-06-06 23:45:16.479  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:200/227; id:district0x; Symbol:DNT
+2022-06-06 23:45:17.053  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:201/227; id:multichain; Symbol:MULTI
+2022-06-06 23:45:17.632  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:202/227; id:casper-network; Symbol:CSPR
+2022-06-06 23:45:18.208  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:203/227; id:tribe-2; Symbol:TRIBE
+2022-06-06 23:45:18.784  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:204/227; id:wanchain; Symbol:WAN
+2022-06-06 23:45:19.359  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:205/227; id:storm; Symbol:STMX
+2022-06-06 23:45:19.923  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:206/227; id:nervos-network; Symbol:CKB
+2022-06-06 23:45:20.498  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:207/227; id:ravencoin; Symbol:RVN
+2022-06-06 23:45:21.071  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:208/227; id:auction; Symbol:AUCTION
+2022-06-06 23:45:21.636  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:209/227; id:vethor-token; Symbol:VTHO
+2022-06-06 23:45:22.212  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:210/227; id:wrapped-nxm; Symbol:WNXM
+2022-06-06 23:45:22.774  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:211/227; id:secret; Symbol:SCRT
+2022-06-06 23:45:23.342  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:212/227; id:wazirx; Symbol:WRX
+2022-06-06 23:45:23.935  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:213/227; id:ethos; Symbol:VGX
+2022-06-06 23:45:24.521  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:214/227; id:funfair; Symbol:FUN
+2022-06-06 23:45:25.102  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:215/227; id:prometeus; Symbol:PROM
+2022-06-06 23:45:25.662  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:216/227; id:gnosis; Symbol:GNO
+2022-06-06 23:45:26.238  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:217/227; id:project-galaxy; Symbol:GAL
+2022-06-06 23:45:26.801  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:218/227; id:highstreet; Symbol:HIGH
+2022-06-06 23:45:27.375  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:219/227; id:fc-porto; Symbol:PORTO
+2022-06-06 23:45:27.968  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:220/227; id:perlin; Symbol:PERL
+2022-06-06 23:45:28.545  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:221/227; id:tycoon-global; Symbol:TCT
+2022-06-06 23:45:29.137  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:222/227; id:ellipsis-x; Symbol:EPX
+2022-06-06 23:45:29.730  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:223/227; id:threshold-network-token; Symbol:T
+2022-06-06 23:45:30.293  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:224/227; id:streamr; Symbol:DATA
+2022-06-06 23:45:30.868  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:225/227; id:burger-swap; Symbol:BURGER
+2022-06-06 23:45:31.493  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:226/227; id:ong; Symbol:ONG
+2022-06-06 23:45:31.493  INFO 10112 --- [main] b.BscScanBinanceApplication              : reload: 2022-06-06 23:45:31
+2022-06-06 23:45:32.069  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:45:32.661  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:45:33.413  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:45:33.987  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:45:34.564  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:45:35.141  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:45:35.720  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:ramp; Symbol:RAMP
+2022-06-06 23:45:36.310  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:45:36.883  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:45:37.473  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:45:38.049  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:45:38.645  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:45:39.237  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:45:39.816  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:45:40.394  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:45:40.972  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:45:41.547  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:dexe; Symbol:DEXE
+2022-06-06 23:45:42.122  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:45:42.698  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:45:43.278  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:waves; Symbol:WAVES
+2022-06-06 23:45:43.868  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:45:44.459  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:balancer; Symbol:BAL
+2022-06-06 23:45:45.036  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:45:45.598  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:steem; Symbol:STEEM
+2022-06-06 23:45:46.194  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:45:46.772  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:45:47.332  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:optimism; Symbol:OP
+2022-06-06 23:45:47.908  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:linear; Symbol:LINA
+2022-06-06 23:45:48.486  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:gifto; Symbol:GTO
+2022-06-06 23:45:49.045  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:45:49.611  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:45:50.173  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:45:50.733  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:45:51.308  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:45:51.856  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:45:52.437  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:45:53.010  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:45:53.587  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:mirror-protocol; Symbol:MIR
+2022-06-06 23:45:54.165  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:38/227; id:santos-fc-fan-token; Symbol:SANTOS
+2022-06-06 23:45:54.724  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:39/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:45:55.317  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:40/227; id:reef-finance; Symbol:REEF
+2022-06-06 23:45:55.896  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:41/227; id:storj; Symbol:STORJ
+2022-06-06 23:45:56.489  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:42/227; id:clover-finance; Symbol:CLV
+2022-06-06 23:45:57.070  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:43/227; id:cortex; Symbol:CTXC
+2022-06-06 23:45:57.631  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:44/227; id:harvest-finance; Symbol:FARM
+2022-06-06 23:45:58.187  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:45/227; id:lazio-fan-token; Symbol:LAZIO
+2022-06-06 23:45:59.086  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:46/227; id:radicle; Symbol:RAD
+2022-06-06 23:45:59.958  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:47/227; id:mask-network; Symbol:MASK
+2022-06-06 23:46:00.516  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:48/227; id:band-protocol; Symbol:BAND
+2022-06-06 23:46:01.106  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:49/227; id:tokenclub; Symbol:TCT
+2022-06-06 23:46:01.685  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:50/227; id:dydx; Symbol:DYDX
+2022-06-06 23:46:02.257  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:51/227; id:mainframe; Symbol:MFT
+2022-06-06 23:46:02.835  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:52/227; id:reserve-rights-token; Symbol:RSR
+2022-06-06 23:46:03.445  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:53/227; id:marlin; Symbol:POND
+2022-06-06 23:46:04.019  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:54/227; id:sushi; Symbol:SUSHI
+2022-06-06 23:46:04.596  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:55/227; id:coin98; Symbol:C98
+2022-06-06 23:46:05.178  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:56/227; id:wing-finance; Symbol:WING
+2022-06-06 23:46:05.754  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:57/227; id:aragon; Symbol:ANT
+2022-06-06 23:46:06.346  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:58/227; id:litentry; Symbol:LIT
+2022-06-06 23:46:06.936  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:59/227; id:terra-virtua-kolect; Symbol:TVK
+2022-06-06 23:46:07.496  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:60/227; id:yield-guild-games; Symbol:YGG
+2022-06-06 23:46:08.075  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:61/227; id:celer-network; Symbol:CELR
+2022-06-06 23:46:08.648  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:62/227; id:oasis-network; Symbol:ROSE
+2022-06-06 23:46:09.217  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:63/227; id:beefy-finance; Symbol:BIFI
+2022-06-06 23:46:09.778  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:64/227; id:ethernity-chain; Symbol:ERN
+2022-06-06 23:46:10.342  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:65/227; id:stratis; Symbol:STRAX
+2022-06-06 23:46:10.903  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:66/227; id:troy; Symbol:TROY
+2022-06-06 23:46:11.464  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:67/227; id:aurora-dao; Symbol:IDEX
+2022-06-06 23:46:12.030  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:68/227; id:qtum; Symbol:QTUM
+2022-06-06 23:46:12.576  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:69/227; id:biconomy; Symbol:BICO
+2022-06-06 23:46:13.137  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:70/227; id:raydium; Symbol:RAY
+2022-06-06 23:46:13.711  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:71/227; id:arpa-chain; Symbol:ARPA
+2022-06-06 23:46:14.291  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:72/227; id:immutable-x; Symbol:IMX
+2022-06-06 23:46:14.867  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:73/227; id:akropolis; Symbol:AKRO
+2022-06-06 23:46:15.443  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:74/227; id:manchester-city-fan-token; Symbol:CITY
+2022-06-06 23:46:16.007  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:75/227; id:keep3rv1; Symbol:KP3R
+2022-06-06 23:46:16.566  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:76/227; id:league-of-kingdoms; Symbol:LOKA
+2022-06-06 23:46:17.158  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:77/227; id:frontier-token; Symbol:FRONT
+2022-06-06 23:46:17.748  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:78/227; id:request-network; Symbol:REQ
+2022-06-06 23:46:18.330  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:79/227; id:republic-protocol; Symbol:REN
+2022-06-06 23:46:18.886  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:80/227; id:beam; Symbol:BEAM
+2022-06-06 23:46:19.478  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:81/227; id:aergo; Symbol:AERGO
+2022-06-06 23:46:20.054  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:82/227; id:spell-token; Symbol:SPELL
+2022-06-06 23:46:20.611  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:83/227; id:dent; Symbol:DENT
+2022-06-06 23:46:21.188  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:84/227; id:ocean-protocol; Symbol:OCEAN
+2022-06-06 23:46:21.765  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:85/227; id:chromaway; Symbol:CHR
+2022-06-06 23:46:22.344  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:86/227; id:omisego; Symbol:OMG
+2022-06-06 23:46:22.937  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:87/227; id:benqi; Symbol:QI
+2022-06-06 23:46:23.481  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:88/227; id:dego-finance; Symbol:DEGO
+2022-06-06 23:46:24.072  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:89/227; id:just; Symbol:JST
+2022-06-06 23:46:24.667  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:90/227; id:tellor; Symbol:TRB
+2022-06-06 23:46:25.258  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:91/227; id:nuls; Symbol:NULS
+2022-06-06 23:46:25.839  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:92/227; id:fetch-ai; Symbol:FET
+2022-06-06 23:46:26.415  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:93/227; id:swipe; Symbol:SXP
+2022-06-06 23:46:27.008  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:94/227; id:atletico-madrid; Symbol:ATM
+2022-06-06 23:46:27.587  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:95/227; id:selfkey; Symbol:KEY
+2022-06-06 23:46:28.146  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:96/227; id:alpine-f1-team-fan-token; Symbol:ALPINE
+2022-06-06 23:46:28.923  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:97/227; id:vulcan-forged; Symbol:PYR
+2022-06-06 23:46:29.518  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:98/227; id:concentrated-voting-power; Symbol:CVP
+2022-06-06 23:46:30.078  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:99/227; id:utrust; Symbol:UTK
+2022-06-06 23:46:30.639  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:100/227; id:curve-dao-token; Symbol:CRV
+2022-06-06 23:46:31.200  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:101/227; id:gitcoin; Symbol:GTC
+2022-06-06 23:46:31.781  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:102/227; id:mantra-dao; Symbol:OM
+2022-06-06 23:46:32.355  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:103/227; id:serum; Symbol:SRM
+2022-06-06 23:46:32.916  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:104/227; id:yearn-finance; Symbol:YFI
+2022-06-06 23:46:33.508  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:105/227; id:safepal; Symbol:SFP
+2022-06-06 23:46:34.088  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:106/227; id:rei-network; Symbol:REI
+2022-06-06 23:46:34.654  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:107/227; id:ooki; Symbol:OOKI
+2022-06-06 23:46:35.218  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:108/227; id:tranchess; Symbol:CHESS
+2022-06-06 23:46:35.780  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:109/227; id:coti; Symbol:COTI
+2022-06-06 23:46:36.340  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:110/227; id:illuvium; Symbol:ILV
+2022-06-06 23:46:36.919  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:111/227; id:waltonchain; Symbol:WTC
+2022-06-06 23:46:37.484  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:112/227; id:contentos; Symbol:COS
+2022-06-06 23:46:38.058  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:113/227; id:dock; Symbol:DOCK
+2022-06-06 23:46:38.621  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:114/227; id:wax; Symbol:WAXP
+2022-06-06 23:46:39.196  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:115/227; id:mobox; Symbol:MBOX
+2022-06-06 23:46:39.757  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:116/227; id:biswap; Symbol:BSW
+2022-06-06 23:46:40.331  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:117/227; id:ankr; Symbol:ANKR
+2022-06-06 23:46:40.904  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:118/227; id:pnetwork; Symbol:PNT
+2022-06-06 23:46:41.467  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:119/227; id:perpetual-protocol; Symbol:PERP
+2022-06-06 23:46:42.041  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:120/227; id:new-bitshares; Symbol:NBS
+2022-06-06 23:46:42.613  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:121/227; id:woo-network; Symbol:WOO
+2022-06-06 23:46:43.187  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:122/227; id:dose-token; Symbol:DOSE
+2022-06-06 23:46:43.764  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:123/227; id:uma; Symbol:UMA
+2022-06-06 23:46:44.338  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:124/227; id:ampleforth-governance-token; Symbol:FORTH
+2022-06-06 23:46:44.912  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:125/227; id:alchemy-pay; Symbol:ACH
+2022-06-06 23:46:45.492  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:126/227; id:superrare; Symbol:RARE
+2022-06-06 23:46:46.043  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:127/227; id:lisk; Symbol:LSK
+2022-06-06 23:46:46.601  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:128/227; id:unlend-finance; Symbol:UFT
+2022-06-06 23:46:47.181  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:129/227; id:bitshares; Symbol:BTS
+2022-06-06 23:46:47.729  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:130/227; id:kava-lend; Symbol:HARD
+2022-06-06 23:46:48.300  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:131/227; id:dia-data; Symbol:DIA
+2022-06-06 23:46:48.864  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:132/227; id:dforce-token; Symbol:DF
+2022-06-06 23:46:49.457  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:133/227; id:playdapp; Symbol:PLA
+2022-06-06 23:46:50.031  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:134/227; id:automata; Symbol:ATA
+2022-06-06 23:46:50.623  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:135/227; id:beta-finance; Symbol:BETA
+2022-06-06 23:46:51.195  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:136/227; id:measurable-data-token; Symbol:MDT
+2022-06-06 23:46:51.773  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:137/227; id:kyber-network-crystal; Symbol:KNC
+2022-06-06 23:46:52.332  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:138/227; id:kava; Symbol:KAVA
+2022-06-06 23:46:52.892  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:139/227; id:superfarm; Symbol:SUPER
+2022-06-06 23:46:53.454  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:140/227; id:syscoin; Symbol:SYS
+2022-06-06 23:46:54.014  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:141/227; id:moonriver; Symbol:MOVR
+2022-06-06 23:46:54.590  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:142/227; id:iostoken; Symbol:IOST
+2022-06-06 23:46:55.328  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:143/227; id:iotex; Symbol:IOTX
+2022-06-06 23:46:55.893  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:144/227; id:livepeer; Symbol:LPT
+2022-06-06 23:46:56.440  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:145/227; id:melon; Symbol:MLN
+2022-06-06 23:46:57.001  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:146/227; id:aion; Symbol:AION
+2022-06-06 23:46:57.575  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:147/227; id:tomochain; Symbol:TOMO
+2022-06-06 23:46:58.149  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:148/227; id:compound-governance-token; Symbol:COMP
+2022-06-06 23:46:58.730  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:149/227; id:adex; Symbol:ADX
+2022-06-06 23:46:59.438  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:150/227; id:api3; Symbol:API3
+2022-06-06 23:47:00.323  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:151/227; id:moonbeam; Symbol:GLMR
+2022-06-06 23:47:01.059  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:152/227; id:skale; Symbol:SKL
+2022-06-06 23:47:01.752  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:153/227; id:bonfida; Symbol:FIDA
+2022-06-06 23:47:02.290  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:154/227; id:hive; Symbol:HIVE
+2022-06-06 23:47:02.850  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:155/227; id:audius; Symbol:AUDIO
+2022-06-06 23:47:03.410  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:156/227; id:orion-protocol; Symbol:ORN
+2022-06-06 23:47:03.987  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:157/227; id:zencash; Symbol:ZEN
+2022-06-06 23:47:04.549  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:158/227; id:alchemix; Symbol:ALCX
+2022-06-06 23:47:05.111  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:159/227; id:concierge-io; Symbol:AVA
+2022-06-06 23:47:05.689  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:160/227; id:joe; Symbol:JOE
+2022-06-06 23:47:06.314  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:161/227; id:pha; Symbol:PHA
+2022-06-06 23:47:06.891  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:162/227; id:tornado-cash; Symbol:TORN
+2022-06-06 23:47:07.470  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:163/227; id:astar; Symbol:ASTR
+2022-06-06 23:47:08.065  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:164/227; id:holotoken; Symbol:HOT
+2022-06-06 23:47:08.628  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:165/227; id:render-token; Symbol:RNDR
+2022-06-06 23:47:09.222  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:166/227; id:ardor; Symbol:ARDR
+2022-06-06 23:47:09.843  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:167/227; id:everipedia; Symbol:IQ
+2022-06-06 23:47:10.404  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:168/227; id:kadena; Symbol:KDA
+2022-06-06 23:47:10.971  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:169/227; id:icon; Symbol:ICX
+2022-06-06 23:47:11.530  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:170/227; id:alpha-finance; Symbol:ALPHA
+2022-06-06 23:47:12.124  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:171/227; id:acala; Symbol:ACA
+2022-06-06 23:47:12.674  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:172/227; id:badger-dao; Symbol:BADGER
+2022-06-06 23:47:13.222  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:173/227; id:bitcoin; Symbol:BTC
+2022-06-06 23:47:13.811  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:174/227; id:zelcash; Symbol:FLUX
+2022-06-06 23:47:14.384  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:175/227; id:dusk-network; Symbol:DUSK
+2022-06-06 23:47:14.932  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:176/227; id:fio-protocol; Symbol:FIO
+2022-06-06 23:47:15.512  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:177/227; id:numeraire; Symbol:NMR
+2022-06-06 23:47:16.090  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:178/227; id:alpaca-finance; Symbol:ALPACA
+2022-06-06 23:47:16.672  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:179/227; id:digibyte; Symbol:DGB
+2022-06-06 23:47:17.254  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:180/227; id:nkn; Symbol:NKN
+2022-06-06 23:47:17.835  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:181/227; id:btc-standard-hashrate-token; Symbol:BTCST
+2022-06-06 23:47:18.412  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:182/227; id:iexec-rlc; Symbol:RLC
+2022-06-06 23:47:18.987  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:183/227; id:bancor; Symbol:BNT
+2022-06-06 23:47:19.536  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:184/227; id:flamingo-finance; Symbol:FLM
+2022-06-06 23:47:20.082  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:185/227; id:celo; Symbol:CELO
+2022-06-06 23:47:20.628  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:186/227; id:orchid-protocol; Symbol:OXT
+2022-06-06 23:47:21.188  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:187/227; id:injective-protocol; Symbol:INJ
+2022-06-06 23:47:21.762  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:188/227; id:iris-network; Symbol:IRIS
+2022-06-06 23:47:22.339  INFO 10112 --- [main] b.BscScanBinanceApplication              : idx:189/227; id:cream-2; Symbol:CREAM
+2022-06-06 23:47:25.195  INFO 10472 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 10472 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:47:25.197  INFO 10472 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:47:26.809  INFO 10472 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:47:26.810  INFO 10472 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:47:26.956  INFO 10472 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:47:27.177  INFO 10472 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:47:27.250  INFO 10472 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:47:27.508  INFO 10472 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:47:27.752  INFO 10472 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:47:28.575  INFO 10472 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:47:29.685  INFO 10472 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.098 seconds (JVM running for 6.229)
+2022-06-06 23:47:29.870  INFO 10472 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:47:30.256  INFO 10472 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:47:31.526  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:47:32.323  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:47:32.928  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:47:33.537  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:47:34.297  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:47:34.333  INFO 10472 --- [http-nio-8090-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:47:34.396  INFO 10472 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:47:34.488  WARN 10472 --- [http-nio-8090-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42601
+2022-06-06 23:47:34.488 ERROR 10472 --- [http-nio-8090-exec-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: syntax error at or near "can"
+  Position: 10703
+2022-06-06 23:47:34.505  INFO 10472 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:47:34.505 ERROR 10472 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:47:34.902  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:47:35.517  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:ramp; Symbol:RAMP
+2022-06-06 23:47:36.124  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:47:36.718  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:47:37.389  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:47:37.999  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:47:38.591  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:47:39.231  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:47:39.839  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:47:40.447  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:47:41.070  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:47:41.694  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:dexe; Symbol:DEXE
+2022-06-06 23:47:42.318  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:47:42.960  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:47:43.600  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:waves; Symbol:WAVES
+2022-06-06 23:47:44.239  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:47:44.861  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:balancer; Symbol:BAL
+2022-06-06 23:47:45.486  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:47:46.109  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:steem; Symbol:STEEM
+2022-06-06 23:47:46.732  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:47:47.357  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:47:47.965  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:optimism; Symbol:OP
+2022-06-06 23:47:48.572  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:linear; Symbol:LINA
+2022-06-06 23:47:49.195  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:gifto; Symbol:GTO
+2022-06-06 23:47:49.807  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:47:50.435  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:47:51.039  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:47:51.647  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:47:52.267  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:47:52.892  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:47:53.514  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:47:54.139  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:47:54.746  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:mirror-protocol; Symbol:MIR
+2022-06-06 23:47:55.357  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:38/227; id:santos-fc-fan-token; Symbol:SANTOS
+2022-06-06 23:47:55.979  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:39/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:47:56.556  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:40/227; id:reef-finance; Symbol:REEF
+2022-06-06 23:47:57.194  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:41/227; id:storj; Symbol:STORJ
+2022-06-06 23:47:57.807  INFO 10472 --- [main] b.BscScanBinanceApplication              : idx:42/227; id:clover-finance; Symbol:CLV
+2022-06-06 23:48:02.567  INFO 11932 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 11932 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:48:02.570  INFO 11932 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:48:04.249  INFO 11932 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:48:04.250  INFO 11932 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:48:04.375  INFO 11932 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:48:04.597  INFO 11932 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:48:04.662  INFO 11932 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:48:04.912  INFO 11932 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:48:05.180  INFO 11932 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:48:05.989  INFO 11932 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:48:07.125  INFO 11932 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.171 seconds (JVM running for 6.686)
+2022-06-06 23:48:07.304  INFO 11932 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:48:07.678  INFO 11932 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:48:08.907  INFO 11932 --- [http-nio-8090-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:48:08.968  INFO 11932 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:48:09.050  WARN 11932 --- [http-nio-8090-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 42883
+2022-06-06 23:48:09.051 ERROR 11932 --- [http-nio-8090-exec-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: operator does not exist: numeric = money
+  Hint: No operator matches the given name and argument types. You might need to add explicit type casts.
+  Position: 10589
+2022-06-06 23:48:09.068  INFO 11932 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Get list Inquiry Consigned Delivery error ------->
+2022-06-06 23:48:09.068 ERROR 11932 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : org.hibernate.exception.SQLGrammarException: could not extract ResultSet
+2022-06-06 23:48:09.274  INFO 11932 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:48:09.873  INFO 11932 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:48:10.482  INFO 11932 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:48:11.088  INFO 11932 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:48:11.708  INFO 11932 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:48:12.317  INFO 11932 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:48:12.896  INFO 11932 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:ramp; Symbol:RAMP
+2022-06-06 23:48:13.325  INFO 11932 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-06-06 23:48:13.340  INFO 11932 --- [RMI TCP Connection(2)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2022-06-06 23:48:13.504  INFO 11932 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:48:13.932 ERROR 11932 --- [main] b.BscScanBinanceApplication              : dkd error LoadData:Error creating bean with name 'spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties': Could not bind properties to 'DataSourceProperties' : prefix=spring.datasource, ignoreInvalidFields=false, ignoreUnknownFields=true; nested exception is java.lang.IllegalStateException: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@246f8b8b has been closed already
+2022-06-06 23:48:48.372  INFO 11152 --- [main] b.BscScanBinanceApplication              : Starting BscScanBinanceApplication using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 11152 (E:\00_Projects\BiGek\bsc_scan_binance\target\classes started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:48:48.375  INFO 11152 --- [main] b.BscScanBinanceApplication              : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:48:50.442  INFO 11152 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-06-06 23:48:50.442  INFO 11152 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.63]
+2022-06-06 23:48:50.589  INFO 11152 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-06-06 23:48:50.826  INFO 11152 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:48:50.913  INFO 11152 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:48:51.177  INFO 11152 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:48:51.434  INFO 11152 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:48:52.215  INFO 11152 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:48:53.359  INFO 11152 --- [main] b.BscScanBinanceApplication              : Started BscScanBinanceApplication in 5.675 seconds (JVM running for 7.083)
+2022-06-06 23:48:53.552  INFO 11152 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-06-06 23:48:53.949  INFO 11152 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-06-06 23:48:55.178  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:0/227; id:mithril; Symbol:MITH
+2022-06-06 23:48:55.802  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:1/227; id:moviebloc; Symbol:MBL
+2022-06-06 23:48:56.414  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:2/227; id:bella-protocol; Symbol:BEL
+2022-06-06 23:48:57.005  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:3/227; id:unifi-protocol-dao; Symbol:UNFI
+2022-06-06 23:48:57.612  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:4/227; id:as-roma-fan-token; Symbol:ASR
+2022-06-06 23:48:57.983  INFO 11152 --- [http-nio-8090-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-06-06 23:48:58.031  INFO 11152 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:48:58.378  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:5/227; id:jasmycoin; Symbol:JASMY
+2022-06-06 23:48:58.408  INFO 11152 --- [http-nio-8090-exec-1] b.service.impl.BinanceServiceImpl        : End getList <--
+2022-06-06 23:48:58.992  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:6/227; id:ramp; Symbol:RAMP
+2022-06-06 23:48:59.612  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:7/227; id:my-neighbor-alice; Symbol:ALICE
+2022-06-06 23:49:00.228  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:8/227; id:metal; Symbol:MTL
+2022-06-06 23:49:00.805  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:9/227; id:fc-barcelona-fan-token; Symbol:BAR
+2022-06-06 23:49:01.552  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:10/227; id:force-protocol; Symbol:FOR
+2022-06-06 23:49:02.501  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:11/227; id:power-ledger; Symbol:POWR
+2022-06-06 23:49:03.266  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:12/227; id:auto; Symbol:AUTO
+2022-06-06 23:49:03.874  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:13/227; id:bluzelle; Symbol:BLZ
+2022-06-06 23:49:04.470  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:14/227; id:og-fan-token; Symbol:OG
+2022-06-06 23:49:05.047  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:15/227; id:stepn; Symbol:GMT
+2022-06-06 23:49:05.626  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:16/227; id:dexe; Symbol:DEXE
+2022-06-06 23:49:06.422  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:17/227; id:barnbridge; Symbol:BOND
+2022-06-06 23:49:07.030  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:18/227; id:paris-saint-germain-fan-token; Symbol:PSG
+2022-06-06 23:49:07.657  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:19/227; id:waves; Symbol:WAVES
+2022-06-06 23:49:08.252  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:20/227; id:anchor-protocol; Symbol:ANC
+2022-06-06 23:49:09.049  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:21/227; id:balancer; Symbol:BAL
+2022-06-06 23:49:09.663  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:22/227; id:aelf; Symbol:ELF
+2022-06-06 23:49:10.269  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:23/227; id:steem; Symbol:STEEM
+2022-06-06 23:49:10.861  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:24/227; id:alien-worlds; Symbol:TLM
+2022-06-06 23:49:11.452  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:25/227; id:tokocrypto; Symbol:TKO
+2022-06-06 23:49:12.031  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:26/227; id:optimism; Symbol:OP
+2022-06-06 23:49:12.624  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:27/227; id:linear; Symbol:LINA
+2022-06-06 23:49:13.247  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:28/227; id:gifto; Symbol:GTO
+2022-06-06 23:49:13.838  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:29/227; id:origin-protocol; Symbol:OGN
+2022-06-06 23:49:14.433  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:30/227; id:cartesi; Symbol:CTSI
+2022-06-06 23:49:15.182  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:31/227; id:bakerytoken; Symbol:BAKE
+2022-06-06 23:49:15.766  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:32/227; id:juventus-fan-token; Symbol:JUV
+2022-06-06 23:49:16.332  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:33/227; id:dodo; Symbol:DODO
+2022-06-06 23:49:16.937  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:34/227; id:ontology; Symbol:ONT
+2022-06-06 23:49:17.529  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:35/227; id:pundi-x-2; Symbol:PUNDIX
+2022-06-06 23:49:18.152  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:36/227; id:v-id-blockchain; Symbol:VIDT
+2022-06-06 23:49:18.728  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:37/227; id:mirror-protocol; Symbol:MIR
+2022-06-06 23:49:19.309  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:38/227; id:santos-fc-fan-token; Symbol:SANTOS
+2022-06-06 23:49:19.905  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:39/227; id:cocos-bcx; Symbol:COCOS
+2022-06-06 23:49:20.490  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:40/227; id:reef-finance; Symbol:REEF
+2022-06-06 23:49:21.111  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:41/227; id:storj; Symbol:STORJ
+2022-06-06 23:49:21.674  INFO 11152 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:49:21.686  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:42/227; id:clover-finance; Symbol:CLV
+2022-06-06 23:49:21.831  INFO 11152 --- [http-nio-8090-exec-2] b.service.impl.BinanceServiceImpl        : End getList <--
+2022-06-06 23:49:22.266  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:43/227; id:cortex; Symbol:CTXC
+2022-06-06 23:49:22.832  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:44/227; id:harvest-finance; Symbol:FARM
+2022-06-06 23:49:23.415  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:45/227; id:lazio-fan-token; Symbol:LAZIO
+2022-06-06 23:49:23.992  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:46/227; id:radicle; Symbol:RAD
+2022-06-06 23:49:24.599  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:47/227; id:mask-network; Symbol:MASK
+2022-06-06 23:49:25.193  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:48/227; id:band-protocol; Symbol:BAND
+2022-06-06 23:49:25.547  INFO 11152 --- [http-nio-8090-exec-3] b.service.impl.BinanceServiceImpl        : Start getList ---->
+2022-06-06 23:49:25.686  INFO 11152 --- [http-nio-8090-exec-3] b.service.impl.BinanceServiceImpl        : End getList <--
+2022-06-06 23:49:25.797  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:49/227; id:tokenclub; Symbol:TCT
+2022-06-06 23:49:26.392  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:50/227; id:dydx; Symbol:DYDX
+2022-06-06 23:49:26.985  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:51/227; id:mainframe; Symbol:MFT
+2022-06-06 23:49:27.565  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:52/227; id:reserve-rights-token; Symbol:RSR
+2022-06-06 23:49:28.172  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:53/227; id:marlin; Symbol:POND
+2022-06-06 23:49:28.751  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:54/227; id:sushi; Symbol:SUSHI
+2022-06-06 23:49:29.359  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:55/227; id:coin98; Symbol:C98
+2022-06-06 23:49:29.952  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:56/227; id:wing-finance; Symbol:WING
+2022-06-06 23:49:30.528  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:57/227; id:litentry; Symbol:LIT
+2022-06-06 23:49:31.120  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:58/227; id:aragon; Symbol:ANT
+2022-06-06 23:49:31.726  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:59/227; id:terra-virtua-kolect; Symbol:TVK
+2022-06-06 23:49:32.305  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:60/227; id:yield-guild-games; Symbol:YGG
+2022-06-06 23:49:32.883  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:61/227; id:celer-network; Symbol:CELR
+2022-06-06 23:49:33.443  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:62/227; id:oasis-network; Symbol:ROSE
+2022-06-06 23:49:34.034  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:63/227; id:beefy-finance; Symbol:BIFI
+2022-06-06 23:49:34.599  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:64/227; id:ethernity-chain; Symbol:ERN
+2022-06-06 23:49:35.159  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:65/227; id:stratis; Symbol:STRAX
+2022-06-06 23:49:35.735  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:66/227; id:troy; Symbol:TROY
+2022-06-06 23:49:36.283  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:67/227; id:aurora-dao; Symbol:IDEX
+2022-06-06 23:49:36.865  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:68/227; id:qtum; Symbol:QTUM
+2022-06-06 23:49:37.453  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:69/227; id:biconomy; Symbol:BICO
+2022-06-06 23:49:38.203  INFO 11152 --- [main] b.BscScanBinanceApplication              : idx:70/227; id:raydium; Symbol:RAY
+2022-06-06 23:50:05.560  INFO 4816 --- [main] b.BscScanBinanceApplicationTests         : Starting BscScanBinanceApplicationTests using Java 1.8.0_201 on DESKTOP-L4M1JU2 with PID 4816 (started by DellE5270 in E:\00_Projects\BiGek\bsc_scan_binance)
+2022-06-06 23:50:05.608  INFO 4816 --- [main] b.BscScanBinanceApplicationTests         : The following 1 profile is active: "@spring.profiles.active@"
+2022-06-06 23:50:07.776  INFO 4816 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-06-06 23:50:07.885  INFO 4816 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.9.Final
+2022-06-06 23:50:08.225  INFO 4816 --- [main] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-06-06 23:50:08.534  INFO 4816 --- [main] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-06-06 23:50:09.602  INFO 4816 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-06-06 23:50:12.229  INFO 4816 --- [main] b.BscScanBinanceApplicationTests         : Started BscScanBinanceApplicationTests in 7.262 seconds (JVM running for 8.929)

@@ -6,7 +6,7 @@ import bsc_scan_binance.response.CandidateTokenCssResponse;
 
 public interface BinanceService {
 
-    List<CandidateTokenCssResponse> getList();
+    List<CandidateTokenCssResponse> getList(Boolean isOrderByBynaceVolume);
 
     public void loadData(String gecko_id, String symbol);
 

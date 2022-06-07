@@ -78,6 +78,7 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "day_10", type = String.class),
                 @ColumnResult(name = "day_11", type = String.class),
                 @ColumnResult(name = "day_12", type = String.class),
+                @ColumnResult(name = "priority", type = String.class),
         })
 })
 

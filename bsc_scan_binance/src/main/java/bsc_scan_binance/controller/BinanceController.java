@@ -26,7 +26,13 @@ public class BinanceController {
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("data_list", service.getList());
+        model.addAttribute("data_list", service.getList(false));
+        return "binance";
+    }
+
+    @GetMapping("/binance")
+    public String listOrderByBinaceVolume(Model model) {
+        model.addAttribute("data_list", service.getList(true));
         return "binance";
     }
 
