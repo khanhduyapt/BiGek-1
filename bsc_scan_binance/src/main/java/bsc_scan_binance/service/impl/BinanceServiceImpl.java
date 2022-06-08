@@ -250,12 +250,6 @@ public class BinanceServiceImpl implements BinanceService {
                         + " ORDER BY 																			  \n"
                         + "  COALESCE(can.priority, 3) ASC, 													  \n"
                         + " (CAST(can.vol_now * 1000000 AS money) / (case when CAST(can.market_cap AS money) = CAST(0 AS money) then CAST(can.gecko_total_volume AS money)  else CAST(can.market_cap AS money) end )) desc,  \n"
-                        //+ "  (case when (CAST(can.vol_now * 1000000 AS money) / (case when CAST(can.market_cap AS money) = CAST(0 AS money) then CAST(can.gecko_total_volume AS money)  else CAST(can.market_cap AS money) end )) > 1 then 1    \n"
-                        //+ "       when (CAST(can.vol_now * 1000000  AS money) / (case when CAST(can.market_cap AS money) = CAST(0 AS money) then CAST(can.gecko_total_volume AS money)  else CAST(can.market_cap AS money) end )) > 0.75 then 2 \n"
-                        //+ " 	  when (CAST(can.vol_now * 1000000  AS money) / (case when CAST(can.market_cap AS money) = CAST(0 AS money) then CAST(can.gecko_total_volume AS money)  else CAST(can.market_cap AS money) end )) > 0.5 then 3  \n"
-                        //+ " 	  when (CAST(can.vol_now * 1000000  AS money) / (case when CAST(can.market_cap AS money) = CAST(0 AS money) then CAST(can.gecko_total_volume AS money)  else CAST(can.market_cap AS money) end )) > 0.25 then 4 \n"
-                        //+ " 	  when (CAST(can.vol_now * 1000000  AS money) / (case when CAST(can.market_cap AS money) = CAST(0 AS money) then CAST(can.gecko_total_volume AS money)  else CAST(can.market_cap AS money) end )) > 0.1 then 5  \n"
-                        //+ " 	  else 6 end) asc, 																\n"
                         + " can.volumn_div_marketcap desc \n";
             } else {
                 sql += " order by                                                                                 \n"

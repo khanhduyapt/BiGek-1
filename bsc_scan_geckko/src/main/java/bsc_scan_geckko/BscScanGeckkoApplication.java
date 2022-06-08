@@ -41,7 +41,7 @@ public class BscScanGeckkoApplication {
                     wait(600000);
                 }
 
-                wait(2000);// 2000ms=30 request/minus
+                wait(1500);// 60000:2000ms=30 request/minus 1500=40
 
                 log.info("idx:" + String.valueOf(idx) + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                         + coin.getSymbol());
