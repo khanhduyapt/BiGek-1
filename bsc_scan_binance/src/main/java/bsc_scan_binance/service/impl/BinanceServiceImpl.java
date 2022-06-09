@@ -248,7 +248,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "                                                                                           \n"
                     + " where                                                                                     \n"
                     + "       cur.hh = TO_CHAR(NOW(), 'HH24')                                                     \n"
-                    + "   AND ( ((can.market_cap > 0) AND (ROUND(can.volumn_div_marketcap * 100, 0) > 10)) OR (can.market_cap = 0) OR (coalesce(can.priority, 3) < 3)) \n"
+                    //+ "   AND ( ((can.market_cap > 0) AND (ROUND(can.volumn_div_marketcap * 100, 0) > 10)) OR (can.market_cap = 0) OR (coalesce(can.priority, 3) < 3)) \n"
                     + "   and can.gecko_id = cur.gecko_id                                                         \n"
                     + "   and can.symbol = cur.symbol                                                             \n";
 
