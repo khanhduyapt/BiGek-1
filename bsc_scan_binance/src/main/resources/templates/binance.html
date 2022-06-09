@@ -115,8 +115,9 @@ p {
 							th:text="${token.symbol}"></span></a>
 						<p style="font-size: 0.7rem !important;" th:text="${token.trend}"></td>
 
-					<td style="min-width: 120px !important; max-width: 150px !important;"><a th:target="_blank"
-						th:href="${token.coin_gecko_link}"> <span
+					<td
+						style="min-width: 120px !important; max-width: 150px !important;"><a
+						th:target="_blank" th:href="${token.coin_gecko_link}"> <span
 							th:text="${token.name}"></span></a>
 						<p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
 					</td>
@@ -131,7 +132,8 @@ p {
 							th:text="${token.gecko_volumn_history}">
 					</td>
 
-					<td style="text-align: right; max-width: 120px !important;" class="bg-light important;"
+					<td style="text-align: right; max-width: 120px !important;"
+						class="bg-light important;"
 						th:classappend="${token.volumn_div_marketcap_css}">
 						<p th:text="${token.volumn_div_marketcap} + '%'">
 						<p th:classappend="${token.volumn_binance_div_marketcap_css}"
@@ -145,8 +147,12 @@ p {
 							th:text="${token.pre_vol_history}">
 					</td>
 
-					<td style="text-align: right; max-width: 120px !important;">
-						<p th:text="${token.current_price} + '$'" />
+					<td
+						style="text-align: right; min-width: 125px !important; max-width: 125px !important;">
+						<p th:classappend="${token.avg_price_css}"
+							th:text="${token.current_price} + '$'"></p>
+						<p style="font-size: 0.9rem !important;"
+							th:text="${token.avg_price}"></p>
 						<p style="font-size: 0.7rem !important;"
 							th:text="${token.pre_price_history}" />
 					</td>

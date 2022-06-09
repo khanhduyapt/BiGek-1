@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,18 +72,25 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<Object> arr_busd = (List<Object>) obj_busd;
 
+            BigDecimal price_open = Utils.getBigDecimal(arr_usdt.get(1));
             BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
             BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
+            BigDecimal price_close = Utils.getBigDecimal(arr_usdt.get(4));
             String close_time = arr_usdt.get(6).toString();
 
             if (Objects.equals("0", close_time)) {
+                price_open = Utils.getBigDecimal(arr_busd.get(1));
                 price_high = Utils.getBigDecimal(arr_busd.get(2));
                 price_low = Utils.getBigDecimal(arr_busd.get(3));
+                price_close = Utils.getBigDecimal(arr_busd.get(4));
+
                 close_time = arr_busd.get(6).toString();
             }
 
             if (!Objects.equals("0", close_time)) {
-                BigDecimal avgPrice = price_low.add(price_high).divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
+                BigDecimal avgPrice = price_low.add(price_high).add(price_open).add(price_close)
+                        .divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
+
                 Date date = Utils.getDate(close_time);
 
                 BigDecimal quote_asset_volume1 = Utils.getBigDecimal(arr_usdt.get(7));
@@ -262,14 +270,22 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<CandidateTokenResponse> results = query.getResultList();
 
+            Formatter formatter = new Formatter();
+
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
             ModelMapper mapper = new ModelMapper();
             for (CandidateTokenResponse dto : results) {
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
                 mapper.map(dto, css);
 
+                BigDecimal price_now = Utils.getBigDecimal(dto.getPrice_now());
                 BigDecimal market_cap = Utils.getBigDecimal(dto.getMarket_cap());
                 BigDecimal gecko_total_volume = Utils.getBigDecimal(dto.getGecko_total_volume());
+
+                Boolean isNeedFormat = false;
+                if (price_now.compareTo(BigDecimal.valueOf(1)) > 0) {
+                    isNeedFormat = true;
+                }
 
                 if ((market_cap.compareTo(BigDecimal.valueOf(36000001)) < 0)
                         && (market_cap.compareTo(BigDecimal.valueOf(1000000)) > 0)) {
@@ -454,6 +470,36 @@ public class BinanceServiceImpl implements BinanceService {
                 int idx_vol_min = getIndexMin(volList);
                 int idx_price_min = getIndexMin(priceList);
 
+                //--------------AVG PRICE---------------
+                BigDecimal avg_price = BigDecimal.ZERO;
+                BigDecimal total_price = BigDecimal.ZERO;
+                for (String price : priceList) {
+                    if (!Objects.equals("", price)) {
+                        total_price = total_price.add(BigDecimal.valueOf(Double.valueOf(price)));
+                    }
+                }
+
+                avg_price = total_price.divide(BigDecimal.valueOf(priceList.size()), 5,
+                        RoundingMode.CEILING);
+
+                if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
+
+                    if (avg_price.compareTo(price_now) < 1) {
+                        css.setAvg_price_css("text-primary");
+                    } else {
+                        css.setAvg_price_css("text-danger");
+                    }
+
+                    String str_avg_price = "(" + ((price_now.divide(avg_price, 2, RoundingMode.CEILING)
+                            .multiply(BigDecimal.valueOf(100))).subtract(BigDecimal.valueOf(100)))
+                                    .toString()
+                                    .replace(".00", "");
+
+                    str_avg_price += "% Avg:" + removeLastZero(formatPrice(avg_price, isNeedFormat).toString()) + "$)";
+                    css.setAvg_price(str_avg_price);
+                }
+                //-----------------------------
+
                 String str_down = "";
 
                 if (Utils.getBigDecimal(priceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
@@ -466,8 +512,6 @@ public class BinanceServiceImpl implements BinanceService {
                 setPriceDayCss(css, idx_price_max, "text-primary", ""); // Max Price
                 setVolumnDayCss(css, idx_vol_min, "text-danger"); // Min Volumn
                 setPriceDayCss(css, idx_price_min, "text-danger", str_down); // Min Price
-
-                BigDecimal price_now = Utils.getBigDecimal(dto.getPrice_now());
 
                 BigDecimal min_add_5_percent = Utils.getBigDecimal(priceList.get(idx_price_min));
                 min_add_5_percent = min_add_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(1.05)));
@@ -517,6 +561,17 @@ public class BinanceServiceImpl implements BinanceService {
             log.error(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
+    }
+
+    private BigDecimal formatPrice(BigDecimal value, Boolean isNeedFormat) {
+        @SuppressWarnings("resource")
+        Formatter formatter = new Formatter();
+        if (isNeedFormat) {
+            formatter.format("%.2f", value);
+        } else {
+            formatter.format("%.3f", value);
+        }
+        return BigDecimal.valueOf(Double.valueOf(formatter.toString()));
     }
 
     private Long getValue(String value) {

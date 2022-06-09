@@ -25,6 +25,9 @@ public class CandidateTokenCssResponse {
     private String market_cap_css;
 
     private String current_price;
+    private String avg_price;
+    private String avg_price_css;
+
     private String pre_price_history;
     private String gecko_total_volume;
     private String gecko_volumn_history;
