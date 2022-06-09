@@ -277,6 +277,11 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal market_cap = Utils.getBigDecimal(dto.getMarket_cap());
                 BigDecimal gecko_total_volume = Utils.getBigDecimal(dto.getGecko_total_volume());
 
+                if ((market_cap.compareTo(BigDecimal.valueOf(36000001)) < 0)
+                        && (market_cap.compareTo(BigDecimal.valueOf(1000000)) > 0)) {
+                    css.setMarket_cap_css("highlight");
+                }
+
                 if (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0) {
                     css.setMarket_cap(
                             market_cap.divide(BigDecimal.valueOf(1000000000), 2, RoundingMode.CEILING).toString());

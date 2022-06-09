@@ -122,6 +122,7 @@ p {
 					</td>
 
 					<td style="text-align: right; max-width: 110px !important;"
+						th:classappend="${token.market_cap_css}"
 						th:text="${#numbers.formatDecimal(token.market_cap, 0, 'COMMA', 0, 'POINT') + '$'}">
 					<td style="text-align: right; max-width: 110px !important;">
 						<p
