@@ -25,7 +25,10 @@ public class CandidateTokenCssResponse {
     private String market_cap_css;
 
     private String current_price;
+    private String avg_percent;
     private String avg_price;
+    private String min_price;
+    private String max_price;
     private String avg_price_css;
 
     private String pre_price_history;

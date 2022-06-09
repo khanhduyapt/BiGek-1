@@ -470,36 +470,6 @@ public class BinanceServiceImpl implements BinanceService {
                 int idx_vol_min = getIndexMin(volList);
                 int idx_price_min = getIndexMin(priceList);
 
-                //--------------AVG PRICE---------------
-                BigDecimal avg_price = BigDecimal.ZERO;
-                BigDecimal total_price = BigDecimal.ZERO;
-                for (String price : priceList) {
-                    if (!Objects.equals("", price)) {
-                        total_price = total_price.add(BigDecimal.valueOf(Double.valueOf(price)));
-                    }
-                }
-
-                avg_price = total_price.divide(BigDecimal.valueOf(priceList.size()), 5,
-                        RoundingMode.CEILING);
-
-                if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
-
-                    if (avg_price.compareTo(price_now) < 1) {
-                        css.setAvg_price_css("text-primary");
-                    } else {
-                        css.setAvg_price_css("text-danger");
-                    }
-
-                    String str_avg_price = "(" + ((price_now.divide(avg_price, 2, RoundingMode.CEILING)
-                            .multiply(BigDecimal.valueOf(100))).subtract(BigDecimal.valueOf(100)))
-                                    .toString()
-                                    .replace(".00", "");
-
-                    str_avg_price += "% Avg:" + removeLastZero(formatPrice(avg_price, isNeedFormat).toString()) + "$)";
-                    css.setAvg_price(str_avg_price);
-                }
-                //-----------------------------
-
                 String str_down = "";
 
                 if (Utils.getBigDecimal(priceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
@@ -548,6 +518,40 @@ public class BinanceServiceImpl implements BinanceService {
                     setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
 
                 }
+
+                //--------------AVG PRICE---------------
+                BigDecimal avg_price = BigDecimal.ZERO;
+                BigDecimal total_price = BigDecimal.ZERO;
+                for (String price : priceList) {
+                    if (!Objects.equals("", price)) {
+                        total_price = total_price.add(BigDecimal.valueOf(Double.valueOf(price)));
+                    }
+                }
+
+                avg_price = total_price.divide(BigDecimal.valueOf(priceList.size()), 5,
+                        RoundingMode.CEILING);
+
+                if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
+
+                    if (avg_price.compareTo(price_now) < 1) {
+                        css.setAvg_price_css("text-primary font-weight-bold");
+                    } else {
+                        css.setAvg_price_css("text-danger font-weight-bold");
+                    }
+                    BigDecimal percent = ((price_now.divide(avg_price, 2, RoundingMode.CEILING)
+                            .multiply(BigDecimal.valueOf(100))).subtract(BigDecimal.valueOf(100)));
+
+                    css.setAvg_price(removeLastZero(avg_price.toString()));
+                    css.setAvg_percent(percent.toString().replace(".00", "") + "%");
+                    css.setAvg_price(removeLastZero(avg_price.toString()));
+                    css.setMin_price(removeLastZero(priceList.get(idx_price_min)));
+                    css.setMax_price(removeLastZero(priceList.get(idx_price_max)));
+
+                    if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)) {
+                        css.setStar("Ok");
+                    }
+                }
+                //-----------------------------
 
                 list.add(css);
             }

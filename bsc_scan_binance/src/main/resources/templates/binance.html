@@ -71,6 +71,8 @@ p {
 					<th class="text-center" scope="col">V4h Binance</th>
 
 					<th class="text-center" scope="col">Price</th>
+					<th class="text-center" scope="col">Avg</th>
+
 					<th class="text-center" scope="col">%24h</th>
 					<th class="text-center" scope="col">%7d</th>
 					<th class="text-center" scope="col">%14d</th>
@@ -149,12 +151,25 @@ p {
 
 					<td
 						style="text-align: right; min-width: 125px !important; max-width: 125px !important;">
-						<p th:classappend="${token.avg_price_css}"
-							th:text="${token.current_price} + '$'"></p>
-						<p style="font-size: 0.9rem !important;"
-							th:text="${token.avg_price}"></p>
+						<p th:text="${token.current_price} + '$'"></p>
 						<p style="font-size: 0.7rem !important;"
 							th:text="${token.pre_price_history}" />
+					</td>
+
+					<td
+						style="text-align: right; min-width: 125px !important; max-width: 125px !important;">
+						<div>
+							<span th:text="${token.avg_price + '$'}"></span> <span
+								th:classappend="${token.avg_price_css}"
+								th:text="${token.avg_percent}"></span>
+						</div>
+						<div>
+							<span style="font-size: 0.8rem !important;"
+								th:text="${token.min_price}"></span>~<span
+								style="font-size: 0.8rem !important;"
+								th:text="${token.max_price}"></span>
+						</div>
+
 					</td>
 
 					<td style="text-align: right;"
