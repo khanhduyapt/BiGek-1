@@ -308,7 +308,7 @@ public class BinanceServiceImpl implements BinanceService {
                     volumn_binance_div_marketcap = Utils.getBigDecimal(dto.getVol_now()).divide(
                             market_cap.divide(BigDecimal.valueOf(100000000), 5, RoundingMode.CEILING), 1,
                             RoundingMode.CEILING);
-                } else {
+                } else if (gecko_total_volume.compareTo(BigDecimal.ZERO) > 0) {
                     volumn_binance_div_marketcap = Utils.getBigDecimal(dto.getVol_now()).divide(
                             gecko_total_volume.divide(BigDecimal.valueOf(100000000), 5, RoundingMode.CEILING), 1,
                             RoundingMode.CEILING);
