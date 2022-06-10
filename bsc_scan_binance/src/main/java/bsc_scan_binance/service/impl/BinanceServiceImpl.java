@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -191,10 +190,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "                                                                                           \n"
                     + "   ROUND((cur.total_volume / COALESCE ((SELECT (case when pre.total_volume = 0.0 then 1000000000 else pre.total_volume end) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 1000000000) * 100 - 100), 0) pre_4h_total_volume_up, \n"
                     + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                      as vol_now, 	\n"
-                    + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as vol_pre_1h, \n"
-                    + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as vol_pre_2h, \n"
-                    + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0) as vol_pre_3h, \n"
-                    + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0) as vol_pre_4h, \n"
                     + "                                                                                           \n"
                     + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                     , 3) as price_now,    \n"
                     + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0), 3) as price_pre_1h, \n"
@@ -203,7 +198,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0), 3) as price_pre_4h, \n"
                     + "                                                                                           \n"
                     + "   can.market_cap ,                                                                        \n"
-                    + "   can.current_price,                                                                      \n"
+                    + "   cur.price_at_binance            as current_price,                                       \n"
                     + "   can.total_volume                as gecko_total_volume,                                  \n"
                     + "                                                                                           \n"
                     + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as gec_vol_pre_1h, \n"
@@ -248,7 +243,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "                                                                                           \n"
                     + " where                                                                                     \n"
                     + "       cur.hh = TO_CHAR(NOW(), 'HH24')                                                     \n"
-                    //+ "   AND ( ((can.market_cap > 0) AND (ROUND(can.volumn_div_marketcap * 100, 0) > 10)) OR (can.market_cap = 0) OR (coalesce(can.priority, 3) < 3)) \n"
                     + "   and can.gecko_id = cur.gecko_id                                                         \n"
                     + "   and can.symbol = cur.symbol                                                             \n";
 
@@ -270,8 +264,6 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<CandidateTokenResponse> results = query.getResultList();
 
-            Formatter formatter = new Formatter();
-
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
             ModelMapper mapper = new ModelMapper();
             for (CandidateTokenResponse dto : results) {
@@ -281,11 +273,6 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal price_now = Utils.getBigDecimal(dto.getPrice_now());
                 BigDecimal market_cap = Utils.getBigDecimal(dto.getMarket_cap());
                 BigDecimal gecko_total_volume = Utils.getBigDecimal(dto.getGecko_total_volume());
-
-                Boolean isNeedFormat = false;
-                if (price_now.compareTo(BigDecimal.valueOf(1)) > 0) {
-                    isNeedFormat = true;
-                }
 
                 if ((market_cap.compareTo(BigDecimal.valueOf(36000001)) < 0)
                         && (market_cap.compareTo(BigDecimal.valueOf(1000000)) > 0)) {
@@ -330,18 +317,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap_str);
-                css.setPre_4h_total_volume_up(dto.getPre_4h_total_volume_up());
-
-                if (getValue(dto.getPre_4h_total_volume_up()) > Long.valueOf(200)) {
-                    css.setPre_4h_total_volume_up_css("text-primary font-weight-bold");
-                }
-                // Volume
-                String pre_vol_history = dto.getVol_now() + "←" + dto.getVol_pre_1h() + "← " + dto.getVol_pre_2h() + "←"
-                        + dto.getVol_pre_3h() + "←" + dto.getVol_pre_4h() + "M";
-                if (pre_vol_history.length() > 35) {
-                    pre_vol_history = pre_vol_history.substring(0, 35);
-                }
-                css.setPre_vol_history(pre_vol_history);
 
                 // Price
                 String pre_price_history = removeLastZero(dto.getPrice_now()) + "←"
@@ -524,19 +499,19 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal total_price = BigDecimal.ZERO;
                 for (String price : priceList) {
                     if (!Objects.equals("", price)) {
-                        total_price = total_price.add(BigDecimal.valueOf(Double.valueOf(price)));
+                        total_price = total_price.add(Utils.getBigDecimalValue(price));
                     }
                 }
 
                 avg_price = total_price.divide(BigDecimal.valueOf(priceList.size()), 5,
                         RoundingMode.CEILING);
 
+                price_now = Utils.getBigDecimalValue(css.getCurrent_price());
                 //if (Objects.equals("unlend-finance", dto.getGecko_id())) {
                 //    boolean debug = true;
                 //}
 
                 if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
-                    price_now = BigDecimal.valueOf(Double.valueOf(css.getCurrent_price()));
 
                     if (avg_price.compareTo(price_now) < 1) {
                         css.setAvg_price_css("text-primary font-weight-bold");
@@ -552,8 +527,39 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setMin_price(removeLastZero(priceList.get(idx_price_min)));
                     css.setMax_price(removeLastZero(priceList.get(idx_price_max)));
 
-                    if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)) {
+                    if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)
+                            && ((Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
+                                    .compareTo(BigDecimal.valueOf(10)) > -1))) {
                         css.setStar("good");
+                    }
+                }
+
+                {
+                    //tp_price: x2:aaa$ or 50%: bbb$ or 20%:ccc$ 10%:ddd$
+                    //stop_limit: price_min * 0.95
+                    //stop_price: price_min * 0.945
+                    String star = css.getStar().toLowerCase();
+
+                    if (star.contains("good") || star.contains("sale")) {
+
+                        String oco_tp_price = "X2:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(2)), 5).toString()
+                                + " 50%:" + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString()
+                                + " 20%:" + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString()
+                                + " 10%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString();
+
+                        BigDecimal price_min = Utils.getBigDecimal(priceList.get(idx_price_min));
+
+                        String oco_stop_limit = "SL:"
+                                + Utils.formatPrice(price_min.multiply(BigDecimal.valueOf(0.95)), 5).toString();
+
+                        String oco_stop_price = "SP:"
+                                + Utils.formatPrice(price_min.multiply(BigDecimal.valueOf(0.945)), 5).toString();
+
+                        css.setOco_tp_price(oco_tp_price);
+                        css.setOco_stop_limit(oco_stop_limit);
+                        css.setOco_stop_price(oco_stop_price);
                     }
                 }
                 //-----------------------------
@@ -570,17 +576,6 @@ public class BinanceServiceImpl implements BinanceService {
             log.error(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
-    }
-
-    private BigDecimal formatPrice(BigDecimal value, Boolean isNeedFormat) {
-        @SuppressWarnings("resource")
-        Formatter formatter = new Formatter();
-        if (isNeedFormat) {
-            formatter.format("%.2f", value);
-        } else {
-            formatter.format("%.3f", value);
-        }
-        return BigDecimal.valueOf(Double.valueOf(formatter.toString()));
     }
 
     private Long getValue(String value) {

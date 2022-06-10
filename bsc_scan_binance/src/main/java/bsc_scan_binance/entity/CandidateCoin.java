@@ -30,11 +30,6 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "pre_4h_total_volume_up", type = String.class),
 
                 @ColumnResult(name = "vol_now", type = String.class),
-                @ColumnResult(name = "vol_pre_1h", type = String.class),
-                @ColumnResult(name = "vol_pre_2h", type = String.class),
-                @ColumnResult(name = "vol_pre_3h", type = String.class),
-                @ColumnResult(name = "vol_pre_4h", type = String.class),
-
                 @ColumnResult(name = "price_now", type = String.class),
                 @ColumnResult(name = "price_pre_1h", type = String.class),
                 @ColumnResult(name = "price_pre_2h", type = String.class),

@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,7 +49,7 @@ public class Utils {
         return ret;
     }
 
-    public static String getValue(Object value) {
+    public static String getStringValue(Object value) {
         if (Objects.equals(null, value)) {
             return "";
         }
@@ -57,6 +58,17 @@ public class Utils {
         }
 
         return value.toString();
+    }
+
+    public static BigDecimal getBigDecimalValue(String value) {
+        if (Objects.equals(null, value)) {
+            return BigDecimal.ZERO;
+        }
+        if (Objects.equals("", value.toString())) {
+            return BigDecimal.ZERO;
+        }
+
+        return BigDecimal.valueOf(Double.valueOf(value.toString()));
     }
 
     public static String getTextCss(String value) {
@@ -69,6 +81,14 @@ public class Utils {
         } else {
             return "text-primary";
         }
+    }
+
+    public static BigDecimal formatPrice(BigDecimal value, int number) {
+        @SuppressWarnings("resource")
+        Formatter formatter = new Formatter();
+        formatter.format("%." + String.valueOf(number) + "f", value);
+
+        return BigDecimal.valueOf(Double.valueOf(formatter.toString()));
     }
 
     public static Date getDate(String unix_time) {

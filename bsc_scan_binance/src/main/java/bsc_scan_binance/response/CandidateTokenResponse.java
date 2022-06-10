@@ -15,11 +15,6 @@ public class CandidateTokenResponse {
     private String pre_4h_total_volume_up;
 
     private String vol_now;
-    private String vol_pre_1h;
-    private String vol_pre_2h;
-    private String vol_pre_3h;
-    private String vol_pre_4h;
-
     private String price_now;
     private String price_pre_1h;
     private String price_pre_2h;

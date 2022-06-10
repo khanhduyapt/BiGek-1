@@ -17,10 +17,6 @@ public class CandidateTokenCssResponse {
     private String volumn_binance_div_marketcap;
     private String volumn_binance_div_marketcap_css;
 
-    private String pre_4h_total_volume_up;
-    private String pre_4h_total_volume_up_css;
-    private String pre_vol_history;
-
     private String market_cap;
     private String market_cap_css;
 
@@ -34,6 +30,13 @@ public class CandidateTokenCssResponse {
     private String pre_price_history;
     private String gecko_total_volume;
     private String gecko_volumn_history;
+
+    //tp_price: x2:aaa$ or 50%: bbb$ or 20%:ccc$ 10%:ddd$
+    //stop_limit: price_min * 0.95
+    //stop_price: price_min * 0.945
+    private String oco_tp_price;
+    private String oco_stop_limit;
+    private String oco_stop_price;
 
     private String price_change_percentage_24h;
     private String price_change_percentage_7d;

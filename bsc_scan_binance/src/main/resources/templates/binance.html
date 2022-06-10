@@ -68,11 +68,9 @@ p {
 					<th class="text-center" scope="col">Volume</th>
 
 					<th class="text-center text-primary" scope="col">v/mc</th>
-					<th class="text-center" scope="col">V4h Binance</th>
-
 					<th class="text-center" scope="col">Price</th>
 					<th class="text-center text-primary" scope="col">Avg</th>
-
+					<th class="text-center text-primary" scope="col">OCO</th>
 					<th class="text-center" scope="col">%24h</th>
 					<th class="text-center" scope="col">%7d</th>
 					<th class="text-center" scope="col">%14d</th>
@@ -111,29 +109,32 @@ p {
 			</thead>
 			<tbody>
 				<tr class="table_row" th:each="token,iter: ${data_list}">
+
 					<td style="text-align: center;" th:text="${iter.index + 1}">
+					<!-- Symbol -->
 					<td style="max-width: 80px !important;"><a th:target="_blank"
 						th:href="${token.binance_trade}"><span
 							th:text="${token.symbol}"></span></a>
 						<p style="font-size: 0.7rem !important;" th:text="${token.trend}"></td>
-
+					<!-- Name -->
 					<td
 						style="min-width: 120px !important; max-width: 150px !important;"><a
 						th:target="_blank" th:href="${token.coin_gecko_link}"> <span
 							th:text="${token.name}"></span></a>
 						<p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
 					</td>
-
+					<!-- MC -->
 					<td style="text-align: right; max-width: 110px !important;"
 						th:classappend="${token.market_cap_css}"
 						th:text="${#numbers.formatDecimal(token.market_cap, 0, 'COMMA', 0, 'POINT') + '$'}">
+					<!-- Volume -->
 					<td style="text-align: right; max-width: 110px !important;">
 						<p
 							th:text="${#numbers.formatDecimal(token.gecko_total_volume, 0, 'COMMA', 0, 'POINT') + '$'}">
 						<p style="font-size: 0.7rem !important;"
 							th:text="${token.gecko_volumn_history}">
 					</td>
-
+					<!-- v/mc -->
 					<td style="text-align: right; max-width: 120px !important;"
 						class="bg-light important;"
 						th:classappend="${token.volumn_div_marketcap_css}">
@@ -141,21 +142,14 @@ p {
 						<p th:classappend="${token.volumn_binance_div_marketcap_css}"
 							th:text="${token.volumn_binance_div_marketcap}">
 					</td>
-
-					<td style="text-align: right; max-width: 120px !important;">
-						<p th:classappend="${token.pre_4h_total_volume_up_css}"
-							th:text="${token.pre_4h_total_volume_up}">
-						<p style="font-size: 0.7rem !important;"
-							th:text="${token.pre_vol_history}">
-					</td>
-
+					<!-- Price -->
 					<td
 						style="text-align: right; min-width: 125px !important; max-width: 125px !important;">
 						<p th:text="${token.current_price} + '$'"></p>
 						<p style="font-size: 0.7rem !important;"
 							th:text="${token.pre_price_history}" />
 					</td>
-
+					<!-- Avg -->
 					<td class="bg-light important;"
 						style="text-align: right; min-width: 125px !important; max-width: 125px !important;">
 						<div>
@@ -169,7 +163,13 @@ p {
 								style="font-size: 0.8rem !important;"
 								th:text="${token.max_price}"></span>
 						</div>
-
+					</td>
+					<!-- OCO -->
+					<td class="bg-light important;"
+						style="text-align: right; min-width: 180px !important; max-width: 180px !important; font-size: 0.9rem !important;">
+							<p th:text="${token.oco_tp_price}"></p>
+							<p th:text="${token.oco_stop_limit}"></p>
+							<p th:text="${token.oco_stop_price}"></p>
 					</td>
 
 					<td style="text-align: right;"
