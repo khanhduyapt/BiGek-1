@@ -553,7 +553,7 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setMax_price(removeLastZero(priceList.get(idx_price_max)));
 
                     if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)) {
-                        css.setStar("Ok");
+                        css.setStar("good");
                     }
                 }
                 //-----------------------------
