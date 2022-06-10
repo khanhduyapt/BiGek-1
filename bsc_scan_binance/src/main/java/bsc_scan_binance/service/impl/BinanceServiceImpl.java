@@ -531,7 +531,12 @@ public class BinanceServiceImpl implements BinanceService {
                 avg_price = total_price.divide(BigDecimal.valueOf(priceList.size()), 5,
                         RoundingMode.CEILING);
 
+                //if (Objects.equals("unlend-finance", dto.getGecko_id())) {
+                //    boolean debug = true;
+                //}
+
                 if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
+                    price_now = BigDecimal.valueOf(Double.valueOf(css.getCurrent_price()));
 
                     if (avg_price.compareTo(price_now) < 1) {
                         css.setAvg_price_css("text-primary font-weight-bold");

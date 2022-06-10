@@ -47,7 +47,7 @@ public class BscScanBinanceApplication {
 
                 wait(300);//200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
 
-                log.info("idx:" + String.valueOf(idx) + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
+                log.info("Binance:" + String.valueOf(idx) + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                         + coin.getSymbol());
 
                 if (Objects.equals(idx, size - 1)) {

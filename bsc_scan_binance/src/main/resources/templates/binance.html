@@ -71,7 +71,7 @@ p {
 					<th class="text-center" scope="col">V4h Binance</th>
 
 					<th class="text-center" scope="col">Price</th>
-					<th class="text-center" scope="col">Avg</th>
+					<th class="text-center text-primary" scope="col">Avg</th>
 
 					<th class="text-center" scope="col">%24h</th>
 					<th class="text-center" scope="col">%7d</th>
@@ -156,7 +156,7 @@ p {
 							th:text="${token.pre_price_history}" />
 					</td>
 
-					<td
+					<td class="bg-light important;"
 						style="text-align: right; min-width: 125px !important; max-width: 125px !important;">
 						<div>
 							<span th:text="${token.avg_price + '$'}"></span> <span
