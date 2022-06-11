@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.CollectionUtils;
 
 import bsc_scan_token.service.TokenService;
@@ -36,7 +37,7 @@ public class BscScanTokenApplication {
 
             wait(10000);
         }
-
+        ((ConfigurableApplicationContext)applicationContext ).close();
 //        List<CandidateCoin> list = gecko_service.getList();
 //        if (CollectionUtils.isEmpty(list)) {
 //            gecko_service.initCandidateCoin();

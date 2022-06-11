@@ -170,7 +170,7 @@ p {
             </div>
           </td>
           <!-- OCO -->
-          <td
+          <td th:classappend="${token.oco_css}"
             style="text-align: right; min-width: 400px !important; max-width: 400px !important; font-size: 0.75rem !important;">
             <p th:text="${token.oco_tp_price}"></p>
             <p th:text="${token.oco_stop_limit}"></p>

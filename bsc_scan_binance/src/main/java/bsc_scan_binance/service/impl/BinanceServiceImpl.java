@@ -564,7 +564,7 @@ public class BinanceServiceImpl implements BinanceService {
                     // stop_price: price_min * 0.945
                     String star = css.getStar().toLowerCase();
 
-                    if (star.contains("🤩")) {
+                    if (true || star.contains("🤩")) {
                         BigDecimal price_min = Utils.getBigDecimal(avgPriceList.get(idx_price_min));
                         BigDecimal lowprice_min = Utils.getBigDecimal(lowPriceList.get(idx_lowprice_min));
                         BigDecimal hightprice_max = Utils.getBigDecimal(hightPriceList.get(idx_hightprice_max))
@@ -577,24 +577,27 @@ public class BinanceServiceImpl implements BinanceService {
                         String percent_stop_limit_1 = Utils.toPercent(price_now, stop_limit_1);
 
                         String oco_tp_price = "X2:"
-                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(2)), 5).toString() + " 50%:"
-                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString() + " 20%:"
-                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString() + " 10%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(2)), 5).toString() + "―50%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString() + "―20%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString() + "―10%:"
                                 + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString();
-                        oco_tp_price += " H(" + percent_hightprice_max + "%):"
+                        oco_tp_price += "―H(" + percent_hightprice_max + "%):"
                                 + Utils.formatPrice(hightprice_max, 5).toString();
 
-                        String oco_stop_limit = "SL1(" + percent_stop_limit_1 + "%):"
-                                + Utils.formatPrice(stop_limit_1, 5).toString();
+                        String oco_stop_limit = " SL1(10%):"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.9)), 5).toString() + "―SL2("
+                                + percent_stop_limit_1 + "%):" + Utils.formatPrice(stop_limit_1, 5).toString();
 
-                        String oco_stop_price = "SP1(" + Utils.toPercent(price_now, stop_price_1) + "%):"
+                        String oco_stop_price = " SP1(10%):"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.895)), 5).toString()
+                                + "―SP2(" + Utils.toPercent(price_now, stop_price_1) + "%):"
                                 + Utils.formatPrice(stop_price_1, 5).toString();
 
                         BigDecimal stop_limit_2 = lowprice_min.multiply(BigDecimal.valueOf(0.95));
                         BigDecimal stop_price_2 = lowprice_min.multiply(BigDecimal.valueOf(0.945));
-                        oco_stop_limit += " SL_Low(" + Utils.toPercent(price_now, stop_limit_2) + "%):"
+                        oco_stop_limit += "―SL_Low(" + Utils.toPercent(price_now, stop_limit_2) + "%):"
                                 + Utils.formatPrice(stop_limit_2, 5).toString();
-                        oco_stop_price += " SP_Low(" + Utils.toPercent(price_now, stop_price_2) + "%):"
+                        oco_stop_price += "―SP_Low(" + Utils.toPercent(price_now, stop_price_2) + "%):"
                                 + Utils.formatPrice(stop_price_2, 5).toString();
 
                         String oco_low_hight = " (L:" + lowprice_min.toString() + "~M:" + price_min + "~H:"
@@ -605,6 +608,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 Utils.getBigDecimalValue(percent_stop_limit_1).multiply(BigDecimal.valueOf(1.5))) < 1) {
                             css.setStar("✖");
                             css.setStar_css("text-danger");
+                            css.setOco_css("text-white");
                         }
 
                         css.setOco_tp_price(oco_tp_price);
@@ -615,13 +619,21 @@ public class BinanceServiceImpl implements BinanceService {
                 }
                 // -----------------------------
 
-                list.add(css);
+                if (isOrderByBynaceVolume) {
+                    if (css.getStar().contains("🤩")) {
+                        list.add(css);
+                    }
+                } else {
+                    list.add(css);
+                }
             }
 
             log.info("End getList <--");
 
             return list;
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
             log.info("Get list Inquiry Consigned Delivery error ------->");
             log.error(e.getMessage());
