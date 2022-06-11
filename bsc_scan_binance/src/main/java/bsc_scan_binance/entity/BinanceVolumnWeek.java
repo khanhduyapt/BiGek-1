@@ -28,5 +28,11 @@ public class BinanceVolumnWeek {
 
     @Column(name = "avg_price")
     private BigDecimal avgPrice;
+
+    @Column(name = "min_price")
+    private BigDecimal min_price;
+
+    @Column(name = "max_price")
+    private BigDecimal max_price;
 }
 

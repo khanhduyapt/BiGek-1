@@ -118,6 +118,8 @@ public class BinanceServiceImpl implements BinanceService {
                 entity.setAvgPrice(avgPrice);
                 entity.setTotalVolume(total_volume);
                 entity.setTotalTrasaction(total_trans);
+                entity.setMin_price(price_low);
+                entity.setMax_price(price_high);
                 list_week.add(entity);
             }
         }
@@ -221,20 +223,21 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.backer,                                                                             \n"
                     + "   can.note,                                                                               \n"
                     + "                                                                                           \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() + interval '1 days', 'yyyyMMdd')) as today, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as day_0, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '1 days', 'yyyyMMdd')) as day_1, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '2 days', 'yyyyMMdd')) as day_2, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '3 days', 'yyyyMMdd')) as day_3, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '4 days', 'yyyyMMdd')) as day_4, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '5 days', 'yyyyMMdd')) as day_5, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '6 days', 'yyyyMMdd')) as day_6, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '7 days', 'yyyyMMdd')) as day_7, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '8 days', 'yyyyMMdd')) as day_8, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '9 days', 'yyyyMMdd')) as day_9, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '10 days', 'yyyyMMdd')) as day_10, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '11 days', 'yyyyMMdd')) as day_11, \n"
-                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '12 days', 'yyyyMMdd')) as day_12, \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() + interval '1 days', 'yyyyMMdd')) as today,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as day_0,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '1 days', 'yyyyMMdd')) as day_1,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '2 days', 'yyyyMMdd')) as day_2,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '3 days', 'yyyyMMdd')) as day_3,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '4 days', 'yyyyMMdd')) as day_4,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '5 days', 'yyyyMMdd')) as day_5,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '6 days', 'yyyyMMdd')) as day_6,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '7 days', 'yyyyMMdd')) as day_7,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '8 days', 'yyyyMMdd')) as day_8,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '9 days', 'yyyyMMdd')) as day_9,  \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '10 days', 'yyyyMMdd')) as day_10, \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '11 days', 'yyyyMMdd')) as day_11, \n"
+                    + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '12 days', 'yyyyMMdd')) as day_12, \n"
+
                     + "   can.priority 	                                                                          \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
@@ -277,16 +280,6 @@ public class BinanceServiceImpl implements BinanceService {
                 if ((market_cap.compareTo(BigDecimal.valueOf(36000001)) < 0)
                         && (market_cap.compareTo(BigDecimal.valueOf(1000000)) > 0)) {
                     css.setMarket_cap_css("highlight");
-                }
-
-                if (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0) {
-                    css.setMarket_cap(
-                            market_cap.divide(BigDecimal.valueOf(1000000000), 2, RoundingMode.CEILING).toString());
-                }
-
-                if (gecko_total_volume.compareTo(BigDecimal.valueOf(1000000000)) > 0) {
-                    css.setGecko_total_volume(gecko_total_volume
-                            .divide(BigDecimal.valueOf(1000000000), 2, RoundingMode.CEILING).toString());
                 }
 
                 BigDecimal volumn_binance_div_marketcap = BigDecimal.ZERO;
@@ -344,20 +337,26 @@ public class BinanceServiceImpl implements BinanceService {
                 css.setGecko_volumn_history(gecko_volumn_history);
 
                 List<String> volList = new ArrayList<String>();
-                List<String> priceList = new ArrayList<String>();
+                List<String> avgPriceList = new ArrayList<String>();
+                List<String> lowPriceList = new ArrayList<String>();
+                List<String> hightPriceList = new ArrayList<String>();
 
                 List<String> temp = splitVolAndPrice(css.getToday());
                 css.setToday_vol(temp.get(0));
-                css.setToday_price(removeLastZero(temp.get(1)));
+                css.setToday_price(temp.get(1));
                 volList.add("");
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
                 BigDecimal vol_today = Utils.getBigDecimal(temp.get(0).replace(",", ""));
 
                 temp = splitVolAndPrice(css.getDay_0());
                 css.setDay_0_vol(temp.get(0));
-                css.setDay_0_price(removeLastZero(temp.get(1)));
+                css.setDay_0_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
                 BigDecimal vol_yesterday = Utils.getBigDecimal(temp.get(0).replace(",", ""));
 
                 if (vol_yesterday.compareTo(BigDecimal.ZERO) == 1) {
@@ -370,86 +369,112 @@ public class BinanceServiceImpl implements BinanceService {
 
                 temp = splitVolAndPrice(css.getDay_1());
                 css.setDay_1_vol(temp.get(0));
-                css.setDay_1_price(removeLastZero(temp.get(1)));
+                css.setDay_1_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_2());
                 css.setDay_2_vol(temp.get(0));
-                css.setDay_2_price(removeLastZero(temp.get(1)));
+                css.setDay_2_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_3());
                 css.setDay_3_vol(temp.get(0));
-                css.setDay_3_price(removeLastZero(temp.get(1)));
+                css.setDay_3_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_4());
                 css.setDay_4_vol(temp.get(0));
-                css.setDay_4_price(removeLastZero(temp.get(1)));
+                css.setDay_4_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_5());
                 css.setDay_5_vol(temp.get(0));
-                css.setDay_5_price(removeLastZero(temp.get(1)));
+                css.setDay_5_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_6());
                 css.setDay_6_vol(temp.get(0));
-                css.setDay_6_price(removeLastZero(temp.get(1)));
+                css.setDay_6_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_7());
                 css.setDay_7_vol(temp.get(0));
-                css.setDay_7_price(removeLastZero(temp.get(1)));
+                css.setDay_7_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_8());
                 css.setDay_8_vol(temp.get(0));
-                css.setDay_8_price(removeLastZero(temp.get(1)));
+                css.setDay_8_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_9());
                 css.setDay_9_vol(temp.get(0));
-                css.setDay_9_price(removeLastZero(temp.get(1)));
+                css.setDay_9_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_10());
                 css.setDay_10_vol(temp.get(0));
-                css.setDay_10_price(removeLastZero(temp.get(1)));
+                css.setDay_10_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_11());
                 css.setDay_11_vol(temp.get(0));
-                css.setDay_11_price(removeLastZero(temp.get(1)));
+                css.setDay_11_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 temp = splitVolAndPrice(css.getDay_12());
                 css.setDay_12_vol(temp.get(0));
-                css.setDay_12_price(removeLastZero(temp.get(1)));
+                css.setDay_12_price(temp.get(1));
                 volList.add(temp.get(0));
-                priceList.add(temp.get(1));
+                avgPriceList.add(temp.get(1));
+                lowPriceList.add(temp.get(2));
+                hightPriceList.add(temp.get(3));
 
                 int idx_vol_max = getIndexMax(volList);
-                int idx_price_max = getIndexMax(priceList);
+                int idx_price_max = getIndexMax(avgPriceList);
                 int idx_vol_min = getIndexMin(volList);
-                int idx_price_min = getIndexMin(priceList);
+                int idx_price_min = getIndexMin(avgPriceList);
+                int idx_lowprice_min = getIndexMin(lowPriceList);
+                int idx_hightprice_max = getIndexMax(hightPriceList);
 
                 String str_down = "";
 
-                if (Utils.getBigDecimal(priceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
-                    BigDecimal down = Utils.getBigDecimal(priceList.get(idx_price_max))
-                            .divide(Utils.getBigDecimal(priceList.get(idx_price_min)), 2, RoundingMode.CEILING)
+                if (Utils.getBigDecimal(avgPriceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal down = Utils.getBigDecimal(avgPriceList.get(idx_price_max))
+                            .divide(Utils.getBigDecimal(avgPriceList.get(idx_price_min)), 2, RoundingMode.CEILING)
                             .multiply(BigDecimal.valueOf(100));
                     str_down = "(" + down.subtract(BigDecimal.valueOf(100)).toString().replace(".00", "") + "%)";
                 }
@@ -458,18 +483,18 @@ public class BinanceServiceImpl implements BinanceService {
                 setVolumnDayCss(css, idx_vol_min, "text-danger"); // Min Volumn
                 setPriceDayCss(css, idx_price_min, "text-danger", str_down); // Min Price
 
-                BigDecimal min_add_5_percent = Utils.getBigDecimal(priceList.get(idx_price_min));
+                BigDecimal min_add_5_percent = Utils.getBigDecimal(avgPriceList.get(idx_price_min));
                 min_add_5_percent = min_add_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(1.05)));
 
-                BigDecimal max_subtract_5_percent = Utils.getBigDecimal(priceList.get(idx_price_max));
+                BigDecimal max_subtract_5_percent = Utils.getBigDecimal(avgPriceList.get(idx_price_max));
                 max_subtract_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(0.95)));
 
                 if (idx_price_min == 0) {
                     setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
                     if (!Objects.equals(null, css.getStar()) && !Objects.equals("", String.valueOf(css.getStar()))) {
-                        css.setStar("※Sale※" + " " + css.getStar());
+                        css.setStar("🤩" + " " + css.getStar());
                     } else {
-                        css.setStar("※Sale※");
+                        css.setStar("🤩");
                     }
                     css.setStar_css("text-primary font-weight-bold");
 
@@ -481,12 +506,12 @@ public class BinanceServiceImpl implements BinanceService {
 
                 } else if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (price_now.compareTo(min_add_5_percent) < 0)) {
 
-                    css.setStar("Sale5%");
+                    css.setStar("🤩");
                     css.setStar_css("text-primary font-weight-bold");
 
                 } else if (idx_vol_min == 1) {
 
-                    css.setStar("Vol min Yesterday");
+                    css.setStar("🤩");
 
                 } else if (idx_price_min == 1) {
 
@@ -494,22 +519,21 @@ public class BinanceServiceImpl implements BinanceService {
 
                 }
 
-                //--------------AVG PRICE---------------
+                // --------------AVG PRICE---------------
                 BigDecimal avg_price = BigDecimal.ZERO;
                 BigDecimal total_price = BigDecimal.ZERO;
-                for (String price : priceList) {
+                for (String price : avgPriceList) {
                     if (!Objects.equals("", price)) {
                         total_price = total_price.add(Utils.getBigDecimalValue(price));
                     }
                 }
 
-                avg_price = total_price.divide(BigDecimal.valueOf(priceList.size()), 5,
-                        RoundingMode.CEILING);
+                avg_price = total_price.divide(BigDecimal.valueOf(avgPriceList.size()), 5, RoundingMode.CEILING);
 
                 price_now = Utils.getBigDecimalValue(css.getCurrent_price());
-                //if (Objects.equals("unlend-finance", dto.getGecko_id())) {
-                //    boolean debug = true;
-                //}
+                // if (Objects.equals("unlend-finance", dto.getGecko_id())) {
+                // boolean debug = true;
+                // }
 
                 if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
 
@@ -524,45 +548,72 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setAvg_price(removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString().replace(".00", "") + "%");
                     css.setAvg_price(removeLastZero(avg_price.toString()));
-                    css.setMin_price(removeLastZero(priceList.get(idx_price_min)));
-                    css.setMax_price(removeLastZero(priceList.get(idx_price_max)));
+                    css.setMin_price(removeLastZero(avgPriceList.get(idx_price_min)));
+                    css.setMax_price(removeLastZero(avgPriceList.get(idx_price_max)));
 
                     if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)
                             && ((Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
                                     .compareTo(BigDecimal.valueOf(10)) > -1))) {
-                        css.setStar("good");
+                        css.setStar("🤩");
                     }
                 }
 
                 {
-                    //tp_price: x2:aaa$ or 50%: bbb$ or 20%:ccc$ 10%:ddd$
-                    //stop_limit: price_min * 0.95
-                    //stop_price: price_min * 0.945
+                    // tp_price: x2:aaa$ or 50%: bbb$ or 20%:ccc$ 10%:ddd$
+                    // stop_limit: price_min * 0.95
+                    // stop_price: price_min * 0.945
                     String star = css.getStar().toLowerCase();
 
-                    if (star.contains("good") || star.contains("sale")) {
+                    if (star.contains("🤩")) {
+                        BigDecimal price_min = Utils.getBigDecimal(avgPriceList.get(idx_price_min));
+                        BigDecimal lowprice_min = Utils.getBigDecimal(lowPriceList.get(idx_lowprice_min));
+                        BigDecimal hightprice_max = Utils.getBigDecimal(hightPriceList.get(idx_hightprice_max))
+                                .multiply(BigDecimal.valueOf(0.9));
+
+                        BigDecimal stop_limit_1 = price_min.multiply(BigDecimal.valueOf(0.95));
+                        BigDecimal stop_price_1 = price_min.multiply(BigDecimal.valueOf(0.945));
+
+                        String percent_hightprice_max = Utils.toPercent(hightprice_max, price_now);
+                        String percent_stop_limit_1 = Utils.toPercent(price_now, stop_limit_1);
 
                         String oco_tp_price = "X2:"
-                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(2)), 5).toString()
-                                + " 50%:" + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString()
-                                + " 20%:" + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString()
-                                + " 10%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(2)), 5).toString() + " 50%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString() + " 20%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString() + " 10%:"
                                 + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString();
+                        oco_tp_price += " H(" + percent_hightprice_max + "%):"
+                                + Utils.formatPrice(hightprice_max, 5).toString();
 
-                        BigDecimal price_min = Utils.getBigDecimal(priceList.get(idx_price_min));
+                        String oco_stop_limit = "SL1(" + percent_stop_limit_1 + "%):"
+                                + Utils.formatPrice(stop_limit_1, 5).toString();
 
-                        String oco_stop_limit = "SL:"
-                                + Utils.formatPrice(price_min.multiply(BigDecimal.valueOf(0.95)), 5).toString();
+                        String oco_stop_price = "SP1(" + Utils.toPercent(price_now, stop_price_1) + "%):"
+                                + Utils.formatPrice(stop_price_1, 5).toString();
 
-                        String oco_stop_price = "SP:"
-                                + Utils.formatPrice(price_min.multiply(BigDecimal.valueOf(0.945)), 5).toString();
+                        BigDecimal stop_limit_2 = lowprice_min.multiply(BigDecimal.valueOf(0.95));
+                        BigDecimal stop_price_2 = lowprice_min.multiply(BigDecimal.valueOf(0.945));
+                        oco_stop_limit += " SL_Low(" + Utils.toPercent(price_now, stop_limit_2) + "%):"
+                                + Utils.formatPrice(stop_limit_2, 5).toString();
+                        oco_stop_price += " SP_Low(" + Utils.toPercent(price_now, stop_price_2) + "%):"
+                                + Utils.formatPrice(stop_price_2, 5).toString();
+
+                        String oco_low_hight = " (L:" + lowprice_min.toString() + "~M:" + price_min + "~H:"
+                                + hightprice_max.toString() + "=" + Utils.toPercent(hightprice_max, lowprice_min)
+                                + "%)";
+
+                        if (Utils.getBigDecimalValue(percent_hightprice_max).compareTo(
+                                Utils.getBigDecimalValue(percent_stop_limit_1).multiply(BigDecimal.valueOf(1.5))) < 1) {
+                            css.setStar("✖");
+                            css.setStar_css("text-danger");
+                        }
 
                         css.setOco_tp_price(oco_tp_price);
                         css.setOco_stop_limit(oco_stop_limit);
                         css.setOco_stop_price(oco_stop_price);
+                        css.setOco_low_hight(oco_low_hight);
                     }
                 }
-                //-----------------------------
+                // -----------------------------
 
                 list.add(css);
             }
@@ -740,17 +791,19 @@ public class BinanceServiceImpl implements BinanceService {
 
     private List<String> splitVolAndPrice(String value) {
         if (Objects.isNull(value)) {
-            return Arrays.asList("", "");
+            return Arrays.asList("", "", "", "");
         }
         String[] arr = value.split("~");
-        if (arr.length != 2) {
-            return Arrays.asList(value, "");
+        if (arr.length != 4) {
+            return Arrays.asList(value, "", "", "");
         }
 
         String volumn = arr[0];
-        String price = arr[1];
+        String avg_price = arr[1];
+        String min_price = arr[2];
+        String max_price = arr[3];
         volumn = String.format("%,.0f", Utils.getBigDecimal(volumn));
-        return Arrays.asList(volumn, removeLastZero(price));
+        return Arrays.asList(volumn, removeLastZero(avg_price), removeLastZero(min_price), removeLastZero(max_price));
     }
 
     private String removeLastZero(String value) {

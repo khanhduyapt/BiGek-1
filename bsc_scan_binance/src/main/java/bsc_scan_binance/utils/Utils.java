@@ -2,6 +2,7 @@ package bsc_scan_binance.utils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -60,15 +61,33 @@ public class Utils {
         return value.toString();
     }
 
-    public static BigDecimal getBigDecimalValue(String value) {
-        if (Objects.equals(null, value)) {
-            return BigDecimal.ZERO;
-        }
-        if (Objects.equals("", value.toString())) {
-            return BigDecimal.ZERO;
+    public static String toPercent(BigDecimal value, BigDecimal compareToValue) {
+        if (Objects.equals("", getStringValue(compareToValue))) {
+            return "0";
         }
 
-        return BigDecimal.valueOf(Double.valueOf(value.toString()));
+        if (compareToValue.compareTo(BigDecimal.ZERO) == 0) {
+            return "[dvz]";
+        }
+        BigDecimal percent = ((value.divide(compareToValue, 2, RoundingMode.CEILING).multiply(BigDecimal.valueOf(100)))
+                .subtract(BigDecimal.valueOf(100)));
+
+        return percent.toString().replace(".00", "");
+    }
+
+    public static BigDecimal getBigDecimalValue(String value) {
+        try {
+            if (Objects.equals(null, value)) {
+                return BigDecimal.ZERO;
+            }
+            if (Objects.equals("", value.toString())) {
+                return BigDecimal.ZERO;
+            }
+
+            return BigDecimal.valueOf(Double.valueOf(value.toString()));
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
     }
 
     public static String getTextCss(String value) {
@@ -193,8 +212,8 @@ public class Utils {
     }
 
     public static String convertStringISOToString(String patternIn, String dateIso, String patternOut) {
-        //        IN :yyyy-MM-dd'T'HH:mm:ss.SSSXXX
-        //        OUT : yyyy-MM-dd
+        // IN :yyyy-MM-dd'T'HH:mm:ss.SSSXXX
+        // OUT : yyyy-MM-dd
         try {
             DateFormat dateFormat = new SimpleDateFormat(patternIn);
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -222,8 +241,7 @@ public class Utils {
         StringBuilder result = new StringBuilder();
         for (Iterator<?> it = list.iterator(); it.hasNext();) {
             Object ob = it.next();
-            result.append(" LOWER(").append(columnName).append(")")
-                    .append(" LIKE '%");
+            result.append(" LOWER(").append(columnName).append(")").append(" LIKE '%");
             result.append(ob.toString());
             result.append("%'");
             if (it.hasNext()) {

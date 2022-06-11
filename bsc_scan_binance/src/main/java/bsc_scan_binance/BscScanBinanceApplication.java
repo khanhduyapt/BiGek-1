@@ -38,14 +38,13 @@ public class BscScanBinanceApplication {
                 CandidateCoin coin = list.get(idx);
 
                 try {
-                    //gecko_service.loadData(coin.getGeckoid());
                     binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                     wait(600000);
                 }
 
-                wait(300);//200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                wait(300);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
 
                 log.info("Binance " + String.valueOf(idx) + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                         + coin.getSymbol());
