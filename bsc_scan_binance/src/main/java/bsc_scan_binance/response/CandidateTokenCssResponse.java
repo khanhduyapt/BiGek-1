@@ -36,6 +36,8 @@ public class CandidateTokenCssResponse {
     //stop_price: price_min * 0.945
     private String oco_css;
     private String oco_tp_price;
+    private String oco_tp_price_hight;
+    private String oco_tp_price_hight_css;
     private String oco_stop_limit;
     private String oco_stop_price;
     private String oco_low_hight;

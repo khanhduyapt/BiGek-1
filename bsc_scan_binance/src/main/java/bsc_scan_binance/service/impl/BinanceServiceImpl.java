@@ -492,7 +492,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (idx_price_min == 0) {
                     setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
                     if (!Objects.equals(null, css.getStar()) && !Objects.equals("", String.valueOf(css.getStar()))) {
-                        css.setStar("🤩" + " " + css.getStar());
+                        css.setStar("🤩🤩" + " " + css.getStar());
                     } else {
                         css.setStar("🤩");
                     }
@@ -580,9 +580,10 @@ public class BinanceServiceImpl implements BinanceService {
                                 + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(2)), 5).toString() + "―50%:"
                                 + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString() + "―20%:"
                                 + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString() + "―10%:"
-                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString();
-                        oco_tp_price += "―H(" + percent_hightprice_max + "%):"
-                                + Utils.formatPrice(hightprice_max, 5).toString();
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString() + "―";
+
+                        css.setOco_tp_price_hight("H(" + percent_hightprice_max + "%):"
+                                + Utils.formatPrice(hightprice_max, 5).toString());
 
                         String oco_stop_limit = " SL1(10%):"
                                 + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.9)), 5).toString() + "―SL2("
@@ -609,6 +610,9 @@ public class BinanceServiceImpl implements BinanceService {
                             css.setStar("✖");
                             css.setStar_css("text-danger");
                             css.setOco_css("text-white");
+                        } else if (Utils.getBigDecimalValue(percent_hightprice_max)
+                                .compareTo(BigDecimal.valueOf(50)) >= 0) {
+                            css.setOco_tp_price_hight_css("text-primary font-weight-bold");
                         }
 
                         css.setOco_tp_price(oco_tp_price);
