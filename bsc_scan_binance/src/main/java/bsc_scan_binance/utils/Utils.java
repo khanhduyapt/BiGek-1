@@ -69,8 +69,8 @@ public class Utils {
         if (compareToValue.compareTo(BigDecimal.ZERO) == 0) {
             return "[dvz]";
         }
-        BigDecimal percent = ((value.divide(compareToValue, 2, RoundingMode.CEILING).multiply(BigDecimal.valueOf(100)))
-                .subtract(BigDecimal.valueOf(100)));
+        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, 2, RoundingMode.CEILING)
+                .multiply(BigDecimal.valueOf(100));
 
         return percent.toString().replace(".00", "");
     }

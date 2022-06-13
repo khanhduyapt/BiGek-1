@@ -577,35 +577,41 @@ public class BinanceServiceImpl implements BinanceService {
                         BigDecimal stop_price_1 = price_min.multiply(BigDecimal.valueOf(0.945));
 
                         String percent_hightprice_max = Utils.toPercent(hightprice_max, price_now);
-                        String percent_stop_limit_1 = Utils.toPercent(price_now, stop_limit_1);
+                        String percent_stop_limit_1 = Utils.toPercent(stop_limit_1, price_now);
 
-                        String oco_tp_price = "" +
-                                "50%:" + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString()
-                                + "―20%:" + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString()
-                                + "―10%:" + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString()
-                                + "―M(" + Utils.toPercent(price_max, price_now) + "%):"
-                                + Utils.formatPrice(price_max.multiply(BigDecimal.valueOf(0.95)), 5).toString()
-                                + "―";
+                        String oco_tp_price = "" + "50%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString() + "―20%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString() + "―10%:"
+                                + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString() + "―M("
+                                + Utils.toPercent(price_max, price_now) + "%):"
+                                + Utils.formatPrice(price_max.multiply(BigDecimal.valueOf(0.95)), 5).toString() + "―";
 
                         css.setOco_tp_price_hight("H(" + percent_hightprice_max + "%):"
                                 + Utils.formatPrice(hightprice_max, 5).toString());
 
-                        String oco_stop_limit = "" +
-                                " SL1(10%):"
+                        String oco_stop_limit = "" + " SL1(-10%):"
                                 + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.9)), 5).toString()
-                                + "―SL_M("
-                                + percent_stop_limit_1 + "%):" + Utils.formatPrice(stop_limit_1, 5).toString();
+                                + "―SL_M(" + percent_stop_limit_1 + "%):"
+                                + Utils.formatPrice(stop_limit_1, 5).toString() + "―";
 
-                        String oco_stop_price = " SP1(10%):"
+                        String oco_stop_price = " SP1(-10%):"
                                 + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.895)), 5).toString()
-                                + "―SP_M(" + Utils.toPercent(price_now, stop_price_1) + "%):"
+                                + "―SP_M(" + Utils.toPercent(stop_price_1, price_now) + "%):"
                                 + Utils.formatPrice(stop_price_1, 5).toString();
 
                         BigDecimal stop_limit_2 = lowprice_min.multiply(BigDecimal.valueOf(0.95));
                         BigDecimal stop_price_2 = lowprice_min.multiply(BigDecimal.valueOf(0.945));
-                        oco_stop_limit += "―SL_Low(" + Utils.toPercent(price_now, stop_limit_2) + "%):"
+
+                        String oco_stop_limit_low_percent = Utils.toPercent(stop_limit_2, price_now);
+                        String oco_stop_limit_low = "SL_Low(" + oco_stop_limit_low_percent + "%):"
                                 + Utils.formatPrice(stop_limit_2, 5).toString();
-                        oco_stop_price += "―SP_Low(" + Utils.toPercent(price_now, stop_price_2) + "%):"
+                        if (!Objects.equals("[dvz]", oco_stop_limit_low_percent)
+                                && Utils.getBigDecimalValue(oco_stop_limit_low_percent)
+                                        .compareTo(BigDecimal.valueOf(-10)) > 0) {
+                            css.setOco_stop_limit_low_css("text-primary font-weight-bold");
+                        }
+
+                        oco_stop_price += "―SP_Low(" + Utils.toPercent(stop_price_2, price_now) + "%):"
                                 + Utils.formatPrice(stop_price_2, 5).toString();
 
                         String oco_low_hight = " (L:" + lowprice_min.toString() + "~M:" + price_min + "~H:"
@@ -624,6 +630,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         css.setOco_tp_price(oco_tp_price);
                         css.setOco_stop_limit(oco_stop_limit);
+                        css.setOco_stop_limit_low(oco_stop_limit_low);
                         css.setOco_stop_price(oco_stop_price);
                         css.setOco_low_hight(oco_low_hight);
                     }
