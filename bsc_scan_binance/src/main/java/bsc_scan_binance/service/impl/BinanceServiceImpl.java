@@ -659,26 +659,24 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
-                coin.setTarget_percent(Utils.getStringValue(css.getAvg_percent()).replace("-", "") + "("
-                        + css.getMin_price() + "->" + css.getMax_price() + ")");
+                coin.setTarget_percent(Utils.getStringValue(css.getAvg_percent()).replace("-", "") + " min:"
+                        + css.getMin_price() + "->max:" + css.getMax_price());
                 String oco_hight = css.getOco_tp_price() + css.getOco_tp_price_hight();
                 oco_hight = oco_hight.substring(oco_hight.indexOf("―M") + 1, oco_hight.length());
                 coin.setOco_hight(oco_hight);
 
                 Boolean is_candidate = false;
                 if (!Objects.equals("", Utils.getStringValue(css.getOco_tp_price_hight_css()))) {
-                    // String avg_percent = css.getAvg_percent().replace("%", "");
-                    // if (Utils.getBigDecimalValue(avg_percent).compareTo(BigDecimal.valueOf(-10))
-                    // <= 0) {
                     is_candidate = true;
-                    // }
                 }
                 coin.setCandidate(is_candidate);
                 coin.setIndex(index);
                 coin.setSymbol(css.getSymbol());
                 coin.setName(css.getName());
-                coin.setNote("(v/mc:" + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap()
-                        + "%) " + Utils.getStringValue(css.getNote()) + " " + Utils.getStringValue(css.getTrend()));
+                coin.setNote("(v/mc:" + css.getVolumn_div_marketcap() + "% " + css.getVolumn_binance_div_marketcap()
+                        + "%, price_24h:"
+                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%) "
+                        + Utils.getStringValue(css.getNote()) + " " + Utils.getStringValue(css.getTrend()));
 
                 index += 1;
                 priorityCoinRepository.save(coin);

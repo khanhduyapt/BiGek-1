@@ -114,7 +114,7 @@ public class WandaBot extends TelegramLongPollingBot {
     }
 
     private String toString(PriorityCoin coin) {
-        return String.format("[%s]  [%s]  [Price: %s$]  [Target:%s$]  %s  %s", coin.getSymbol(), coin.getName(),
+        return String.format("[%s]  [%s]  [Price: %s$]  [Target:%s$=%s]  %s", coin.getSymbol(), coin.getName(),
                 coin.getCurrent_price(),
                 coin.getTarget_price(), coin.getTarget_percent(), coin.getNote());
     }
