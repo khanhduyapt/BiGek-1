@@ -550,10 +550,8 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal taget_percent_profit_today = Utils
                         .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now));
 
-                css.setLow_to_hight_price(
-                        "L:" + lowest_price_today + "(" + taget_percent_lost_today + "%)➞H:"
-                                + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "")
-                                + "%)");
+                css.setLow_to_hight_price("L:" + lowest_price_today + "(" + taget_percent_lost_today + "%)➞H:"
+                        + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)");
 
                 coin.setCurrent_price(price_now);
 
@@ -606,17 +604,16 @@ public class BinanceServiceImpl implements BinanceService {
                             + Utils.toPercent(price_max, price_now) + "%):"
                             + Utils.formatPrice(price_max.multiply(BigDecimal.valueOf(0.95)), 5).toString() + "―";
 
-                    css.setOco_tp_price_hight("H(" + percent_hightprice_max + "%):"
-                            + Utils.formatPrice(hightprice_max, 5).toString());
+                    css.setOco_tp_price_hight(
+                            "H(" + percent_hightprice_max + "%):" + Utils.formatPrice(hightprice_max, 5).toString());
 
                     String oco_stop_limit = "" + " SL1(-10%):"
-                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.9)), 5).toString()
-                            + "―SL_M(" + percent_stop_limit_1 + "%):"
-                            + Utils.formatPrice(stop_limit_1, 5).toString() + "―";
+                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.9)), 5).toString() + "―SL_M("
+                            + percent_stop_limit_1 + "%):" + Utils.formatPrice(stop_limit_1, 5).toString() + "―";
 
                     String oco_stop_price = " SP1(-10%):"
-                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.895)), 5).toString()
-                            + "―SP_M(" + Utils.toPercent(stop_price_1, price_now) + "%):"
+                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.895)), 5).toString() + "―SP_M("
+                            + Utils.toPercent(stop_price_1, price_now) + "%):"
                             + Utils.formatPrice(stop_price_1, 5).toString();
 
                     BigDecimal stop_limit_2 = lowprice_min.multiply(BigDecimal.valueOf(0.95));
@@ -625,9 +622,8 @@ public class BinanceServiceImpl implements BinanceService {
                     String oco_stop_limit_low_percent = Utils.toPercent(stop_limit_2, price_now);
                     String oco_stop_limit_low = "SL_Low(" + oco_stop_limit_low_percent + "%):"
                             + Utils.formatPrice(stop_limit_2, 5).toString();
-                    if (!Objects.equals("[dvz]", oco_stop_limit_low_percent)
-                            && Utils.getBigDecimalValue(oco_stop_limit_low_percent)
-                                    .compareTo(BigDecimal.valueOf(-10)) > 0) {
+                    if (!Objects.equals("[dvz]", oco_stop_limit_low_percent) && Utils
+                            .getBigDecimalValue(oco_stop_limit_low_percent).compareTo(BigDecimal.valueOf(-10)) > 0) {
                         css.setOco_stop_limit_low_css("text-primary font-weight-bold");
                     }
 
@@ -635,16 +631,20 @@ public class BinanceServiceImpl implements BinanceService {
                             + Utils.formatPrice(stop_price_2, 5).toString();
 
                     String oco_low_hight = " (L:" + lowprice_min.toString() + "~M:" + price_min + "~H:"
-                            + hightprice_max.toString() + "=" + Utils.toPercent(hightprice_max, lowprice_min)
-                            + "%)";
+                            + hightprice_max.toString() + "=" + Utils.toPercent(hightprice_max, lowprice_min) + "%)";
 
-                    if (Utils.getBigDecimalValue(percent_hightprice_max).compareTo(
-                            Utils.getBigDecimalValue(percent_stop_limit_1).multiply(BigDecimal.valueOf(1.5))) < 1) {
+                    if (Utils.getBigDecimalValue(percent_hightprice_max)
+                            .compareTo(Utils.getBigDecimalValue(oco_stop_limit_low_percent.replace("-", ""))
+                                    .multiply(BigDecimal.valueOf(1.5))) < 1) {
                         css.setStar("✖");
                         css.setStar_css("text-danger");
                         css.setOco_css("text-white");
                     } else if (Utils.getBigDecimalValue(percent_hightprice_max)
                             .compareTo(BigDecimal.valueOf(50)) >= 0) {
+                        css.setOco_tp_price_hight_css("text-primary font-weight-bold");
+                    } else if (Utils.getBigDecimalValue(percent_hightprice_max)
+                            .compareTo(Utils.getBigDecimalValue(oco_stop_limit_low_percent.replace("-", ""))
+                                    .multiply(BigDecimal.valueOf(2))) >= 0) {
                         css.setOco_tp_price_hight_css("text-primary font-weight-bold");
                     }
 
@@ -656,27 +656,26 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
-                coin.setTarget_percent(
-                        Utils.getStringValue(css.getAvg_percent()).replace("-", "")
-                                + "(" + css.getMin_price() + "->" + css.getMax_price() + ")");
+                coin.setTarget_percent(Utils.getStringValue(css.getAvg_percent()).replace("-", "") + "("
+                        + css.getMin_price() + "->" + css.getMax_price() + ")");
                 String oco_hight = css.getOco_tp_price() + css.getOco_tp_price_hight();
                 oco_hight = oco_hight.substring(oco_hight.indexOf("―M") + 1, oco_hight.length());
                 coin.setOco_hight(oco_hight);
 
                 Boolean is_candidate = false;
                 if (!Objects.equals("", Utils.getStringValue(css.getOco_tp_price_hight_css()))) {
-                    //String avg_percent = css.getAvg_percent().replace("%", "");
-                    //if (Utils.getBigDecimalValue(avg_percent).compareTo(BigDecimal.valueOf(-10)) <= 0) {
-                        is_candidate = true;
-                    //}
+                    // String avg_percent = css.getAvg_percent().replace("%", "");
+                    // if (Utils.getBigDecimalValue(avg_percent).compareTo(BigDecimal.valueOf(-10))
+                    // <= 0) {
+                    is_candidate = true;
+                    // }
                 }
                 coin.setCandidate(is_candidate);
                 coin.setIndex(index);
                 coin.setSymbol(css.getSymbol());
                 coin.setName(css.getName());
-                coin.setNote("(v/mc:" +
-                        css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap() + "%) " +
-                        Utils.getStringValue(css.getNote()) + " " + Utils.getStringValue(css.getTrend()));
+                coin.setNote("(v/mc:" + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap()
+                        + "%) " + Utils.getStringValue(css.getNote()) + " " + Utils.getStringValue(css.getTrend()));
 
                 index += 1;
                 priorityCoinRepository.save(coin);
