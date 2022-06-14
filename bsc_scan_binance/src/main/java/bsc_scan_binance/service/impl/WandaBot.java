@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -92,6 +93,18 @@ public class WandaBot extends TelegramLongPollingBot {
                 for (PriorityCoin coin : list) {
                     message.setText(toString(coin));
                     execute(message);
+                }
+            } else if (command.contains("/check")) {
+                String[] arr = command.split(" ");
+
+                message.setChatId(update.getMessage().getChatId().toString());
+                binance_service.getList(false);
+                List<PriorityCoin> list = priorityCoinRepository.searchBySymbolLike(arr[1].toUpperCase());
+                if (!CollectionUtils.isEmpty(list)) {
+                    for (PriorityCoin coin : list) {
+                        message.setText(toString(coin));
+                        execute(message);
+                    }
                 }
             }
 

@@ -665,10 +665,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                 Boolean is_candidate = false;
                 if (!Objects.equals("", Utils.getStringValue(css.getOco_tp_price_hight_css()))) {
-                    String avg_percent = css.getAvg_percent().replace("%", "");
-                    if (Utils.getBigDecimalValue(avg_percent).compareTo(BigDecimal.valueOf(-10)) <= 0) {
+                    //String avg_percent = css.getAvg_percent().replace("%", "");
+                    //if (Utils.getBigDecimalValue(avg_percent).compareTo(BigDecimal.valueOf(-10)) <= 0) {
                         is_candidate = true;
-                    }
+                    //}
                 }
                 coin.setCandidate(is_candidate);
                 coin.setIndex(index);
