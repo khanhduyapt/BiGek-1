@@ -151,8 +151,11 @@ p {
           </td>
           <!-- Price -->
           <td
-            style="text-align: right; min-width: 150px !important; max-width: 150px !important;">
-            <p th:text="${token.current_price} + '$'"></p>
+            style="text-align: right; min-width: 220px !important; max-width: 220px !important;">
+            <div>
+                <span th:text="${token.current_price} + '$'"></span>
+                <span th:text="${token.price_target}"></span>
+            </div>
             <p style="font-size: 0.7rem !important;"
               th:text="${token.pre_price_history}" />
           </td>
@@ -198,13 +201,16 @@ p {
             th:text="${#numbers.formatDecimal(token.price_change_percentage_30d, 1, 'COMMA', 1, 'POINT') + '%'}">
           <td style="text-align: center;" th:classappend="${token.star_css}"
             th:text="${token.star}">
-            <!-- Price History -->
-          <td style="text-align: right;" class="text-info">
+
+          <!-- Volume/AvgPrice/Low-Hight today -->
+          <td style="text-align: right; min-width: 200px !important; max-width: 200px !important;" class="text-info">
             <p th:classappend="${token.today_vol_css}"
               th:text="${token.today_vol}">
             <p th:classappend="${token.today_price_css}"
               th:text="${token.today_price}">
+            <p style="color: black !important; font-size: 0.8rem !important;" th:text="${token.low_to_hight_price}">
           </td>
+
           <td style="text-align: right;">
             <p th:classappend="${token.day_0_vol_css}"
               th:text="${token.day_0_vol}">

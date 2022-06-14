@@ -21,6 +21,7 @@ public class CandidateTokenCssResponse {
     private String market_cap_css;
 
     private String current_price;
+    private String price_target;
     private String avg_percent;
     private String avg_price;
     private String min_price;
@@ -65,6 +66,7 @@ public class CandidateTokenCssResponse {
     private String star = "";
     private String star_css = "";
 
+    private String low_to_hight_price;
     private String today;
     private String day_0;
     private String day_1;

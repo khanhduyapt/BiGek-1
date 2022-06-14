@@ -348,6 +348,9 @@ public class BinanceServiceImpl implements BinanceService {
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
                 hightPriceList.add(temp.get(3));
+
+                BigDecimal lowest_price_today = Utils.getBigDecimalValue(temp.get(2));
+                BigDecimal highest_price_today = Utils.getBigDecimalValue(temp.get(3));
                 BigDecimal vol_today = Utils.getBigDecimal(temp.get(0).replace(",", ""));
 
                 temp = splitVolAndPrice(css.getDay_0());
@@ -531,9 +534,15 @@ public class BinanceServiceImpl implements BinanceService {
                 avg_price = total_price.divide(BigDecimal.valueOf(avgPriceList.size()), 5, RoundingMode.CEILING);
 
                 price_now = Utils.getBigDecimalValue(css.getCurrent_price());
-                // if (Objects.equals("unlend-finance", dto.getGecko_id())) {
-                // boolean debug = true;
-                // }
+
+                BigDecimal taget_percent_today = Utils
+                        .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now));
+                css.setLow_to_hight_price(
+                        "L:" + lowest_price_today + "(" + Utils.toPercent(lowest_price_today, price_now) + "%)➞H:"
+                                + highest_price_today + "(" + taget_percent_today.toString().replace(".0", "") + "%)");
+
+                css.setPrice_target("(->" +
+                        highest_price_today.toString() + "=" + taget_percent_today.toString().replace(".0", "") + "%)");
 
                 if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
 
@@ -627,6 +636,10 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setOco_stop_price(oco_stop_price);
                         css.setOco_low_hight(oco_low_hight);
                     }
+                }
+
+                if (taget_percent_today.compareTo(BigDecimal.valueOf(10)) >= 0) {
+                    css.setStar(css.getStar() + " ※");
                 }
                 // -----------------------------
 
