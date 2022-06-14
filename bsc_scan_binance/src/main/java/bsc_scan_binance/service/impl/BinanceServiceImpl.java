@@ -535,14 +535,20 @@ public class BinanceServiceImpl implements BinanceService {
 
                 price_now = Utils.getBigDecimalValue(css.getCurrent_price());
 
-                BigDecimal taget_percent_today = Utils
+                BigDecimal taget_percent_lost_today = Utils
+                        .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now));
+                BigDecimal taget_percent_profit_today = Utils
                         .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now));
+
                 css.setLow_to_hight_price(
-                        "L:" + lowest_price_today + "(" + Utils.toPercent(lowest_price_today, price_now) + "%)➞H:"
-                                + highest_price_today + "(" + taget_percent_today.toString().replace(".0", "") + "%)");
+                        "L:" + lowest_price_today + "(" + taget_percent_lost_today + "%)➞H:"
+                                + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "")
+                                + "%)");
 
                 css.setPrice_target("(->" +
-                        highest_price_today.toString() + "=" + taget_percent_today.toString().replace(".0", "") + "%)");
+                        highest_price_today.toString() + "="
+                        + taget_percent_profit_today.toString().replace(".0", "")
+                        + "%)");
 
                 if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
 
@@ -645,10 +651,23 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
 
-                if (taget_percent_today.compareTo(BigDecimal.valueOf(10)) >= 0) {
-                    css.setStar(css.getStar() + " ※");
+                if ((taget_percent_profit_today.add(taget_percent_lost_today)).compareTo(BigDecimal.valueOf(10)) >= 0) {
+
+                    css.setStar("※" + css.getStar() + "※");
+
+                } else if ((taget_percent_profit_today).compareTo(BigDecimal.valueOf(15)) >= 0) {
+
+                    css.setStar("※" + css.getStar() + "※");
+
+                } else if ((taget_percent_profit_today.add(taget_percent_lost_today))
+                        .compareTo(BigDecimal.valueOf(5)) >= 0) {
+
+                    css.setStar(css.getStar() + "※");
                 }
                 // -----------------------------
+                if (css.getStar().contains("※")) {
+                    css.setStar_css(css.getStar_css() + " bg-success rounded-lg");
+                }
 
                 if (isOrderByBynaceVolume) {
                     if (css.getStar().contains("🤩")) {

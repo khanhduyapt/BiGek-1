@@ -204,7 +204,7 @@ p {
           <td style="text-align: right;"
             th:classappend="${token.price_change_30d_css}"
             th:text="${#numbers.formatDecimal(token.price_change_percentage_30d, 1, 'COMMA', 1, 'POINT') + '%'}">
-          <td style="text-align: center;" th:classappend="${token.star_css}"
+          <td style="text-align: center; min-width: 80px !important;" th:classappend="${token.star_css}"
             th:text="${token.star}">
 
           <!-- Volume/AvgPrice/Low-Hight today -->
