@@ -40,6 +40,8 @@ public class CandidateTokenCssResponse {
     private String oco_tp_price_hight;
     private String oco_tp_price_hight_css;
     private String oco_stop_limit;
+    private String oco_stop_limit_low;
+    private String oco_stop_limit_low_css;
     private String oco_stop_price;
     private String oco_low_hight;
 

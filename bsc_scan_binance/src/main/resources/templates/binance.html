@@ -182,7 +182,12 @@ p {
                 th:classappend="${token.oco_tp_price_hight_css}"
                 th:text="${token.oco_tp_price_hight}"></span>
             </div>
-            <p th:text="${token.oco_stop_limit}"></p>
+            <div>
+              <span th:text="${token.oco_stop_limit}"></span><span
+                th:classappend="${token.oco_stop_limit_low_css}"
+                th:text="${token.oco_stop_limit_low}"></span>
+            </div>
+
             <p th:text="${token.oco_stop_price}"></p>
             <p th:text="${token.oco_low_hight}"></p>
           </td>
