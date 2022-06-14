@@ -8,10 +8,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.CollectionUtils;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import bsc_scan_binance.entity.CandidateCoin;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.service.CoinGeckoService;
+import bsc_scan_binance.service.impl.WandaBot;
 import bsc_scan_binance.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +30,14 @@ public class BscScanBinanceApplication {
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
+            WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
+
+            try {
+                TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+                telegramBotsApi.registerBot(wandaBot);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
 
             List<CandidateCoin> list = gecko_service.getList();
             if (CollectionUtils.isEmpty(list)) {

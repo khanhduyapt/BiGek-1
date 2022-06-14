@@ -50,6 +50,22 @@ public class Utils {
         return ret;
     }
 
+    public static String removeLastZero(String value) {
+        if ((value == null) || (Objects.equals("", value))) {
+            return "";
+        }
+        if (Objects.equals("0", value.subSequence(value.length() - 1, value.length()))) {
+            String str = value.substring(0, value.length() - 1);
+            return removeLastZero(str);
+        }
+
+        if (value.indexOf(".") == value.length() - 1) {
+            return value + "0";
+        }
+
+        return value;
+    }
+
     public static String getStringValue(Object value) {
         if (Objects.equals(null, value)) {
             return "";
