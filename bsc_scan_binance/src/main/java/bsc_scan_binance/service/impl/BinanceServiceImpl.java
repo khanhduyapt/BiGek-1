@@ -639,6 +639,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar("✖");
                         css.setStar_css("text-danger");
                         css.setOco_css("text-white");
+                        css.setOco_stop_limit_low_css("");
                     } else if (Utils.getBigDecimalValue(percent_hightprice_max)
                             .compareTo(BigDecimal.valueOf(50)) >= 0) {
                         css.setOco_tp_price_hight_css("text-primary font-weight-bold");
@@ -646,6 +647,8 @@ public class BinanceServiceImpl implements BinanceService {
                             .compareTo(Utils.getBigDecimalValue(oco_stop_limit_low_percent.replace("-", ""))
                                     .multiply(BigDecimal.valueOf(2))) >= 0) {
                         css.setOco_tp_price_hight_css("text-primary font-weight-bold");
+                    } else if (Objects.equals("🤩", css.getStar())) {
+                        css.setStar("");
                     }
 
                     css.setOco_tp_price(oco_tp_price);
