@@ -116,6 +116,21 @@ public class CandidateTokenCssResponse {
     private String day_11_price;
     private String day_12_price;
 
+    private String today_ema;
+    private String day_0_ema;
+    private String day_1_ema;
+    private String day_2_ema;
+    private String day_3_ema;
+    private String day_4_ema;
+    private String day_5_ema;
+    private String day_6_ema;
+    private String day_7_ema;
+    private String day_8_ema;
+    private String day_9_ema;
+    private String day_10_ema;
+    private String day_11_ema;
+    private String day_12_ema;
+
     private String today_vol_css = "";
     private String day_0_vol_css = "";
     private String day_1_vol_css = "";
