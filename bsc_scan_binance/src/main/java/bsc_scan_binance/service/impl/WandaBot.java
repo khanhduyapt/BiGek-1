@@ -11,6 +11,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.google.common.base.Objects;
+
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.service.BinanceService;
@@ -29,6 +31,10 @@ public class WandaBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         try {
+            if (!Objects.equal("khanhduyapt", update.getMessage().getChat().getUserName())) {
+                return;
+            }
+
             System.out.println(update.getMessage().getText());
             String command = update.getMessage().getText();
             SendMessage message = new SendMessage();
