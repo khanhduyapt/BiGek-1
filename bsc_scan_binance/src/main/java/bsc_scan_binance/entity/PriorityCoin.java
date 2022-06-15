@@ -49,4 +49,6 @@ public class PriorityCoin {
     @Column(name = "symbol")
     private String symbol;
 
+    @Column(name = "ema")
+    private BigDecimal ema;
 }

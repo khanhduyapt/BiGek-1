@@ -1,5 +1,6 @@
 package bsc_scan_binance.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,8 +92,10 @@ public class WandaBot extends TelegramLongPollingBot {
                 binance_service.getList(false);
                 List<PriorityCoin> list = priorityCoinRepository.findAllByCandidateOrderByIndexAsc(true);
                 for (PriorityCoin coin : list) {
-                    message.setText(toString(coin));
-                    execute(message);
+                    if (coin.getEma().compareTo(BigDecimal.ZERO) > 0) {
+                        message.setText(toString(coin));
+                        execute(message);
+                    }
                 }
             } else if (command.contains("/check")) {
                 String[] arr = command.split(" ");

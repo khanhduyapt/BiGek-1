@@ -22,6 +22,8 @@ public class CandidateTokenCssResponse {
 
     private String current_price;
     private String price_target;
+    private String btc_warning_css;
+
     private String avg_percent;
     private String avg_price;
     private String min_price;

@@ -74,6 +74,8 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "day_11", type = String.class),
                 @ColumnResult(name = "day_12", type = String.class),
                 @ColumnResult(name = "priority", type = String.class),
+                @ColumnResult(name = "ema", type = BigDecimal.class),
+                @ColumnResult(name = "uptrend", type = Boolean.class),
         })
 })
 

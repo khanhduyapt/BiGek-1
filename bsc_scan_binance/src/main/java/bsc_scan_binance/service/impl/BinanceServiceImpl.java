@@ -243,16 +243,48 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '11 days', 'yyyyMMdd')) as day_11, \n"
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '12 days', 'yyyyMMdd')) as day_12, \n"
 
-                    + "   can.priority 	                                                                          \n"
+                    + "   can.priority,                                                                           \n"
+                    + "   (CASE WHEN macd.ema >=0 THEN macd.ema ELSE 0 END) AS ema,                               \n"
+                    + "   (CASE WHEN macd.ema >=0 THEN true ELSE false END) AS uptrend                            \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
-                    + "   binance_volumn_day cur                                                                  \n"
+                    + "   binance_volumn_day cur,                                                                 \n"
+                    + "                                                                                           \n"
+                    + " (                                                                                         \n"
+                    + "     select                                                                                \n"
+                    + "         xyz.gecko_id,                                                                     \n"
+                    + "         ROUND(COALESCE(((today-day_0)+(day_0-day_1)+(day_1-day_2)+(day_2 - day_3)+(day_3 - day_4)+(day_4 - day_5)+(day_5 - day_6)+(day_6 - day_7)+(day_7 - day_8)+(day_8 - day_9)+(day_9 - day_10)+(day_10 - day_11)+(day_11 - day_12))/13, -99), 6) as ema \n"
+                    + "     from                                                                                  \n"
+                    + "     (                                                                                     \n"
+                    + "         select                                                                            \n"
+                    + "             can.gecko_id,                                                                 \n"
+                    + "             can.symbol,                                                                   \n"
+                    + "             can.name,                                                                     \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() + interval '1 days', 'yyyyMMdd')) as today,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as day_0,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '1 days', 'yyyyMMdd')) as day_1,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '2 days', 'yyyyMMdd')) as day_2,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '3 days', 'yyyyMMdd')) as day_3,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '4 days', 'yyyyMMdd')) as day_4,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '5 days', 'yyyyMMdd')) as day_5,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '6 days', 'yyyyMMdd')) as day_6,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '7 days', 'yyyyMMdd')) as day_7,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '8 days', 'yyyyMMdd')) as day_8,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '9 days', 'yyyyMMdd')) as day_9,   \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '10 days', 'yyyyMMdd')) as day_10, \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '11 days', 'yyyyMMdd')) as day_11, \n"
+                    + "            (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '12 days', 'yyyyMMdd')) as day_12  \n"
+                    + "         from                                                                              \n"
+                    + "             candidate_coin can                                                            \n"
+                    + "     ) xyz                                                                                 \n"
+                    + " ) macd                                                                                    \n"
                     + "                                                                                           \n"
                     + " where                                                                                     \n"
                     + "       cur.hh = TO_CHAR(NOW(), 'HH24')                                                     \n"
                     + "   and can.gecko_id = cur.gecko_id                                                         \n"
-                    + "   and can.symbol = cur.symbol                                                             \n";
+                    + "   and can.symbol = cur.symbol                                                             \n"
+                    + "   and can.gecko_id = macd.gecko_id                                                        \n";
 
             if (isOrderByBynaceVolume) {
                 sql = " select * from ( 																		  \n"
@@ -553,6 +585,17 @@ public class BinanceServiceImpl implements BinanceService {
                 css.setLow_to_hight_price("L:" + lowest_price_today + "(" + taget_percent_lost_today + "%)➞H:"
                         + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)");
 
+                //btc_warning_css
+                if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
+                    if ((lowest_price_today.multiply(BigDecimal.valueOf(1.02))).compareTo(price_now) >= 0) {
+                        css.setBtc_warning_css("bg-success");
+                    }
+
+                    if (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0) {
+                        css.setBtc_warning_css("bg-danger");
+                    }
+                }
+
                 coin.setCurrent_price(price_now);
 
                 if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
@@ -657,6 +700,9 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setOco_stop_price(oco_stop_price);
                     css.setOco_low_hight(oco_low_hight);
                 }
+                if (dto.getUptrend()) {
+                    css.setStar(css.getStar() + " Uptrend");
+                }
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
                 coin.setTarget_percent(Utils.getStringValue(css.getAvg_percent()).replace("-", "") + " min:"
@@ -677,7 +723,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "%, price_24h:"
                         + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%) "
                         + Utils.getStringValue(css.getNote()) + " " + Utils.getStringValue(css.getTrend()));
-
+                coin.setEma(dto.getEma());
                 index += 1;
                 priorityCoinRepository.save(coin);
 

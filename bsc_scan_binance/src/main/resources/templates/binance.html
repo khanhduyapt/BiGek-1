@@ -150,7 +150,7 @@ p {
               th:text="${token.volumn_binance_div_marketcap}">
           </td>
           <!-- Price -->
-          <td
+          <td th:classappend="${token.btc_warning_css}"
             style="text-align: right; min-width: 220px !important; max-width: 220px !important;">
             <div>
                 <span th:text="${token.current_price} + '$'"></span>

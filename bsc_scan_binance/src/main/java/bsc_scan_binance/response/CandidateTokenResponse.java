@@ -1,5 +1,7 @@
 package bsc_scan_binance.response;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -59,4 +61,6 @@ public class CandidateTokenResponse {
     private String day_11;
     private String day_12;
     private String priority;
+    private BigDecimal ema;
+    private Boolean uptrend;
 }
