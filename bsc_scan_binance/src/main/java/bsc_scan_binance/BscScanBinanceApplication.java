@@ -62,6 +62,8 @@ public class BscScanBinanceApplication {
                         + coin.getSymbol());
 
                 if (Objects.equals(idx, size - 1)) {
+                    binance_service.getList(false); //~3p 1 lan
+
                     log.info("reload: " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()));
                     idx = 0;
                     list.clear();
