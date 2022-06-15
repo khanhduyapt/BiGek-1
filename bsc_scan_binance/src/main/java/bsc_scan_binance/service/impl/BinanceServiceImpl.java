@@ -587,11 +587,28 @@ public class BinanceServiceImpl implements BinanceService {
 
                 //btc_warning_css
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
+
                     if ((lowest_price_today.multiply(BigDecimal.valueOf(1.02))).compareTo(price_now) >= 0) {
                         css.setBtc_warning_css("bg-success");
+
+                        Utils.sendToTelegram("Bot:");
+                        Utils.sendToTelegram("-------------Start----------------");
+                        Utils.sendToTelegram(Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
+                        Utils.sendToTelegram("[SUCCESS] Đến thời điểm mua hàng!");
+                        List<PriorityCoin> list_tele_coin = priorityCoinRepository.searchCandidate();
+                        for (PriorityCoin tele : list_tele_coin) {
+                            Utils.sendToTelegram(Utils.toString(tele));
+                        }
+                        Utils.sendToTelegram("--------------End----------------");
                     }
 
                     if (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0) {
+                        Utils.sendToTelegram("Bot:");
+                        Utils.sendToTelegram("-------------Start----------------");
+                        Utils.sendToTelegram(Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
+                        Utils.sendToTelegram("[WARNING] Thoát hàng gấp!");
+                        Utils.sendToTelegram("--------------End----------------");
+
                         css.setBtc_warning_css("bg-danger");
                     }
                 }
@@ -739,9 +756,8 @@ public class BinanceServiceImpl implements BinanceService {
             log.info("End getList <--");
 
             return list;
-        } catch (
 
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("Get list Inquiry Consigned Delivery error ------->");
             log.error(e.getMessage());

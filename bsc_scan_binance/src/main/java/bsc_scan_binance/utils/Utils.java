@@ -1,8 +1,13 @@
 package bsc_scan_binance.utils;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,7 +26,33 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
+import bsc_scan_binance.entity.PriorityCoin;
+
 public class Utils {
+
+    public static String toString(PriorityCoin tele) {
+        return tele.getSymbol() + ":" + tele.getName() + " P:" + tele.getCurrent_price() + "$ Target:"
+                + tele.getTarget_percent() + " ema:" + tele.getEma();
+    }
+
+    public static void sendToTelegram(String text) {
+        String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
+
+        //Add Telegram token
+        String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
+        String chatId = "5099224587";
+
+        urlString = String.format(urlString, apiToken, chatId, text);
+
+        try {
+            URL url = new URL(urlString);
+            URLConnection conn = url.openConnection();
+            @SuppressWarnings("unused")
+            InputStream is = new BufferedInputStream(conn.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static BigDecimal getBigDecimal(Object value) {
         if (Objects.equals(null, value)) {
