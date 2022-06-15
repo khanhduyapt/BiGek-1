@@ -290,8 +290,8 @@ public class BinanceServiceImpl implements BinanceService {
                 sql = " select * from ( 																		  \n"
                         + sql + " ) can                                                                           \n"
                         + " ORDER BY 																			  \n"
-                        + "  COALESCE(can.priority, 3) ASC, 													  \n"
-                        + " (CAST(can.vol_now * 1000000 AS money) / (case when CAST(can.market_cap AS money) = CAST(0 AS money) then CAST(can.gecko_total_volume AS money)  else CAST(can.market_cap AS money) end )) desc,  \n"
+                        //+ "  COALESCE(can.priority, 3) ASC, 													  \n"
+                        //+ " (CAST(can.vol_now * 1000000 AS money) / (case when CAST(can.market_cap AS money) = CAST(0 AS money) then CAST(can.gecko_total_volume AS money)  else CAST(can.market_cap AS money) end )) desc,  \n"
                         + " can.volumn_div_marketcap desc \n";
             } else {
                 sql += " order by                                                                                 \n"
@@ -728,7 +728,7 @@ public class BinanceServiceImpl implements BinanceService {
                 priorityCoinRepository.save(coin);
 
                 if (isOrderByBynaceVolume) {
-                    if (css.getStar().contains("🤩")) {
+                    if (dto.getUptrend()) {
                         list.add(css);
                     }
                 } else {
