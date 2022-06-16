@@ -42,7 +42,7 @@ public class WandaBot extends TelegramLongPollingBot {
             if (command.equals("/web3")) {
                 message.setChatId(update.getMessage().getChatId().toString());
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.findAllByCandidateOrderByIndexAsc(true);
+                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("web3")) {
                         message.setText(toString(coin));
@@ -52,7 +52,7 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/defi")) {
                 message.setChatId(update.getMessage().getChatId().toString());
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.findAllByCandidateOrderByIndexAsc(true);
+                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("defi")) {
                         message.setText(toString(coin));
@@ -62,7 +62,7 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/fan")) {
                 message.setChatId(update.getMessage().getChatId().toString());
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.findAllByCandidateOrderByIndexAsc(true);
+                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getName() + coin.getGeckoid()).toLowerCase().contains("fan")) {
                         message.setText(toString(coin));
@@ -72,7 +72,7 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/game")) {
                 message.setChatId(update.getMessage().getChatId().toString());
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.findAllByCandidateOrderByIndexAsc(true);
+                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("game")) {
                         message.setText(toString(coin));
@@ -82,7 +82,7 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/other")) {
                 message.setChatId(update.getMessage().getChatId().toString());
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.findAllByCandidateOrderByIndexAsc(true);
+                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     String text = (Utils.getStringValue(coin.getName() + coin.getGeckoid())
                             + Utils.getStringValue(coin.getNote())).toLowerCase();
@@ -96,7 +96,7 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/all")) {
                 message.setChatId(update.getMessage().getChatId().toString());
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.findAllByCandidateOrderByIndexAsc(true);
+                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (coin.getEma().compareTo(BigDecimal.ZERO) > 0) {
                         message.setText(toString(coin));

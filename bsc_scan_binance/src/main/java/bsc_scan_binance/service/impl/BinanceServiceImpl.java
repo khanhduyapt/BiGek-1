@@ -630,29 +630,19 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((lowest_price_today.multiply(BigDecimal.valueOf(1.02))).compareTo(price_now) >= 0) {
                         css.setBtc_warning_css("bg-success");
 
-                        Utils.sendToTelegram(Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
-                        Utils.sendToTelegram("　　　🤩　　🤩　　🤩　　　");
-                        Utils.sendToTelegram("🤩　　🤩　　🤩　　🤩　　🤩");
-                        Utils.sendToTelegram("　　　🤩　　🤩　　🤩　　　");
-                        Utils.sendToTelegram("Đến thời điểm mua hàng!");
-                        Utils.sendToTelegram("BTC:" + css.getCurrent_price());
-                        Utils.sendToTelegram(css.getLow_to_hight_price());
-                        // List<PriorityCoin> list_tele_coin = priorityCoinRepository.searchCandidate();
-                        // for (PriorityCoin tele : list_tele_coin) {
-                        // Utils.sendToTelegram(Utils.toString(tele));
-                        // }
-                        Utils.sendToTelegram("　👍👍👍👍👍　");
-                    }
+                        Utils.sendToTelegram("🤩🤩🤩");
+                        Utils.sendToTelegram(
+                                "Time to buy! BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
+                                        + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
 
-                    if (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0) {
+                    } else if (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0) {
                         css.setBtc_warning_css("bg-danger");
 
-                        Utils.sendToTelegram("　🤣🤣🤣🤣🤣　");
-                        Utils.sendToTelegram("Btc đã lên đến đỉnh ngày hôm nay!");
-                        Utils.sendToTelegram(Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
-                        Utils.sendToTelegram("BTC:" + css.getCurrent_price());
-                        Utils.sendToTelegram(css.getLow_to_hight_price());
-                        Utils.sendToTelegram("　🤣🤣🤣🤣🤣　");
+                        Utils.sendToTelegram("🤣🤣🤣🤣🤣");
+                        Utils.sendToTelegram(
+                                "BTC peaked today!" + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date())
+                                        + " BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
+                                        + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
                     }
                 }
 
