@@ -305,15 +305,23 @@ public class WandaBot extends TelegramLongPollingBot {
                         if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
                             Utils.sendToTelegram(
                                     String.format(
-                                            "PROFIT: [%s]_[%s] [Qty:%s] [TP:%s$] [%s]", dto.getSymbol(),
+                                            "PROFIT: [%s]_[%s] [Qty:%s]x[%s$]=[Total:%s$] [TP:%s$] %s％", dto.getSymbol(),
                                             dto.getName(),
-                                            dto.getQty(), dto.getTp_amount(), dto.getTp_percent()));
+                                            Utils.removeLastZero(dto.getQty().toString()),
+                                            Utils.removeLastZero(dto.getOrder_price().toString()),
+                                            Utils.removeLastZero(dto.getAmount().toString()),
+                                            Utils.removeLastZero(dto.getTp_amount().toString()),
+                                            dto.getTp_percent()));
 
                         } else {
                             Utils.sendToTelegram(
-                                    String.format("STOP LOST: [%s]_[%s] [Qty:%s] [TP:%s$] [%s]",
+                                    String.format("LOST: [%s]_[%s] [Qty:%s]x[%s$]=[Total:%s$] [TP:%s$] %s％",
                                             dto.getSymbol(), dto.getName(),
-                                            dto.getQty(), dto.getTp_amount(), dto.getTp_percent()));
+                                            Utils.removeLastZero(dto.getQty().toString()),
+                                            Utils.removeLastZero(dto.getOrder_price().toString()),
+                                            Utils.removeLastZero(dto.getAmount().toString()),
+                                            Utils.removeLastZero(dto.getTp_amount().toString()),
+                                            dto.getTp_percent()));
 
                         }
                     }
