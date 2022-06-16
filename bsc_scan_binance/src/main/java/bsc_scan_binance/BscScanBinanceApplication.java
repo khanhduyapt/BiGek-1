@@ -27,6 +27,7 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()) + " ---->");
 
+            //--------------------Init--------------------
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
@@ -39,10 +40,14 @@ public class BscScanBinanceApplication {
                 e.printStackTrace();
             }
 
+            //--------------------Start--------------------
+
             List<CandidateCoin> list = gecko_service.getList();
             if (CollectionUtils.isEmpty(list)) {
                 gecko_service.initCandidateCoin();
             }
+
+            binance_service.monitorProfit();
 
             int size = list.size();
             int idx = 0;
@@ -65,6 +70,8 @@ public class BscScanBinanceApplication {
                     binance_service.getList(false); //~3p 1 lan
 
                     binance_service.monitorEma();
+
+                    binance_service.monitorProfit();
 
                     log.info("reload: " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()));
                     idx = 0;

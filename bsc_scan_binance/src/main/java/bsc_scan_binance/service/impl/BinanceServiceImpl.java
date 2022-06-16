@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.vdurmont.emoji.EmojiParser;
+
 import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
@@ -32,6 +34,7 @@ import bsc_scan_binance.repository.PriorityCoinHistoryRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
+import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinHistoryResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
@@ -56,6 +59,13 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private PriorityCoinHistoryRepository priorityCoinHistoryRepository;
+
+    //https://gist.github.com/naiieandrade/b7166fc879627a1295e1b67b98672770
+    private String emoji_heart = EmojiParser.parseToUnicode(":heart:");
+
+    private String emoji_star = EmojiParser.parseToUnicode(":star:");
+
+    private String emoji_exclamation = EmojiParser.parseToUnicode(":exclamation:");
 
     @Override
     public void loadData(String gecko_id, String symbol) {
@@ -637,7 +647,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((lowest_price_today.multiply(BigDecimal.valueOf(1.02))).compareTo(price_now) >= 0) {
                         css.setBtc_warning_css("bg-success");
 
-                        Utils.sendToTelegram("🤩🤩🤩");
+                        Utils.sendToTelegram(emoji_heart);
                         Utils.sendToTelegram(
                                 "Time to buy! BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
                                         + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
@@ -645,7 +655,7 @@ public class BinanceServiceImpl implements BinanceService {
                     } else if (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0) {
                         css.setBtc_warning_css("bg-danger");
 
-                        Utils.sendToTelegram("🤣🤣🤣🤣🤣");
+                        Utils.sendToTelegram(emoji_exclamation);
                         Utils.sendToTelegram(
                                 "BTC peaked today!" + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date())
                                         + " BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
@@ -1120,6 +1130,64 @@ public class BinanceServiceImpl implements BinanceService {
         Exception e) {
             e.printStackTrace();
             log.info("monitorEma error ------->");
+            log.error(e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public void monitorProfit() {
+        try {
+            log.info("Start monitorProfit ---->");
+
+            String sql = ""
+                    + " SELECT * from (                                                                             \n"
+                    + "    SELECT                                                                                   \n"
+                    + "      od.gecko_id,                                                                           \n"
+                    + "      od.symbol,                                                                             \n"
+                    + "      od.name,                                                                               \n"
+                    + "      od.order_price,                                                                        \n"
+                    + "      od.qty,                                                                                \n"
+                    + "      od.amount,                                                                             \n"
+                    + "      cur.price_at_binance,                                                                  \n"
+                    + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 0)  as tp_percent, \n"
+                    + "      ROUND(((cur.price_at_binance - od.order_price)*od.order_price)*od.qty, 0) as tp_amount \n"
+                    + "    FROM                                                                                     \n"
+                    + "        orders od,                                                                           \n"
+                    + "        binance_volumn_day cur                                                               \n"
+                    + "    WHERE                                                                                    \n"
+                    + "            cur.hh      = TO_CHAR(NOW(), 'HH24')                                             \n"
+                    + "        and od.gecko_id = cur.gecko_id                                                       \n"
+                    + "        and od.symbol   = cur.symbol                                                         \n"
+                    + " ) odr ORDER BY odr.tp_percent desc ";
+
+            Query query = entityManager.createNativeQuery(sql, "OrdersProfitResponse");
+
+            List<OrdersProfitResponse> results = query.getResultList();
+
+            if (!CollectionUtils.isEmpty(results)) {
+                for (OrdersProfitResponse dto : results) {
+                    if (dto.getTp_percent().compareTo(BigDecimal.valueOf(10)) > 0) {
+                        Utils.sendToTelegram(String.format("TakeProfit: [%s] [Qty:%s] [TP:%s$] [%s]", dto.getName(),
+                                dto.getQty(), dto.getTp_amount(), dto.getTp_percent()));
+
+                    }
+
+                    if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-9)) < 0) {
+                        Utils.sendToTelegram(String.format("STOP LOST: [%s] [Qty:%s] [TP:%s$] [%s]", dto.getName(),
+                                dto.getQty(), dto.getTp_amount(), dto.getTp_percent()));
+
+                    }
+                }
+            }
+
+            log.info("End monitorProfit <----");
+        } catch (
+
+        Exception e) {
+            e.printStackTrace();
+            log.info("monitorProfit error ------->");
             log.error(e.getMessage());
         }
     }

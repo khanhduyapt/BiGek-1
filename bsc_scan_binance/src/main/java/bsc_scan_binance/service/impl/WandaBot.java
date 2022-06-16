@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -22,6 +26,7 @@ import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
+import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +48,9 @@ public class WandaBot extends TelegramLongPollingBot {
 
     @Autowired
     private TakeProfitRepository takeProfitRepository;
+
+    @PersistenceContext
+    private final EntityManager entityManager;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -265,6 +273,51 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 }
 
+            } else if (command.contains("/balance")) {
+                String sql = ""
+                        + " SELECT * from (                                                                             \n"
+                        + "    SELECT                                                                                   \n"
+                        + "      od.gecko_id,                                                                           \n"
+                        + "      od.symbol,                                                                             \n"
+                        + "      od.name,                                                                               \n"
+                        + "      od.order_price,                                                                        \n"
+                        + "      od.qty,                                                                                \n"
+                        + "      od.amount,                                                                             \n"
+                        + "      cur.price_at_binance,                                                                  \n"
+                        + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 0)  as tp_percent, \n"
+                        + "      ROUND(((cur.price_at_binance - od.order_price)*od.order_price)*od.qty, 0) as tp_amount \n"
+                        + "    FROM                                                                                     \n"
+                        + "        orders od,                                                                           \n"
+                        + "        binance_volumn_day cur                                                               \n"
+                        + "    WHERE                                                                                    \n"
+                        + "            cur.hh      = TO_CHAR(NOW(), 'HH24')                                             \n"
+                        + "        and od.gecko_id = cur.gecko_id                                                       \n"
+                        + "        and od.symbol   = cur.symbol                                                         \n"
+                        + " ) odr ORDER BY odr.tp_percent desc ";
+
+                Query query = entityManager.createNativeQuery(sql, "OrdersProfitResponse");
+
+                @SuppressWarnings("unchecked")
+                List<OrdersProfitResponse> results = query.getResultList();
+
+                if (!CollectionUtils.isEmpty(results)) {
+                    for (OrdersProfitResponse dto : results) {
+                        if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
+                            Utils.sendToTelegram(
+                                    String.format(
+                                            "PROFIT: [%s]_[%s] [Qty:%s] [TP:%s$] [%s]", dto.getSymbol(),
+                                            dto.getName(),
+                                            dto.getQty(), dto.getTp_amount(), dto.getTp_percent()));
+
+                        } else {
+                            Utils.sendToTelegram(
+                                    String.format("STOP LOST: [%s]_[%s] [Qty:%s] [TP:%s$] [%s]",
+                                            dto.getSymbol(), dto.getName(),
+                                            dto.getQty(), dto.getTp_amount(), dto.getTp_percent()));
+
+                        }
+                    }
+                }
             }
 
         } catch (TelegramApiException e) {

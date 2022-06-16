@@ -3,10 +3,14 @@ package bsc_scan_binance.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
+import bsc_scan_binance.response.OrdersProfitResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +31,21 @@ import lombok.NoArgsConstructor;
 //    amount numeric(30,5) DEFAULT 0,
 //    CONSTRAINT orders_pkey PRIMARY KEY (gecko_id)
 //)
+
+@SqlResultSetMapping(name = "OrdersProfitResponse", classes = {
+        @ConstructorResult(targetClass = OrdersProfitResponse.class, columns = {
+                @ColumnResult(name = "gecko_id", type = String.class),
+                @ColumnResult(name = "symbol", type = String.class),
+                @ColumnResult(name = "name", type = String.class),
+
+                @ColumnResult(name = "order_price", type = BigDecimal.class),
+                @ColumnResult(name = "qty", type = BigDecimal.class),
+                @ColumnResult(name = "amount", type = BigDecimal.class),
+                @ColumnResult(name = "price_at_binance", type = BigDecimal.class),
+                @ColumnResult(name = "tp_percent", type = BigDecimal.class),
+                @ColumnResult(name = "tp_amount", type = BigDecimal.class),
+        })
+})
 
 public class Orders {
     @Id
