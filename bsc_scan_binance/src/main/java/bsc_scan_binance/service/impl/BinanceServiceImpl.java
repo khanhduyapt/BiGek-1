@@ -60,12 +60,13 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private PriorityCoinHistoryRepository priorityCoinHistoryRepository;
 
-    //https://gist.github.com/naiieandrade/b7166fc879627a1295e1b67b98672770
-    private String emoji_heart = EmojiParser.parseToUnicode(":heart:");
+    // https://gist.github.com/naiieandrade/b7166fc879627a1295e1b67b98672770
+    // private String emoji_heart = EmojiParser.parseToUnicode(":heart:");
+    // private String emoji_star = EmojiParser.parseToUnicode(":star:");
+    // private String emoji_exclamation =
+    // EmojiParser.parseToUnicode(":exclamation:");
 
-    private String emoji_star = EmojiParser.parseToUnicode(":star:");
-
-    private String emoji_exclamation = EmojiParser.parseToUnicode(":exclamation:");
+    private BigDecimal pre_lowest_price_BTC_today = BigDecimal.ZERO;
 
     @Override
     public void loadData(String gecko_id, String symbol) {
@@ -263,7 +264,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4), '~', ROUND(w.ema, 5)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '12 days', 'yyyyMMdd')) as day_12, \n"
 
                     + "   can.priority,                                                                           \n"
-                    //+ "   (CASE WHEN macd.ema >=0 THEN macd.ema ELSE 0 END) AS ema,                             \n"
+                    // + " (CASE WHEN macd.ema >=0 THEN macd.ema ELSE 0 END) AS ema, \n"
                     + "   macd.ema AS ema,                                                                        \n"
                     + "   (CASE WHEN macd.ema >=0 THEN true ELSE false END) AS uptrend                            \n"
                     + "                                                                                           \n"
@@ -330,6 +331,7 @@ public class BinanceServiceImpl implements BinanceService {
             Integer index = 1;
             String sql_update_ema = "";
             String today = Utils.convertDateToString("yyyyMMdd", new Date());
+
             for (CandidateTokenResponse dto : results) {
                 PriorityCoin coin = new PriorityCoin();
                 coin.setGeckoid(dto.getGecko_id());
@@ -645,10 +647,12 @@ public class BinanceServiceImpl implements BinanceService {
 
                 // btc_warning_css
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
-                    if ((lowest_price_today.multiply(BigDecimal.valueOf(1.02))).compareTo(price_now) >= 0) {
+                    if ((lowest_price_today.compareTo(pre_lowest_price_BTC_today) != 0)
+                            && ((lowest_price_today.multiply(BigDecimal.valueOf(1.02))).compareTo(price_now) >= 0)) {
+                        pre_lowest_price_BTC_today = lowest_price_today;
                         css.setBtc_warning_css("bg-success");
 
-                        //Utils.sendToTelegram(emoji_heart);
+                        // Utils.sendToTelegram(emoji_heart);
                         Utils.sendToTelegram(
                                 "Time to buy! BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
                                         + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
@@ -656,7 +660,7 @@ public class BinanceServiceImpl implements BinanceService {
                     } else if (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0) {
                         css.setBtc_warning_css("bg-danger");
 
-                        //Utils.sendToTelegram(emoji_exclamation);
+                        // Utils.sendToTelegram(emoji_exclamation);
                         Utils.sendToTelegram(
                                 "BTC peaked today!" + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date())
                                         + " BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
@@ -1025,10 +1029,9 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             log.info("Start monitorEma ---->");
 
-            //check not in history -> msg 10 times
+            // check not in history -> msg 10 times
             {
-                String sql = ""
-                        + " SELECT                                                                  \n"
+                String sql = "" + " SELECT                                                                  \n"
                         + "     gecko_id,                                                           \n"
                         + "     symbol,                                                             \n"
                         + "     name,                                                               \n"
@@ -1043,7 +1046,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (!CollectionUtils.isEmpty(results)) {
                     for (PriorityCoinHistoryResponse dto : results) {
-                        //update count_notify +=1
+                        // update count_notify +=1
                         PriorityCoinHistory entity = priorityCoinHistoryRepository.findById(dto.getGecko_id())
                                 .orElse(null);
                         if (Objects.equals(null, entity)) {
@@ -1058,8 +1061,7 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
 
-                sql = "" +
-                        " SELECT                                                            \n"
+                sql = "" + " SELECT                                                            \n"
                         + "      gecko_id,                                                  \n"
                         + "      symbol,                                                    \n"
                         + "      name,                                                      \n"
@@ -1087,10 +1089,9 @@ public class BinanceServiceImpl implements BinanceService {
 
             }
 
-            //check delete from history -> msg 10 times
+            // check delete from history -> msg 10 times
             {
-                String sql = ""
-                        + " SELECT                                                                  \n"
+                String sql = "" + " SELECT                                                                  \n"
                         + "     gecko_id,                                                           \n"
                         + "     symbol,                                                             \n"
                         + "     name,                                                               \n"
@@ -1104,7 +1105,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (!CollectionUtils.isEmpty(results)) {
 
                     for (PriorityCoinHistoryResponse dto : results) {
-                        //update count_notify +=1
+                        // update count_notify +=1
                         PriorityCoinHistory entity = priorityCoinHistoryRepository.findById(dto.getGecko_id())
                                 .orElse(null);
                         if (!Objects.equals(null, entity)) {
@@ -1153,7 +1154,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "      od.amount,                                                                             \n"
                     + "      cur.price_at_binance,                                                                  \n"
                     + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1)  as tp_percent, \n"
-                    + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount   \n"
+                    + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,  \n"
+                    + "      (select concat(cast(target_price as varchar), ' ', target_percent) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
                     + "    FROM                                                                                     \n"
                     + "        orders od,                                                                           \n"
                     + "        binance_volumn_day cur                                                               \n"
@@ -1171,22 +1173,16 @@ public class BinanceServiceImpl implements BinanceService {
                 for (OrdersProfitResponse dto : results) {
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(10)) > 0) {
                         Utils.sendToTelegram(
-                                String.format("TakeProfit: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s percents",
-                                        dto.getName(),
-                                        dto.getQty(),
-                                        Utils.removeLastZero(dto.getAmount().toString()),
-                                        dto.getTp_amount(),
-                                        dto.getTp_percent()));
+                                String.format("TakeProfit: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s percents, Target:%s",
+                                        dto.getName(), dto.getQty(), Utils.removeLastZero(dto.getAmount().toString()),
+                                        dto.getTp_amount(), dto.getTp_percent(), dto.getTarget()));
                     }
 
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {
                         Utils.sendToTelegram(
-                                String.format("STOP LOST: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s percents",
-                                        dto.getName(),
-                                        dto.getQty(),
-                                        Utils.removeLastZero(dto.getAmount().toString()),
-                                        dto.getTp_amount(),
-                                        dto.getTp_percent()));
+                                String.format("STOP LOST: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s percents, Target:%s",
+                                        dto.getName(), dto.getQty(), Utils.removeLastZero(dto.getAmount().toString()),
+                                        dto.getTp_amount(), dto.getTp_percent(), dto.getTarget()));
                     }
                 }
             }

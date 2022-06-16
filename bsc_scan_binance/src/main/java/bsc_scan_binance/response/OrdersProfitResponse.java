@@ -21,5 +21,5 @@ public class OrdersProfitResponse {
     private BigDecimal price_at_binance;
     private BigDecimal tp_percent;
     private BigDecimal tp_amount;
-
+    private String target;
 }

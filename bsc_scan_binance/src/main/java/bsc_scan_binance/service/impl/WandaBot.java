@@ -178,8 +178,8 @@ public class WandaBot extends TelegramLongPollingBot {
                     ordersRepository.save(entity);
 
                     message.setText(String.format("Added:[%s] [%s] [Qty:%s(+%s)]_[P:%s$]_[Amount:%s$].",
-                            entity.getSymbol(),
-                            entity.getName(), entity.getQty(), qty2, entity.getOrder_price(), entity.getAmount()));
+                            entity.getSymbol(), entity.getName(), entity.getQty(), qty2, entity.getOrder_price(),
+                            entity.getAmount()));
                     execute(message);
                 }
             } else if (command.contains("/sell")) {
@@ -203,7 +203,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 for (BinanceVolumnDay dto : list) {
                     Orders order = ordersRepository.findById(dto.getId().getGeckoid()).orElse(null);
                     if (Objects.equal(null, order)) {
-                        message.setText("Not found:" + arr[1].toUpperCase());
+                        message.setText("[Orders] Not found:" + arr[1].toUpperCase());
                         execute(message);
                         return;
                     }
@@ -255,10 +255,9 @@ public class WandaBot extends TelegramLongPollingBot {
                         ordersRepository.save(order);
 
                         message.setText(String.format("Remain:[%s] [%s] [Qty:%s]_[P:%s$]_[Amount:%s$].",
-                                order.getSymbol(), order.getName(),
-                                order.getQty(), order_price1, order.getAmount()));
+                                order.getSymbol(), order.getName(), order.getQty(), order_price1, order.getAmount()));
                         execute(message);
-                        //------------------------
+                        // ------------------------
                         profit.setQty(qty2);
                         profit.setAmount(amount2);
                         profit.setSale_price(order_price2);
@@ -266,9 +265,9 @@ public class WandaBot extends TelegramLongPollingBot {
                     }
 
                     takeProfitRepository.save(profit);
-                    message.setText(String.format("Sell:[%s] [%s] [Qty:-%s]_[P:%s$]_[Amount:%s$]_[PT:%s$].",
-                            profit.getSymbol(), profit.getName(),
-                            profit.getQty(), order_price2, amount2, profit.getProfit()));
+                    message.setText(
+                            String.format("Sell:[%s] [%s] [Qty:-%s]_[P:%s$]_[Amount:%s$]_[PT:%s$].", profit.getSymbol(),
+                                    profit.getName(), profit.getQty(), order_price2, amount2, profit.getProfit()));
                     execute(message);
 
                 }
@@ -285,7 +284,8 @@ public class WandaBot extends TelegramLongPollingBot {
                         + "      od.amount,                                                                             \n"
                         + "      cur.price_at_binance,                                                                  \n"
                         + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1) as tp_percent,  \n"
-                        + "      ROUND((cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount    \n"
+                        + "      ROUND((cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,   \n"
+                        + "      (select concat(cast(target_price as varchar), ' ', target_percent) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
                         + "    FROM                                                                                     \n"
                         + "        orders od,                                                                           \n"
                         + "        binance_volumn_day cur                                                               \n"
@@ -303,33 +303,25 @@ public class WandaBot extends TelegramLongPollingBot {
                 if (!CollectionUtils.isEmpty(results)) {
                     for (OrdersProfitResponse dto : results) {
                         if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
-                            Utils.sendToTelegram(
-                                    String.format(
-                                            "PROFIT: [%s]_[%s] [Qty:%s]x[%s$] [%s$], Now:[P:%s][TP:%s$] %s percents.",
-                                            dto.getSymbol(),
-                                            dto.getName(),
-                                            Utils.removeLastZero(dto.getQty().toString()),
-                                            Utils.removeLastZero(dto.getOrder_price().toString()),
-                                            Utils.removeLastZero(dto.getAmount().toString()),
+                            Utils.sendToTelegram(String.format(
+                                    "PROFIT: [%s]_[%s] [Qty:%s]x[%s$] [%s$], Now:[P:%s][TP:%s$] %s percents, Target:%s.",
+                                    dto.getSymbol(), dto.getName(), Utils.removeLastZero(dto.getQty().toString()),
+                                    Utils.removeLastZero(dto.getOrder_price().toString()),
+                                    Utils.removeLastZero(dto.getAmount().toString()),
 
-                                            Utils.removeLastZero(dto.getPrice_at_binance().toString()),
-                                            Utils.removeLastZero(dto.getTp_amount().toString()),
-                                            dto.getTp_percent()));
-
+                                    Utils.removeLastZero(dto.getPrice_at_binance().toString()),
+                                    Utils.removeLastZero(dto.getTp_amount().toString()), dto.getTp_percent(),
+                                    dto.getTarget()));
                         } else {
-                            Utils.sendToTelegram(
-                                    String.format(
-                                            "LOST: [%s]_[%s] [Qty:%s]x[%s$] [%s$], Now:[P:%s][TP:%s$] %s percents.",
-                                            dto.getSymbol(),
-                                            dto.getName(),
-                                            Utils.removeLastZero(dto.getQty().toString()),
-                                            Utils.removeLastZero(dto.getOrder_price().toString()),
-                                            Utils.removeLastZero(dto.getAmount().toString()),
+                            Utils.sendToTelegram(String.format(
+                                    "LOST: [%s]_[%s] [Qty:%s]x[%s$] [%s$], Now:[P:%s][TP:%s$] %s percents, Target:%s.",
+                                    dto.getSymbol(), dto.getName(), Utils.removeLastZero(dto.getQty().toString()),
+                                    Utils.removeLastZero(dto.getOrder_price().toString()),
+                                    Utils.removeLastZero(dto.getAmount().toString()),
 
-                                            Utils.removeLastZero(dto.getPrice_at_binance().toString()),
-                                            Utils.removeLastZero(dto.getTp_amount().toString()),
-                                            dto.getTp_percent()));
-
+                                    Utils.removeLastZero(dto.getPrice_at_binance().toString()),
+                                    Utils.removeLastZero(dto.getTp_amount().toString()), dto.getTp_percent(),
+                                    dto.getTarget()));
                         }
                     }
                 }
@@ -342,8 +334,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
     private String toString(PriorityCoin coin) {
         return String.format("[%s]  [%s]  [Price: %s$]  [Target:%s$=%s]  %s", coin.getSymbol(), coin.getName(),
-                coin.getCurrent_price(),
-                coin.getTarget_price(), coin.getTarget_percent(), coin.getNote());
+                coin.getCurrent_price(), coin.getTarget_price(), coin.getTarget_percent(), coin.getNote());
     }
 
     @Override
