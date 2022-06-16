@@ -284,8 +284,8 @@ public class WandaBot extends TelegramLongPollingBot {
                         + "      od.qty,                                                                                \n"
                         + "      od.amount,                                                                             \n"
                         + "      cur.price_at_binance,                                                                  \n"
-                        + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 0)  as tp_percent, \n"
-                        + "      ROUND(((cur.price_at_binance - od.order_price)*od.order_price)*od.qty, 0) as tp_amount \n"
+                        + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1) as tp_percent,  \n"
+                        + "      ROUND((cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount    \n"
                         + "    FROM                                                                                     \n"
                         + "        orders od,                                                                           \n"
                         + "        binance_volumn_day cur                                                               \n"
@@ -305,21 +305,28 @@ public class WandaBot extends TelegramLongPollingBot {
                         if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
                             Utils.sendToTelegram(
                                     String.format(
-                                            "PROFIT: [%s]_[%s] [Qty:%s]x[%s$]=[Total:%s$] [TP:%s$] %s％", dto.getSymbol(),
+                                            "PROFIT: [%s]_[%s] [Qty:%s]x[%s$] [%s$], Now:[P:%s][TP:%s$] %s percents.",
+                                            dto.getSymbol(),
                                             dto.getName(),
                                             Utils.removeLastZero(dto.getQty().toString()),
                                             Utils.removeLastZero(dto.getOrder_price().toString()),
                                             Utils.removeLastZero(dto.getAmount().toString()),
+
+                                            Utils.removeLastZero(dto.getPrice_at_binance().toString()),
                                             Utils.removeLastZero(dto.getTp_amount().toString()),
                                             dto.getTp_percent()));
 
                         } else {
                             Utils.sendToTelegram(
-                                    String.format("LOST: [%s]_[%s] [Qty:%s]x[%s$]=[Total:%s$] [TP:%s$] %s％",
-                                            dto.getSymbol(), dto.getName(),
+                                    String.format(
+                                            "LOST: [%s]_[%s] [Qty:%s]x[%s$] [%s$], Now:[P:%s][TP:%s$] %s percents.",
+                                            dto.getSymbol(),
+                                            dto.getName(),
                                             Utils.removeLastZero(dto.getQty().toString()),
                                             Utils.removeLastZero(dto.getOrder_price().toString()),
                                             Utils.removeLastZero(dto.getAmount().toString()),
+
+                                            Utils.removeLastZero(dto.getPrice_at_binance().toString()),
                                             Utils.removeLastZero(dto.getTp_amount().toString()),
                                             dto.getTp_percent()));
 

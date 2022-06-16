@@ -47,8 +47,6 @@ public class BscScanBinanceApplication {
                 gecko_service.initCandidateCoin();
             }
 
-            binance_service.monitorProfit();
-
             int size = list.size();
             int idx = 0;
             while (idx < size) {

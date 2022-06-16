@@ -1149,11 +1149,11 @@ public class BinanceServiceImpl implements BinanceService {
                     + "      od.symbol,                                                                             \n"
                     + "      od.name,                                                                               \n"
                     + "      od.order_price,                                                                        \n"
-                    + "      od.qty,                                                                                \n"
+                    + "      ROUND(od.qty, 1) qty,                                                                  \n"
                     + "      od.amount,                                                                             \n"
                     + "      cur.price_at_binance,                                                                  \n"
-                    + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 0)  as tp_percent, \n"
-                    + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*od.qty, 0) as tp_amount \n"
+                    + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1)  as tp_percent, \n"
+                    + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount   \n"
                     + "    FROM                                                                                     \n"
                     + "        orders od,                                                                           \n"
                     + "        binance_volumn_day cur                                                               \n"
@@ -1171,16 +1171,22 @@ public class BinanceServiceImpl implements BinanceService {
                 for (OrdersProfitResponse dto : results) {
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(10)) > 0) {
                         Utils.sendToTelegram(
-                                String.format("TakeProfit: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s％", dto.getName(),
-                                        dto.getQty(), dto.getAmount(), dto.getTp_amount(), dto.getTp_percent()));
-
+                                String.format("TakeProfit: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s percents",
+                                        dto.getName(),
+                                        dto.getQty(),
+                                        Utils.removeLastZero(dto.getAmount().toString()),
+                                        dto.getTp_amount(),
+                                        dto.getTp_percent()));
                     }
 
-                    if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) < 0) {
+                    if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {
                         Utils.sendToTelegram(
-                                String.format("STOP LOST: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s％", dto.getName(),
-                                        dto.getQty(), dto.getAmount(), dto.getTp_amount(), dto.getTp_percent()));
-
+                                String.format("STOP LOST: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s percents",
+                                        dto.getName(),
+                                        dto.getQty(),
+                                        Utils.removeLastZero(dto.getAmount().toString()),
+                                        dto.getTp_amount(),
+                                        dto.getTp_percent()));
                     }
                 }
             }
