@@ -17,6 +17,7 @@ import javax.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import bsc_scan_binance.entity.BinanceVolumnDay;
@@ -24,11 +25,14 @@ import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.PriorityCoin;
+import bsc_scan_binance.entity.PriorityCoinHistory;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
+import bsc_scan_binance.repository.PriorityCoinHistoryRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
+import bsc_scan_binance.response.PriorityCoinHistoryResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +53,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private PriorityCoinRepository priorityCoinRepository;
+
+    @Autowired
+    private PriorityCoinHistoryRepository priorityCoinHistoryRepository;
 
     @Override
     public void loadData(String gecko_id, String symbol) {
@@ -622,7 +629,7 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal taget_percent_profit_today = Utils
                         .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now));
 
-                css.setLow_to_hight_price("L:" + lowest_price_today + "(" + taget_percent_lost_today + "%)➞H:"
+                css.setLow_to_hight_price("L:" + lowest_price_today + "(" + taget_percent_lost_today + "%)_H:"
                         + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)");
 
                 // btc_warning_css
@@ -998,6 +1005,123 @@ public class BinanceServiceImpl implements BinanceService {
 
         return Arrays.asList(volumn, Utils.removeLastZero(avg_price), Utils.removeLastZero(min_price),
                 Utils.removeLastZero(max_price), arr[4]);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public void monitorEma() {
+        try {
+            log.info("Start monitorEma ---->");
+
+            //check not in history -> msg 10 times
+            {
+                String sql = ""
+                        + " SELECT                                                                  \n"
+                        + "     gecko_id,                                                           \n"
+                        + "     symbol,                                                             \n"
+                        + "     name,                                                               \n"
+                        + "     0 as count_notify                                                   \n"
+                        + " FROM priority_coin                                                      \n"
+                        + " WHERE ema > 0                                                           \n"
+                        + "   AND gecko_id NOT IN                                                   \n"
+                        + "    (SELECT gecko_id FROM priority_coin_history)                         \n";
+                Query query = entityManager.createNativeQuery(sql, "PriorityCoinHistoryResponse");
+
+                List<PriorityCoinHistoryResponse> results = query.getResultList();
+
+                if (!CollectionUtils.isEmpty(results)) {
+                    for (PriorityCoinHistoryResponse dto : results) {
+                        //update count_notify +=1
+                        PriorityCoinHistory entity = priorityCoinHistoryRepository.findById(dto.getGecko_id())
+                                .orElse(null);
+                        if (Objects.equals(null, entity)) {
+                            entity = new PriorityCoinHistory();
+                            entity.setGeckoid(dto.getGecko_id());
+                            entity.setSymbol(dto.getSymbol());
+                            entity.setName(dto.getName());
+                            entity.setCount_notify(1);
+
+                            priorityCoinHistoryRepository.save(entity);
+                        }
+                    }
+                }
+
+                sql = "" +
+                        " SELECT                                                            \n"
+                        + "      gecko_id,                                                  \n"
+                        + "      symbol,                                                    \n"
+                        + "      name,                                                      \n"
+                        + "      count_notify                                               \n"
+                        + "  FROM priority_coin_history                                     \n"
+                        + "  WHERE count_notify < 10                                        \n"
+                        + "  AND gecko_id  IN                                               \n"
+                        + "     (SELECT gecko_id FROM priority_coin where ema > 0)          \n";
+
+                query = entityManager.createNativeQuery(sql, "PriorityCoinHistoryResponse");
+                results = query.getResultList();
+
+                if (!CollectionUtils.isEmpty(results)) {
+                    for (PriorityCoinHistoryResponse dto : results) {
+                        PriorityCoinHistory entity = new PriorityCoinHistory();
+                        entity.setGeckoid(dto.getGecko_id());
+                        entity.setSymbol(dto.getSymbol());
+                        entity.setName(dto.getName());
+                        entity.setCount_notify(Utils.getIntValue(dto.getCount_notify()) + 1);
+
+                        priorityCoinHistoryRepository.save(entity);
+                        Utils.sendToTelegram("Uptrend: " + Utils.addGoodCoin(entity));
+                    }
+                }
+
+            }
+
+            //check delete from history -> msg 10 times
+            {
+                String sql = ""
+                        + " SELECT                                                                  \n"
+                        + "     gecko_id,                                                           \n"
+                        + "     symbol,                                                             \n"
+                        + "     name,                                                               \n"
+                        + "     count_notify                                                        \n"
+                        + " FROM priority_coin_history                                              \n"
+                        + " WHERE gecko_id NOT IN                                                   \n"
+                        + "    (SELECT gecko_id FROM priority_coin where ema > 0)                   \n";
+                Query query = entityManager.createNativeQuery(sql, "PriorityCoinHistoryResponse");
+
+                List<PriorityCoinHistoryResponse> results = query.getResultList();
+                if (!CollectionUtils.isEmpty(results)) {
+
+                    for (PriorityCoinHistoryResponse dto : results) {
+                        //update count_notify +=1
+                        PriorityCoinHistory entity = priorityCoinHistoryRepository.findById(dto.getGecko_id())
+                                .orElse(null);
+                        if (!Objects.equals(null, entity)) {
+
+                            if (entity.getCount_notify() > 0) {
+                                entity.setCount_notify(Utils.getIntValue(entity.getCount_notify()) - 1);
+
+                                priorityCoinHistoryRepository.save(entity);
+                            } else {
+
+                                priorityCoinHistoryRepository.delete(entity);
+                            }
+
+                            Utils.sendToTelegram("Downtrend: " + Utils.addGoodCoin(entity) + "!");
+                        }
+
+                    }
+
+                }
+            }
+            log.info("End monitorEma <----");
+        } catch (
+
+        Exception e) {
+            e.printStackTrace();
+            log.info("monitorEma error ------->");
+            log.error(e.getMessage());
+        }
     }
 
 }

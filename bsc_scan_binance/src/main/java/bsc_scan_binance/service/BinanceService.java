@@ -10,4 +10,5 @@ public interface BinanceService {
 
     public void loadData(String gecko_id, String symbol);
 
+    public void monitorEma();
 }

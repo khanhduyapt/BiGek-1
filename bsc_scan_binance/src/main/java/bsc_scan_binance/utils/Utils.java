@@ -27,12 +27,18 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
 import bsc_scan_binance.entity.PriorityCoin;
+import bsc_scan_binance.entity.PriorityCoinHistory;
 
 public class Utils {
 
     public static String toString(PriorityCoin tele) {
         return tele.getSymbol() + ":" + tele.getName() + " P:" + tele.getCurrent_price() + "$ Target:"
                 + tele.getTarget_percent() + " ema:" + tele.getEma();
+    }
+
+    public static String addGoodCoin(PriorityCoinHistory tele) {
+        return String.format("[%s]  [%s] [Count: %s]", tele.getSymbol(), tele.getName(),
+                getIntValue(tele.getCount_notify()));
     }
 
     public static void sendToTelegram(String text) {
@@ -95,6 +101,18 @@ public class Utils {
         }
 
         return value;
+    }
+
+    public static Integer getIntValue(Object value) {
+        try {
+            if (Objects.equals(null, value)) {
+                return 0;
+            }
+
+            return Integer.valueOf(value.toString());
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public static String getStringValue(Object value) {

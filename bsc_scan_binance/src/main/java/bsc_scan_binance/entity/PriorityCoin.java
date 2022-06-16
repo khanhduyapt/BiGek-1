@@ -17,6 +17,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "priority_coin")
 
+//CREATE TABLE IF NOT EXISTS public.priority_coin
+//(
+//    gecko_id character varying(255) COLLATE pg_catalog."default" NOT NULL,
+//    current_price numeric(10,5) DEFAULT 0,
+//    target_price numeric(10,5) DEFAULT 0,
+//    target_percent character varying(100) COLLATE pg_catalog."default",
+//    oco_hight character varying(200) COLLATE pg_catalog."default",
+//    is_candidate boolean DEFAULT false,
+//    index numeric(3,0),
+//    name character varying(255) COLLATE pg_catalog."default",
+//    note character varying(200) COLLATE pg_catalog."default",
+//    symbol character varying(255) COLLATE pg_catalog."default",
+//    ema numeric(10,5) DEFAULT '-999'::integer,
+//    CONSTRAINT priority_coin_pkey PRIMARY KEY (gecko_id)
+//);
+
 public class PriorityCoin {
     @Id
     @Column(name = "gecko_id")
