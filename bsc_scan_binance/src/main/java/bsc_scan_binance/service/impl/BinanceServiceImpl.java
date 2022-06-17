@@ -824,12 +824,14 @@ public class BinanceServiceImpl implements BinanceService {
                     is_candidate = true;
                 }
 
-                if (!css.getAvg_percent().contains("-")) {
-                    is_candidate = false;
-                }
-
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
                 coin.setTarget_percent(Utils.getIntValue(css.getAvg_percent().replace("-", "").replace("%", "")));
+
+                if (!css.getAvg_percent().contains("-")) {
+                    is_candidate = false;
+                    coin.setTarget_percent(0 - coin.getTarget_percent());
+                }
+
                 coin.setVmc(Utils.getIntValue(css.getVolumn_div_marketcap()));
 
                 coin.setOco_hight(css.getLow_to_hight_price());
