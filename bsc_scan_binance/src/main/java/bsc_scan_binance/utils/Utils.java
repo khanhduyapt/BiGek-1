@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Iterator;
@@ -57,7 +58,7 @@ public class Utils {
     }
 
     public static String createMsg(CandidateTokenCssResponse css) {
-        return Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()) + "%0A"
+        return Utils.convertDateToString("yyyy-MM-dd hh:mm", Calendar.getInstance().getTime()) + "%0A"
                 + "BTC:" + css.getCurrent_price() + "$" + "%0A"
                 + css.getLow_to_hight_price();
     }

@@ -3,6 +3,8 @@ package bsc_scan_binance.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -20,10 +22,14 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import com.google.common.base.Objects;
 
 import bsc_scan_binance.entity.BinanceVolumnDay;
+import bsc_scan_binance.entity.BinanceVolumnDayKey;
+import bsc_scan_binance.entity.BinanceVolumnWeek;
+import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.TakeProfit;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
+import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
@@ -40,6 +46,9 @@ public class WandaBot extends TelegramLongPollingBot {
 
     @Autowired
     private PriorityCoinRepository priorityCoinRepository;
+
+    @Autowired
+    private BinanceVolumnWeekRepository binanceVolumnWeekRepository;
 
     @Autowired
     private BinanceVolumnDayRepository binanceVolumnDayRepository;
@@ -137,6 +146,29 @@ public class WandaBot extends TelegramLongPollingBot {
                     }
                 }
             } else if (command.contains("/buy")) {
+                Calendar calendar = Calendar.getInstance();
+                BinanceVolumnWeek btc = binanceVolumnWeekRepository.findById(new BinanceVolumnWeekKey("bitcoin", "BTC",
+                        Utils.convertDateToString("yyyyMMdd", calendar.getTime()))).orElse(null);
+
+                BinanceVolumnDay btc_now = binanceVolumnDayRepository.findById(
+                        new BinanceVolumnDayKey("bitcoin", "BTC", Utils.convertDateToString("HH", calendar.getTime())))
+                        .orElse(null);
+                if (Objects.equal(null, btc) || Objects.equal(null, btc_now)) {
+                    message.setText("Failed to check the price of BTC.\nPlease buy another time.");
+                    execute(message);
+                    return;
+                }
+
+                BigDecimal avg_btc_price = (btc.getMin_price().add(btc.getMax_price())).divide(BigDecimal.valueOf(2), 5,
+                        RoundingMode.CEILING);
+                avg_btc_price = avg_btc_price.multiply(BigDecimal.valueOf(0.99));
+                if (btc_now.getPriceAtBinance().compareTo(avg_btc_price) > 0) {
+                    message.setText("The current buying price is unfavorable.\nWaiting for BTC to correct below "
+                            + avg_btc_price + "$.");
+                    execute(message);
+                    return;
+                }
+
                 // /buy LIT 600$
                 // /buy WING 600$
                 String[] arr = command.split(" ");
@@ -180,9 +212,8 @@ public class WandaBot extends TelegramLongPollingBot {
 
                     ordersRepository.save(entity);
 
-                    message.setText(String.format("Added:[%s] [%s] [Qty:%s(+%s)]_[P:%s$] [T:%s$].",
-                            entity.getSymbol(), entity.getName(), entity.getQty(), qty2, entity.getOrder_price(),
-                            entity.getAmount()));
+                    message.setText(String.format("Added:[%s] [%s] [Qty:%s(+%s)]_[P:%s$] [T:%s$].", entity.getSymbol(),
+                            entity.getName(), entity.getQty(), qty2, entity.getOrder_price(), entity.getAmount()));
                     execute(message);
                 }
             } else if (command.contains("/sell")) {
@@ -257,8 +288,8 @@ public class WandaBot extends TelegramLongPollingBot {
                         order.setAmount(amount_remain);
                         ordersRepository.save(order);
 
-                        message.setText(String.format("Remain:[%s] [%s] [Qty:%s]_[P:%s$] [T:%s$].",
-                                order.getSymbol(), order.getName(), order.getQty(), order_price1, order.getAmount()));
+                        message.setText(String.format("Remain:[%s] [%s] [Qty:%s]_[P:%s$] [T:%s$].", order.getSymbol(),
+                                order.getName(), order.getQty(), order_price1, order.getAmount()));
                         execute(message);
                         // ------------------------
                         profit.setQty(qty2);
@@ -324,8 +355,7 @@ public class WandaBot extends TelegramLongPollingBot {
     private List<PriorityCoin> searchCandidate() {
         try {
 
-            String sql = ""
-                    + " SELECT gecko_id       AS geckoid,                       \n"
+            String sql = "" + " SELECT gecko_id       AS geckoid,                       \n"
                     + "        current_price  AS current_price,                 \n"
                     + "        target_price   AS target_price,                  \n"
                     + "        target_percent AS target_percent,                \n"

@@ -1,7 +1,6 @@
 package bsc_scan_binance;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,10 +25,11 @@ public class BscScanBinanceApplication {
 
     public static void main(String[] args) {
         try {
-            log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()) + " ---->");
+            Calendar calendar = Calendar.getInstance();
+            log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", calendar.getTime()) + " ---->");
 
             // --------------------Init--------------------
-            Calendar calendar = Calendar.getInstance();
+
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
@@ -61,7 +61,7 @@ public class BscScanBinanceApplication {
                     wait(600000);
                 }
 
-                wait(400);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                wait(200);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
 
                 log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
@@ -74,7 +74,8 @@ public class BscScanBinanceApplication {
                         binance_service.monitorProfit();
                     }
 
-                    log.info("reload: " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()));
+                    log.info("reload: "
+                            + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
                     idx = 0;
                     list.clear();
                     list = gecko_service.getList();
@@ -84,7 +85,7 @@ public class BscScanBinanceApplication {
                 }
             }
 
-            log.info("End " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()) + " <----");
+            log.info("End " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", calendar.getTime()) + " <----");
         } catch (Exception e) {
             log.error(e.getMessage());
         }

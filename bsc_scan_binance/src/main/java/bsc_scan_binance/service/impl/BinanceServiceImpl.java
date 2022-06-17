@@ -360,7 +360,7 @@ public class BinanceServiceImpl implements BinanceService {
             ModelMapper mapper = new ModelMapper();
             Integer index = 1;
             String sql_update_ema = "";
-            String today = Utils.convertDateToString("yyyyMMdd", new Date());
+            String today = Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime());
 
             for (CandidateTokenResponse dto : results) {
                 PriorityCoin coin = new PriorityCoin();
