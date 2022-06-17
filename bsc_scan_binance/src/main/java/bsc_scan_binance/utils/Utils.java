@@ -65,9 +65,9 @@ public class Utils {
     public static String createMsg(PriorityCoin dto) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getName()) + "\n"
                 + "Price: " + dto.getCurrent_price().toString() + "$, "
-                + "Target: " + dto.getTarget_price() + "$=(" + dto.getTarget_percent().replace("% ", "%)\n") + "\n"
+                + "Target: " + dto.getTarget_price() + "$=(" + dto.getTarget_percent() + "%)\n"
                 + dto.getOco_hight() + "\n"
-                + dto.getNote();
+                + dto.getNote().replace("~", "\n");
         return result;
     }
 
@@ -138,7 +138,7 @@ public class Utils {
                 return 0;
             }
 
-            return Integer.valueOf(value.toString());
+            return Integer.valueOf(value.toString().trim());
         } catch (Exception e) {
             return 0;
         }

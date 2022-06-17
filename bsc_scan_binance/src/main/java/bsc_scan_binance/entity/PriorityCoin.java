@@ -45,7 +45,7 @@ public class PriorityCoin {
     private BigDecimal target_price;
 
     @Column(name = "target_percent")
-    private String target_percent;
+    private Integer target_percent;
 
     @Column(name = "oco_hight")
     private String oco_hight;

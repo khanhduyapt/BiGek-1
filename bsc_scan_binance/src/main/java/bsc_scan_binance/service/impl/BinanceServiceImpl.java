@@ -701,7 +701,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 coin.setCurrent_price(price_now);
 
-                if (avg_price.compareTo(BigDecimal.ZERO) > 0) {
+                if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
                     if (avg_price.compareTo(price_now) < 1) {
                         css.setAvg_price_css("text-primary font-weight-bold");
@@ -722,6 +722,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     .compareTo(BigDecimal.valueOf(10)) > -1))) {
                         css.setStar("🤩");
                     }
+                } else {
+                    css.setAvg_price("0.0");
                 }
 
                 {
@@ -806,23 +808,33 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar(css.getStar() + " Uptrend");
                 }
 
-                coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
-                coin.setTarget_percent(Utils.getStringValue(css.getAvg_percent()).replace("-", "") + " min:"
-                        + css.getMin_price() + "->max:" + css.getMax_price());
-                coin.setOco_hight(css.getLow_to_hight_price());
-
+                //if (Objects.equals("GMT", css.getSymbol())) {
+                //    String debug = "";
+                //}
                 Boolean is_candidate = false;
                 if (!Objects.equals("", Utils.getStringValue(css.getOco_tp_price_hight_css()))) {
                     is_candidate = true;
+                } else if ((Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""))
+                        .compareTo(BigDecimal.valueOf(20)) >= 0)
+                        && css.getPrice_change_percentage_24h().contains("-")
+                        && !css.getStar().contains("✖")
+                        && (Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
+                                .compareTo(BigDecimal.valueOf(30)) >= 0)) {
+                    is_candidate = true;
                 }
+
+                coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
+                coin.setTarget_percent(Utils.getIntValue(css.getAvg_percent().replace("-", "").replace("%", "")));
+                coin.setOco_hight(css.getLow_to_hight_price());
                 coin.setCandidate(is_candidate);
                 coin.setIndex(index);
                 coin.setSymbol(css.getSymbol());
                 coin.setName(css.getName());
-                coin.setNote("(v/mc:" + css.getVolumn_div_marketcap() + "% " + css.getVolumn_binance_div_marketcap()
+                coin.setNote("(v/mc:" + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap()
                         + "%, price_24h:"
-                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%) "
-                        + Utils.getStringValue(css.getNote()) + " " + Utils.getStringValue(css.getTrend()));
+                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%)~"
+                        + Utils.getStringValue(css.getNote()) + "~" + Utils.getStringValue(css.getTrend()) + " "
+                        + css.getPumping_history());
                 coin.setEma(dto.getEma());
                 index += 1;
                 priorityCoinRepository.save(coin);
