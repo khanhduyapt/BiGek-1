@@ -28,6 +28,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.PriorityCoinHistory;
+import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 
 public class Utils {
@@ -53,6 +54,12 @@ public class Utils {
                 + "Target: " + dto.getTarget().replace(" L:", "$%0AL:");
 
         return result;
+    }
+
+    public static String createMsg(CandidateTokenCssResponse css) {
+        return Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()) + "%0A"
+                + "BTC:" + css.getCurrent_price() + "$" + "%0A"
+                + css.getLow_to_hight_price();
     }
 
     public static String createMsg(PriorityCoin dto) {

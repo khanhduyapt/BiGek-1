@@ -682,9 +682,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setBtc_warning_css("bg-success");
 
                         // Utils.sendToTelegram(emoji_heart);
-                        Utils.sendToTelegram(
-                                "Time to buy! BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
-                                        + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
+                        Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css));
 
                     } else if ((pre_hightest_price_BTC_today
                             .compareTo(Utils.toPercent(highest_price_today, price_now, 1)) != 0)
@@ -695,10 +693,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setBtc_warning_css("bg-danger");
 
                         // Utils.sendToTelegram(emoji_exclamation);
-                        Utils.sendToTelegram(
-                                "BTC peaked today!" + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date())
-                                        + " BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
-                                        + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
+                        Utils.sendToTelegram("BTC peaked today! " + Utils.createMsg(css));
                     }
                 }
 
@@ -746,8 +741,7 @@ public class BinanceServiceImpl implements BinanceService {
                     String percent_hightprice_max = Utils.toPercent(hightprice_max, price_now);
                     String percent_stop_limit_1 = Utils.toPercent(stop_limit_1, price_now);
 
-                    String oco_tp_price = "" + "50%:"
-                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.5)), 5).toString() + "―20%:"
+                    String oco_tp_price = "" + "20%:"
                             + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString() + "―10%:"
                             + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString() + "―M("
                             + Utils.toPercent(price_max, price_now) + "%):"
