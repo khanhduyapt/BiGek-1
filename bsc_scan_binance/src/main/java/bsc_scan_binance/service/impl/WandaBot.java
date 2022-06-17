@@ -286,9 +286,10 @@ public class WandaBot extends TelegramLongPollingBot {
                         + "      od.qty,                                                                                \n"
                         + "      od.amount,                                                                             \n"
                         + "      cur.price_at_binance,                                                                  \n"
+                        + "      (select target_percent from priority_coin po where po.gecko_id = od.gecko_id) target_percent, \n"
                         + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1) as tp_percent,  \n"
                         + "      ROUND((cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,   \n"
-                        + "      (select concat(cast(target_price as varchar), ' ', target_percent, ' ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
+                        + "      (select concat(cast(target_price as varchar), '$ (', target_percent, '%) ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
                         + "    FROM                                                                                     \n"
                         + "        orders od,                                                                           \n"
                         + "        binance_volumn_day cur                                                               \n"
@@ -306,10 +307,10 @@ public class WandaBot extends TelegramLongPollingBot {
                 if (!CollectionUtils.isEmpty(results)) {
                     for (OrdersProfitResponse dto : results) {
                         if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
-                            Utils.sendToTelegram("PROFIT:" + Utils.createMsg(dto));
+                            Utils.sendToTelegram("PROFIT: " + Utils.createMsg(dto));
 
                         } else {
-                            Utils.sendToTelegram("LOST  :" + Utils.createMsg(dto));
+                            Utils.sendToTelegram("LOST  : " + Utils.createMsg(dto));
                         }
                     }
                 }

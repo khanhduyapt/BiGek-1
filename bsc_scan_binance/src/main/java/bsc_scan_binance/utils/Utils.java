@@ -51,7 +51,7 @@ public class Utils {
                 + "Pnow: " + dto.getPrice_at_binance().toString() + "$, "
                 + "Profit: " + Utils.removeLastZero(dto.getTp_amount().toString())
                 + "$ (" + dto.getTp_percent() + "%)%0A"
-                + "Target: " + dto.getTarget().replace(" L:", "$%0AL:");
+                + "Target: " + dto.getTarget().replace(" L:", "%0AL:");
 
         return result;
     }

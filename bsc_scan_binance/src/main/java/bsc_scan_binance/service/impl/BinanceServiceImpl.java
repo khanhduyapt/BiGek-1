@@ -1200,6 +1200,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "      ROUND(od.qty, 1) qty,                                                                  \n"
                     + "      od.amount,                                                                             \n"
                     + "      cur.price_at_binance,                                                                  \n"
+                    + "      (select target_percent from priority_coin po where po.gecko_id = od.gecko_id) target_percent, \n"
                     + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1)  as tp_percent, \n"
                     + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,  \n"
                     + "      (select concat(cast(target_price as varchar), ' ', target_percent, ' ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
@@ -1210,7 +1211,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "            cur.hh      = TO_CHAR(NOW(), 'HH24')                                             \n"
                     + "        and od.gecko_id = cur.gecko_id                                                       \n"
                     + "        and od.symbol   = cur.symbol                                                         \n"
-                    + " ) odr ORDER BY odr.tp_percent desc ";
+                    + " ) odr ORDER BY odr.tp_amount desc ";
 
             Query query = entityManager.createNativeQuery(sql, "OrdersProfitResponse");
 
@@ -1218,8 +1219,12 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (!CollectionUtils.isEmpty(results)) {
                 for (OrdersProfitResponse dto : results) {
+                    BigDecimal tp_percent = Utils.getBigDecimal(dto.getTp_percent());
+                    BigDecimal target_percent = Utils.getBigDecimal(dto.getTarget_percent())
+                            .multiply(BigDecimal.valueOf(0.9));
 
-                    if (dto.getTp_percent().compareTo(BigDecimal.valueOf(10)) > 0) {
+                    if ((tp_percent.compareTo(BigDecimal.valueOf(10)) > 0)
+                            || (tp_percent.compareTo(target_percent) >= 0)) {
                         Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
                     }
 

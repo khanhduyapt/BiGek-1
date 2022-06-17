@@ -19,6 +19,7 @@ public class OrdersProfitResponse {
     private BigDecimal qty;
     private BigDecimal amount;
     private BigDecimal price_at_binance;
+    private BigDecimal target_percent;
     private BigDecimal tp_percent;
     private BigDecimal tp_amount;
     private String target;

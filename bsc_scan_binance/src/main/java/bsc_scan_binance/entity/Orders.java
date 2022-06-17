@@ -42,6 +42,7 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "qty", type = BigDecimal.class),
                 @ColumnResult(name = "amount", type = BigDecimal.class),
                 @ColumnResult(name = "price_at_binance", type = BigDecimal.class),
+                @ColumnResult(name = "target_percent", type = BigDecimal.class),
                 @ColumnResult(name = "tp_percent", type = BigDecimal.class),
                 @ColumnResult(name = "tp_amount", type = BigDecimal.class),
 
