@@ -514,7 +514,10 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 String sql = " DELETE FROM candidate_coin WHERE gecko_id=:gecko_id ;"
                         + " DELETE FROM gecko_volumn_day WHERE gecko_id=:gecko_id ;"
                         + " DELETE FROM binance_volumn_week WHERE gecko_id=:gecko_id ;"
-                        + " DELETE FROM binance_volumn_day WHERE gecko_id=:gecko_id ;";
+                        + " DELETE FROM binance_volumn_day WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM priority_coin WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM priority_coin_history WHERE gecko_id=:gecko_id ;"
+                        ;
 
                 Query query = entityManager.createNativeQuery(sql);
                 query.setParameter("gecko_id", request.getId());

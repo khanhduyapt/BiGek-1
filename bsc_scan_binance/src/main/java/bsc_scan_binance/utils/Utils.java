@@ -28,6 +28,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.PriorityCoinHistory;
+import bsc_scan_binance.response.OrdersProfitResponse;
 
 public class Utils {
 
@@ -41,14 +42,35 @@ public class Utils {
                 getIntValue(tele.getCount_notify()));
     }
 
+    public static String createMsg(OrdersProfitResponse dto) {
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getName()) + "%0A"
+                + "Pmua: " + dto.getOrder_price().toString() + "$, "
+                + "T: " + Utils.removeLastZero(dto.getAmount().toString()) + "$%0A"
+                + "Pnow: " + dto.getPrice_at_binance().toString() + "$, "
+                + "Profit: " + Utils.removeLastZero(dto.getTp_amount().toString())
+                + "$ (" + dto.getTp_percent() + "%)%0A"
+                + "Target: " + dto.getTarget().replace(" L:", "$%0AL:");
+
+        return result;
+    }
+
+    public static String createMsg(PriorityCoin dto) {
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getName()) + "\n"
+                + "Price: " + dto.getCurrent_price().toString() + "$, "
+                + "Target: " + dto.getTarget_price() + "$=(" + dto.getTarget_percent().replace("% ", "%)\n") + "\n"
+                + dto.getOco_hight() + "\n"
+                + dto.getNote();
+        return result;
+    }
+
     public static void sendToTelegram(String text) {
-        String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s";
+        String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
 
         //Add Telegram token
         String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
         String chatId = "5099224587";
 
-        urlString = String.format(urlString, apiToken, chatId, text);
+        urlString = String.format(urlString, apiToken, chatId) + text;
 
         try {
             URL url = new URL(urlString);
@@ -127,6 +149,10 @@ public class Utils {
     }
 
     public static String toPercent(BigDecimal value, BigDecimal compareToValue) {
+        return toPercent(value, compareToValue, 0);
+    }
+
+    public static String toPercent(BigDecimal value, BigDecimal compareToValue, int scale) {
         if (Objects.equals("", getStringValue(compareToValue))) {
             return "0";
         }
@@ -134,10 +160,10 @@ public class Utils {
         if (compareToValue.compareTo(BigDecimal.ZERO) == 0) {
             return "[dvz]";
         }
-        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, 2, RoundingMode.CEILING)
+        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, 2 + scale, RoundingMode.CEILING)
                 .multiply(BigDecimal.valueOf(100));
 
-        return percent.toString().replace(".00", "");
+        return removeLastZero(percent.toString());
     }
 
     public static BigDecimal getBigDecimalValue(String value) {

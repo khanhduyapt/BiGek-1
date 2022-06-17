@@ -69,7 +69,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("web3")) {
-                        message.setText(toString(coin));
+                        message.setText(Utils.createMsg(coin));
                         execute(message);
                     }
                 }
@@ -78,7 +78,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("defi")) {
-                        message.setText(toString(coin));
+                        message.setText(Utils.createMsg(coin));
                         execute(message);
                     }
                 }
@@ -87,7 +87,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getName() + coin.getGeckoid()).toLowerCase().contains("fan")) {
-                        message.setText(toString(coin));
+                        message.setText(Utils.createMsg(coin));
                         execute(message);
                     }
                 }
@@ -96,7 +96,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("game")) {
-                        message.setText(toString(coin));
+                        message.setText(Utils.createMsg(coin));
                         execute(message);
                     }
                 }
@@ -109,7 +109,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                     if (!text.contains("game") && !text.contains("web3") && !text.contains("defi")
                             && !text.contains("fan")) {
-                        message.setText(toString(coin));
+                        message.setText(Utils.createMsg(coin));
                         execute(message);
                     }
                 }
@@ -118,7 +118,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (coin.getEma().compareTo(BigDecimal.ZERO) > 0) {
-                        message.setText(toString(coin));
+                        message.setText(Utils.createMsg(coin));
                         execute(message);
                     }
                 }
@@ -129,7 +129,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 List<PriorityCoin> list = priorityCoinRepository.searchBySymbolLike(arr[1].toUpperCase());
                 if (!CollectionUtils.isEmpty(list)) {
                     for (PriorityCoin coin : list) {
-                        message.setText(toString(coin));
+                        message.setText(Utils.createMsg(coin));
                         execute(message);
                     }
                 }
@@ -146,7 +146,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 List<BinanceVolumnDay> list = binanceVolumnDayRepository.searchBySymbol(arr[1].toUpperCase());
                 if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Not found:" + arr[1].toUpperCase());
+                    message.setText("(BinanceVolumnDay) Not found:" + arr[1].toUpperCase());
                     execute(message);
                     return;
                 }
@@ -195,7 +195,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 List<BinanceVolumnDay> list = binanceVolumnDayRepository.searchBySymbol(arr[1].toUpperCase());
                 if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Not found:" + arr[1].toUpperCase());
+                    message.setText("(BinanceVolumnDay) Not found:" + arr[1].toUpperCase());
                     execute(message);
                     return;
                 }
@@ -285,7 +285,7 @@ public class WandaBot extends TelegramLongPollingBot {
                         + "      cur.price_at_binance,                                                                  \n"
                         + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1) as tp_percent,  \n"
                         + "      ROUND((cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,   \n"
-                        + "      (select concat(cast(target_price as varchar), ' ', target_percent) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
+                        + "      (select concat(cast(target_price as varchar), ' ', target_percent, ' ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
                         + "    FROM                                                                                     \n"
                         + "        orders od,                                                                           \n"
                         + "        binance_volumn_day cur                                                               \n"
@@ -303,25 +303,10 @@ public class WandaBot extends TelegramLongPollingBot {
                 if (!CollectionUtils.isEmpty(results)) {
                     for (OrdersProfitResponse dto : results) {
                         if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
-                            Utils.sendToTelegram(String.format(
-                                    "PROFIT: [%s]_[%s] [Qty:%s]x[%s$] [%s$], Now:[P:%s][TP:%s$] %s percents, Target:%s.",
-                                    dto.getSymbol(), dto.getName(), Utils.removeLastZero(dto.getQty().toString()),
-                                    Utils.removeLastZero(dto.getOrder_price().toString()),
-                                    Utils.removeLastZero(dto.getAmount().toString()),
+                            Utils.sendToTelegram("PROFIT:" + Utils.createMsg(dto));
 
-                                    Utils.removeLastZero(dto.getPrice_at_binance().toString()),
-                                    Utils.removeLastZero(dto.getTp_amount().toString()), dto.getTp_percent(),
-                                    dto.getTarget()));
                         } else {
-                            Utils.sendToTelegram(String.format(
-                                    "LOST: [%s]_[%s] [Qty:%s]x[%s$] [%s$], Now:[P:%s][TP:%s$] %s percents, Target:%s.",
-                                    dto.getSymbol(), dto.getName(), Utils.removeLastZero(dto.getQty().toString()),
-                                    Utils.removeLastZero(dto.getOrder_price().toString()),
-                                    Utils.removeLastZero(dto.getAmount().toString()),
-
-                                    Utils.removeLastZero(dto.getPrice_at_binance().toString()),
-                                    Utils.removeLastZero(dto.getTp_amount().toString()), dto.getTp_percent(),
-                                    dto.getTarget()));
+                            Utils.sendToTelegram("LOST  :" + Utils.createMsg(dto));
                         }
                     }
                 }
@@ -330,11 +315,6 @@ public class WandaBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-    }
-
-    private String toString(PriorityCoin coin) {
-        return String.format("[%s]  [%s]  [Price: %s$]  [Target:%s$=%s]  %s", coin.getSymbol(), coin.getName(),
-                coin.getCurrent_price(), coin.getTarget_price(), coin.getTarget_percent(), coin.getNote());
     }
 
     @Override

@@ -20,8 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
-import com.vdurmont.emoji.EmojiParser;
-
 import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
@@ -66,7 +64,7 @@ public class BinanceServiceImpl implements BinanceService {
     // private String emoji_exclamation =
     // EmojiParser.parseToUnicode(":exclamation:");
 
-    private BigDecimal pre_lowest_price_BTC_today = BigDecimal.ZERO;
+    private String pre_lowest_price_BTC_today = "";
 
     @Override
     public void loadData(String gecko_id, String symbol) {
@@ -638,18 +636,19 @@ public class BinanceServiceImpl implements BinanceService {
                 price_now = Utils.getBigDecimalValue(css.getCurrent_price());
 
                 BigDecimal taget_percent_lost_today = Utils
-                        .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now));
+                        .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now, 1));
                 BigDecimal taget_percent_profit_today = Utils
-                        .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now));
+                        .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
 
                 css.setLow_to_hight_price("L:" + lowest_price_today + "(" + taget_percent_lost_today + "%)_H:"
                         + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)");
 
                 // btc_warning_css
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
-                    if ((lowest_price_today.compareTo(pre_lowest_price_BTC_today) != 0)
+
+                    if ((pre_lowest_price_BTC_today.compareTo(Utils.toPercent(lowest_price_today, price_now, 1)) != 0)
                             && ((lowest_price_today.multiply(BigDecimal.valueOf(1.02))).compareTo(price_now) >= 0)) {
-                        pre_lowest_price_BTC_today = lowest_price_today;
+                        pre_lowest_price_BTC_today = Utils.toPercent(lowest_price_today, price_now, 1);
                         css.setBtc_warning_css("bg-success");
 
                         // Utils.sendToTelegram(emoji_heart);
@@ -779,9 +778,7 @@ public class BinanceServiceImpl implements BinanceService {
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
                 coin.setTarget_percent(Utils.getStringValue(css.getAvg_percent()).replace("-", "") + " min:"
                         + css.getMin_price() + "->max:" + css.getMax_price());
-                String oco_hight = css.getOco_tp_price() + css.getOco_tp_price_hight();
-                oco_hight = oco_hight.substring(oco_hight.indexOf("―M") + 1, oco_hight.length());
-                coin.setOco_hight(oco_hight);
+                coin.setOco_hight(css.getLow_to_hight_price());
 
                 Boolean is_candidate = false;
                 if (!Objects.equals("", Utils.getStringValue(css.getOco_tp_price_hight_css()))) {
@@ -1155,7 +1152,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "      cur.price_at_binance,                                                                  \n"
                     + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1)  as tp_percent, \n"
                     + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,  \n"
-                    + "      (select concat(cast(target_price as varchar), ' ', target_percent) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
+                    + "      (select concat(cast(target_price as varchar), ' ', target_percent, ' ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
                     + "    FROM                                                                                     \n"
                     + "        orders od,                                                                           \n"
                     + "        binance_volumn_day cur                                                               \n"
@@ -1171,18 +1168,13 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (!CollectionUtils.isEmpty(results)) {
                 for (OrdersProfitResponse dto : results) {
+
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(10)) > 0) {
-                        Utils.sendToTelegram(
-                                String.format("TakeProfit: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s percents, Target:%s",
-                                        dto.getName(), dto.getQty(), Utils.removeLastZero(dto.getAmount().toString()),
-                                        dto.getTp_amount(), dto.getTp_percent(), dto.getTarget()));
+                        Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
                     }
 
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {
-                        Utils.sendToTelegram(
-                                String.format("STOP LOST: [%s] [Qty:%s] [Total:%s] [TP:%s$] %s percents, Target:%s",
-                                        dto.getName(), dto.getQty(), Utils.removeLastZero(dto.getAmount().toString()),
-                                        dto.getTp_amount(), dto.getTp_percent(), dto.getTarget()));
+                        Utils.sendToTelegram("STOP LOST: " + Utils.createMsg(dto));
                     }
                 }
             }
