@@ -241,10 +241,11 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.symbol,                                                                             \n"
                     + "   can.name,                                                                               \n"
                     + "                                                                                           \n"
+                    + "   concat('Pumping:', coalesce((select string_agg(his.hh, '<-') from (select * from binance_pumping_history his where his.gecko_id = can.gecko_id and his.symbol = can.symbol order by his.total desc limit 5) as his), ''), 'h') as pumping_history, \n"
                     + "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n"
                     + "                                                                                           \n"
                     + "   ROUND((cur.total_volume / COALESCE ((SELECT (case when pre.total_volume = 0.0 then 1000000000 else pre.total_volume end) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 1000000000) * 100 - 100), 0) pre_4h_total_volume_up, \n"
-                    + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                      as vol_now, 	\n"
+                    + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                  as vol_now,      \n"
                     + "                                                                                           \n"
                     + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                     , 3) as price_now,    \n"
                     + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0), 3) as price_pre_1h, \n"
@@ -404,6 +405,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap_str);
+                css.setPumping_history(dto.getPumping_history().replace("Pumping:h", ""));
 
                 // Price
                 String pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"

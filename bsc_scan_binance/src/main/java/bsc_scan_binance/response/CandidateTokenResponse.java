@@ -13,6 +13,7 @@ public class CandidateTokenResponse {
     private String gecko_id;
     private String symbol;
     private String name;
+    private String pumping_history;
     private String volumn_div_marketcap;
     private String pre_4h_total_volume_up;
 

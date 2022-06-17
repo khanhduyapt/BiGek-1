@@ -11,6 +11,7 @@ public class CandidateTokenCssResponse {
     private String gecko_id;
     private String symbol;
     private String name;
+    private String pumping_history;
 
     private String volumn_div_marketcap;
     private String volumn_div_marketcap_css = "";
