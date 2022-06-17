@@ -70,6 +70,7 @@ public class BinanceServiceImpl implements BinanceService {
     // EmojiParser.parseToUnicode(":exclamation:");
 
     private String pre_lowest_price_BTC_today = "";
+    private String pre_hightest_price_BTC_today = "";
 
     @Override
     public void loadData(String gecko_id, String symbol) {
@@ -685,7 +686,12 @@ public class BinanceServiceImpl implements BinanceService {
                                 "Time to buy! BTC:" + css.getCurrent_price() + " " + css.getLow_to_hight_price() + " "
                                         + Utils.convertDateToString("yyyy-MM-dd hh:mm", new Date()));
 
-                    } else if (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0) {
+                    } else if ((pre_hightest_price_BTC_today
+                            .compareTo(Utils.toPercent(highest_price_today, price_now, 1)) != 0)
+                            && (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0)) {
+
+                        pre_hightest_price_BTC_today = Utils.toPercent(highest_price_today, price_now, 1);
+
                         css.setBtc_warning_css("bg-danger");
 
                         // Utils.sendToTelegram(emoji_exclamation);
