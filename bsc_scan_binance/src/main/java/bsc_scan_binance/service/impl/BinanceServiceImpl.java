@@ -20,12 +20,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import bsc_scan_binance.entity.BinancePumpingHistory;
 import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.PriorityCoinHistory;
+import bsc_scan_binance.repository.BinancePumpingHistoryRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.PriorityCoinHistoryRepository;
@@ -57,6 +59,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private PriorityCoinHistoryRepository priorityCoinHistoryRepository;
+
+    @Autowired
+    private BinancePumpingHistoryRepository binancePumpingHistoryRepository;
 
     // https://gist.github.com/naiieandrade/b7166fc879627a1295e1b67b98672770
     // private String emoji_heart = EmojiParser.parseToUnicode(":heart:");
@@ -133,6 +138,30 @@ public class BinanceServiceImpl implements BinanceService {
                     day.setTotalTrasaction(total_trans);
                     day.setPriceAtBinance(price_at_binance);
                     list_day.add(day);
+
+                    calendar.add(Calendar.HOUR_OF_DAY, 2);
+                    BinanceVolumnDay pre2h = binanceVolumnDayRepository
+                            .findById(new BinanceVolumnDayKey(gecko_id, symbol,
+                                    Utils.convertDateToString("HH", calendar.getTime())))
+                            .orElse(null);
+
+                    if (!Objects.equals(null, pre2h) && (pre2h.getPriceAtBinance().compareTo(BigDecimal.ZERO) > 0)) {
+                        if (price_at_binance.compareTo(
+                                pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
+
+                            BinancePumpingHistory his = binancePumpingHistoryRepository.findById(day.getId())
+                                    .orElse(null);
+
+                            if (Objects.equals(null, his)) {
+                                his = new BinancePumpingHistory();
+                                his.setId(day.getId());
+                                his.setTotal(Long.valueOf(0));
+                            }
+                            his.setTotal(his.getTotal() + 1);
+                            binancePumpingHistoryRepository.save(his);
+                        }
+                    }
+
                 }
 
                 BinanceVolumnWeek entity = new BinanceVolumnWeek();
@@ -647,7 +676,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
                     if ((pre_lowest_price_BTC_today.compareTo(Utils.toPercent(lowest_price_today, price_now, 1)) != 0)
-                            && ((lowest_price_today.multiply(BigDecimal.valueOf(1.02))).compareTo(price_now) >= 0)) {
+                            && ((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
                         pre_lowest_price_BTC_today = Utils.toPercent(lowest_price_today, price_now, 1);
                         css.setBtc_warning_css("bg-success");
 
