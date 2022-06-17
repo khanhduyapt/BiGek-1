@@ -28,7 +28,9 @@ public class BinancePumpingHistory {
     @EmbeddedId
     private BinanceVolumnDayKey id;
 
-    @Column(name = "total")
-    private Long total = Long.valueOf(0);
+    @Column(name = "total_pump")
+    private Long total_pump = Long.valueOf(0);
 
+    @Column(name = "total_dump")
+    private Long total_dump = Long.valueOf(0);
 }

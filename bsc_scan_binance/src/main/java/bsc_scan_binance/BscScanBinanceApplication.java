@@ -66,11 +66,10 @@ public class BscScanBinanceApplication {
                 log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
                 if (Objects.equals(idx, size - 1)) {
-                    binance_service.getList(false); // ~3p 1 lan
-
-                    binance_service.monitorEma();
 
                     if (Utils.getIntValue(Utils.convertDateToString("mm", calendar.getTime())) > 10) {
+                        binance_service.getList(false); // ~3p 1 lan
+                        binance_service.monitorEma();
                         binance_service.monitorProfit();
                     }
 

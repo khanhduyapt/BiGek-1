@@ -140,28 +140,43 @@ public class BinanceServiceImpl implements BinanceService {
                     day.setPriceAtBinance(price_at_binance);
                     list_day.add(day);
 
-                    calendar.add(Calendar.HOUR_OF_DAY, 2);
-                    BinanceVolumnDay pre2h = binanceVolumnDayRepository
-                            .findById(new BinanceVolumnDayKey(gecko_id, symbol,
-                                    Utils.convertDateToString("HH", calendar.getTime())))
-                            .orElse(null);
+                    calendar.add(Calendar.HOUR_OF_DAY, -2);
+                    BinanceVolumnDay pre2h = binanceVolumnDayRepository.findById(new BinanceVolumnDayKey(gecko_id,
+                            symbol, Utils.convertDateToString("HH", calendar.getTime()))).orElse(null);
 
                     if (!Objects.equals(null, pre2h)
                             && (Utils.getBigDecimal(pre2h.getPriceAtBinance()).compareTo(BigDecimal.ZERO) > 0)) {
-                        if (price_at_binance.compareTo(
-                                pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
 
-                            BinancePumpingHistory his = binancePumpingHistoryRepository.findById(day.getId())
+                        if (price_at_binance
+                                .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
+
+                            BinancePumpingHistory his_pump = binancePumpingHistoryRepository.findById(day.getId())
                                     .orElse(null);
 
-                            if (Objects.equals(null, his)) {
-                                his = new BinancePumpingHistory();
-                                his.setId(day.getId());
-                                his.setTotal(Long.valueOf(0));
+                            if (Objects.equals(null, his_pump)) {
+                                his_pump = new BinancePumpingHistory();
+                                his_pump.setId(day.getId());
+                                his_pump.setTotal_pump(Long.valueOf(0));
                             }
-                            his.setTotal(his.getTotal() + 1);
-                            binancePumpingHistoryRepository.save(his);
+                            his_pump.setTotal_pump(his_pump.getTotal_pump() + 1);
+                            binancePumpingHistoryRepository.save(his_pump);
                         }
+
+                        if (price_at_binance
+                                .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(0.9))) < 0) {
+
+                            BinancePumpingHistory his_dump = binancePumpingHistoryRepository.findById(day.getId())
+                                    .orElse(null);
+
+                            if (Objects.equals(null, his_dump)) {
+                                his_dump = new BinancePumpingHistory();
+                                his_dump.setId(day.getId());
+                                his_dump.setTotal_dump(Long.valueOf(0));
+                            }
+                            his_dump.setTotal_dump(his_dump.getTotal_dump() + 1);
+                            binancePumpingHistoryRepository.save(his_dump);
+                        }
+
                     }
 
                 }
@@ -242,7 +257,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.symbol,                                                                             \n"
                     + "   can.name,                                                                               \n"
                     + "                                                                                           \n"
-                    + "   concat('Pumping:', coalesce((select string_agg(his.hh, '<-') from (select * from binance_pumping_history his where his.gecko_id = can.gecko_id and his.symbol = can.symbol order by his.total desc limit 5) as his), ''), 'h') as pumping_history, \n"
+                    + "   concat('Pumping:', coalesce((select string_agg(his.hh, '<-') from (select * from binance_pumping_history his where his.gecko_id = can.gecko_id and his.symbol = can.symbol order by his.total_pump desc limit 5) as his), ''), 'h') as pumping_history, \n"
                     + "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n"
                     + "                                                                                           \n"
                     + "   ROUND((cur.total_volume / COALESCE ((SELECT (case when pre.total_volume = 0.0 then 1000000000 else pre.total_volume end) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 1000000000) * 100 - 100), 0) pre_4h_total_volume_up, \n"
@@ -809,17 +824,15 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar(css.getStar() + " Uptrend");
                 }
 
-                //if (Objects.equals("GMT", css.getSymbol())) {
-                //    String debug = "";
-                //}
+                // if (Objects.equals("GMT", css.getSymbol())) {
+                // String debug = "";
+                // }
                 Boolean is_candidate = false;
                 if (!Objects.equals("", Utils.getStringValue(css.getOco_tp_price_hight_css()))) {
                     is_candidate = true;
                 } else if ((Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""))
-                        .compareTo(BigDecimal.valueOf(20)) >= 0)
-                        && css.getPrice_change_percentage_24h().contains("-")
-                        && !css.getStar().contains("✖")
-                        && (Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
+                        .compareTo(BigDecimal.valueOf(20)) >= 0) && css.getPrice_change_percentage_24h().contains("-")
+                        && !css.getStar().contains("✖") && (Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
                                 .compareTo(BigDecimal.valueOf(30)) >= 0)) {
                     is_candidate = true;
                 }
