@@ -46,12 +46,12 @@ public class Utils {
 
     public static String createMsg(OrdersProfitResponse dto) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getName()) + "%0A"
-                + "Pmua: " + dto.getOrder_price().toString() + "$, "
+                + "Pbuy: " + dto.getOrder_price().toString() + "$, "
                 + "T: " + Utils.removeLastZero(dto.getAmount().toString()) + "$%0A"
                 + "Pnow: " + dto.getPrice_at_binance().toString() + "$, "
                 + "Profit: " + Utils.removeLastZero(dto.getTp_amount().toString())
                 + "$ (" + dto.getTp_percent() + "%)%0A"
-                + "Target: " + dto.getTarget().replace(" L:", "%0AL:");
+                + "Target: " + dto.getTarget().replace(" H:", "%0AH:");
 
         return result;
     }

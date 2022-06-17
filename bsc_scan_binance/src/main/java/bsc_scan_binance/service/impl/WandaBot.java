@@ -180,7 +180,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                     ordersRepository.save(entity);
 
-                    message.setText(String.format("Added:[%s] [%s] [Qty:%s(+%s)]_[P:%s$]_[Amount:%s$].",
+                    message.setText(String.format("Added:[%s] [%s] [Qty:%s(+%s)]_[P:%s$] [T:%s$].",
                             entity.getSymbol(), entity.getName(), entity.getQty(), qty2, entity.getOrder_price(),
                             entity.getAmount()));
                     execute(message);
@@ -257,7 +257,7 @@ public class WandaBot extends TelegramLongPollingBot {
                         order.setAmount(amount_remain);
                         ordersRepository.save(order);
 
-                        message.setText(String.format("Remain:[%s] [%s] [Qty:%s]_[P:%s$]_[Amount:%s$].",
+                        message.setText(String.format("Remain:[%s] [%s] [Qty:%s]_[P:%s$] [T:%s$].",
                                 order.getSymbol(), order.getName(), order.getQty(), order_price1, order.getAmount()));
                         execute(message);
                         // ------------------------
@@ -269,7 +269,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                     takeProfitRepository.save(profit);
                     message.setText(
-                            String.format("Sell:[%s] [%s] [Qty:-%s]_[P:%s$]_[Amount:%s$]_[PT:%s$].", profit.getSymbol(),
+                            String.format("Sell:[%s] [%s] [Qty:-%s]_[P:%s$]_[T:%s$] [PT:%s$].", profit.getSymbol(),
                                     profit.getName(), profit.getQty(), order_price2, amount2, profit.getProfit()));
                     execute(message);
 

@@ -1,5 +1,6 @@
 package bsc_scan_binance;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +28,8 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()) + " ---->");
 
-            //--------------------Init--------------------
+            // --------------------Init--------------------
+            Calendar calendar = Calendar.getInstance();
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
@@ -40,7 +42,7 @@ public class BscScanBinanceApplication {
                 e.printStackTrace();
             }
 
-            //--------------------Start--------------------
+            // --------------------Start--------------------
 
             List<CandidateCoin> list = gecko_service.getList();
             if (CollectionUtils.isEmpty(list)) {
@@ -64,11 +66,13 @@ public class BscScanBinanceApplication {
                 log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
                 if (Objects.equals(idx, size - 1)) {
-                    binance_service.getList(false); //~3p 1 lan
+                    binance_service.getList(false); // ~3p 1 lan
 
                     binance_service.monitorEma();
 
-                    binance_service.monitorProfit();
+                    if (Utils.getIntValue(Utils.convertDateToString("mm", calendar.getTime())) > 10) {
+                        binance_service.monitorProfit();
+                    }
 
                     log.info("reload: " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()));
                     idx = 0;
