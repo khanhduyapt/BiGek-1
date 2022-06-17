@@ -60,18 +60,18 @@ public class TakeProfit {
     private String name;
 
     @Column(name = "order_price")
-    private BigDecimal order_price;
+    private BigDecimal order_price = BigDecimal.ZERO;
 
     @Column(name = "qty")
-    private BigDecimal qty;
+    private BigDecimal qty = BigDecimal.ZERO;
 
     @Column(name = "amount")
-    private BigDecimal amount;
+    private BigDecimal amount = BigDecimal.ZERO;
 
     @Column(name = "sale_price")
-    private BigDecimal sale_price;
+    private BigDecimal sale_price = BigDecimal.ZERO;
 
     @Column(name = "profit")
-    private BigDecimal profit;
+    private BigDecimal profit = BigDecimal.ZERO;
 
 }

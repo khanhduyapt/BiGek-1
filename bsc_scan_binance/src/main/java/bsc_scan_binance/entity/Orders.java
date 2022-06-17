@@ -61,12 +61,12 @@ public class Orders {
     private String name;
 
     @Column(name = "order_price")
-    private BigDecimal order_price;
+    private BigDecimal order_price = BigDecimal.ZERO;
 
     @Column(name = "qty")
-    private BigDecimal qty;
+    private BigDecimal qty = BigDecimal.ZERO;
 
     @Column(name = "amount")
-    private BigDecimal amount;
+    private BigDecimal amount = BigDecimal.ZERO;
 
 }

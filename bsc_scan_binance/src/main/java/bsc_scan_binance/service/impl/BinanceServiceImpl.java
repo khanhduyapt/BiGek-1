@@ -146,7 +146,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     Utils.convertDateToString("HH", calendar.getTime())))
                             .orElse(null);
 
-                    if (!Objects.equals(null, pre2h) && (pre2h.getPriceAtBinance().compareTo(BigDecimal.ZERO) > 0)) {
+                    if (!Objects.equals(null, pre2h)
+                            && (Utils.getBigDecimal(pre2h.getPriceAtBinance()).compareTo(BigDecimal.ZERO) > 0)) {
                         if (price_at_binance.compareTo(
                                 pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
 
@@ -821,6 +822,10 @@ public class BinanceServiceImpl implements BinanceService {
                         && (Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
                                 .compareTo(BigDecimal.valueOf(30)) >= 0)) {
                     is_candidate = true;
+                }
+
+                if (!css.getAvg_percent().contains("-")) {
+                    is_candidate = false;
                 }
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));

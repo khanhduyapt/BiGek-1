@@ -105,13 +105,13 @@ public class CandidateCoin {
     private String busd;
 
     @Column(name = "total_supply")
-    private BigDecimal totalSupply;
+    private BigDecimal totalSupply = BigDecimal.ZERO;
 
     @Column(name = "max_supply")
-    private BigDecimal maxSupply;
+    private BigDecimal maxSupply = BigDecimal.ZERO;
 
     @Column(name = "circulating_supply")
-    private BigDecimal circulatingSupply;
+    private BigDecimal circulatingSupply = BigDecimal.ZERO;
 
     @Column(name = "binance_trade")
     private String binanceTrade;
@@ -123,28 +123,28 @@ public class CandidateCoin {
     private String backer;
 
     @Column(name = "market_cap")
-    private BigDecimal marketCap;
+    private BigDecimal marketCap = BigDecimal.ZERO;
 
     @Column(name = "current_price")
-    private BigDecimal currentPrice;
+    private BigDecimal currentPrice = BigDecimal.ZERO;
 
     @Column(name = "total_volume")
-    private BigDecimal totalVolume;
+    private BigDecimal totalVolume = BigDecimal.ZERO;
 
     @Column(name = "price_change_percentage_24h")
-    private BigDecimal priceChangePercentage24H;
+    private BigDecimal priceChangePercentage24H = BigDecimal.ZERO;
 
     @Column(name = "price_change_percentage_7d")
-    private BigDecimal priceChangePercentage7D;
+    private BigDecimal priceChangePercentage7D = BigDecimal.ZERO;
 
     @Column(name = "price_change_percentage_14d")
-    private BigDecimal priceChangePercentage14D;
+    private BigDecimal priceChangePercentage14D = BigDecimal.ZERO;
 
     @Column(name = "price_change_percentage_30d")
-    private BigDecimal priceChangePercentage30D;
+    private BigDecimal priceChangePercentage30D = BigDecimal.ZERO;
 
     @Column(name = "volumn_div_marketcap")
-    private BigDecimal volumnDivMarketcap;
+    private BigDecimal volumnDivMarketcap = BigDecimal.ZERO;
 
     public CandidateCoin(String geckoid, String symbol, String name) {
         this.geckoid = geckoid;

@@ -21,6 +21,6 @@ public class GeckoVolumnDay {
     private GeckoVolumnDayKey id;
 
     @Column(name = "total_volume")
-    private BigDecimal totalVolume;
+    private BigDecimal totalVolume = BigDecimal.ZERO;
 
 }

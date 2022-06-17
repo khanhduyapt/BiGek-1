@@ -29,6 +29,6 @@ public class BinancePumpingHistory {
     private BinanceVolumnDayKey id;
 
     @Column(name = "total")
-    private Long total;
+    private Long total = Long.valueOf(0);
 
 }

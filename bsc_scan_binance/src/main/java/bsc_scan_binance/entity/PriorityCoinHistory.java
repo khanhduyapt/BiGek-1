@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "priority_coin_history")
 
-
 @SqlResultSetMapping(name = "PriorityCoinHistoryResponse", classes = {
         @ConstructorResult(targetClass = PriorityCoinHistoryResponse.class, columns = {
                 @ColumnResult(name = "gecko_id", type = String.class),
@@ -49,5 +48,5 @@ public class PriorityCoinHistory {
     private String name;
 
     @Column(name = "count_notify")
-    private Integer count_notify;
+    private Integer count_notify = 0;
 }

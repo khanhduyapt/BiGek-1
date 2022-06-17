@@ -21,12 +21,12 @@ public class BinanceVolumnDay {
     private BinanceVolumnDayKey id;
 
     @Column(name = "total_volume")
-    private BigDecimal totalVolume;
+    private BigDecimal totalVolume = BigDecimal.ZERO;
 
     @Column(name = "total_trasaction")
-    private BigDecimal totalTrasaction;
+    private BigDecimal totalTrasaction = BigDecimal.ZERO;
 
     @Column(name = "price_at_binance")
-    private BigDecimal priceAtBinance;
+    private BigDecimal priceAtBinance = BigDecimal.ZERO;
 
 }

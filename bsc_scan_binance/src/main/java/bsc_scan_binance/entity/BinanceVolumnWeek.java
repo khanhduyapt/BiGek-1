@@ -21,18 +21,18 @@ public class BinanceVolumnWeek {
     private BinanceVolumnWeekKey id;
 
     @Column(name = "total_volume")
-    private BigDecimal totalVolume;
+    private BigDecimal totalVolume = BigDecimal.ZERO;
 
     @Column(name = "total_trasaction")
-    private BigDecimal totalTrasaction;
+    private BigDecimal totalTrasaction = BigDecimal.ZERO;
 
     @Column(name = "avg_price")
-    private BigDecimal avgPrice;
+    private BigDecimal avgPrice = BigDecimal.ZERO;
 
     @Column(name = "min_price")
-    private BigDecimal min_price;
+    private BigDecimal min_price = BigDecimal.ZERO;
 
     @Column(name = "max_price")
-    private BigDecimal max_price;
+    private BigDecimal max_price = BigDecimal.ZERO;
 }
 

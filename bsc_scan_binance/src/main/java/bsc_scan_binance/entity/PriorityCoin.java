@@ -59,13 +59,13 @@ public class PriorityCoin {
     private String geckoid;
 
     @Column(name = "current_price")
-    private BigDecimal current_price;
+    private BigDecimal current_price = BigDecimal.ZERO;
 
     @Column(name = "target_price")
-    private BigDecimal target_price;
+    private BigDecimal target_price = BigDecimal.ZERO;
 
     @Column(name = "target_percent")
-    private Integer target_percent;
+    private Integer target_percent = 0;
 
     @Column(name = "vmc")
     private Integer vmc;
@@ -77,7 +77,7 @@ public class PriorityCoin {
     private Boolean candidate;
 
     @Column(name = "index")
-    private Integer index;
+    private Integer index = 0;
 
     @Column(name = "name")
     private String name;
@@ -89,5 +89,5 @@ public class PriorityCoin {
     private String symbol;
 
     @Column(name = "ema")
-    private BigDecimal ema;
+    private BigDecimal ema = BigDecimal.ZERO;
 }
