@@ -55,14 +55,18 @@ public class WandaBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         try {
-            if (!Objects.equal("khanhduyapt", update.getMessage().getChat().getUserName())) {
+            SendMessage message = new SendMessage();
+            message.setChatId(update.getMessage().getChatId().toString());
+
+            if ((!Objects.equal("khanhduyapt", update.getMessage().getChat().getUserName()))
+                    || (!Utils.chatId.equals(update.getMessage().getChatId().toString()))) {
+                message.setText("You are not my master.");
+                execute(message);
                 return;
             }
 
             System.out.println(update.getMessage().getText());
             String command = update.getMessage().getText();
-            SendMessage message = new SendMessage();
-            message.setChatId(update.getMessage().getChatId().toString());
 
             if (command.equals("/web3")) {
                 binance_service.getList(false);

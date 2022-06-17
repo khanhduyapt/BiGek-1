@@ -31,6 +31,7 @@ import bsc_scan_binance.entity.PriorityCoinHistory;
 import bsc_scan_binance.response.OrdersProfitResponse;
 
 public class Utils {
+    public static String chatId = "5099224587";
 
     public static String toString(PriorityCoin tele) {
         return tele.getSymbol() + ":" + tele.getName() + " P:" + tele.getCurrent_price() + "$ Target:"
@@ -68,7 +69,6 @@ public class Utils {
 
         //Add Telegram token
         String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
-        String chatId = "5099224587";
 
         urlString = String.format(urlString, apiToken, chatId) + text;
 
