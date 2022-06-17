@@ -2,6 +2,7 @@ package bsc_scan_binance.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -70,7 +71,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
             if (command.equals("/web3")) {
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
+                List<PriorityCoin> list = searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("web3")) {
                         message.setText(Utils.createMsg(coin));
@@ -79,7 +80,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
             } else if (command.equals("/defi")) {
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
+                List<PriorityCoin> list = searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("defi")) {
                         message.setText(Utils.createMsg(coin));
@@ -88,7 +89,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
             } else if (command.equals("/fan")) {
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
+                List<PriorityCoin> list = searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getName() + coin.getGeckoid()).toLowerCase().contains("fan")) {
                         message.setText(Utils.createMsg(coin));
@@ -97,7 +98,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
             } else if (command.equals("/game")) {
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
+                List<PriorityCoin> list = searchCandidate();
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("game")) {
                         message.setText(Utils.createMsg(coin));
@@ -106,7 +107,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
             } else if (command.equals("/other")) {
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
+                List<PriorityCoin> list = searchCandidate();
                 for (PriorityCoin coin : list) {
                     String text = (Utils.getStringValue(coin.getName() + coin.getGeckoid())
                             + Utils.getStringValue(coin.getNote())).toLowerCase();
@@ -119,12 +120,10 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
             } else if (command.equals("/all")) {
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchCandidate();
+                List<PriorityCoin> list = searchCandidate();
                 for (PriorityCoin coin : list) {
-                    if (coin.getEma().compareTo(BigDecimal.ZERO) > 0) {
-                        message.setText(Utils.createMsg(coin));
-                        execute(message);
-                    }
+                    message.setText(Utils.createMsg(coin));
+                    execute(message);
                 }
             } else if (command.contains("/check")) {
                 String[] arr = command.split(" ");
@@ -318,6 +317,54 @@ public class WandaBot extends TelegramLongPollingBot {
 
         } catch (TelegramApiException e) {
             e.printStackTrace();
+        }
+    }
+
+    private List<PriorityCoin> searchCandidate() {
+        try {
+
+            String sql = ""
+                    + " SELECT gecko_id       AS geckoid,                       \n"
+                    + "        current_price  AS current_price,                 \n"
+                    + "        target_price   AS target_price,                  \n"
+                    + "        target_percent AS target_percent,                \n"
+                    + "        vmc,                                             \n"
+                    + "        oco_hight      AS oco_hight,                     \n"
+                    + "        is_candidate   AS candidate,                     \n"
+                    + "        index,                                           \n"
+                    + "        name AS name,                                    \n"
+                    + "        note AS note,                                    \n"
+                    + "        symbol AS symbol,                                \n"
+                    + "        ema AS ema                                       \n"
+                    + " FROM Priority_Coin                                      \n"
+                    + " WHERE ema > 0                                           \n"
+                    + "   AND CAST(target_percent AS numeric) >=10              \n"
+                    + " UNION ALL                                               \n"
+                    + " SELECT gecko_id       AS geckoid,                       \n"
+                    + "        current_price  AS current_price,                 \n"
+                    + "        target_price   AS target_price,                  \n"
+                    + "        target_percent AS target_percent,                \n"
+                    + "        vmc,                                             \n"
+                    + "        oco_hight      AS oco_hight,                     \n"
+                    + "        is_candidate   AS candidate,                     \n"
+                    + "        index,                                           \n"
+                    + "        name AS name,                                    \n"
+                    + "        note AS note,                                    \n"
+                    + "        symbol AS symbol,                                \n"
+                    + "        ema AS ema                                       \n"
+                    + " FROM Priority_Coin                                      \n"
+                    + " WHERE ema <= 0                                          \n"
+                    + "   AND (target_percent >=20)                             \n"
+                    + "   AND (vmc >= 40)                                       \n";
+
+            Query query = entityManager.createNativeQuery(sql, "PriorityCoin");
+
+            @SuppressWarnings("unchecked")
+            List<PriorityCoin> results = query.getResultList();
+
+            return results;
+        } catch (Exception e) {
+            return new ArrayList<PriorityCoin>();
         }
     }
 

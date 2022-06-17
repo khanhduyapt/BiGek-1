@@ -16,7 +16,4 @@ public interface PriorityCoinRepository extends JpaRepository<PriorityCoin, Stri
     @Query("SELECT m FROM PriorityCoin m WHERE m.symbol LIKE %:symbol%")
     List<PriorityCoin> searchBySymbolLike(@Param("symbol") String symbol);
 
-    @Query("SELECT m FROM PriorityCoin m WHERE m.ema > 0 Order by index asc")
-    List<PriorityCoin> searchCandidate();
-
 }

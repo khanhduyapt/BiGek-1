@@ -825,6 +825,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
                 coin.setTarget_percent(Utils.getIntValue(css.getAvg_percent().replace("-", "").replace("%", "")));
+                coin.setVmc(Utils.getIntValue(css.getVolumn_div_marketcap()));
+
                 coin.setOco_hight(css.getLow_to_hight_price());
                 coin.setCandidate(is_candidate);
                 coin.setIndex(index);
@@ -1223,9 +1225,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             log.info("End monitorProfit <----");
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("monitorProfit error ------->");
             log.error(e.getMessage());
