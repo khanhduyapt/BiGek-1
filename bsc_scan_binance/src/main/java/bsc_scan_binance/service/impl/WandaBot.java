@@ -239,7 +239,7 @@ public class WandaBot extends TelegramLongPollingBot {
                             entity.getName(), entity.getQty(), qty2, entity.getOrder_price(), entity.getAmount()));
                     execute(message);
                 }
-            } else if (command.contains("/sell")) {
+            } else if (command.contains("/sel")) {
                 // /sell UNFI
                 // /sell UNFI 100$
                 String[] arr = command.split(" ");

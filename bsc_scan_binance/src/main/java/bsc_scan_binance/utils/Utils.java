@@ -75,9 +75,8 @@ public class Utils {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + "%0A" + "Price: "
                 + dto.getPrice_at_binance().toString() + "$, " + "Profit: "
                 + Utils.removeLastZero(dto.getTp_amount().toString()) + "$ (" + dto.getTp_percent() + "%)%0A"
-                + "Target: " + dto.getTarget().replace(" H:", "%0AH:") + "%0A" + "%0A" + "Bought: "
-                + dto.getOrder_price().toString() + "$, " + "T: " + Utils.removeLastZero(dto.getAmount().toString())
-                + "$" + "%0A" + "L:" + dto.getLow_price() + "("
+                + "Bought: " + dto.getOrder_price().toString() + "$, " + "T: "
+                + Utils.removeLastZero(dto.getAmount().toString()) + "$" + "%0A" + "L:" + dto.getLow_price() + "("
                 + removeLastZero(toPercent(dto.getLow_price(), dto.getOrder_price())) + "%)_H:" + dto.getHeight_price()
                 + "(" + removeLastZero(toPercent(dto.getHeight_price(), dto.getOrder_price())) + "%)";
 

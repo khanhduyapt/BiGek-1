@@ -25,8 +25,8 @@ public class BscScanBinanceApplication {
 
     public static void main(String[] args) {
         try {
-            Calendar calendar = Calendar.getInstance();
-            log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", calendar.getTime()) + " ---->");
+            log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
+                    + " ---->");
 
             // --------------------Init--------------------
 
@@ -66,7 +66,7 @@ public class BscScanBinanceApplication {
                 log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
                 if (Objects.equals(idx, size - 1)) {
-                    int minus = Utils.getIntValue(Utils.convertDateToString("mm", calendar.getTime()));
+                    int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
                     if ((minus > 5) && (minus < 55)) {
                         binance_service.getList(false); // ~3p 1 lan
                         binance_service.monitorEma();
@@ -84,7 +84,8 @@ public class BscScanBinanceApplication {
                 }
             }
 
-            log.info("End " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", calendar.getTime()) + " <----");
+            log.info("End " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
+                    + " <----");
         } catch (Exception e) {
             log.error(e.getMessage());
         }
