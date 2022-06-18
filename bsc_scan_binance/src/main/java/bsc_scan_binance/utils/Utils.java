@@ -41,41 +41,36 @@ public class Utils {
     }
 
     public static String addGoodCoin(PriorityCoinHistory tele) {
-        return String.format("[%s]  [%s] [Count: %s]", tele.getSymbol(), tele.getName(),
+        return String.format("[%s]  [%s] [Count: %s]", tele.getSymbol(), tele.getGeckoid(),
                 getIntValue(tele.getCount_notify()));
     }
 
     public static String createMsg(OrdersProfitResponse dto) {
-        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getName()) + "%0A"
-                + "Pbuy: " + dto.getOrder_price().toString() + "$, "
-                + "T: " + Utils.removeLastZero(dto.getAmount().toString()) + "$%0A"
-                + "Pnow: " + dto.getPrice_at_binance().toString() + "$, "
-                + "Profit: " + Utils.removeLastZero(dto.getTp_amount().toString())
-                + "$ (" + dto.getTp_percent() + "%)%0A"
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + "%0A" + "Pbuy: "
+                + dto.getOrder_price().toString() + "$, " + "T: " + Utils.removeLastZero(dto.getAmount().toString())
+                + "$%0A" + "Pnow: " + dto.getPrice_at_binance().toString() + "$, " + "Profit: "
+                + Utils.removeLastZero(dto.getTp_amount().toString()) + "$ (" + dto.getTp_percent() + "%)%0A"
                 + "Target: " + dto.getTarget().replace(" H:", "%0AH:");
 
         return result;
     }
 
     public static String createMsg(CandidateTokenCssResponse css) {
-        return Utils.convertDateToString("yyyy-MM-dd hh:mm", Calendar.getInstance().getTime()) + "%0A"
-                + "BTC:" + css.getCurrent_price() + "$" + "%0A"
-                + css.getLow_to_hight_price();
+        return Utils.convertDateToString("yyyy-MM-dd hh:mm", Calendar.getInstance().getTime()) + "%0A" + "BTC:"
+                + css.getCurrent_price() + "$" + "%0A" + css.getLow_to_hight_price();
     }
 
     public static String createMsg(PriorityCoin dto) {
-        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getName()) + "\n"
-                + "Price: " + dto.getCurrent_price().toString() + "$, "
-                + "Target: " + dto.getTarget_price() + "$=(" + dto.getTarget_percent() + "%)\n"
-                + dto.getOco_hight() + "\n"
-                + dto.getNote().replace("~", "\n");
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGeckoid()) + "\n" + "Price: "
+                + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
+                + dto.getTarget_percent() + "%)\n" + dto.getOco_hight() + "\n" + dto.getNote().replace("~", "\n");
         return result;
     }
 
     public static void sendToTelegram(String text) {
         String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
 
-        //Add Telegram token
+        // Add Telegram token
         String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
 
         urlString = String.format(urlString, apiToken, chatId) + text;

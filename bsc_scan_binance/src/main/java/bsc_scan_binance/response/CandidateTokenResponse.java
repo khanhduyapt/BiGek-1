@@ -62,6 +62,14 @@ public class CandidateTokenResponse {
     private String day_11;
     private String day_12;
     private String priority;
-    private BigDecimal ema;
+
+    private BigDecimal ema07d;
+    private BigDecimal ema14d;
+    private BigDecimal ema21d;
+    private BigDecimal ema28d;
+    private BigDecimal avg07d;
+    private BigDecimal avg14d;
+    private BigDecimal avg21d;
+    private BigDecimal avg28d;
     private Boolean uptrend;
 }

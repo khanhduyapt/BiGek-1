@@ -1,5 +1,7 @@
 package bsc_scan_binance.response;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,6 +49,8 @@ public class CandidateTokenCssResponse {
     private String oco_stop_limit_low_css = "";
     private String oco_stop_price = "";
     private String oco_low_hight = "";
+    private String ema_history;
+    private String avg_history;
 
     private String price_change_percentage_24h = "";
     private String price_change_percentage_7d = "";

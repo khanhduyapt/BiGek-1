@@ -66,8 +66,8 @@ public class BscScanBinanceApplication {
                 log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
                 if (Objects.equals(idx, size - 1)) {
-
-                    if (Utils.getIntValue(Utils.convertDateToString("mm", calendar.getTime())) > 10) {
+                    int minus = Utils.getIntValue(Utils.convertDateToString("mm", calendar.getTime()));
+                    if ((minus > 10) && (minus < 58)) {
                         binance_service.getList(false); // ~3p 1 lan
                         binance_service.monitorEma();
                         binance_service.monitorProfit();

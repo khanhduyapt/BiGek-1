@@ -140,10 +140,8 @@ public class WandaBot extends TelegramLongPollingBot {
                 binance_service.getList(false);
                 List<PriorityCoin> list = priorityCoinRepository.searchBySymbolLike(arr[1].toUpperCase());
                 if (!CollectionUtils.isEmpty(list)) {
-                    for (PriorityCoin coin : list) {
-                        message.setText(Utils.createMsg(coin));
-                        execute(message);
-                    }
+                    message.setText(Utils.createMsg(list.get(0)));
+                    execute(message);
                 }
             } else if (command.contains("/buy")) {
                 Calendar calendar = Calendar.getInstance();
@@ -159,12 +157,20 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                BigDecimal avg_btc_price = (btc.getMin_price().add(btc.getMax_price())).divide(BigDecimal.valueOf(2), 5,
-                        RoundingMode.CEILING);
-                avg_btc_price = avg_btc_price.multiply(BigDecimal.valueOf(0.99));
-                if (btc_now.getPriceAtBinance().compareTo(avg_btc_price) > 0) {
+                message.setText("BTC:" + Utils.removeLastZero(btc_now.getPriceAtBinance().toString()) + "$\n" + "L:"
+                        + Utils.removeLastZero(btc.getMin_price().toString()) + "("
+                        + Utils.toPercent(btc.getMin_price(), btc_now.getPriceAtBinance()) + "%)" + "-H:"
+                        + Utils.removeLastZero(btc.getMax_price().toString()) + "("
+                        + Utils.toPercent(btc_now.getPriceAtBinance(), btc.getMax_price()) + "%)" + "$");
+                execute(message);
+
+                BigDecimal good_btc_price = (btc.getMax_price().subtract(btc.getMin_price()));
+                good_btc_price = good_btc_price.divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
+                good_btc_price = btc.getMin_price().add(good_btc_price);
+
+                if (btc_now.getPriceAtBinance().compareTo(good_btc_price) > 0) {
                     message.setText("The current buying price is unfavorable.\nWaiting for BTC to correct below "
-                            + avg_btc_price + "$.");
+                            + good_btc_price + "$.");
                     execute(message);
                     return;
                 }
