@@ -22,5 +22,7 @@ public class OrdersProfitResponse {
     private BigDecimal target_percent;
     private BigDecimal tp_percent;
     private BigDecimal tp_amount;
+    private BigDecimal low_price;
+    private BigDecimal height_price;
     private String target;
 }

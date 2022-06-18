@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -172,7 +173,10 @@ public class WandaBot extends TelegramLongPollingBot {
                     message.setText("The current buying price is unfavorable.\nWaiting for BTC to correct below "
                             + good_btc_price + "$.");
                     execute(message);
-                    return;
+
+                    if (!command.contains("/buynow")) {
+                        return;
+                    }
                 }
 
                 // /buy LIT 600$
@@ -193,6 +197,17 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
                 for (BinanceVolumnDay dto : list) {
+                    BinanceVolumnWeek dtoweek = binanceVolumnWeekRepository
+                            .findById(new BinanceVolumnWeekKey(dto.getId().getGeckoid(), dto.getId().getSymbol(),
+                                    Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime())))
+                            .orElse(null);
+                    BigDecimal low_price = BigDecimal.ZERO;
+                    BigDecimal height_price = BigDecimal.ZERO;
+                    if (!Objects.equal(null, dtoweek)) {
+                        low_price = Utils.getBigDecimal(dtoweek.getMin_price());
+                        height_price = Utils.getBigDecimal(dtoweek.getMax_price());
+                    }
+
                     Orders entity = ordersRepository.findById(dto.getId().getGeckoid()).orElse(null);
                     if (Objects.equal(null, entity)) {
                         entity = new Orders();
@@ -215,6 +230,8 @@ public class WandaBot extends TelegramLongPollingBot {
                     entity.setOrder_price(avg_price);
                     entity.setAmount(amount);
                     entity.setQty(qty);
+                    entity.setLow_price(low_price);
+                    entity.setHeight_price(height_price);
 
                     ordersRepository.save(entity);
 
@@ -313,30 +330,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
             } else if (command.contains("/balance")) {
-                String sql = ""
-                        + " SELECT * from (                                                                             \n"
-                        + "    SELECT                                                                                   \n"
-                        + "      od.gecko_id,                                                                           \n"
-                        + "      od.symbol,                                                                             \n"
-                        + "      od.name,                                                                               \n"
-                        + "      od.order_price,                                                                        \n"
-                        + "      od.qty,                                                                                \n"
-                        + "      od.amount,                                                                             \n"
-                        + "      cur.price_at_binance,                                                                  \n"
-                        + "      (select target_percent from priority_coin po where po.gecko_id = od.gecko_id) target_percent, \n"
-                        + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1) as tp_percent,  \n"
-                        + "      ROUND((cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,   \n"
-                        + "      (select concat(cast(target_price as varchar), '$ (', target_percent, '%) ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
-                        + "    FROM                                                                                     \n"
-                        + "        orders od,                                                                           \n"
-                        + "        binance_volumn_day cur                                                               \n"
-                        + "    WHERE                                                                                    \n"
-                        + "            cur.hh      = TO_CHAR(NOW(), 'HH24')                                             \n"
-                        + "        and od.gecko_id = cur.gecko_id                                                       \n"
-                        + "        and od.symbol   = cur.symbol                                                         \n"
-                        + " ) odr ORDER BY odr.tp_percent desc ";
-
-                Query query = entityManager.createNativeQuery(sql, "OrdersProfitResponse");
+                Query query = entityManager.createNativeQuery(Utils.sql_OrdersProfitResponse, "OrdersProfitResponse");
 
                 @SuppressWarnings("unchecked")
                 List<OrdersProfitResponse> results = query.getResultList();

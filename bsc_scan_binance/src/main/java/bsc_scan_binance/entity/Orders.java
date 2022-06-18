@@ -45,7 +45,8 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "target_percent", type = BigDecimal.class),
                 @ColumnResult(name = "tp_percent", type = BigDecimal.class),
                 @ColumnResult(name = "tp_amount", type = BigDecimal.class),
-
+                @ColumnResult(name = "low_price", type = BigDecimal.class),
+                @ColumnResult(name = "height_price", type = BigDecimal.class),
                 @ColumnResult(name = "target", type = String.class),
         })
 })
@@ -70,4 +71,9 @@ public class Orders {
     @Column(name = "amount")
     private BigDecimal amount = BigDecimal.ZERO;
 
+    @Column(name = "low_price")
+    private BigDecimal low_price = BigDecimal.ZERO;
+
+    @Column(name = "height_price")
+    private BigDecimal height_price = BigDecimal.ZERO;
 }

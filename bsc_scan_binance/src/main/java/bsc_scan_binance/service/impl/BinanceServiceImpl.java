@@ -105,22 +105,22 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
             BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
             BigDecimal price_close = Utils.getBigDecimal(arr_usdt.get(4));
-            String close_time = arr_usdt.get(6).toString();
+            String open_time = arr_usdt.get(0).toString();
 
-            if (Objects.equals("0", close_time)) {
+            if (Objects.equals("0", open_time)) {
                 price_open = Utils.getBigDecimal(arr_busd.get(1));
                 price_high = Utils.getBigDecimal(arr_busd.get(2));
                 price_low = Utils.getBigDecimal(arr_busd.get(3));
                 price_close = Utils.getBigDecimal(arr_busd.get(4));
 
-                close_time = arr_busd.get(6).toString();
+                open_time = arr_busd.get(0).toString();
             }
 
-            if (!Objects.equals("0", close_time)) {
+            if (!Objects.equals("0", open_time)) {
                 BigDecimal avgPrice = price_low.add(price_high).add(price_open).add(price_close)
                         .divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
 
-                Date date = Utils.getDate(close_time);
+                Date date = Utils.getDate(open_time);
 
                 BigDecimal quote_asset_volume1 = Utils.getBigDecimal(arr_usdt.get(7));
                 BigDecimal number_of_trades1 = Utils.getBigDecimal(arr_usdt.get(8));
@@ -797,8 +797,8 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setOco_stop_price(oco_stop_price);
                     css.setOco_low_hight(oco_low_hight);
 
-                    String ema_history = "ema7: " + dto.getEma07d() + ", ema14: " + dto.getEma14d() + ", ema21: "
-                            + dto.getEma21d() + ", ema28: " + dto.getEma28d();
+                    String ema_history = "ema1-7: " + dto.getEma07d() + ", ema7-14: " + dto.getEma14d() + ", ema14-21: "
+                            + dto.getEma21d() + ", ema21-28: " + dto.getEma28d();
                     css.setEma_history(ema_history);
 
                     String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(price_now, dto.getAvg07d())
@@ -1172,30 +1172,7 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             log.info("Start monitorProfit ---->");
 
-            String sql = ""
-                    + " SELECT * from (                                                                             \n"
-                    + "    SELECT                                                                                   \n"
-                    + "      od.gecko_id,                                                                           \n"
-                    + "      od.symbol,                                                                             \n"
-                    + "      od.name,                                                                               \n"
-                    + "      od.order_price,                                                                        \n"
-                    + "      ROUND(od.qty, 1) qty,                                                                  \n"
-                    + "      od.amount,                                                                             \n"
-                    + "      cur.price_at_binance,                                                                  \n"
-                    + "      (select target_percent from priority_coin po where po.gecko_id = od.gecko_id) target_percent, \n"
-                    + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1)  as tp_percent, \n"
-                    + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,  \n"
-                    + "      (select concat(cast(target_price as varchar), ' ', target_percent, ' ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
-                    + "    FROM                                                                                     \n"
-                    + "        orders od,                                                                           \n"
-                    + "        binance_volumn_day cur                                                               \n"
-                    + "    WHERE                                                                                    \n"
-                    + "            cur.hh      = TO_CHAR(NOW(), 'HH24')                                             \n"
-                    + "        and od.gecko_id = cur.gecko_id                                                       \n"
-                    + "        and od.symbol   = cur.symbol                                                         \n"
-                    + " ) odr ORDER BY odr.tp_amount desc ";
-
-            Query query = entityManager.createNativeQuery(sql, "OrdersProfitResponse");
+            Query query = entityManager.createNativeQuery(Utils.sql_OrdersProfitResponse, "OrdersProfitResponse");
 
             List<OrdersProfitResponse> results = query.getResultList();
 
@@ -1208,10 +1185,16 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((tp_percent.compareTo(BigDecimal.valueOf(10)) > 0)
                             || (tp_percent.compareTo(target_percent) >= 0)) {
                         Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
+                    } else if (dto.getPrice_at_binance()
+                            .compareTo(dto.getHeight_price().multiply(BigDecimal.valueOf(0.98))) >= 0) {
+                        Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
                     }
 
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {
                         Utils.sendToTelegram("STOP LOST: " + Utils.createMsg(dto));
+                    } else if (dto.getPrice_at_binance()
+                            .compareTo(dto.getLow_price().multiply(BigDecimal.valueOf(0.99))) <= 0) {
+                        Utils.sendToTelegram("STOP LOST (Low): " + Utils.createMsg(dto));
                     }
                 }
             }

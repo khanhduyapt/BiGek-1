@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.MessageSource;
@@ -35,6 +36,31 @@ import bsc_scan_binance.response.OrdersProfitResponse;
 public class Utils {
     public static String chatId = "5099224587";
 
+    public static String sql_OrdersProfitResponse = ""
+            + " SELECT * from (                                                                             \n"
+            + "    SELECT                                                                                   \n"
+            + "      od.gecko_id,                                                                           \n"
+            + "      od.symbol,                                                                             \n"
+            + "      od.name,                                                                               \n"
+            + "      od.order_price,                                                                        \n"
+            + "      ROUND(od.qty, 1) qty,                                                                  \n"
+            + "      od.amount,                                                                             \n"
+            + "      cur.price_at_binance,                                                                  \n"
+            + "      (select target_percent from priority_coin po where po.gecko_id = od.gecko_id) target_percent, \n"
+            + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1)  as tp_percent, \n"
+            + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,  \n"
+            + "      od.low_price,                                                                          \n"
+            + "      od.height_price,                                                                       \n"
+            + "      (select concat(cast(target_price as varchar), ' ', target_percent, ' ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
+            + "    FROM                                                                                     \n"
+            + "        orders od,                                                                           \n"
+            + "        binance_volumn_day cur                                                               \n"
+            + "    WHERE                                                                                    \n"
+            + "            cur.hh      = TO_CHAR(NOW(), 'HH24')                                             \n"
+            + "        and od.gecko_id = cur.gecko_id                                                       \n"
+            + "        and od.symbol   = cur.symbol                                                         \n"
+            + " ) odr ORDER BY odr.tp_amount desc ";
+
     public static String toString(PriorityCoin tele) {
         return tele.getSymbol() + ":" + tele.getName() + " P:" + tele.getCurrent_price() + "$ Target:"
                 + tele.getTarget_percent() + " ema:" + tele.getEma();
@@ -46,11 +72,14 @@ public class Utils {
     }
 
     public static String createMsg(OrdersProfitResponse dto) {
-        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + "%0A" + "Pbuy: "
-                + dto.getOrder_price().toString() + "$, " + "T: " + Utils.removeLastZero(dto.getAmount().toString())
-                + "$%0A" + "Pnow: " + dto.getPrice_at_binance().toString() + "$, " + "Profit: "
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + "%0A" + "Price: "
+                + dto.getPrice_at_binance().toString() + "$, " + "Profit: "
                 + Utils.removeLastZero(dto.getTp_amount().toString()) + "$ (" + dto.getTp_percent() + "%)%0A"
-                + "Target: " + dto.getTarget().replace(" H:", "%0AH:");
+                + "Target: " + dto.getTarget().replace(" H:", "%0AH:") + "%0A" + "%0A" + "Bought: "
+                + dto.getOrder_price().toString() + "$, " + "T: " + Utils.removeLastZero(dto.getAmount().toString())
+                + "$" + "%0A" + "L:" + dto.getLow_price() + "("
+                + removeLastZero(toPercent(dto.getLow_price(), dto.getOrder_price())) + "%)_H:" + dto.getHeight_price()
+                + "(" + removeLastZero(toPercent(dto.getHeight_price(), dto.getOrder_price())) + "%)";
 
         return result;
     }
