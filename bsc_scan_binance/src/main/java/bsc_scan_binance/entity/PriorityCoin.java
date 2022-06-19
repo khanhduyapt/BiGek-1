@@ -78,4 +78,7 @@ public class PriorityCoin {
 
     @Column(name = "discovery_date_time")
     private String discovery_date_time;
+
+    @Column(name = "mute")
+    private Boolean mute = false;
 }

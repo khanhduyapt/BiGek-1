@@ -98,6 +98,7 @@ public class BinanceServiceImpl implements BinanceService {
         List<BinanceVolumnWeek> list_week = new ArrayList<BinanceVolumnWeek>();
         String sql_pump_dump = "";
 
+        int day_index = 0;
         for (int idx = limit - 1; idx >= 0; idx--) {
             Object obj_usdt = result_usdt.get(idx);
             Object obj_busd = result_busd.get(idx);
@@ -125,8 +126,6 @@ public class BinanceServiceImpl implements BinanceService {
             if (!Objects.equals("0", open_time)) {
                 BigDecimal avgPrice = price_low.add(price_high).add(price_open).add(price_close)
                         .divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
-
-                Date date = Utils.getDate(open_time);
 
                 BigDecimal quote_asset_volume1 = Utils.getBigDecimal(arr_usdt.get(7));
                 BigDecimal number_of_trades1 = Utils.getBigDecimal(arr_usdt.get(8));
@@ -180,7 +179,10 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 BinanceVolumnWeek entity = new BinanceVolumnWeek();
-                entity.setId(new BinanceVolumnWeekKey(gecko_id, symbol, Utils.convertDateToString("yyyyMMdd", date)));
+                Calendar calendar_day = Calendar.getInstance();
+                calendar_day.add(Calendar.DAY_OF_MONTH, -day_index);
+                entity.setId(new BinanceVolumnWeekKey(gecko_id, symbol,
+                        Utils.convertDateToString("yyyyMMdd", calendar_day.getTime())));
                 entity.setAvgPrice(avgPrice);
                 entity.setTotalVolume(total_volume);
                 entity.setTotalTrasaction(total_trans);
@@ -188,6 +190,7 @@ public class BinanceServiceImpl implements BinanceService {
                 entity.setMax_price(price_high);
                 list_week.add(entity);
             }
+            day_index += 1;
         }
 
         binanceVolumnDayRepository.saveAll(list_day);
@@ -1244,7 +1247,11 @@ public class BinanceServiceImpl implements BinanceService {
                             Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
                         }
                     } else if (dto.getTp_amount().compareTo(BigDecimal.valueOf(-0.8)) < 0) {
-                        Utils.sendToTelegram("Lost (Hight): " + Utils.createMsg(dto));
+
+                        PriorityCoin coin = priorityCoinRepository.findById(dto.getGecko_id()).orElse(null);
+                        if (!Objects.equals(null, coin) && !coin.getMute()) {
+                            Utils.sendToTelegram("Lost (Hight): " + Utils.createMsg(dto));
+                        }
                     }
 
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {
