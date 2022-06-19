@@ -821,7 +821,12 @@ public class BinanceServiceImpl implements BinanceService {
                             && (dto.getEma14d().compareTo(BigDecimal.ZERO) < 0)) {
                         predict_ema = dto.getEma14d().subtract(dto.getEma07d());
                         predict_ema = dto.getEma07d().subtract(predict_ema);
+                    } else if ((dto.getEma07d().compareTo(BigDecimal.ZERO) < 0)
+                            && (dto.getEma14d().compareTo(BigDecimal.ZERO) > 0)) {
+                        predict_ema = price_now.subtract(dto.getAvg07d());
+                        predict_ema = dto.getEma07d().subtract(predict_ema);
                     }
+
                     if (predict_ema.compareTo(BigDecimal.ZERO) > 0) {
                         ema_history = "Predict:" + predict_ema + ", " + ema_history;
                     }
@@ -1131,7 +1136,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "      name,                                                      \n"
                         + "      count_notify                                               \n"
                         + "  FROM priority_coin_history                                     \n"
-                        + "  WHERE count_notify < 10                                        \n"
+                        + "  WHERE count_notify < 3                                         \n" // 3 time
                         + "  AND gecko_id  IN                                               \n"
                         + "     (SELECT gecko_id FROM priority_coin where ema > 0)          \n";
 
@@ -1147,13 +1152,17 @@ public class BinanceServiceImpl implements BinanceService {
                         entity.setCount_notify(Utils.getIntValue(dto.getCount_notify()) + 1);
 
                         priorityCoinHistoryRepository.save(entity);
-                        Utils.sendToTelegram("Uptrend: " + Utils.addGoodCoin(entity));
+
+                        PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
+                        if (!Objects.equals(null, coin)) {
+                            Utils.sendToTelegram("Uptrend: " + Utils.createMsg(coin));
+                        }
                     }
                 }
 
             }
 
-            // check delete from history -> msg 10 times
+            // check delete from history -> msg
             {
                 String sql = "" + " SELECT                                                                  \n"
                         + "     gecko_id,                                                           \n"
@@ -1187,7 +1196,11 @@ public class BinanceServiceImpl implements BinanceService {
                             Optional<Orders> order = list_order.stream()
                                     .filter(item -> Objects.equals(item.getGeckoid(), entity.getGeckoid())).findFirst();
                             if (order.isPresent()) {
-                                Utils.sendToTelegram("Downtrend: " + Utils.addGoodCoin(entity) + "!");
+
+                                PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
+                                if (!Objects.equals(null, coin)) {
+                                    Utils.sendToTelegram("Downtrend: " + Utils.createMsg(coin));
+                                }
                             }
                         }
 
@@ -1227,7 +1240,11 @@ public class BinanceServiceImpl implements BinanceService {
                         Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
                     } else if (dto.getPrice_at_binance()
                             .compareTo(dto.getHeight_price().multiply(BigDecimal.valueOf(0.98))) >= 0) {
-                        Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
+                        if(dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0) {
+                            Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
+                        } else {
+                            Utils.sendToTelegram("Lost (Hight): " + Utils.createMsg(dto));
+                        }
                     }
 
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {

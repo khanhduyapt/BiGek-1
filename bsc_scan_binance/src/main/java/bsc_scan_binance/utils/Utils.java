@@ -66,11 +66,6 @@ public class Utils {
                 + tele.getTarget_percent() + " ema:" + tele.getEma();
     }
 
-    public static String addGoodCoin(PriorityCoinHistory tele) {
-        return String.format("[%s]  [%s] [Count: %s]", tele.getSymbol(), tele.getGeckoid(),
-                getIntValue(tele.getCount_notify()));
-    }
-
     public static String createMsg(OrdersProfitResponse dto) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + "%0A" + "Price: "
                 + dto.getPrice_at_binance().toString() + "$, " + "Profit: "

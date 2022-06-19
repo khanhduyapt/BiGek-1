@@ -172,6 +172,17 @@ public class WandaBot extends TelegramLongPollingBot {
                     message.setText(Utils.createMsg(coin));
                     execute(message);
                 }
+            } else if (command.contains("/btc")) {
+                binance_service.getList(false);
+                List<PriorityCoin> list = priorityCoinRepository.searchBySymbol("BTC");
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
+                message.setText(Utils.createMsg(list.get(0)));
+                execute(message);
             } else if (command.contains("/check")) {
                 String[] arr = command.split(" ");
 
