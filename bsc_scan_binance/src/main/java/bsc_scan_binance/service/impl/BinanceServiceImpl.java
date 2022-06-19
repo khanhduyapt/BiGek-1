@@ -1240,11 +1240,11 @@ public class BinanceServiceImpl implements BinanceService {
                         Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
                     } else if (dto.getPrice_at_binance()
                             .compareTo(dto.getHeight_price().multiply(BigDecimal.valueOf(0.98))) >= 0) {
-                        if(dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0) {
+                        if (dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0) {
                             Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
-                        } else {
-                            Utils.sendToTelegram("Lost (Hight): " + Utils.createMsg(dto));
                         }
+                    } else if (dto.getTp_amount().compareTo(BigDecimal.valueOf(-0.8)) < 0) {
+                        Utils.sendToTelegram("Lost (Hight): " + Utils.createMsg(dto));
                     }
 
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {
