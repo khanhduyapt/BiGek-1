@@ -1246,7 +1246,8 @@ public class BinanceServiceImpl implements BinanceService {
                         if (dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0) {
                             Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
                         }
-                    } else if (dto.getTp_amount().compareTo(BigDecimal.valueOf(-0.8)) < 0) {
+                    } else if (dto.getTp_amount().compareTo(BigDecimal.ZERO) < 0
+                            && dto.getTp_amount().abs().compareTo(BigDecimal.valueOf(0.8)) > 0) {
 
                         PriorityCoin coin = priorityCoinRepository.findById(dto.getGecko_id()).orElse(null);
                         if (!Objects.equals(null, coin) && !coin.getMute()) {
