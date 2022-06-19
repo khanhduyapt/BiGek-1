@@ -329,7 +329,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    select                                                                                   \n"
                     + "       xyz.gecko_id,                                                                         \n"
                     + "       xyz.symbol,                                                                           \n"
-                    + "       COALESCE(price_today   - price_pre_07d, -99) as ema07d,                               \n"
+                    + "       (case when (COALESCE(price_today - price_pre_07d, -99) < 0 and COALESCE(price_today - COALESCE(avg07d, -99), -99) >0) then COALESCE(price_today - COALESCE(avg07d, -99), -99) else COALESCE(price_today - price_pre_07d, -99) end) as ema07d,                               \n"
                     + "       COALESCE(price_pre_07d - price_pre_14d, -99) as ema14d,                               \n"
                     + "       COALESCE(price_pre_14d - price_pre_21d, -99) as ema21d,                               \n"
                     + "       COALESCE(price_pre_21d - price_pre_28d, -99) as ema28d,                               \n"
@@ -678,7 +678,8 @@ public class BinanceServiceImpl implements BinanceService {
                         .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
 
                 css.setLow_to_hight_price("L:" + lowest_price_today + "(" + taget_percent_lost_today + "%)_H:"
-                        + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)");
+                        + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)"
+                        + " " + Utils.whenGoodPrice(price_now, lowest_price_today, highest_price_today));
 
                 // btc_warning_css
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {

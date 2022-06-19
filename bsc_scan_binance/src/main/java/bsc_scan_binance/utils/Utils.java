@@ -89,7 +89,8 @@ public class Utils {
     }
 
     public static String createMsg(PriorityCoin dto) {
-        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGeckoid()) + "\n" + "Price: "
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGeckoid())
+                + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + "\n" + "Price: "
                 + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
                 + dto.getTarget_percent() + "%)\n" +
 
@@ -97,8 +98,24 @@ public class Utils {
                 + "%)_H:" + dto.getHeight_price() + "("
                 + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price())) + "%)"
 
-                + "\n" + dto.getNote().replace("~", "\n") + "\n" + dto.getDiscovery_date_time();
+                + "\n" + dto.getNote().replace("~~", "").replace("~", "\n") + "\nDisco:" + dto.getDiscovery_date_time();
         return result;
+    }
+
+    public static Boolean isGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+
+        BigDecimal good_btc_price = (hight_price.subtract(low_price));
+        good_btc_price = good_btc_price.divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
+        good_btc_price = low_price.add(good_btc_price);
+
+        if (curr_price.compareTo(good_btc_price) > 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public static String whenGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+        return (isGoodPrice(curr_price, low_price, hight_price) ? "*5*" : "");
     }
 
     public static void sendToTelegram(String text) {

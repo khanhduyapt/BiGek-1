@@ -206,13 +206,8 @@ public class WandaBot extends TelegramLongPollingBot {
                         + Utils.toPercent(btc_now.getPriceAtBinance(), btc.getMax_price()) + "%)" + "$");
                 execute(message);
 
-                BigDecimal good_btc_price = (btc.getMax_price().subtract(btc.getMin_price()));
-                good_btc_price = good_btc_price.divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
-                good_btc_price = btc.getMin_price().add(good_btc_price);
-
-                if (btc_now.getPriceAtBinance().compareTo(good_btc_price) > 0) {
-                    message.setText("The current buying price is unfavorable.\nWaiting for BTC to correct below "
-                            + good_btc_price + "$.");
+                if (!Utils.isGoodPrice(btc_now.getPriceAtBinance(), btc.getMin_price(), btc.getMax_price())) {
+                    message.setText("The current buying price is unfavorable.\nWaiting for BTC to correct the price.");
                     execute(message);
 
                     if (!command.contains("/buynow")) {
