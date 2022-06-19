@@ -259,7 +259,11 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.symbol,                                                                             \n"
                     + "   can.name,                                                                               \n"
                     + "                                                                                           \n"
-                    + "   concat('Pumping:', coalesce((select string_agg(his.hh, '<-') from (select * from binance_pumping_history his where his.gecko_id = can.gecko_id and his.symbol = can.symbol order by his.total_pump desc limit 5) as his), ''), 'h') as pumping_history, \n"
+
+                    + "    concat('Pump:', coalesce((select string_agg(his1.hh, '<-') from (select * from binance_pumping_history his1 where his1.gecko_id = can.gecko_id and his1.symbol = can.symbol and his1.total_pump > 1 order by his1.total_pump desc limit 5) as his1), ''), 'h', ' ', \n"
+                    + "           'Dump:', coalesce((select string_agg(his2.hh, '<-') from (select * from binance_pumping_history his2 where his2.gecko_id = can.gecko_id and his2.symbol = can.symbol and his2.total_dump > 1 order by his2.total_dump desc limit 5) as his2), ''), 'h' \n"
+                    + "          ) as pumping_history,                                                            \n"
+
                     + "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n"
                     + "                                                                                           \n"
                     + "   ROUND((cur.total_volume / COALESCE ((SELECT (case when pre.total_volume = 0.0 then 1000000000 else pre.total_volume end) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 1000000000) * 100 - 100), 0) pre_4h_total_volume_up, \n"
@@ -426,7 +430,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap_str);
-                css.setPumping_history(dto.getPumping_history().replace("Pumping:h", ""));
+                css.setPumping_history(dto.getPumping_history().replace("Pump:h", "").replace("Dump:h", ""));
 
                 // Price
                 String pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"
@@ -810,11 +814,21 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setOco_stop_price(oco_stop_price);
                     css.setOco_low_hight(oco_low_hight);
 
-                    String ema_history = "ema1-7: " + dto.getEma07d() + ", ema7-14: " + dto.getEma14d() + ", ema14-21: "
-                            + dto.getEma21d() + ", ema21-28: " + dto.getEma28d();
+                    String ema_history = "ema1.7: " + dto.getEma07d() + ", ema7.14: " + dto.getEma14d() + ", ema14.21: "
+                            + dto.getEma21d() + ", ema21.28: " + dto.getEma28d();
+                    BigDecimal predict_ema = BigDecimal.ZERO;
+                    if ((dto.getEma07d().compareTo(BigDecimal.ZERO) < 0)
+                            && (dto.getEma14d().compareTo(BigDecimal.ZERO) < 0)) {
+                        predict_ema = dto.getEma14d().subtract(dto.getEma07d());
+                        predict_ema = dto.getEma07d().subtract(predict_ema);
+                    }
+                    if (predict_ema.compareTo(BigDecimal.ZERO) > 0) {
+                        ema_history = "Predict:" + predict_ema + ", " + ema_history;
+                    }
+
                     css.setEma_history(ema_history);
 
-                    String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(price_now, dto.getAvg07d())
+                    String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(dto.getAvg07d(), price_now)
                             + "%)" + ", avg14: " + dto.getAvg14d() + ", avg21: " + dto.getAvg21d() + ", avg28: "
                             + dto.getAvg28d();
                     css.setAvg_history(avg_history);
@@ -855,11 +869,15 @@ public class BinanceServiceImpl implements BinanceService {
                         + Utils.getStringValue(css.getNote()) + "~" + Utils.getStringValue(css.getTrend()) + "~"
                         + css.getPumping_history());
                 coin.setEma(dto.getEma07d());
-                if (Objects.equals("", coin.getDiscovery_date_time())) {
-                    if (is_candidate) {
+
+                if (is_candidate) {
+                    if (Objects.equals("", coin.getDiscovery_date_time())
+                            || !Objects.equals(coin.getEma(), dto.getEma07d())) {
                         coin.setDiscovery_date_time(
                                 Utils.convertDateToString("MM/dd hh:mm:ss", Calendar.getInstance().getTime()));
                     }
+                } else {
+                    coin.setDiscovery_date_time("");
                 }
                 index += 1;
                 priorityCoinRepository.save(coin);
