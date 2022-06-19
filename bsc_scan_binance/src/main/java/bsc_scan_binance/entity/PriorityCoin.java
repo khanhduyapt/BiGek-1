@@ -26,7 +26,6 @@ import lombok.NoArgsConstructor;
 //    current_price numeric(10,5) DEFAULT 0,
 //    target_price numeric(10,5) DEFAULT 0,
 //    target_percent character varying(100) COLLATE pg_catalog."default",
-//    oco_hight character varying(200) COLLATE pg_catalog."default",
 //    is_candidate boolean DEFAULT false,
 //    index numeric(3,0),
 //    name character varying(255) COLLATE pg_catalog."default",
@@ -35,23 +34,6 @@ import lombok.NoArgsConstructor;
 //    ema numeric(10,5) DEFAULT '-999'::integer,
 //    CONSTRAINT priority_coin_pkey PRIMARY KEY (gecko_id)
 //);
-
-@SqlResultSetMapping(name = "PriorityCoin", classes = {
-        @ConstructorResult(targetClass = PriorityCoin.class, columns = {
-                @ColumnResult(name = "geckoid", type = String.class),
-                @ColumnResult(name = "current_price", type = BigDecimal.class),
-                @ColumnResult(name = "target_price", type = BigDecimal.class),
-                @ColumnResult(name = "target_percent", type = Integer.class),
-                @ColumnResult(name = "vmc", type = Integer.class),
-                @ColumnResult(name = "oco_hight", type = String.class),
-                @ColumnResult(name = "candidate", type = Boolean.class),
-                @ColumnResult(name = "index", type = Integer.class),
-                @ColumnResult(name = "name", type = String.class),
-                @ColumnResult(name = "note", type = String.class),
-                @ColumnResult(name = "symbol", type = String.class),
-                @ColumnResult(name = "ema", type = BigDecimal.class),
-        })
-})
 
 public class PriorityCoin {
     @Id
@@ -70,8 +52,11 @@ public class PriorityCoin {
     @Column(name = "vmc")
     private Integer vmc;
 
-    @Column(name = "oco_hight")
-    private String oco_hight;
+    @Column(name = "low_price")
+    private BigDecimal low_price = BigDecimal.ZERO;
+
+    @Column(name = "height_price")
+    private BigDecimal height_price = BigDecimal.ZERO;
 
     @Column(name = "is_candidate")
     private Boolean candidate;
@@ -90,4 +75,7 @@ public class PriorityCoin {
 
     @Column(name = "ema")
     private BigDecimal ema = BigDecimal.ZERO;
+
+    @Column(name = "discovery_date_time")
+    private String discovery_date_time;
 }

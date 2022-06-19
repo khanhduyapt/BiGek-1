@@ -51,7 +51,7 @@ public class Utils {
             + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,  \n"
             + "      od.low_price,                                                                          \n"
             + "      od.height_price,                                                                       \n"
-            + "      (select concat(cast(target_price as varchar), ' ', target_percent, ' ', oco_hight) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
+            + "      (select concat(cast(target_price as varchar), ' ', target_percent) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
             + "    FROM                                                                                     \n"
             + "        orders od,                                                                           \n"
             + "        binance_volumn_day cur                                                               \n"
@@ -91,7 +91,13 @@ public class Utils {
     public static String createMsg(PriorityCoin dto) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGeckoid()) + "\n" + "Price: "
                 + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
-                + dto.getTarget_percent() + "%)\n" + dto.getOco_hight() + "\n" + dto.getNote().replace("~", "\n");
+                + dto.getTarget_percent() + "%)\n" +
+
+                "L:" + dto.getLow_price() + "(" + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price()))
+                + "%)_H:" + dto.getHeight_price() + "("
+                + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price())) + "%)"
+
+                + "\n" + dto.getNote().replace("~", "\n") + "\n" + dto.getDiscovery_date_time();
         return result;
     }
 

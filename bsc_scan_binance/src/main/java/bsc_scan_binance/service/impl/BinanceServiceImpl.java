@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,11 +26,13 @@ import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
+import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.PriorityCoinHistory;
 import bsc_scan_binance.repository.BinancePumpingHistoryRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
+import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinHistoryRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
@@ -59,6 +62,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private PriorityCoinHistoryRepository priorityCoinHistoryRepository;
+
+    @Autowired
+    private OrdersRepository ordersRepository;
 
 //    @Autowired
 //    private BinancePumpingHistoryRepository binancePumpingHistoryRepository;
@@ -370,8 +376,14 @@ public class BinanceServiceImpl implements BinanceService {
             Integer index = 1;
             String sql_update_ema = "";
 
+            List<PriorityCoin> listPriorityCoin = priorityCoinRepository.findAll();
+
             for (CandidateTokenResponse dto : results) {
-                PriorityCoin coin = new PriorityCoin();
+
+                PriorityCoin coin = listPriorityCoin.stream()
+                        .filter(item -> Objects.equals(item.getGeckoid(), dto.getGecko_id())).findFirst()
+                        .orElse(new PriorityCoin());
+
                 coin.setGeckoid(dto.getGecko_id());
 
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
@@ -825,15 +837,13 @@ public class BinanceServiceImpl implements BinanceService {
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
                 coin.setTarget_percent(Utils.getIntValue(css.getAvg_percent().replace("-", "").replace("%", "")));
-
                 if (!css.getAvg_percent().contains("-")) {
                     is_candidate = false;
                     coin.setTarget_percent(0 - coin.getTarget_percent());
                 }
-
                 coin.setVmc(Utils.getIntValue(css.getVolumn_div_marketcap()));
-
-                coin.setOco_hight(css.getLow_to_hight_price());
+                coin.setLow_price(lowest_price_today);
+                coin.setHeight_price(highest_price_today);
                 coin.setCandidate(is_candidate);
                 coin.setIndex(index);
                 coin.setSymbol(css.getSymbol());
@@ -841,9 +851,15 @@ public class BinanceServiceImpl implements BinanceService {
                 coin.setNote("(v/mc:" + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap()
                         + "%, price_24h:"
                         + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%)~"
-                        + Utils.getStringValue(css.getNote()) + "~" + Utils.getStringValue(css.getTrend()) + " "
+                        + Utils.getStringValue(css.getNote()) + "~" + Utils.getStringValue(css.getTrend()) + "~"
                         + css.getPumping_history());
                 coin.setEma(dto.getEma07d());
+                if (Objects.equals("", coin.getDiscovery_date_time())) {
+                    if (is_candidate) {
+                        coin.setDiscovery_date_time(
+                                Utils.convertDateToString("MM/dd hh:mm:ss", Calendar.getInstance().getTime()));
+                    }
+                }
                 index += 1;
                 priorityCoinRepository.save(coin);
 
@@ -851,7 +867,7 @@ public class BinanceServiceImpl implements BinanceService {
                         "update binance_volumn_week set ema='%s' where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getEma07d(), dto.getGecko_id(), dto.getSymbol());
                 if (isOrderByBynaceVolume) {
-                    if (dto.getUptrend()) {
+                    if (dto.getUptrend() && !css.getStar().contains("✖")) {
                         list.add(css);
                     }
                 } else {
@@ -1132,6 +1148,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 List<PriorityCoinHistoryResponse> results = query.getResultList();
                 if (!CollectionUtils.isEmpty(results)) {
+                    List<Orders> list_order = ordersRepository.findAll();
 
                     for (PriorityCoinHistoryResponse dto : results) {
                         // update count_notify +=1
@@ -1148,7 +1165,11 @@ public class BinanceServiceImpl implements BinanceService {
                                 priorityCoinHistoryRepository.delete(entity);
                             }
 
-                            Utils.sendToTelegram("Downtrend: " + Utils.addGoodCoin(entity) + "!");
+                            Optional<Orders> order = list_order.stream()
+                                    .filter(item -> Objects.equals(item.getGeckoid(), entity.getGeckoid())).findFirst();
+                            if (order.isPresent()) {
+                                Utils.sendToTelegram("Downtrend: " + Utils.addGoodCoin(entity) + "!");
+                            }
                         }
 
                     }
@@ -1192,8 +1213,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {
                         Utils.sendToTelegram("STOP LOST: " + Utils.createMsg(dto));
-                    } else if (dto.getPrice_at_binance()
-                            .compareTo(dto.getLow_price().multiply(BigDecimal.valueOf(0.99))) <= 0) {
+                    } else if (dto.getPrice_at_binance().compareTo(dto.getLow_price()) <= 0) {
                         Utils.sendToTelegram("STOP LOST (Low): " + Utils.createMsg(dto));
                     }
                 }

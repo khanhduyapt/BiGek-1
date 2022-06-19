@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -82,6 +83,12 @@ public class WandaBot extends TelegramLongPollingBot {
             if (command.equals("/web3")) {
                 binance_service.getList(false);
                 List<PriorityCoin> list = searchCandidate();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("web3")) {
                         message.setText(Utils.createMsg(coin));
@@ -91,6 +98,12 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/defi")) {
                 binance_service.getList(false);
                 List<PriorityCoin> list = searchCandidate();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("defi")) {
                         message.setText(Utils.createMsg(coin));
@@ -100,6 +113,12 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/fan")) {
                 binance_service.getList(false);
                 List<PriorityCoin> list = searchCandidate();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getName() + coin.getGeckoid()).toLowerCase().contains("fan")) {
                         message.setText(Utils.createMsg(coin));
@@ -109,6 +128,12 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/game")) {
                 binance_service.getList(false);
                 List<PriorityCoin> list = searchCandidate();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("game")) {
                         message.setText(Utils.createMsg(coin));
@@ -118,6 +143,12 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/other")) {
                 binance_service.getList(false);
                 List<PriorityCoin> list = searchCandidate();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
                 for (PriorityCoin coin : list) {
                     String text = (Utils.getStringValue(coin.getName() + coin.getGeckoid())
                             + Utils.getStringValue(coin.getNote())).toLowerCase();
@@ -131,6 +162,12 @@ public class WandaBot extends TelegramLongPollingBot {
             } else if (command.equals("/all")) {
                 binance_service.getList(false);
                 List<PriorityCoin> list = searchCandidate();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
                 for (PriorityCoin coin : list) {
                     message.setText(Utils.createMsg(coin));
                     execute(message);
@@ -139,11 +176,15 @@ public class WandaBot extends TelegramLongPollingBot {
                 String[] arr = command.split(" ");
 
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchBySymbolLike(arr[1].toUpperCase());
-                if (!CollectionUtils.isEmpty(list)) {
-                    message.setText(Utils.createMsg(list.get(0)));
+                List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
                     execute(message);
+                    return;
                 }
+
+                message.setText(Utils.createMsg(list.get(0)));
+                execute(message);
             } else if (command.contains("/buy")) {
                 Calendar calendar = Calendar.getInstance();
                 BinanceVolumnWeek btc = binanceVolumnWeekRepository.findById(new BinanceVolumnWeekKey("bitcoin", "BTC",
@@ -333,16 +374,19 @@ public class WandaBot extends TelegramLongPollingBot {
                 Query query = entityManager.createNativeQuery(Utils.sql_OrdersProfitResponse, "OrdersProfitResponse");
 
                 @SuppressWarnings("unchecked")
-                List<OrdersProfitResponse> results = query.getResultList();
+                List<OrdersProfitResponse> list = query.getResultList();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
 
-                if (!CollectionUtils.isEmpty(results)) {
-                    for (OrdersProfitResponse dto : results) {
-                        if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
-                            Utils.sendToTelegram("PROFIT: " + Utils.createMsg(dto));
+                for (OrdersProfitResponse dto : list) {
+                    if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
+                        Utils.sendToTelegram("PROFIT: " + Utils.createMsg(dto));
 
-                        } else {
-                            Utils.sendToTelegram("LOST  : " + Utils.createMsg(dto));
-                        }
+                    } else {
+                        Utils.sendToTelegram("LOST  : " + Utils.createMsg(dto));
                     }
                 }
             }
@@ -354,47 +398,11 @@ public class WandaBot extends TelegramLongPollingBot {
 
     private List<PriorityCoin> searchCandidate() {
         try {
-
-            String sql = "" + " SELECT gecko_id       AS geckoid,                       \n"
-                    + "        current_price  AS current_price,                 \n"
-                    + "        target_price   AS target_price,                  \n"
-                    + "        target_percent AS target_percent,                \n"
-                    + "        vmc,                                             \n"
-                    + "        oco_hight      AS oco_hight,                     \n"
-                    + "        is_candidate   AS candidate,                     \n"
-                    + "        index,                                           \n"
-                    + "        name AS name,                                    \n"
-                    + "        note AS note,                                    \n"
-                    + "        symbol AS symbol,                                \n"
-                    + "        ema AS ema                                       \n"
-                    + " FROM Priority_Coin                                      \n"
-                    + " WHERE ema > 0                                           \n"
-                    + "   AND CAST(target_percent AS numeric) >=10              \n"
-                    + " UNION ALL                                               \n"
-                    + " SELECT gecko_id       AS geckoid,                       \n"
-                    + "        current_price  AS current_price,                 \n"
-                    + "        target_price   AS target_price,                  \n"
-                    + "        target_percent AS target_percent,                \n"
-                    + "        vmc,                                             \n"
-                    + "        oco_hight      AS oco_hight,                     \n"
-                    + "        is_candidate   AS candidate,                     \n"
-                    + "        index,                                           \n"
-                    + "        name AS name,                                    \n"
-                    + "        note AS note,                                    \n"
-                    + "        symbol AS symbol,                                \n"
-                    + "        ema AS ema                                       \n"
-                    + " FROM Priority_Coin                                      \n"
-                    + " WHERE ema <= 0                                          \n"
-                    + "   AND (target_percent >=20)                             \n"
-                    + "   AND (vmc >= 40)                                       \n";
-
-            Query query = entityManager.createNativeQuery(sql, "PriorityCoin");
-
-            @SuppressWarnings("unchecked")
-            List<PriorityCoin> results = query.getResultList();
-
+            List<PriorityCoin> results = priorityCoinRepository.findAllByCandidateAndEmaGreaterThanOrderByVmcAsc(true,
+                    BigDecimal.ZERO);
             return results;
         } catch (Exception e) {
+            e.printStackTrace();
             return new ArrayList<PriorityCoin>();
         }
     }
