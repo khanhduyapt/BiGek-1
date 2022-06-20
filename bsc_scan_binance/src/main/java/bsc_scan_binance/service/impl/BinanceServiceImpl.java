@@ -869,7 +869,10 @@ public class BinanceServiceImpl implements BinanceService {
                 coin.setSymbol(css.getSymbol());
                 coin.setName(css.getName());
                 coin.setNote("(v/mc:" + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap()
-                        + "%, price_24h:"
+                        + "%, Mc:"
+                        + Utils.getBigDecimalValue(css.getMarket_cap().replaceAll(",", ""))
+                                .divide(BigDecimal.valueOf(1000000), 1, RoundingMode.CEILING)
+                        + "M, price_24h:"
                         + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%)~"
                         + Utils.getStringValue(css.getNote()) + "~" + Utils.getStringValue(css.getTrend()) + "~"
                         + css.getPumping_history());
@@ -1160,7 +1163,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                         PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
                         if (!Objects.equals(null, coin)) {
-                            Utils.sendToTelegram("Uptrend: " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
+                            Utils.sendToTelegram(
+                                    "Uptrend: " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
                         }
                     }
                 }
@@ -1204,7 +1208,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
                                 if (!Objects.equals(null, coin)) {
-                                    Utils.sendToTelegram("Downtrend: " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
+                                    Utils.sendToTelegram("Downtrend: "
+                                            + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
                                 }
                             }
                         }
