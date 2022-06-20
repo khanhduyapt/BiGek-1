@@ -705,7 +705,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setBtc_warning_css("bg-danger");
 
                         // Utils.sendToTelegram(emoji_exclamation);
-                        Utils.sendToTelegram("BTC peaked today! " + Utils.createMsg(css));
+                        Utils.sendToTelegram("Sell Now! " + Utils.createMsg(css));
                     }
                 }
 
@@ -845,15 +845,29 @@ public class BinanceServiceImpl implements BinanceService {
                 // if (Objects.equals("GMT", css.getSymbol())) {
                 // String debug = "";
                 // }
+                BigDecimal avg_percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
                 Boolean is_candidate = false;
                 if (dto.getUptrend() && !css.getStar().contains("✖")
                         && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 30)) {
-                    BigDecimal percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
 
-                    if (percent.abs().compareTo(BigDecimal.valueOf(10)) >= 0) {
+                    if (avg_percent.abs().compareTo(BigDecimal.valueOf(10)) >= 0) {
                         is_candidate = true;
                     }
                 }
+
+                Boolean predict = false;
+                // MC < 50  avg_percent > 15, star contain Uptrend, %24h < 10
+                if ((market_cap.compareTo(BigDecimal.valueOf(50000000)) < 0)
+                        && (avg_percent.abs().compareTo(BigDecimal.valueOf(9)) >= 0)
+                        && (css.getStar().contains("Uptrend"))
+                        && (Utils.getBigDecimalValue(dto.getPrice_change_percentage_24h())
+                                .compareTo(BigDecimal.valueOf(10)) <= 0)
+                        && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 10)
+                        && css.getAvg_percent().contains("-")) {
+
+                    predict = true;
+                }
+                coin.setPredict(predict);
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
                 coin.setTarget_percent(Utils.getIntValue(css.getAvg_percent().replace("-", "").replace("%", "")));
@@ -873,9 +887,15 @@ public class BinanceServiceImpl implements BinanceService {
                         + Utils.getBigDecimalValue(css.getMarket_cap().replaceAll(",", ""))
                                 .divide(BigDecimal.valueOf(1000000), 1, RoundingMode.CEILING)
                         + "M, price_24h:"
-                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%)~"
-                        + Utils.getStringValue(css.getNote()) + "~" + Utils.getStringValue(css.getTrend()) + "~"
-                        + css.getPumping_history());
+                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%)"
+
+                        + (Objects.equals("", Utils.getStringValue(css.getNote())) ? ""
+                                : "~" + Utils.getStringValue(css.getNote()))
+                        + (Objects.equals("", Utils.getStringValue(css.getTrend())) ? ""
+                                : "~" + Utils.getStringValue(css.getTrend()))
+                        + (Objects.equals("", Utils.getStringValue(css.getPumping_history())) ? ""
+                                : "~" + Utils.getStringValue(css.getPumping_history())));
+
                 coin.setEma(dto.getEma07d());
 
                 if (is_candidate) {

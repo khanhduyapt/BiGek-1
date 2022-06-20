@@ -79,8 +79,9 @@ public class Utils {
     }
 
     public static String createMsg(CandidateTokenCssResponse css) {
-        return Utils.convertDateToString("yyyy-MM-dd hh:mm", Calendar.getInstance().getTime()) + "%0A" + "BTC:"
-                + css.getCurrent_price() + "$" + "%0A" + css.getLow_to_hight_price();
+        return "BTC: "
+                + css.getCurrent_price() + "$" + "%0A" + css.getLow_to_hight_price() + "%0A" +
+                Utils.convertDateToString("MM-dd hh:mm", Calendar.getInstance().getTime());
     }
 
     public static String createMsg(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {

@@ -37,7 +37,7 @@ public class BscScanGeckkoApplication {
                 try {
                     gecko_service.loadData(coin.getGeckoid());
                 } catch (Exception e) {
-                    log.error("dkd error LoadData:" + e.getMessage());
+                    log.error("dkd error LoadData:[" + coin.getGeckoid() + "]" + e.getMessage());
                     wait(600000);
                 }
 

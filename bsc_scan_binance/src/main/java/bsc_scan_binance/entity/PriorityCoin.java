@@ -3,11 +3,8 @@ package bsc_scan_binance.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -81,4 +78,7 @@ public class PriorityCoin {
 
     @Column(name = "mute")
     private Boolean mute = false;
+
+    @Column(name = "predict")
+    private Boolean predict = false;
 }
