@@ -1144,7 +1144,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "      name,                                                      \n"
                         + "      count_notify                                               \n"
                         + "  FROM priority_coin_history                                     \n"
-                        + "  WHERE count_notify < 2                                         \n" // 1 time
+                        + "  WHERE count_notify < 3                                         \n" // 2 time
                         + "  AND gecko_id  IN                                               \n"
                         + "     (SELECT gecko_id FROM priority_coin where ema > 0)          \n";
 
@@ -1162,7 +1162,9 @@ public class BinanceServiceImpl implements BinanceService {
                         priorityCoinHistoryRepository.save(entity);
 
                         PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
-                        if (!Objects.equals(null, coin)) {
+                        if (!Objects.equals(null, coin) && (coin.getTarget_percent() >= 10)
+                                && ((coin.getLow_price().add(coin.getHeight_price())).divide(BigDecimal.valueOf(2))
+                                        .compareTo(coin.getCurrent_price()) > 0)) {
                             Utils.sendToTelegram(
                                     "Uptrend: " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
                         }
