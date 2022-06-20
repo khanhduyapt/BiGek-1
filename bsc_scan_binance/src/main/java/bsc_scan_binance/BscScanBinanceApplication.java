@@ -67,7 +67,7 @@ public class BscScanBinanceApplication {
 
                 if (Objects.equals(idx, size - 1)) {
                     int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-                    if ((minus > 5) && (minus < 55)) {
+                    if ((minus > 5) && (minus < 59)) {
                         binance_service.getList(false); // ~3p 1 lan
                         binance_service.monitorEma();
                         binance_service.monitorProfit();

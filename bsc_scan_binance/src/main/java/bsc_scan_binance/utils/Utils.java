@@ -131,7 +131,7 @@ public class Utils {
 
     public static void sendToTelegram(String text) {
         int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-        if ((minus > 5) && (minus < 55)) {
+        if ((minus > 5) && (minus < 59)) {
 
             String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
 
