@@ -4,11 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.ColumnResult;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -77,6 +74,13 @@ public class WandaBot extends TelegramLongPollingBot {
                 return;
             }
 
+            int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+            if ((minus > 55) && (minus < 5)) {
+                message.setText("55...5 minutes is the time to get data.");
+                execute(message);
+                return;
+            }
+
             System.out.println(update.getMessage().getText());
             String command = update.getMessage().getText();
 
@@ -91,7 +95,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("web3")) {
-                        message.setText(Utils.createMsg(coin));
+                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
                         execute(message);
                     }
                 }
@@ -106,7 +110,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("defi")) {
-                        message.setText(Utils.createMsg(coin));
+                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
                         execute(message);
                     }
                 }
@@ -121,7 +125,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getName() + coin.getGeckoid()).toLowerCase().contains("fan")) {
-                        message.setText(Utils.createMsg(coin));
+                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
                         execute(message);
                     }
                 }
@@ -136,7 +140,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 for (PriorityCoin coin : list) {
                     if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("game")) {
-                        message.setText(Utils.createMsg(coin));
+                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
                         execute(message);
                     }
                 }
@@ -155,7 +159,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                     if (!text.contains("game") && !text.contains("web3") && !text.contains("defi")
                             && !text.contains("fan")) {
-                        message.setText(Utils.createMsg(coin));
+                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
                         execute(message);
                     }
                 }
@@ -169,7 +173,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
                 for (PriorityCoin coin : list) {
-                    message.setText(Utils.createMsg(coin));
+                    message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
                     execute(message);
                 }
             } else if (command.contains("/btc")) {
@@ -181,7 +185,7 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                message.setText(Utils.createMsg(list.get(0)));
+                message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
                 execute(message);
             } else if (command.contains("/check")) {
                 String[] arr = command.split(" ");
@@ -194,7 +198,7 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                message.setText(Utils.createMsg(list.get(0)));
+                message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
                 execute(message);
             } else if (command.contains("/buy")) {
                 Calendar calendar = Calendar.getInstance();
@@ -204,37 +208,35 @@ public class WandaBot extends TelegramLongPollingBot {
                 BinanceVolumnDay btc_now = binanceVolumnDayRepository.findById(
                         new BinanceVolumnDayKey("bitcoin", "BTC", Utils.convertDateToString("HH", calendar.getTime())))
                         .orElse(null);
+
                 if (Objects.equal(null, btc) || Objects.equal(null, btc_now)) {
                     message.setText("Failed to check the price of BTC.\nPlease buy another time.");
                     execute(message);
                     return;
                 }
 
-                message.setText("BTC:" + Utils.removeLastZero(btc_now.getPriceAtBinance().toString()) + "$\n" + "L:"
-                        + Utils.removeLastZero(btc.getMin_price().toString()) + "("
-                        + Utils.toPercent(btc.getMin_price(), btc_now.getPriceAtBinance()) + "%)" + "-H:"
-                        + Utils.removeLastZero(btc.getMax_price().toString()) + "("
-                        + Utils.toPercent(btc_now.getPriceAtBinance(), btc.getMax_price()) + "%)" + "$");
+                message.setText("BTC: " + Utils.createMsg(btc_now.getPriceAtBinance(), btc.getMin_price(),
+                        btc_now.getPriceAtBinance()));
                 execute(message);
 
+                Boolean allowNext = true;
                 if (!Utils.isGoodPrice(btc_now.getPriceAtBinance(), btc.getMin_price(), btc.getMax_price())) {
-                    message.setText("The current buying price is unfavorable.\nWaiting for BTC to correct the price.");
+                    BigDecimal good_price = Utils.getGoodPrice(btc_now.getPriceAtBinance(), btc.getMin_price(),
+                            btc.getMax_price());
+
+                    message.setText("The current price is unfavorable.\nWaiting for BTC correct to "
+                            + Utils.removeLastZero(good_price.toString())
+                            + "(" + Utils.toPercent(btc_now.getPriceAtBinance(), good_price, 1) + "%).");
                     execute(message);
 
                     if (!command.contains("/buynow")) {
-                        return;
+                        allowNext = false;
                     }
                 }
 
                 // /buy LIT 600$
                 // /buy WING 600$
                 String[] arr = command.split(" ");
-
-                if (arr.length != 3) {
-                    message.setText("format: /buy TOKEN USD");
-                    execute(message);
-                    return;
-                }
 
                 List<BinanceVolumnDay> list = binanceVolumnDayRepository.searchBySymbol(arr[1].toUpperCase());
                 if (CollectionUtils.isEmpty(list)) {
@@ -243,49 +245,84 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                for (BinanceVolumnDay dto : list) {
-                    BinanceVolumnWeek dtoweek = binanceVolumnWeekRepository
-                            .findById(new BinanceVolumnWeekKey(dto.getId().getGeckoid(), dto.getId().getSymbol(),
-                                    Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime())))
-                            .orElse(null);
-                    BigDecimal low_price = BigDecimal.ZERO;
-                    BigDecimal height_price = BigDecimal.ZERO;
-                    if (!Objects.equal(null, dtoweek)) {
-                        low_price = Utils.getBigDecimal(dtoweek.getMin_price());
-                        height_price = Utils.getBigDecimal(dtoweek.getMax_price());
-                    }
+                BinanceVolumnDay dto = list.get(0);
 
-                    Orders entity = ordersRepository.findById(dto.getId().getGeckoid()).orElse(null);
-                    if (Objects.equal(null, entity)) {
-                        entity = new Orders();
-                        entity.setGeckoid(dto.getId().getGeckoid());
-                        entity.setSymbol(dto.getId().getSymbol());
-                        entity.setName(dto.getId().getGeckoid());
-                    }
+                BinanceVolumnWeek temp = binanceVolumnWeekRepository
+                        .findById(new BinanceVolumnWeekKey(dto.getId().getGeckoid(), dto.getId().getSymbol(),
+                                Utils.convertDateToString("yyyyMMdd", calendar.getTime())))
+                        .orElse(null);
 
-                    BigDecimal amount1 = Utils.getBigDecimal(entity.getAmount());
-                    BigDecimal qty1 = Utils.getBigDecimal(entity.getQty());
+                message.setText(
+                        dto.getId().getSymbol() + ": " + Utils.createMsg(dto.getPriceAtBinance(), temp.getMin_price(),
+                                temp.getMax_price()));
+                execute(message);
 
-                    BigDecimal order_price2 = Utils.getBigDecimal(dto.getPriceAtBinance());
-                    BigDecimal amount2 = Utils.getBigDecimal(arr[2].replace("$", ""));
-                    BigDecimal qty2 = amount2.divide(order_price2, 5, RoundingMode.CEILING);
+                if (!Utils.isGoodPrice(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price())) {
+                    BigDecimal good_price = Utils.getGoodPrice(dto.getPriceAtBinance(),
+                            temp.getMin_price(), temp.getMax_price());
 
-                    BigDecimal amount = amount1.add(amount2);
-                    BigDecimal qty = qty1.add(qty2);
-                    BigDecimal avg_price = amount.divide(qty, 5, RoundingMode.CEILING);
-
-                    entity.setOrder_price(avg_price);
-                    entity.setAmount(amount);
-                    entity.setQty(qty);
-                    entity.setLow_price(low_price);
-                    entity.setHeight_price(height_price);
-
-                    ordersRepository.save(entity);
-
-                    message.setText(String.format("Added:[%s] [%s] [Qty:%s(+%s)]_[P:%s$] [T:%s$].", entity.getSymbol(),
-                            entity.getName(), entity.getQty(), qty2, entity.getOrder_price(), entity.getAmount()));
+                    message.setText("Waiting for " + dto.getId().getSymbol() + " correct to "
+                            + Utils.removeLastZero(good_price.toString())
+                            + "(" + Utils.toPercent(dto.getPriceAtBinance(), good_price, 1) + "%).");
                     execute(message);
+
+                    if (!command.contains("/buynow")) {
+                        allowNext = false;
+                    }
                 }
+
+                if (arr.length != 3) {
+                    message.setText("format: /buy TOKEN USD");
+                    execute(message);
+                    return;
+                }
+
+                if (!allowNext) {
+                    return;
+                }
+
+                BinanceVolumnWeek dtoweek = binanceVolumnWeekRepository
+                        .findById(new BinanceVolumnWeekKey(dto.getId().getGeckoid(), dto.getId().getSymbol(),
+                                Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime())))
+                        .orElse(null);
+                BigDecimal low_price = BigDecimal.ZERO;
+                BigDecimal height_price = BigDecimal.ZERO;
+                if (!Objects.equal(null, dtoweek)) {
+                    low_price = Utils.getBigDecimal(dtoweek.getMin_price());
+                    height_price = Utils.getBigDecimal(dtoweek.getMax_price());
+                }
+
+                Orders entity = ordersRepository.findById(dto.getId().getGeckoid()).orElse(null);
+                if (Objects.equal(null, entity)) {
+                    entity = new Orders();
+                    entity.setGeckoid(dto.getId().getGeckoid());
+                    entity.setSymbol(dto.getId().getSymbol());
+                    entity.setName(dto.getId().getGeckoid());
+                }
+
+                BigDecimal amount1 = Utils.getBigDecimal(entity.getAmount());
+                BigDecimal qty1 = Utils.getBigDecimal(entity.getQty());
+
+                BigDecimal order_price2 = Utils.getBigDecimal(dto.getPriceAtBinance());
+                BigDecimal amount2 = Utils.getBigDecimal(arr[2].replace("$", ""));
+                BigDecimal qty2 = amount2.divide(order_price2, 5, RoundingMode.CEILING);
+
+                BigDecimal amount = amount1.add(amount2);
+                BigDecimal qty = qty1.add(qty2);
+                BigDecimal avg_price = amount.divide(qty, 5, RoundingMode.CEILING);
+
+                entity.setOrder_price(avg_price);
+                entity.setAmount(amount);
+                entity.setQty(qty);
+                entity.setLow_price(low_price);
+                entity.setHeight_price(height_price);
+
+                ordersRepository.save(entity);
+
+                message.setText(String.format("Added:[%s] [%s] [Qty:%s(+%s)]_[P:%s$] [T:%s$].", entity.getSymbol(),
+                        entity.getName(), entity.getQty(), qty2, entity.getOrder_price(), entity.getAmount()));
+                execute(message);
+
             } else if (command.contains("/sel")) {
                 // /sell UNFI
                 // /sell UNFI 100$
@@ -410,7 +447,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 coin.setMute(true);
                 priorityCoinRepository.save(coin);
 
-                message.setText(Utils.createMsg(list.get(0)));
+                message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
                 execute(message);
             }
         } catch (TelegramApiException e) {
@@ -420,7 +457,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
     private List<PriorityCoin> searchCandidate() {
         try {
-            List<PriorityCoin> results = priorityCoinRepository.findAllByCandidateAndEmaGreaterThanOrderByVmcAsc(true,
+            List<PriorityCoin> results = priorityCoinRepository.findAllByCandidateAndEmaGreaterThanOrderByVmcDesc(true,
                     BigDecimal.ZERO);
             return results;
         } catch (Exception e) {

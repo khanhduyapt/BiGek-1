@@ -12,7 +12,7 @@ import bsc_scan_binance.entity.PriorityCoin;
 
 @Repository
 public interface PriorityCoinRepository extends JpaRepository<PriorityCoin, String> {
-    public List<PriorityCoin> findAllByCandidateAndEmaGreaterThanOrderByVmcAsc(Boolean is_candidate, BigDecimal ema);
+    public List<PriorityCoin> findAllByCandidateAndEmaGreaterThanOrderByVmcDesc(Boolean is_candidate, BigDecimal ema);
 
     @Query("SELECT m FROM PriorityCoin m WHERE m.symbol = :symbol")
     List<PriorityCoin> searchBySymbol(@Param("symbol") String symbol);

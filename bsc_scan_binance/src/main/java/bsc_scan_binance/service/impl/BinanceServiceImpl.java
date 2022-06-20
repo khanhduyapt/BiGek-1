@@ -5,7 +5,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
-import bsc_scan_binance.entity.BinancePumpingHistory;
 import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
@@ -29,7 +27,6 @@ import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.PriorityCoinHistory;
-import bsc_scan_binance.repository.BinancePumpingHistoryRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.OrdersRepository;
@@ -66,8 +63,8 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private OrdersRepository ordersRepository;
 
-//    @Autowired
-//    private BinancePumpingHistoryRepository binancePumpingHistoryRepository;
+    //    @Autowired
+    //    private BinancePumpingHistoryRepository binancePumpingHistoryRepository;
 
     // https://gist.github.com/naiieandrade/b7166fc879627a1295e1b67b98672770
     // private String emoji_heart = EmojiParser.parseToUnicode(":heart:");
@@ -849,13 +846,13 @@ public class BinanceServiceImpl implements BinanceService {
                 // String debug = "";
                 // }
                 Boolean is_candidate = false;
-                if (!Objects.equals("", Utils.getStringValue(css.getOco_tp_price_hight_css()))) {
-                    is_candidate = true;
-                } else if ((Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""))
-                        .compareTo(BigDecimal.valueOf(20)) >= 0) && css.getPrice_change_percentage_24h().contains("-")
-                        && !css.getStar().contains("✖") && (Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
-                                .compareTo(BigDecimal.valueOf(30)) >= 0)) {
-                    is_candidate = true;
+                if (dto.getUptrend() && !css.getStar().contains("✖")
+                        && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 30)) {
+                    BigDecimal percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
+
+                    if (percent.abs().compareTo(BigDecimal.valueOf(10)) >= 0) {
+                        is_candidate = true;
+                    }
                 }
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
@@ -894,8 +891,13 @@ public class BinanceServiceImpl implements BinanceService {
                         "update binance_volumn_week set ema='%s' where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getEma07d(), dto.getGecko_id(), dto.getSymbol());
                 if (isOrderByBynaceVolume) {
-                    if (dto.getUptrend() && !css.getStar().contains("✖")) {
-                        list.add(css);
+                    if (dto.getUptrend() && !css.getStar().contains("✖")
+                            && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 30)) {
+                        BigDecimal percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
+
+                        if (percent.abs().compareTo(BigDecimal.valueOf(10)) >= 0) {
+                            list.add(css);
+                        }
                     }
                 } else {
                     list.add(css);
@@ -1158,7 +1160,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
                         if (!Objects.equals(null, coin)) {
-                            Utils.sendToTelegram("Uptrend: " + Utils.createMsg(coin));
+                            Utils.sendToTelegram("Uptrend: " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
                         }
                     }
                 }
@@ -1202,7 +1204,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
                                 if (!Objects.equals(null, coin)) {
-                                    Utils.sendToTelegram("Downtrend: " + Utils.createMsg(coin));
+                                    Utils.sendToTelegram("Downtrend: " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
                                 }
                             }
                         }
@@ -1240,31 +1242,39 @@ public class BinanceServiceImpl implements BinanceService {
 
                     if ((tp_percent.compareTo(BigDecimal.valueOf(10)) > 0)
                             || (tp_percent.compareTo(target_percent) >= 0)) {
+
                         Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
-                    } else if (dto.getPrice_at_binance()
-                            .compareTo(dto.getHeight_price().multiply(BigDecimal.valueOf(0.98))) >= 0) {
-                        if (dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0) {
-                            Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
-                        }
+
+                    } else if (tp_percent.compareTo(BigDecimal.valueOf(-5)) <= 0) {
+
+                        Utils.sendToTelegram("STOP LOST: " + Utils.createMsg(dto));
+
+                    } else if (dto.getPrice_at_binance().compareTo(dto.getLow_price()) <= 0) {
+
+                        Utils.sendToTelegram("STOP LOST (Low): " + Utils.createMsg(dto));
+
+                    } else if ((dto.getPrice_at_binance()
+                            .compareTo(dto.getHeight_price().multiply(BigDecimal.valueOf(0.98))) >= 0)
+                            && (dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0)) {
+
+                        Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
+
                     } else if (dto.getTp_amount().compareTo(BigDecimal.ZERO) < 0
-                            && dto.getTp_amount().abs().compareTo(BigDecimal.valueOf(0.8)) > 0) {
+                            && tp_percent.abs().compareTo(BigDecimal.valueOf(0.8)) > 0) {
 
                         PriorityCoin coin = priorityCoinRepository.findById(dto.getGecko_id()).orElse(null);
                         if (!Objects.equals(null, coin) && !coin.getMute()) {
                             Utils.sendToTelegram("Lost (Hight): " + Utils.createMsg(dto));
                         }
-                    }
 
-                    if (dto.getTp_percent().compareTo(BigDecimal.valueOf(-5)) <= 0) {
-                        Utils.sendToTelegram("STOP LOST: " + Utils.createMsg(dto));
-                    } else if (dto.getPrice_at_binance().compareTo(dto.getLow_price()) <= 0) {
-                        Utils.sendToTelegram("STOP LOST (Low): " + Utils.createMsg(dto));
                     }
                 }
             }
 
             log.info("End monitorProfit <----");
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
             log.info("monitorProfit error ------->");
             log.error(e.getMessage());

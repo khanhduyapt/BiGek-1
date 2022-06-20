@@ -22,19 +22,19 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
 import bsc_scan_binance.entity.PriorityCoin;
-import bsc_scan_binance.entity.PriorityCoinHistory;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 
 public class Utils {
     public static String chatId = "5099224587";
+    public static String new_line_from_bot = "\n";
+    public static String new_line_from_service = "%0A";
 
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
@@ -83,27 +83,42 @@ public class Utils {
                 + css.getCurrent_price() + "$" + "%0A" + css.getLow_to_hight_price();
     }
 
-    public static String createMsg(PriorityCoin dto) {
+    public static String createMsg(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+        return Utils.removeLastZero(curr_price.toString()) + "$\n" + "L:"
+                + Utils.removeLastZero(low_price.toString()) + "("
+                + Utils.toPercent(low_price, curr_price, 1) + "%)" + "-H:"
+                + Utils.removeLastZero(hight_price.toString()) + "("
+                + Utils.toPercent(hight_price, curr_price, 1) + "%)" + "$";
+    }
+
+    public static String createMsgPriorityToken(PriorityCoin dto, String newline) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGeckoid())
-                + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + "\n" + "Price: "
+                + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline + "Price: "
                 + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
-                + dto.getTarget_percent() + "%)\n" +
+                + dto.getTarget_percent() + "%)" + newline +
 
                 "L:" + dto.getLow_price() + "(" + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price()))
                 + "%)_H:" + dto.getHeight_price() + "("
                 + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price())) + "%)"
 
-                + "\n" + dto.getNote().replace("~~", "").replace("~", "\n") + "\nDisco:" + dto.getDiscovery_date_time();
+                + newline + dto.getNote().replace("~", newline) + newline + "Disco:" + dto.getDiscovery_date_time();
         return result;
+    }
+
+    public static BigDecimal getGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+
+        BigDecimal good_price = (hight_price.subtract(low_price));
+        good_price = good_price.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        good_price = low_price.add(good_price);
+
+        return good_price;
     }
 
     public static Boolean isGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
 
-        BigDecimal good_btc_price = (hight_price.subtract(low_price));
-        good_btc_price = good_btc_price.divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
-        good_btc_price = low_price.add(good_btc_price);
+        BigDecimal good_price = getGoodPrice(curr_price, low_price, hight_price);
 
-        if (curr_price.compareTo(good_btc_price) > 0) {
+        if (curr_price.compareTo(good_price) > 0) {
             return false;
         }
         return true;
