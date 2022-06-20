@@ -698,7 +698,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     } else if ((pre_hightest_price_BTC_today
                             .compareTo(Utils.toPercent(highest_price_today, price_now, 1)) != 0)
-                            && (price_now.multiply(BigDecimal.valueOf(1.02)).compareTo(highest_price_today) > 0)) {
+                            && (price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)) {
 
                         pre_hightest_price_BTC_today = Utils.toPercent(highest_price_today, price_now, 1);
 
