@@ -386,6 +386,7 @@ public class WandaBot extends TelegramLongPollingBot {
                     }
 
                     TakeProfit profit = new TakeProfit();
+                    profit.setProfit_id(take_profit_id_seq());
                     profit.setGeckoid(dto.getId().getGeckoid());
                     profit.setSymbol(dto.getId().getSymbol());
                     profit.setName(dto.getId().getGeckoid());
@@ -488,6 +489,11 @@ public class WandaBot extends TelegramLongPollingBot {
     @Override
     public String getBotToken() {
         return "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
+    }
+
+    private Long take_profit_id_seq() {
+        String sql = "SELECT nextval('take_profit_id_seq')";
+        return Long.parseLong(entityManager.createNativeQuery(sql).getSingleResult().toString());
     }
 
 }

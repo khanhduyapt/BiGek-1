@@ -4,10 +4,7 @@ import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -45,8 +42,8 @@ import lombok.NoArgsConstructor;
 public class TakeProfit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "take_profit_id_seq")
-    @SequenceGenerator(name = "take_profit_id_seq", sequenceName = "take_profit_id_seq", allocationSize = 1)
+    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "take_profit_id_seq")
+    //@SequenceGenerator(name = "take_profit_id_seq", sequenceName = "take_profit_id_seq", allocationSize = 1)
     @Column(name = "profit_id")
     private Long profit_id;
 
