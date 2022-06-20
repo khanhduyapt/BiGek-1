@@ -1144,7 +1144,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "      name,                                                      \n"
                         + "      count_notify                                               \n"
                         + "  FROM priority_coin_history                                     \n"
-                        + "  WHERE count_notify < 3                                         \n" // 3 time
+                        + "  WHERE count_notify < 2                                         \n" // 1 time
                         + "  AND gecko_id  IN                                               \n"
                         + "     (SELECT gecko_id FROM priority_coin where ema > 0)          \n";
 
