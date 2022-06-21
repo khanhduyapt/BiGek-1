@@ -716,12 +716,14 @@ public class BinanceServiceImpl implements BinanceService {
                             .compareTo(temp_hight_percent) != 0)
                             && (price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)) {
 
-                        pre_hightest_price_BTC_today = temp_hight_percent;
-
                         css.setBtc_warning_css("bg-danger");
 
                         // Utils.sendToTelegram(emoji_exclamation);
-                        Utils.sendToTelegram("High price zone! " + Utils.createMsg(css));
+                        if (temp_hight_percent.compareTo(pre_hightest_price_BTC_today) > 0) {
+                            Utils.sendToTelegram("High price zone! " + Utils.createMsg(css));
+                        }
+
+                        pre_hightest_price_BTC_today = temp_hight_percent;
                     }
                 }
 
@@ -1291,8 +1293,7 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal target_percent = Utils.getBigDecimal(dto.getTarget_percent())
                             .multiply(BigDecimal.valueOf(0.9));
 
-                    if ((tp_percent.compareTo(BigDecimal.valueOf(10)) > 0)
-                            || (tp_percent.compareTo(target_percent) >= 0)) {
+                    if (tp_percent.compareTo(target_percent) >= 0) {
 
                         Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
 
@@ -1300,25 +1301,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                         Utils.sendToTelegram("STOP LOST: " + Utils.createMsg(dto));
 
-                    } else if (dto.getPrice_at_binance().compareTo(dto.getLow_price()) <= 0) {
-
-                        Utils.sendToTelegram("STOP LOST (Low): " + Utils.createMsg(dto));
-
-                    } else if ((dto.getPrice_at_binance()
-                            .compareTo(dto.getHeight_price().multiply(BigDecimal.valueOf(0.98))) >= 0)
-                            && (dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0)) {
-
-                        Utils.sendToTelegram("TakeProfit (Hight): " + Utils.createMsg(dto));
-
-                    } else if (dto.getTp_amount().compareTo(BigDecimal.ZERO) < 0
-                            && tp_percent.abs().compareTo(BigDecimal.valueOf(0.8)) > 0) {
-
-                        PriorityCoin coin = priorityCoinRepository.findById(dto.getGecko_id()).orElse(null);
-                        if (!Objects.equals(null, coin) && !coin.getMute()) {
-                            Utils.sendToTelegram("Lost (Hight): " + Utils.createMsg(dto));
-                        }
-
                     }
+
                 }
             }
 
