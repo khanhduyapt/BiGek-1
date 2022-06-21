@@ -686,7 +686,9 @@ public class BinanceServiceImpl implements BinanceService {
                         + " " + Utils.whenGoodPrice(price_now, lowest_price_today, highest_price_today));
 
                 // btc_warning_css
-                if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
+                if (Objects.equals("BTC", dto.getSymbol().toUpperCase())
+                        && Utils.getBigDecimalValue(Utils.toPercent(highest_price_today, lowest_price_today, 1))
+                                .compareTo(BigDecimal.valueOf(2)) > 0) {
 
                     if ((pre_lowest_price_BTC_today.compareTo(Utils.toPercent(lowest_price_today, price_now, 1)) != 0)
                             && ((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
@@ -863,7 +865,8 @@ public class BinanceServiceImpl implements BinanceService {
                         && (Utils.getBigDecimalValue(dto.getPrice_change_percentage_24h())
                                 .compareTo(BigDecimal.valueOf(10)) <= 0)
                         && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 10)
-                        && css.getAvg_percent().contains("-")) {
+                        && css.getAvg_percent().contains("-")
+                        && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 20)) {
 
                     predict = true;
                 }
@@ -1164,7 +1167,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "      name,                                                      \n"
                         + "      count_notify                                               \n"
                         + "  FROM priority_coin_history                                     \n"
-                        + "  WHERE count_notify < 3                                         \n" // 2 time
+                        + "  WHERE count_notify < 2                                         \n" // 1 time
                         + "  AND gecko_id  IN                                               \n"
                         + "     (SELECT gecko_id FROM priority_coin where ema > 0)          \n";
 
@@ -1184,7 +1187,8 @@ public class BinanceServiceImpl implements BinanceService {
                         PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
                         if (!Objects.equals(null, coin) && (coin.getTarget_percent() >= 10)
                                 && ((coin.getLow_price().add(coin.getHeight_price())).divide(BigDecimal.valueOf(2))
-                                        .compareTo(coin.getCurrent_price()) > 0)) {
+                                        .compareTo(coin.getCurrent_price()) > 0)
+                                && (coin.getVmc() >= 30)) {
                             Utils.sendToTelegram(
                                     "Uptrend: " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
                         }

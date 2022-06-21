@@ -98,9 +98,9 @@ public class Utils {
                 + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
                 + dto.getTarget_percent() + "%)" + newline +
 
-                "L:" + dto.getLow_price() + "(" + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price()))
+                "L:" + dto.getLow_price() + "(" + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price(), 1))
                 + "%)_H:" + dto.getHeight_price() + "("
-                + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price())) + "%)"
+                + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price(), 1)) + "%)"
 
                 + newline + dto.getNote().replace("~", newline) + newline + "Disco:" + dto.getDiscovery_date_time();
         return result;
