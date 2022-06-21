@@ -927,6 +927,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (this_token_is_good_price && btc_is_good_price) {
                     coin.setGoodPrice(true);
+                } else if (this_token_is_good_price) {
+                    coin.setGoodPrice(true);
                 }
 
                 index += 1;
@@ -1342,7 +1344,8 @@ public class BinanceServiceImpl implements BinanceService {
             if (!CollectionUtils.isEmpty(results)) {
                 for (PriorityCoin dto : results) {
                     Utils.sendToTelegram(
-                            "Good Price: " + Utils.createMsgPriorityToken(dto, Utils.new_line_from_service));
+                            "[Inspector] Good Price: "
+                                    + Utils.createMsgPriorityToken(dto, Utils.new_line_from_service));
                 }
             }
 

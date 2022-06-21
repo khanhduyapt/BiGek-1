@@ -71,6 +71,7 @@ public class BscScanBinanceApplication {
                         binance_service.getList(false); // ~3p 1 lan
                         binance_service.monitorEma();
                         binance_service.monitorProfit();
+                        binance_service.monitorToken();
                     }
 
                     log.info("reload: "
