@@ -610,12 +610,7 @@ public class BinanceServiceImpl implements BinanceService {
                 int idx_lowprice_min = getIndexMin(lowPriceList);
                 int idx_hightprice_max = getIndexMax(hightPriceList);
 
-                if (Objects.equals("UNFI", dto.getSymbol())) {
-                    String debug = "";
-                }
-
                 String str_down = "";
-
                 if (Utils.getBigDecimal(avgPriceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
                     BigDecimal down = Utils.getBigDecimal(avgPriceList.get(idx_price_max))
                             .divide(Utils.getBigDecimal(avgPriceList.get(idx_price_min)), 2, RoundingMode.CEILING)
@@ -830,12 +825,13 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setAvg_history(avg_history);
                 }
                 if (dto.getUptrend()) {
-
                     if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
                         css.setStar(css.getStar() + " Uptrend Plus");
                     } else {
                         css.setStar(css.getStar() + " Uptrend");
                     }
+                } else if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
+                    css.setStar(css.getStar() + " Ema714");
                 }
 
                 // if (Objects.equals("GMT", css.getSymbol())) {
