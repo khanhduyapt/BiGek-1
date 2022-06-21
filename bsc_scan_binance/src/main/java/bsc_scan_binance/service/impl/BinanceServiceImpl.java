@@ -72,8 +72,8 @@ public class BinanceServiceImpl implements BinanceService {
     // private String emoji_exclamation =
     // EmojiParser.parseToUnicode(":exclamation:");
 
-    private String pre_lowest_price_BTC_today = "";
-    private String pre_hightest_price_BTC_today = "";
+    private BigDecimal pre_lowest_price_BTC_today = BigDecimal.ZERO;
+    private BigDecimal pre_hightest_price_BTC_today = BigDecimal.ZERO;
 
     @Override
     @Transactional
@@ -690,24 +690,33 @@ public class BinanceServiceImpl implements BinanceService {
                         && Utils.getBigDecimalValue(Utils.toPercent(highest_price_today, lowest_price_today, 1))
                                 .compareTo(BigDecimal.valueOf(2)) > 0) {
 
-                    if ((pre_lowest_price_BTC_today.compareTo(Utils.toPercent(lowest_price_today, price_now, 1)) != 0)
+                    BigDecimal temp_low_percent = Utils
+                            .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now, 1));
+
+                    BigDecimal temp_hight_percent = Utils
+                            .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
+
+                    if ((pre_lowest_price_BTC_today.compareTo(temp_low_percent) != 0)
                             && ((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
-                        pre_lowest_price_BTC_today = Utils.toPercent(lowest_price_today, price_now, 1);
+
                         css.setBtc_warning_css("bg-success");
 
-                        // Utils.sendToTelegram(emoji_heart);
-                        Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css));
+                        if (pre_lowest_price_BTC_today.compareTo(temp_low_percent) < 0) {
+                            Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css));
+                        }
+
+                        pre_lowest_price_BTC_today = temp_low_percent;
 
                     } else if ((pre_hightest_price_BTC_today
-                            .compareTo(Utils.toPercent(highest_price_today, price_now, 1)) != 0)
+                            .compareTo(temp_hight_percent) != 0)
                             && (price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)) {
 
-                        pre_hightest_price_BTC_today = Utils.toPercent(highest_price_today, price_now, 1);
+                        pre_hightest_price_BTC_today = temp_hight_percent;
 
                         css.setBtc_warning_css("bg-danger");
 
                         // Utils.sendToTelegram(emoji_exclamation);
-                        Utils.sendToTelegram("Sell Now! " + Utils.createMsg(css));
+                        Utils.sendToTelegram("High price zone! " + Utils.createMsg(css));
                     }
                 }
 
