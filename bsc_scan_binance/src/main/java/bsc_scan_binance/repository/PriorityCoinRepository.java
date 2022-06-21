@@ -14,6 +14,7 @@ import bsc_scan_binance.entity.PriorityCoin;
 public interface PriorityCoinRepository extends JpaRepository<PriorityCoin, String> {
     public List<PriorityCoin> findAllByCandidateAndEmaGreaterThanOrderByVmcDesc(Boolean is_candidate, BigDecimal ema);
 
+    public List<PriorityCoin> findAllByInspectModeAndGoodPriceOrderByVmcDesc(Boolean inspectMode, Boolean goodPrice);
 
     public List<PriorityCoin> findAllByPredictOrderByVmcDesc(Boolean predict);
 

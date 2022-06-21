@@ -13,4 +13,6 @@ public interface BinanceService {
     public void monitorEma();
 
     public void monitorProfit();
+
+    public void monitorToken();
 }

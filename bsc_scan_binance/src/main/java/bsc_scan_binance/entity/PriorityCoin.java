@@ -81,4 +81,11 @@ public class PriorityCoin {
 
     @Column(name = "predict")
     private Boolean predict = false;
+
+    @Column(name = "inspect_mode")
+    private Boolean inspectMode = false;
+
+    @Column(name = "good_price")
+    private Boolean goodPrice = false;
+
 }

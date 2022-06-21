@@ -379,7 +379,8 @@ public class BinanceServiceImpl implements BinanceService {
             ModelMapper mapper = new ModelMapper();
             Integer index = 1;
             String sql_update_ema = "";
-
+            Boolean btc_is_good_price = false;
+            Boolean this_token_is_good_price = false;
             List<PriorityCoin> listPriorityCoin = priorityCoinRepository.findAll();
 
             for (CandidateTokenResponse dto : results) {
@@ -685,16 +686,20 @@ public class BinanceServiceImpl implements BinanceService {
                         + highest_price_today + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)"
                         + " " + Utils.whenGoodPrice(price_now, lowest_price_today, highest_price_today));
 
+                this_token_is_good_price = Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today);
+
                 // btc_warning_css
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())
                         && Utils.getBigDecimalValue(Utils.toPercent(highest_price_today, lowest_price_today, 1))
-                                .compareTo(BigDecimal.valueOf(2)) > 0) {
+                                .compareTo(BigDecimal.valueOf(2.3)) > 0) {
 
                     BigDecimal temp_low_percent = Utils
                             .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now, 1));
 
                     BigDecimal temp_hight_percent = Utils
                             .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
+
+                    btc_is_good_price = Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today);
 
                     if ((pre_lowest_price_BTC_today.compareTo(temp_low_percent) != 0)
                             && ((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
@@ -919,6 +924,11 @@ public class BinanceServiceImpl implements BinanceService {
                 } else {
                     coin.setDiscovery_date_time("");
                 }
+
+                if (this_token_is_good_price && btc_is_good_price) {
+                    coin.setGoodPrice(true);
+                }
+
                 index += 1;
                 priorityCoinRepository.save(coin);
 
@@ -1317,6 +1327,31 @@ public class BinanceServiceImpl implements BinanceService {
         Exception e) {
             e.printStackTrace();
             log.info("monitorProfit error ------->");
+            log.error(e.getMessage());
+        }
+    }
+
+    @Override
+    public void monitorToken() {
+        try {
+            log.info("Start monitorToken ---->");
+
+            List<PriorityCoin> results = priorityCoinRepository.findAllByInspectModeAndGoodPriceOrderByVmcDesc(true,
+                    true);
+
+            if (!CollectionUtils.isEmpty(results)) {
+                for (PriorityCoin dto : results) {
+                    Utils.sendToTelegram(
+                            "Good Price: " + Utils.createMsgPriorityToken(dto, Utils.new_line_from_service));
+                }
+            }
+
+            log.info("End monitorToken <----");
+        } catch (
+
+        Exception e) {
+            e.printStackTrace();
+            log.info("monitorToken error ------->");
             log.error(e.getMessage());
         }
     }

@@ -464,6 +464,24 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
                 execute(message);
+            } else if (command.contains("/inspect")) {
+                String[] arr = command.split(" ");
+
+                binance_service.getList(false);
+                List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
+                PriorityCoin coin = list.get(0);
+                coin.setInspectMode(true);
+                priorityCoinRepository.save(coin);
+
+                message.setText(
+                        "Set inspect_mode: " + Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
+                execute(message);
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();
