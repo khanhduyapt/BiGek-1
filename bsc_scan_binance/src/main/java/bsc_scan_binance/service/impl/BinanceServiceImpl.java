@@ -63,8 +63,8 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private OrdersRepository ordersRepository;
 
-    //    @Autowired
-    //    private BinancePumpingHistoryRepository binancePumpingHistoryRepository;
+    // @Autowired
+    // private BinancePumpingHistoryRepository binancePumpingHistoryRepository;
 
     // https://gist.github.com/naiieandrade/b7166fc879627a1295e1b67b98672770
     // private String emoji_heart = EmojiParser.parseToUnicode(":heart:");
@@ -333,7 +333,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    select                                                                                   \n"
                     + "       xyz.gecko_id,                                                                         \n"
                     + "       xyz.symbol,                                                                           \n"
-                    + "       (case when (COALESCE(price_today - price_pre_07d, -99) < 0 and COALESCE(price_today - COALESCE(avg07d, -99), -99) >0) then COALESCE(price_today - COALESCE(avg07d, -99), -99) else COALESCE(price_today - price_pre_07d, -99) end) as ema07d,                               \n"
+                    + "       COALESCE(price_today   - price_pre_07d*1.05, -99) as ema07d,                          \n"
                     + "       COALESCE(price_pre_07d - price_pre_14d, -99) as ema14d,                               \n"
                     + "       COALESCE(price_pre_14d - price_pre_21d, -99) as ema21d,                               \n"
                     + "       COALESCE(price_pre_21d - price_pre_28d, -99) as ema28d,                               \n"
@@ -712,8 +712,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         pre_lowest_price_BTC_today = temp_low_percent;
 
-                    } else if ((pre_hightest_price_BTC_today
-                            .compareTo(temp_hight_percent) != 0)
+                    } else if ((pre_hightest_price_BTC_today.compareTo(temp_hight_percent) != 0)
                             && (price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)) {
 
                         css.setBtc_warning_css("bg-danger");
@@ -741,9 +740,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString().replace(".00", "") + "%");
-                    css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
-                    css.setMin_price(Utils.removeLastZero(avgPriceList.get(idx_price_min)));
-                    css.setMax_price(Utils.removeLastZero(avgPriceList.get(idx_price_max)));
+
+                    // css.setMin_price(Utils.removeLastZero(avgPriceList.get(idx_price_min)));
+                    css.setMax_price(Utils.removeLastZero(avgPriceList.get(idx_price_max)) + "$("
+                            + Utils.toPercent(Utils.getBigDecimalValue(avgPriceList.get(idx_price_max)), price_now)
+                            + "%)");
 
                     if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)
                             && ((Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
@@ -813,7 +814,7 @@ public class BinanceServiceImpl implements BinanceService {
                                     .multiply(BigDecimal.valueOf(1.5))) < 1) {
                         css.setStar("✖");
                         css.setStar_css("text-danger");
-                        css.setOco_css("text-white");
+                        // css.setOco_css("text-white");
                         css.setOco_stop_limit_low_css("");
                     } else if (Utils.getBigDecimalValue(percent_hightprice_max)
                             .compareTo(BigDecimal.valueOf(50)) >= 0) {
@@ -832,23 +833,7 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setOco_stop_price(oco_stop_price);
                     css.setOco_low_hight(oco_low_hight);
 
-                    String ema_history = "ema1.7: " + dto.getEma07d() + ", ema7.14: " + dto.getEma14d() + ", ema14.21: "
-                            + dto.getEma21d() + ", ema21.28: " + dto.getEma28d();
-                    BigDecimal predict_ema = BigDecimal.ZERO;
-                    if ((dto.getEma07d().compareTo(BigDecimal.ZERO) < 0)
-                            && (dto.getEma14d().compareTo(BigDecimal.ZERO) < 0)) {
-                        predict_ema = dto.getEma14d().subtract(dto.getEma07d());
-                        predict_ema = dto.getEma07d().subtract(predict_ema);
-                    } else if ((dto.getEma07d().compareTo(BigDecimal.ZERO) < 0)
-                            && (dto.getEma14d().compareTo(BigDecimal.ZERO) > 0)) {
-                        predict_ema = price_now.subtract(dto.getAvg07d());
-                        predict_ema = dto.getEma07d().subtract(predict_ema);
-                    }
-
-                    if (predict_ema.compareTo(BigDecimal.ZERO) > 0) {
-                        ema_history = "Predict:" + predict_ema + ", " + ema_history;
-                    }
-
+                    String ema_history = "ema1.7: " + dto.getEma07d() + ", ema7.14: " + dto.getEma14d();
                     css.setEma_history(ema_history);
 
                     String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(dto.getAvg07d(), price_now)
@@ -857,7 +842,12 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setAvg_history(avg_history);
                 }
                 if (dto.getUptrend()) {
-                    css.setStar(css.getStar() + " Uptrend");
+
+                    if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
+                        css.setStar(css.getStar() + " Uptrend Plus");
+                    } else {
+                        css.setStar(css.getStar() + " Uptrend");
+                    }
                 }
 
                 // if (Objects.equals("GMT", css.getSymbol())) {
@@ -874,14 +864,13 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 Boolean predict = false;
-                // MC < 50  avg_percent > 15, star contain Uptrend, %24h < 10
+                // MC < 50 avg_percent > 15, star contain Uptrend, %24h < 10
                 if ((market_cap.compareTo(BigDecimal.valueOf(50000000)) < 0)
                         && (avg_percent.abs().compareTo(BigDecimal.valueOf(9)) >= 0)
                         && (css.getStar().contains("Uptrend"))
                         && (Utils.getBigDecimalValue(dto.getPrice_change_percentage_24h())
                                 .compareTo(BigDecimal.valueOf(10)) <= 0)
-                        && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 10)
-                        && css.getAvg_percent().contains("-")
+                        && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 10) && css.getAvg_percent().contains("-")
                         && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 20)) {
 
                     predict = true;
@@ -1326,9 +1315,8 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (!CollectionUtils.isEmpty(results)) {
                 for (PriorityCoin dto : results) {
-                    Utils.sendToTelegram(
-                            "[Inspector] Good Price: "
-                                    + Utils.createMsgPriorityToken(dto, Utils.new_line_from_service));
+                    Utils.sendToTelegram("[Inspector] Good Price: "
+                            + Utils.createMsgPriorityToken(dto, Utils.new_line_from_service));
                 }
             }
 
