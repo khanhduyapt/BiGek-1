@@ -925,9 +925,8 @@ public class BinanceServiceImpl implements BinanceService {
                     coin.setDiscovery_date_time("");
                 }
 
-                if (this_token_is_good_price && btc_is_good_price) {
-                    coin.setGoodPrice(true);
-                } else if (this_token_is_good_price) {
+                coin.setGoodPrice(false);
+                if (this_token_is_good_price || btc_is_good_price) {
                     coin.setGoodPrice(true);
                 }
 
