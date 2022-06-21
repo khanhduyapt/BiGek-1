@@ -72,8 +72,7 @@ public class BinanceServiceImpl implements BinanceService {
     // private String emoji_exclamation =
     // EmojiParser.parseToUnicode(":exclamation:");
 
-    private BigDecimal pre_lowest_price_BTC_today = BigDecimal.ZERO;
-    private BigDecimal pre_hightest_price_BTC_today = BigDecimal.ZERO;
+    private String pre_btc_msg_type = "";
 
     @Override
     @Transactional
@@ -693,37 +692,26 @@ public class BinanceServiceImpl implements BinanceService {
                         && Utils.getBigDecimalValue(Utils.toPercent(highest_price_today, lowest_price_today, 1))
                                 .compareTo(BigDecimal.valueOf(2.3)) > 0) {
 
-                    BigDecimal temp_low_percent = Utils
-                            .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now, 1));
-
-                    BigDecimal temp_hight_percent = Utils
-                            .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
-
                     btc_is_good_price = Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today);
 
-                    if ((pre_lowest_price_BTC_today.compareTo(temp_low_percent) != 0)
-                            && ((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
+                    if (((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)
+                            && !Objects.equals("Low", pre_btc_msg_type)) {
 
                         css.setBtc_warning_css("bg-success");
 
-                        if (pre_lowest_price_BTC_today.compareTo(temp_low_percent) < 0) {
-                            Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css));
-                        }
-
-                        pre_lowest_price_BTC_today = temp_low_percent;
-
-                    } else if ((pre_hightest_price_BTC_today.compareTo(temp_hight_percent) != 0)
-                            && (price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)) {
-
-                        css.setBtc_warning_css("bg-danger");
-
-                        // Utils.sendToTelegram(emoji_exclamation);
-                        if (temp_hight_percent.compareTo(pre_hightest_price_BTC_today) > 0) {
-                            Utils.sendToTelegram("High price zone! " + Utils.createMsg(css));
-                        }
-
-                        pre_hightest_price_BTC_today = temp_hight_percent;
+                        Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css));
+                        pre_btc_msg_type = "Low";
                     }
+
+                } else if ((price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)
+                        && !Objects.equals("High", pre_btc_msg_type)) {
+
+                    css.setBtc_warning_css("bg-danger");
+
+                    // Utils.sendToTelegram(emoji_exclamation);
+                    Utils.sendToTelegram("High price zone! " + Utils.createMsg(css));
+                    pre_btc_msg_type = "High";
+
                 }
 
                 coin.setCurrent_price(price_now);
@@ -946,7 +934,9 @@ public class BinanceServiceImpl implements BinanceService {
 
             return list;
 
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
             log.info("Get list Inquiry Consigned Delivery error ------->");
             log.error(e.getMessage());
