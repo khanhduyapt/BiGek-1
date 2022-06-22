@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
+import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
@@ -98,7 +99,8 @@ public class Utils {
                 + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
                 + dto.getTarget_percent() + "%)" + newline +
 
-                "L:" + dto.getLow_price() + "(" + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price(), 1))
+                "L:" + dto.getLow_price() + "("
+                + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price(), 1))
                 + "%)_H:" + dto.getHeight_price() + "("
                 + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price(), 1)) + "%)"
 
@@ -130,6 +132,10 @@ public class Utils {
     }
 
     public static void sendToTelegram(String text) {
+        if (!BscScanBinanceApplication.msg_on) {
+            return;
+        }
+
         int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
         if ((minus > 5) && (minus < 59)) {
 

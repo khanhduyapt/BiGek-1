@@ -22,26 +22,32 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 public class BscScanBinanceApplication {
+    public static boolean msg_on = false;
 
     public static void main(String[] args) {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-
+            if (!Objects.equals(null, args) && args.length > 0 && Objects.equals("msg_on", args[0])) {
+                msg_on = true;
+            }
+            log.info("msg_on:" + msg_on);
             // --------------------Init--------------------
 
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
-            WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
 
-            try {
-                TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-                telegramBotsApi.registerBot(wandaBot);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
+            if (msg_on) {
+                WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
+
+                try {
+                    TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
+                    telegramBotsApi.registerBot(wandaBot);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
             }
-
             // --------------------Start--------------------
 
             List<CandidateCoin> list = gecko_service.getList();
