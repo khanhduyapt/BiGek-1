@@ -448,10 +448,23 @@ public class WandaBot extends TelegramLongPollingBot {
                     }
                 }
             } else if (command.contains("/mute")) {
+                List<PriorityCoin> list = priorityCoinRepository.findAllByMute(true);
+                if (CollectionUtils.isEmpty(list)) {
+                    String msg = "Muting: ";
+                    for(PriorityCoin dto : list) {
+                        msg += dto.getSymbol() + ", ";
+                    }
+                    message.setText(msg);
+                    execute(message);
+                } else {
+                    message.setText("Muting list is empty");
+                    execute(message);
+                }
+
                 String[] arr = command.split(" ");
 
                 binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
+                list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
                 if (CollectionUtils.isEmpty(list)) {
                     message.setText("Empty");
                     execute(message);
@@ -459,10 +472,10 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
                 PriorityCoin coin = list.get(0);
-                coin.setMute(true);
+                coin.setMute(!coin.getMute());
                 priorityCoinRepository.save(coin);
 
-                message.setText(String.format("Muting: [%s]_[%s]", list.get(0).getSymbol(), list.get(0).getGeckoid()));
+                message.setText(String.format("Muting: [%s]_[%s] = [%s]", list.get(0).getSymbol(), list.get(0).getGeckoid(), coin.getMute()));
                 execute(message);
             } else if (command.contains("/inspect") || command.contains("/stop")) {
                 String[] arr = command.split(" ");

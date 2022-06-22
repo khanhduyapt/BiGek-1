@@ -889,10 +889,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                 coin.setEma(dto.getEma07d());
 
-                if(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()).compareTo(BigDecimal.valueOf(5))< 0) {
-                    coin.setMute(false);
-                }
-
                 if (css.getPumping_history().contains("Dump")) {
                     css.setStar("");
                 }
@@ -1305,8 +1301,8 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             log.info("Start monitorToken ---->");
             {
-                List<PriorityCoin> results = priorityCoinRepository.findAllByInspectModeAndGoodPriceOrderByVmcDesc(true,
-                        true);
+                List<PriorityCoin> results = priorityCoinRepository.findAllByInspectModeAndGoodPriceAndMuteOrderByVmcDesc(true,
+                        true, false);
 
                 if (!CollectionUtils.isEmpty(results)) {
                     int idx = 0;
