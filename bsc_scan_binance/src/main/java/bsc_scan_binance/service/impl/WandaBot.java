@@ -464,7 +464,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
                 execute(message);
-            } else if (command.contains("/inspect")) {
+            } else if (command.contains("/inspect") || command.contains("/stop")) {
                 String[] arr = command.split(" ");
 
                 binance_service.getList(false);
@@ -476,11 +476,16 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
                 PriorityCoin coin = list.get(0);
-                coin.setInspectMode(true);
-                priorityCoinRepository.save(coin);
+                if (command.contains("/inspect")) {
+                    coin.setInspectMode(true);
+                } else {
+                    coin.setInspectMode(false);
+                }
 
+                priorityCoinRepository.save(coin);
                 message.setText(
-                        "Set inspect_mode: " + Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
+                        "Set inspect_mode: " + coin.getInspectMode() + Utils.new_line_from_bot
+                                + Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
                 execute(message);
             }
         } catch (TelegramApiException e) {
