@@ -462,7 +462,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 coin.setMute(true);
                 priorityCoinRepository.save(coin);
 
-                message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
+                message.setText(String.format("Muting: [%s]_[%s]", list.get(0).getSymbol(), list.get(0).getGeckoid()));
                 execute(message);
             } else if (command.contains("/inspect") || command.contains("/stop")) {
                 String[] arr = command.split(" ");

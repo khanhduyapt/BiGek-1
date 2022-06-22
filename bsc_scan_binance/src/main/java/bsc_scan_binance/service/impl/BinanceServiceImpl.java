@@ -36,6 +36,7 @@ import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinHistoryResponse;
+import bsc_scan_binance.response.PriorityCoinResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -258,7 +259,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.symbol,                                                                             \n"
                     + "   can.name,                                                                               \n"
                     + "                                                                                           \n"
-
+                    + "    (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '5 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as virgin, "
                     + "    concat('Pump:', coalesce((select string_agg(his1.hh, '<-') from (select * from binance_pumping_history his1 where his1.gecko_id = can.gecko_id and his1.symbol = can.symbol and his1.total_pump > 3 order by his1.total_pump desc limit 5) as his1), ''), 'h', ' ', \n"
                     + "           'Dump:', coalesce((select string_agg(his2.hh, '<-') from (select * from binance_pumping_history his2 where his2.gecko_id = can.gecko_id and his2.symbol = can.symbol and his2.total_dump > 3 order by his2.total_dump desc limit 5) as his2), ''), 'h' \n"
                     + "          ) as pumping_history,                                                            \n"
@@ -467,7 +468,7 @@ public class BinanceServiceImpl implements BinanceService {
                 List<String> temp = splitVolAndPrice(css.getToday());
                 css.setToday_vol(temp.get(0));
                 css.setToday_price(temp.get(1));
-                css.setToday_ema(temp.get(4));
+                css.setToday_ema("(" + dto.getVirgin() + "V) " + temp.get(4));
                 volList.add("");
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -793,7 +794,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (Utils.getBigDecimalValue(percent_hightprice_max)
                             .compareTo(Utils.getBigDecimalValue(oco_stop_limit_low_percent.replace("-", ""))
                                     .multiply(BigDecimal.valueOf(1.5))) < 1) {
-                        //css.setStar("✖");
+                        // css.setStar("✖");
                         css.setStar_css("text-danger");
                         // css.setOco_css("text-white");
                         css.setOco_stop_limit_low_css("");
@@ -830,7 +831,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar(css.getStar() + " Uptrend");
                     }
                 } else if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
-                    //css.setStar(css.getStar() + " 714");
+                    // css.setStar(css.getStar() + " 714");
                 }
 
                 // if (Objects.equals("GMT", css.getSymbol())) {
@@ -841,6 +842,11 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar(css.getStar().replace("🤩", ""));
                 } else if (!css.getStar().contains("🤩")) {
                     css.setStar("🤩" + css.getStar());
+                }
+
+                if (Objects.equals(1, dto.getVirgin()) && (dto.getEma07d().compareTo(BigDecimal.ZERO) > 0)) {
+                    css.setStar("🤩" + css.getStar() + " Virgin");
+                    css.setStar_css("text-success");
                 }
 
                 Boolean is_candidate = false;
@@ -882,6 +888,10 @@ public class BinanceServiceImpl implements BinanceService {
                                 : "~" + Utils.getStringValue(css.getPumping_history())));
 
                 coin.setEma(dto.getEma07d());
+
+                if(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()).compareTo(BigDecimal.valueOf(5))< 0) {
+                    coin.setMute(false);
+                }
 
                 if (css.getPumping_history().contains("Dump")) {
                     css.setStar("");
@@ -1263,6 +1273,10 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal target_percent = Utils.getBigDecimal(dto.getTarget_percent())
                             .multiply(BigDecimal.valueOf(0.9));
 
+                    if (target_percent.compareTo(BigDecimal.valueOf(5)) < 0) {
+                        target_percent = BigDecimal.valueOf(5);
+                    }
+
                     if (tp_percent.compareTo(target_percent) >= 0) {
 
                         Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
@@ -1290,17 +1304,85 @@ public class BinanceServiceImpl implements BinanceService {
     public void monitorToken() {
         try {
             log.info("Start monitorToken ---->");
+            {
+                List<PriorityCoin> results = priorityCoinRepository.findAllByInspectModeAndGoodPriceOrderByVmcDesc(true,
+                        true);
 
-            List<PriorityCoin> results = priorityCoinRepository.findAllByInspectModeAndGoodPriceOrderByVmcDesc(true,
-                    true);
+                if (!CollectionUtils.isEmpty(results)) {
+                    int idx = 0;
+                    String msg = "";
+                    for (PriorityCoin dto : results) {
+                        idx += 1;
+                        msg += "[Inspector] Good Price: " + Utils.createMsgPriorityToken(dto, Utils.new_line_from_service)
+                                + Utils.new_line_from_service + Utils.new_line_from_service;
 
-            if (!CollectionUtils.isEmpty(results)) {
-                for (PriorityCoin dto : results) {
-                    Utils.sendToTelegram("[Inspector] Good Price: "
-                            + Utils.createMsgPriorityToken(dto, Utils.new_line_from_service));
+                        if (idx == 5) {
+                            idx = 0;
+                            Utils.sendToTelegram(msg);
+                            msg = "";
+                        }
+                    }
+                    if (Utils.isNotBlank(msg)) {
+                        Utils.sendToTelegram(msg);
+                    }
                 }
             }
 
+            {
+                String sql =  ""
+                        + " SELECT                              \n"
+                        + "     coin.gecko_id,                  \n"
+                        + "     coin.current_price,             \n"
+                        + "     coin.target_price,              \n"
+                        + "     coin.target_percent,            \n"
+                        + "     coin.vmc,                       \n"
+                        + "     coin.is_candidate,              \n"
+                        + "     coin.index,                     \n"
+                        + "     coin.name,                      \n"
+                        + "     coin.note,                      \n"
+                        + "     coin.symbol,                    \n"
+                        + "     coin.ema,                       \n"
+                        + "     coin.low_price,                 \n"
+                        + "     coin.height_price,              \n"
+                        + "     coin.discovery_date_time,       \n"
+                        + "     coin.mute,                      \n"
+                        + "     coin.predict,                   \n"
+                        + "     coin.inspect_mode,              \n"
+                        + "     coin.good_price                 \n"
+                        + " FROM                                \n"
+                        + "    priority_coin coin,              \n"
+                        + "    binance_volumn_week week         \n"
+                        + "WHERE coin.mute = false              \n"
+                        + " and coin.ema > 0                                        \n"
+                        + " and coin.gecko_id = week.gecko_id                       \n"
+                        + " and week.yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd')          \n"
+                        + " and (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = coin.gecko_id and w.symbol = coin.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) = 1 \n"
+                        + " and coin.gecko_id not in (select gecko_id from orders)  \n";
+
+                Query query = entityManager.createNativeQuery(sql, "PriorityCoinResponse");
+
+                @SuppressWarnings("unchecked")
+                List<PriorityCoinResponse> virgin_list = query.getResultList();
+                if(!CollectionUtils.isEmpty(virgin_list)) {
+                    int idx = 0;
+                    String msg = "";
+                    for (PriorityCoinResponse dto : virgin_list) {
+                        idx += 1;
+                        msg += "[Virgin] " + Utils.createMsgPriorityCoinResponse(dto, Utils.new_line_from_service)
+                                + Utils.new_line_from_service + Utils.new_line_from_service;
+
+                        if (idx == 5) {
+                            idx = 0;
+                            Utils.sendToTelegram(msg);
+                            msg = "";
+                        }
+                    }
+                    if (Utils.isNotBlank(msg)) {
+                        Utils.sendToTelegram(msg);
+                    }
+                }
+            }
+            //(select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as virgin,
             log.info("End monitorToken <----");
         } catch (
 

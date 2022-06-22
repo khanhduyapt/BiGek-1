@@ -31,6 +31,7 @@ import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
+import bsc_scan_binance.response.PriorityCoinResponse;
 
 public class Utils {
     public static String chatId = "5099224587";
@@ -112,6 +113,21 @@ public class Utils {
         return result;
     }
 
+    public static String createMsgPriorityCoinResponse(PriorityCoinResponse dto, String newline) {
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id())
+                + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline + "Price: "
+                + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
+                + dto.getTarget_percent() + "%)" + newline +
+
+                "L:" + dto.getLow_price() + "("
+                + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price(), 1))
+                + "%)_H:" + dto.getHeight_price() + "("
+                + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price(), 1)) + "%)" + newline +
+                dto.getNote();
+
+        return result;
+    }
+
     public static boolean isNotBlank(String value) {
         if (Objects.equals(null, value) || Objects.equals("", value)) {
             return false;
@@ -144,13 +160,8 @@ public class Utils {
 
     public static boolean isCandidate(CandidateTokenCssResponse css) {
 
-        if (css.getStar().toLowerCase().contains("uptrend")
-                && (Utils.getIntValue(css.getVolumn_div_marketcap()) >= 19)) {
-            BigDecimal percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
-
-            //if (percent.compareTo(BigDecimal.valueOf(-10)) > 0) {
-                return true;
-            //}
+        if (css.getStar().toLowerCase().contains("uptrend")) {
+            return true;
         }
 
         return false;

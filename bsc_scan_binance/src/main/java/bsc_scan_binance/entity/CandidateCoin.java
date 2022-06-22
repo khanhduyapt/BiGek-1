@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "gecko_id", type = String.class),
                 @ColumnResult(name = "symbol", type = String.class),
                 @ColumnResult(name = "name", type = String.class),
+                @ColumnResult(name = "virgin", type = Integer.class),
                 @ColumnResult(name = "pumping_history", type = String.class),
 
                 @ColumnResult(name = "volumn_div_marketcap", type = String.class),
