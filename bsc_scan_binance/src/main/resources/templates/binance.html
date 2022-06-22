@@ -166,9 +166,10 @@ p {
           <td class="bg-light important;"
             style="text-align: right; min-width: 150px !important; max-width: 150px !important;">
             <div>
-              <span th:text="${token.avg_price + '$'}"></span> <span
+             <span style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
                 th:classappend="${token.avg_price_css}"
-                th:text="${token.avg_percent}"></span>
+                th:text="${token.avg_percent}"></span>=
+              <span th:text="${token.avg_price + '$'}"></span>
             </div>
             <div>
               <span

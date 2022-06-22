@@ -714,12 +714,11 @@ public class BinanceServiceImpl implements BinanceService {
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
                     if (avg_price.compareTo(price_now) < 1) {
-                        css.setAvg_price_css("text-primary font-weight-bold");
-                    } else {
                         css.setAvg_price_css("text-danger font-weight-bold");
+                    } else {
+                        css.setAvg_price_css("text-primary font-weight-bold");
                     }
-                    BigDecimal percent = ((price_now.divide(avg_price, 2, RoundingMode.CEILING)
-                            .multiply(BigDecimal.valueOf(100))).subtract(BigDecimal.valueOf(100)));
+                    BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(avg_price, price_now, 1));
 
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString().replace(".00", "") + "%");
@@ -795,7 +794,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (Utils.getBigDecimalValue(percent_hightprice_max)
                             .compareTo(Utils.getBigDecimalValue(oco_stop_limit_low_percent.replace("-", ""))
                                     .multiply(BigDecimal.valueOf(1.5))) < 1) {
-                        css.setStar("✖");
+                        //css.setStar("✖");
                         css.setStar_css("text-danger");
                         // css.setOco_css("text-white");
                         css.setOco_stop_limit_low_css("");
@@ -816,7 +815,7 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setOco_stop_price(oco_stop_price);
                     css.setOco_low_hight(oco_low_hight);
 
-                    String ema_history = "ema1.7: " + dto.getEma07d() + ", ema7.14: " + dto.getEma14d();
+                    String ema_history = "vector7: " + dto.getEma07d() + ", vector14: " + dto.getEma14d();
                     css.setEma_history(ema_history);
 
                     String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(dto.getAvg07d(), price_now)
@@ -831,7 +830,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar(css.getStar() + " Uptrend");
                     }
                 } else if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
-                    css.setStar(css.getStar() + " Ema714");
+                    //css.setStar(css.getStar() + " 714");
                 }
 
                 // if (Objects.equals("GMT", css.getSymbol())) {
@@ -839,24 +838,12 @@ public class BinanceServiceImpl implements BinanceService {
                 // }
                 BigDecimal avg_percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
                 Boolean is_candidate = false;
-                if (dto.getUptrend() && !css.getStar().contains("✖")
-                        && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 30)) {
-
-                    if (avg_percent.abs().compareTo(BigDecimal.valueOf(10)) >= 0) {
-                        is_candidate = true;
-                    }
+                if (Utils.isCandidate(css)) {
+                    is_candidate = true;
                 }
 
                 Boolean predict = false;
-                // MC < 50 avg_percent > 15, star contain Uptrend, %24h < 10
-                if ((market_cap.compareTo(BigDecimal.valueOf(50000000)) < 0)
-                        && (avg_percent.abs().compareTo(BigDecimal.valueOf(9)) >= 0)
-                        && (css.getStar().contains("Uptrend"))
-                        && (Utils.getBigDecimalValue(dto.getPrice_change_percentage_24h())
-                                .compareTo(BigDecimal.valueOf(10)) <= 0)
-                        && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 10) && css.getAvg_percent().contains("-")
-                        && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 20)) {
-
+                if (Utils.isCandidate(css) && (Utils.getIntValue(css.getAvg_percent()) >= 10)) {
                     predict = true;
                 }
                 coin.setPredict(predict);
@@ -912,13 +899,8 @@ public class BinanceServiceImpl implements BinanceService {
                         "update binance_volumn_week set ema='%s' where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getEma07d(), dto.getGecko_id(), dto.getSymbol());
                 if (isOrderByBynaceVolume) {
-                    if (dto.getUptrend() && !css.getStar().contains("✖")
-                            && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 30)) {
-                        BigDecimal percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
-
-                        if (percent.abs().compareTo(BigDecimal.valueOf(10)) >= 0) {
-                            list.add(css);
-                        }
+                    if (Utils.isCandidate(css)) {
+                        list.add(css);
                     }
                 } else {
                     list.add(css);

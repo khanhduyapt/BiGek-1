@@ -75,8 +75,8 @@ public class WandaBot extends TelegramLongPollingBot {
             }
 
             int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-            if ((minus > 59) || (minus < 5)) {
-                message.setText("59...5 minutes is the time to get data.");
+            if ((minus > 59) || (minus < 3)) {
+                message.setText("59...3 minutes is the time to get data.");
                 execute(message);
                 return;
             }

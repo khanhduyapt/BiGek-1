@@ -104,7 +104,11 @@ public class Utils {
                 + "%)_H:" + dto.getHeight_price() + "("
                 + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price(), 1)) + "%)"
 
-                + newline + dto.getNote().replace("~", newline) + newline + "Disco:" + dto.getDiscovery_date_time();
+                + newline + dto.getNote().replace("~", newline);
+
+        if (!Objects.equals("", dto.getDiscovery_date_time())) {
+            result += newline + "Disco:" + dto.getDiscovery_date_time();
+        }
         return result;
     }
 
@@ -129,6 +133,20 @@ public class Utils {
 
     public static String whenGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
         return (isGoodPrice(curr_price, low_price, hight_price) ? "*5*" : "");
+    }
+
+    public static boolean isCandidate(CandidateTokenCssResponse css) {
+
+        if (css.getStar().toLowerCase().contains("uptrend")
+                && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 30)) {
+            BigDecimal percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
+
+            if (percent.compareTo(BigDecimal.valueOf(0)) > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static void sendToTelegram(String text) {
