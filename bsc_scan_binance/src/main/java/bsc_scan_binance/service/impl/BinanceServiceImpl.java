@@ -259,8 +259,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.name,                                                                               \n"
                     + "                                                                                           \n"
 
-                    + "    concat('Pump:', coalesce((select string_agg(his1.hh, '<-') from (select * from binance_pumping_history his1 where his1.gecko_id = can.gecko_id and his1.symbol = can.symbol and his1.total_pump > 1 order by his1.total_pump desc limit 5) as his1), ''), 'h', ' ', \n"
-                    + "           'Dump:', coalesce((select string_agg(his2.hh, '<-') from (select * from binance_pumping_history his2 where his2.gecko_id = can.gecko_id and his2.symbol = can.symbol and his2.total_dump > 1 order by his2.total_dump desc limit 5) as his2), ''), 'h' \n"
+                    + "    concat('Pump:', coalesce((select string_agg(his1.hh, '<-') from (select * from binance_pumping_history his1 where his1.gecko_id = can.gecko_id and his1.symbol = can.symbol and his1.total_pump > 3 order by his1.total_pump desc limit 5) as his1), ''), 'h', ' ', \n"
+                    + "           'Dump:', coalesce((select string_agg(his2.hh, '<-') from (select * from binance_pumping_history his2 where his2.gecko_id = can.gecko_id and his2.symbol = can.symbol and his2.total_dump > 3 order by his2.total_dump desc limit 5) as his2), ''), 'h' \n"
                     + "          ) as pumping_history,                                                            \n"
 
                     + "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n"
@@ -696,17 +696,16 @@ public class BinanceServiceImpl implements BinanceService {
 
                         Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css));
                         pre_btc_msg_type = "Low";
+                    } else if ((price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)
+                            && !Objects.equals("High", pre_btc_msg_type)) {
+
+                        css.setBtc_warning_css("bg-danger");
+
+                        // Utils.sendToTelegram(emoji_exclamation);
+                        Utils.sendToTelegram("High price zone! " + Utils.createMsg(css));
+                        pre_btc_msg_type = "High";
+
                     }
-
-                } else if ((price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)
-                        && !Objects.equals("High", pre_btc_msg_type)) {
-
-                    css.setBtc_warning_css("bg-danger");
-
-                    // Utils.sendToTelegram(emoji_exclamation);
-                    Utils.sendToTelegram("High price zone! " + Utils.createMsg(css));
-                    pre_btc_msg_type = "High";
-
                 }
 
                 coin.setCurrent_price(price_now);
@@ -837,6 +836,12 @@ public class BinanceServiceImpl implements BinanceService {
                 // String debug = "";
                 // }
                 BigDecimal avg_percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
+                if (avg_percent.compareTo(BigDecimal.valueOf(10)) < 0) {
+                    css.setStar(css.getStar().replace("🤩", ""));
+                } else if (!css.getStar().contains("🤩")) {
+                    css.setStar("🤩" + css.getStar());
+                }
+
                 Boolean is_candidate = false;
                 if (Utils.isCandidate(css)) {
                     is_candidate = true;
@@ -876,6 +881,10 @@ public class BinanceServiceImpl implements BinanceService {
                                 : "~" + Utils.getStringValue(css.getPumping_history())));
 
                 coin.setEma(dto.getEma07d());
+
+                if (css.getPumping_history().contains("Dump")) {
+                    css.setStar("");
+                }
 
                 if (is_candidate) {
                     if (Objects.equals("", coin.getDiscovery_date_time())
