@@ -106,10 +106,17 @@ public class Utils {
 
                 + newline + dto.getNote().replace("~", newline);
 
-        if (!Objects.equals("", dto.getDiscovery_date_time())) {
+        if (isNotBlank(dto.getDiscovery_date_time())) {
             result += newline + "Disco:" + dto.getDiscovery_date_time();
         }
         return result;
+    }
+
+    public static boolean isNotBlank(String value) {
+        if (Objects.equals(null, value) || Objects.equals("", value)) {
+            return false;
+        }
+        return true;
     }
 
     public static BigDecimal getGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
@@ -138,12 +145,12 @@ public class Utils {
     public static boolean isCandidate(CandidateTokenCssResponse css) {
 
         if (css.getStar().toLowerCase().contains("uptrend")
-                && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 30)) {
+                && (Utils.getIntValue(css.getVolumn_div_marketcap()) >= 19)) {
             BigDecimal percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
 
-            if (percent.compareTo(BigDecimal.valueOf(-2)) > 0) {
+            //if (percent.compareTo(BigDecimal.valueOf(-10)) > 0) {
                 return true;
-            }
+            //}
         }
 
         return false;

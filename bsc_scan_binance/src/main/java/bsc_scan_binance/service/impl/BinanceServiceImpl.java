@@ -822,6 +822,7 @@ public class BinanceServiceImpl implements BinanceService {
                             + dto.getAvg28d();
                     css.setAvg_history(avg_history);
                 }
+
                 if (dto.getUptrend()) {
                     if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
                         css.setStar(css.getStar() + " Uptrend Plus");
@@ -909,8 +910,10 @@ public class BinanceServiceImpl implements BinanceService {
                         dto.getEma07d(), dto.getGecko_id(), dto.getSymbol());
 
                 if (isOrderByBynaceVolume) {
-                    if (Utils.isCandidate(css)) {
-                        list.add(css);
+                    if (Utils.isCandidate(css) || Objects.equals("BTC", css.getSymbol())) {
+                        if (!css.getStar().contains("Max5")) {
+                            list.add(css);
+                        }
                     }
                 } else {
                     list.add(css);
