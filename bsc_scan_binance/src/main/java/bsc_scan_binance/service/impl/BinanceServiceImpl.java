@@ -907,6 +907,7 @@ public class BinanceServiceImpl implements BinanceService {
                 sql_update_ema += String.format(
                         "update binance_volumn_week set ema='%s' where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getEma07d(), dto.getGecko_id(), dto.getSymbol());
+
                 if (isOrderByBynaceVolume) {
                     if (Utils.isCandidate(css)) {
                         list.add(css);

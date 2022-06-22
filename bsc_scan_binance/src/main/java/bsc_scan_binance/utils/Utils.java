@@ -141,7 +141,7 @@ public class Utils {
                 && (Utils.getIntValue(css.getVolumn_div_marketcap()) > 30)) {
             BigDecimal percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
 
-            if (percent.compareTo(BigDecimal.valueOf(0)) > 0) {
+            if (percent.compareTo(BigDecimal.valueOf(-2)) > 0) {
                 return true;
             }
         }
