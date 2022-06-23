@@ -154,6 +154,10 @@ public class Utils {
         return true;
     }
 
+    public static Boolean isVectorUp(BigDecimal vector) {
+        return (vector.compareTo(BigDecimal.ZERO) >= 0);
+    }
+
     public static String whenGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
         return (isGoodPrice(curr_price, low_price, hight_price) ? "*5*" : "");
     }

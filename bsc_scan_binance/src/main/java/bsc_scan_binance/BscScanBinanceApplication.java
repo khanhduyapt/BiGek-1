@@ -28,7 +28,7 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            //msg_on = true;
+            msg_on = true;
             if (!Objects.equals(null, args) && args.length > 0 && Objects.equals("msg_on", args[0])) {
                 msg_on = true;
             }
@@ -38,6 +38,8 @@ public class BscScanBinanceApplication {
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
+
+            binance_service.loadDataBtcVolumeDay();
 
             if (msg_on) {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
@@ -79,6 +81,7 @@ public class BscScanBinanceApplication {
                         binance_service.monitorEma();
                         binance_service.monitorProfit();
                         binance_service.monitorToken();
+                        binance_service.loadDataBtcVolumeDay();
                     }
 
                     log.info("reload: "
