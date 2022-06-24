@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,21 +23,18 @@ import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
+import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcVolumeDay;
-import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
-import bsc_scan_binance.entity.PriorityCoinHistory;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
+import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
-import bsc_scan_binance.repository.OrdersRepository;
-import bsc_scan_binance.repository.PriorityCoinHistoryRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
-import bsc_scan_binance.response.BtcVolumeDayByBollingerResponse;
+import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
-import bsc_scan_binance.response.PriorityCoinHistoryResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -61,15 +57,10 @@ public class BinanceServiceImpl implements BinanceService {
     private PriorityCoinRepository priorityCoinRepository;
 
     @Autowired
-    private PriorityCoinHistoryRepository priorityCoinHistoryRepository;
-
-    @Autowired
     private BtcVolumeDayRepository btcVolumeDayRepository;
 
     @Autowired
-    private OrdersRepository ordersRepository;
-
-    private String pre_btc_msg_type = "";
+    private BollAreaRepository bollAreaRepository;
 
     @Override
     @Transactional
@@ -310,10 +301,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.symbol,                                                                             \n"
                     + "   can.name,                                                                               \n"
 
-                    + "    boll.price_can_buy,         \n"
-                    + "    boll.price_can_sell,        \n"
-                    + "    boll.is_bottom_area,        \n"
-                    + "    boll.is_top_area,           \n"
+                    + "    boll.price_can_buy,         \n" + "    boll.price_can_sell,        \n"
+                    + "    boll.is_bottom_area,        \n" + "    boll.is_top_area,           \n"
                     + "    (case when boll.price_can_buy > 0 then ROUND(100*(boll.price_can_sell - boll.price_can_buy)/boll.price_can_buy, 2) else 0 end) as profit,    \n"
                     + "                                                                                           \n"
                     + "    (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '5 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as count_up, "
@@ -380,7 +369,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   macd.avg14d,                                                                               \n"
                     + "   macd.avg21d,                                                                               \n"
                     + "   macd.avg28d,                                                                               \n"
-                    + "   (CASE WHEN (macd.ema07d > 0) and (macd.ema14d < 0) THEN true ELSE false END) AS uptrend   \n"
+                    // Bottleneck -> maybe up trend
+                    + "   (CASE WHEN  (select gecko_id from boll_area b where can.gecko_id = b.gecko_id) IS NOT NULL THEN true ELSE false END) AS uptrend   \n"
                     + "                                                                                             \n"
                     + " from                                                                                        \n"
                     + "   candidate_coin can,                                                                       \n"
@@ -751,23 +741,14 @@ public class BinanceServiceImpl implements BinanceService {
 
                     btc_is_good_price = Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today);
 
-                    if (((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)
-                            && !Objects.equals("Low", pre_btc_msg_type)) {
+                    if (((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
 
                         css.setBtc_warning_css("bg-success");
 
-                        //Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css) + Utils.new_line_from_service  + checkBtcUpDown());
-                        pre_btc_msg_type = "Low";
-
-                    } else if ((price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)
-                            && !Objects.equals("High", pre_btc_msg_type)) {
+                    } else if ((price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)) {
 
                         css.setBtc_warning_css("bg-danger");
 
-                        // Utils.sendToTelegram(emoji_exclamation);
-                        // Utils.sendToTelegram("High price zone! " + Utils.createMsg(css) + Utils.new_line_from_service + checkBtcUpDown());
-
-                        pre_btc_msg_type = "High";
                     }
                 }
 
@@ -784,9 +765,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString().replace(".00", "") + "%");
-                    //css.setMax_price(Utils.removeLastZero(avgPriceList.get(idx_price_max)) + "$("
-                    //        + Utils.toPercent(Utils.getBigDecimalValue(avgPriceList.get(idx_price_max)), price_now)
-                    //        + "%)");
+                    // css.setMax_price(Utils.removeLastZero(avgPriceList.get(idx_price_max)) + "$("
+                    // + Utils.toPercent(Utils.getBigDecimalValue(avgPriceList.get(idx_price_max)),
+                    // price_now)
+                    // + "%)");
 
                     if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)
                             && ((Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
@@ -886,9 +868,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (dto.getUptrend()) {
                     if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
-                        css.setStar(css.getStar() + " Uptrend Plus");
+                        css.setStar(css.getStar() + " Bottleneck Uptrend");
                     } else {
-                        css.setStar(css.getStar() + " Uptrend");
+                        css.setStar(css.getStar() + " Bottleneck");
                     }
                 } else if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
                     // css.setStar(css.getStar() + " 714");
@@ -907,7 +889,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
-                coin.setTarget_percent(Utils.getIntValue(css.getAvg_percent().replace("-", "").replace("%", "")));
                 coin.setVmc(Utils.getIntValue(css.getVolumn_div_marketcap()));
                 coin.setLow_price(lowest_price_today);
                 coin.setHeight_price(highest_price_today);
@@ -917,7 +898,7 @@ public class BinanceServiceImpl implements BinanceService {
                 coin.setEma(dto.getEma07d());
 
                 if (css.getPumping_history().contains("Dump")) {
-                    css.setStar("");
+                    css.setStar(css.getStar() + " Dump_history");
                 }
 
                 Boolean is_candidate = false;
@@ -929,35 +910,32 @@ public class BinanceServiceImpl implements BinanceService {
                     String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now, 1);
                     String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now, 1);
 
-                    css.setAvg_boll_min("Buy: " + Utils.removeLastZero(dto.getPrice_can_buy().toString())
-                            + "(" + avg_boll_min + "%)");
+                    coin.setTarget_percent(Utils.getIntValue(Utils.getBigDecimalValue(avg_boll_max).toBigInteger()));
+
+                    css.setAvg_boll_min("Buy: " + Utils.removeLastZero(dto.getPrice_can_buy().toString()) + "("
+                            + avg_boll_min + "%)");
 
                     css.setAvg_boll_max("Sell: " + Utils.removeLastZero(dto.getPrice_can_sell().toString()) + "("
                             + avg_boll_max + "%)");
 
                     if (dto.getIs_bottom_area()
-                            || ((Utils.getBigDecimalValue(avg_boll_min).abs().multiply(BigDecimal.valueOf(3)))
-                                    .compareTo(Utils.getBigDecimalValue(avg_boll_max).abs()) < 0)) {
+                            || (Utils.getBigDecimal(avg_boll_min).compareTo(BigDecimal.valueOf(-3)) > 0
+                                    && Utils.getBigDecimalValue(avg_boll_max).compareTo(BigDecimal.valueOf(6)) > 0)) {
                         is_candidate = true;
                         predict = true;
 
                         if (BigDecimal.ZERO.compareTo(Utils.getBigDecimal(avg_boll_min)) != 0) {
-                            css.setStar(css.getStar() + " Boll(" + Utils.getBigDecimalValue(avg_boll_max)
-                                    .divide(Utils.getBigDecimalValue(avg_boll_min), 1, RoundingMode.CEILING).abs()
-                                    + ")");
+                            css.setStar(css.getStar() + " Boll(" + avg_boll_max + "%)");
                         }
 
                         css.setStar_css("text-primary");
-
                     }
                 }
                 coin.setPredict(predict);
                 coin.setCandidate(is_candidate);
 
-                String note = "Can" + css.getAvg_boll_min() + "~"
-                        + "Can" + css.getAvg_boll_max() + "~"
-                        + "(v/mc:" + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap()
-                        + "%, Mc:"
+                String note = "Can" + css.getAvg_boll_min() + "~" + "Can" + css.getAvg_boll_max() + "~" + "(v/mc:"
+                        + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap() + "%, Mc:"
                         + Utils.getBigDecimalValue(css.getMarket_cap().replaceAll(",", ""))
                                 .divide(BigDecimal.valueOf(1000000), 1, RoundingMode.CEILING)
                         + "M, price_24h:"
@@ -1195,138 +1173,6 @@ public class BinanceServiceImpl implements BinanceService {
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public void monitorEma() {
-        try {
-            log.info("Start monitorEma ---->");
-
-            // check not in history -> msg 10 times
-            {
-                String sql = "" + " SELECT                                                                  \n"
-                        + "     gecko_id,                                                           \n"
-                        + "     symbol,                                                             \n"
-                        + "     name,                                                               \n"
-                        + "     0 as count_notify                                                   \n"
-                        + " FROM priority_coin                                                      \n"
-                        + " WHERE ema > 0                                                           \n"
-                        + "   AND gecko_id NOT IN                                                   \n"
-                        + "    (SELECT gecko_id FROM priority_coin_history)                         \n";
-                Query query = entityManager.createNativeQuery(sql, "PriorityCoinHistoryResponse");
-
-                List<PriorityCoinHistoryResponse> results = query.getResultList();
-
-                if (!CollectionUtils.isEmpty(results)) {
-                    for (PriorityCoinHistoryResponse dto : results) {
-                        // update count_notify +=1
-                        PriorityCoinHistory entity = priorityCoinHistoryRepository.findById(dto.getGecko_id())
-                                .orElse(null);
-                        if (Objects.equals(null, entity)) {
-                            entity = new PriorityCoinHistory();
-                            entity.setGeckoid(dto.getGecko_id());
-                            entity.setSymbol(dto.getSymbol());
-                            entity.setName(dto.getName());
-                            entity.setCount_notify(1);
-
-                            priorityCoinHistoryRepository.save(entity);
-                        }
-                    }
-                }
-
-                sql = "" + " SELECT                                                         \n"
-                        + "      gecko_id,                                                  \n"
-                        + "      symbol,                                                    \n"
-                        + "      name,                                                      \n"
-                        + "      count_notify                                               \n"
-                        + "  FROM priority_coin_history                                     \n"
-                        + "  WHERE count_notify < 2                                         \n" // 1 time
-                        + "  AND gecko_id  IN                                               \n"
-                        + "     (SELECT gecko_id FROM priority_coin where ema > 0)          \n";
-
-                query = entityManager.createNativeQuery(sql, "PriorityCoinHistoryResponse");
-                results = query.getResultList();
-
-                if (!CollectionUtils.isEmpty(results)) {
-                    for (PriorityCoinHistoryResponse dto : results) {
-                        PriorityCoinHistory entity = new PriorityCoinHistory();
-                        entity.setGeckoid(dto.getGecko_id());
-                        entity.setSymbol(dto.getSymbol());
-                        entity.setName(dto.getName());
-                        entity.setCount_notify(Utils.getIntValue(dto.getCount_notify()) + 1);
-
-                        priorityCoinHistoryRepository.save(entity);
-
-                        PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
-                        if (!Objects.equals(null, coin) && (coin.getTarget_percent() >= 10)
-                                && ((coin.getLow_price().add(coin.getHeight_price())).divide(BigDecimal.valueOf(2))
-                                        .compareTo(coin.getCurrent_price()) > 0)
-                                && (coin.getVmc() >= 30)) {
-                            Utils.sendToTelegram(
-                                    "Uptrend: " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
-                        }
-                    }
-                }
-
-            }
-
-            // check delete from history -> msg
-            {
-                String sql = "" + " SELECT                                                                  \n"
-                        + "     gecko_id,                                                           \n"
-                        + "     symbol,                                                             \n"
-                        + "     name,                                                               \n"
-                        + "     count_notify                                                        \n"
-                        + " FROM priority_coin_history                                              \n"
-                        + " WHERE gecko_id NOT IN                                                   \n"
-                        + "    (SELECT gecko_id FROM priority_coin where ema > 0)                   \n";
-                Query query = entityManager.createNativeQuery(sql, "PriorityCoinHistoryResponse");
-
-                List<PriorityCoinHistoryResponse> results = query.getResultList();
-                if (!CollectionUtils.isEmpty(results)) {
-                    List<Orders> list_order = ordersRepository.findAll();
-
-                    for (PriorityCoinHistoryResponse dto : results) {
-                        // update count_notify +=1
-                        PriorityCoinHistory entity = priorityCoinHistoryRepository.findById(dto.getGecko_id())
-                                .orElse(null);
-                        if (!Objects.equals(null, entity)) {
-
-                            if (entity.getCount_notify() > 0) {
-                                entity.setCount_notify(Utils.getIntValue(entity.getCount_notify()) - 1);
-
-                                priorityCoinHistoryRepository.save(entity);
-                            } else {
-
-                                priorityCoinHistoryRepository.delete(entity);
-                            }
-
-                            Optional<Orders> order = list_order.stream()
-                                    .filter(item -> Objects.equals(item.getGeckoid(), entity.getGeckoid())).findFirst();
-                            if (order.isPresent()) {
-
-                                PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
-                                if (!Objects.equals(null, coin)) {
-                                    Utils.sendToTelegram("Downtrend: "
-                                            + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
-                                }
-                            }
-                        }
-
-                    }
-
-                }
-            }
-            log.info("End monitorEma <----");
-        } catch (
-
-        Exception e) {
-            e.printStackTrace();
-            log.info("monitorEma error ------->");
-            log.error(e.getMessage());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    @Transactional
     public void monitorProfit() {
         try {
             log.info("Start monitorProfit ---->");
@@ -1336,6 +1182,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<OrdersProfitResponse> results = query.getResultList();
 
             if (!CollectionUtils.isEmpty(results)) {
+
                 for (OrdersProfitResponse dto : results) {
                     BigDecimal tp_percent = Utils.getBigDecimal(dto.getTp_percent());
                     BigDecimal target_percent = Utils.getBigDecimal(dto.getTarget_percent())
@@ -1346,19 +1193,12 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (tp_percent.compareTo(target_percent) >= 0) {
-
-                        Utils.sendToTelegram("TakeProfit: " + Utils.createMsg(dto));
-
+                        Utils.sendToTelegram("TakeProfit (target=" + target_percent + "%): " + Utils.createMsg(dto));
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-5)) <= 0) {
-
                         Utils.sendToTelegram("STOP LOST 5%: " + Utils.createMsg(dto));
-
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-2.8)) <= 0) {
-
                         Utils.sendToTelegram("STOP LOST 3%: " + Utils.createMsg(dto));
-
                     }
-
                 }
             }
 
@@ -1373,26 +1213,28 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @Override
-    public void monitorToken(String gecko_id) {
+    @Transactional
+    public void monitorBollingerBandwidth() {
         try {
             log.info("Start monitorToken ---->");
-            String sql = ""
-                    + " select                          \n"
-                    + "     boll.gecko_id,              \n"
-                    + "     boll.symbol,                \n"
-                    + "     boll.name,                  \n"
-                    + "     boll.avg_price,             \n"
-                    + "     boll.price_can_buy,         \n"
-                    + "     boll.price_can_sell,        \n"
-                    + "     boll.is_bottom_area,        \n"
-                    + "     boll.is_top_area,           \n"
-                    + "     ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) profit,    \n"
-                    + "     (case when vector.vector_now > 0 then true else false end) vector_up,   \n"
-                    + "     concat('v1h:', cast(vector.vector_now as varchar), ', v4h:' ,cast(vector.vector_pre4h as varchar)) as vector_desc \n"
+            String sql = "" + " select                                                              \n"
+                    + "     boll.gecko_id,                                                          \n"
+                    + "     boll.symbol,                                                            \n"
+                    + "     boll.name,                                                              \n"
+                    + "     boll.avg_price,                                                         \n"
+                    + "     boll.price_open_candle,                                                 \n"
+                    + "     boll.price_close_candle,                                                \n"
+                    + "     boll.low_price,                                                         \n"
+                    + "     boll.hight_price,                                                       \n"
+                    + "     boll.price_can_buy,                                                     \n"
+                    + "     boll.price_can_sell,                                                    \n"
+                    + "     boll.is_bottom_area,                                                    \n"
+                    + "     boll.is_top_area,                                                       \n"
+                    + "     ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) as profit,                                             \n"
+                    + "     (case when vector.vector_now > 0 then true else false end)   as vector_up,                                          \n"
+                    + "     concat('v1h:', cast(vector.vector_now as varchar), ', v4h:' ,cast(vector.vector_pre4h as varchar)) as vector_desc   \n"
                     + " FROM                                                                        \n"
-                    + Utils.sql_boll_2_body
-
-                    + " , \n"
+                    + Utils.sql_boll_2_body + " , \n"
                     + " (                                                                                           \n"
                     + "  select                                                                                     \n"
                     + "       pre.gecko_id,                                                                         \n"
@@ -1415,57 +1257,39 @@ public class BinanceServiceImpl implements BinanceService {
                     + "                                                                                             \n"
                     + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '4 hours', 'HH24') and TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre4h,   \n"
                     + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '8 hours', 'HH24') and TO_CHAR(NOW() - interval  '5 hours', 'HH24')) as price_pre8h    \n"
-                    + "           from  \n"
-                    + "               btc_volumn_day d \n"
+                    + "           from  \n" + "               btc_volumn_day d \n"
                     + "           where d.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "           ) as tmp                                                                          \n"
                     + "   ) as pre                                                                                  \n"
                     + " ) vector                                                                                    \n"
                     + "                                                                                             \n"
-                    + " where 1=1                                                                                   \n";
-
-            if (Utils.isNotBlank(gecko_id)) {
-                sql += " and boll.gecko_id ='" + gecko_id + "'";
-            } else {
-                sql += " and ((boll.is_bottom_area and boll.gecko_id not in (select gecko_id from orders)) or (boll.is_top_area and boll.gecko_id in (select gecko_id from orders)))  \n";
-            }
-
-            sql += " and vector.gecko_id = boll.gecko_id                                                            \n"
+                    + " where 1=1                                                                                   \n"
+                    + " and (abs(price_can_sell-price_can_buy) < 3*abs(price_close_candle-price_open_candle))       \n"
+                    + " and vector.gecko_id = boll.gecko_id                                                         \n"
                     + " order by ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) desc                  \n";
 
-            Query query = entityManager.createNativeQuery(sql, "BtcVolumeDayByBollingerResponse");
-
-            String msg = "";
+            Query query = entityManager.createNativeQuery(sql, "BollAreaResponse");
 
             @SuppressWarnings("unchecked")
-            List<BtcVolumeDayByBollingerResponse> boll_anna_list = query.getResultList();
+            List<BollAreaResponse> boll_anna_list = query.getResultList();
             if (!CollectionUtils.isEmpty(boll_anna_list)) {
-                int idx = 0;
+                bollAreaRepository.deleteAll();
 
-                for (BtcVolumeDayByBollingerResponse dto : boll_anna_list) {
-                    idx += 1;
-                    msg += "(Boll) " + Utils.createMsgBollingerResponse(dto)
-                            + Utils.new_line_from_service + Utils.new_line_from_service;
+                List<BollArea> list = new ArrayList<BollArea>();
+                for (BollAreaResponse dto : boll_anna_list) {
+                    BollArea entiy = (new ModelMapper()).map(dto, BollArea.class);
+                    list.add(entiy);
 
-                    if (idx == 5) {
-                        idx = 0;
-                        Utils.sendToTelegram(msg);
-                        msg = "";
+                    if (dto.getIs_bottom_area()
+                            && (Utils.getBigDecimal(dto.getProfit()).compareTo(BigDecimal.valueOf(5)) > 0)) {
+                        Utils.sendToTelegram(Utils.createMsgBollingerResponse(dto));
                     }
                 }
-                if (Utils.isNotBlank(msg)) {
-                    Utils.sendToTelegram(msg);
-                }
-            }
 
-            if (Utils.isNotBlank(gecko_id) && !Utils.isNotBlank(msg)) {
-                Utils.sendToTelegram("(Boll) Not found:" + gecko_id);
+                bollAreaRepository.saveAll(list);
             }
-
             log.info("End monitorToken <----");
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("monitorToken error ------->");
             log.error(e.getMessage());

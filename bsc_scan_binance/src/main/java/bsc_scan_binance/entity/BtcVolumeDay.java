@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
-import bsc_scan_binance.response.BtcVolumeDayByBollingerResponse;
+import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.BtcVolumeDayResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 //)
 
 @SqlResultSetMapping(name = "BtcVolumeDayByBollingerResponse", classes = {
-        @ConstructorResult(targetClass = BtcVolumeDayByBollingerResponse.class, columns = {
+        @ConstructorResult(targetClass = BollAreaResponse.class, columns = {
                 @ColumnResult(name = "gecko_id", type = String.class),
                 @ColumnResult(name = "symbol", type = String.class),
                 @ColumnResult(name = "name", type = String.class),

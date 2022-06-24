@@ -74,12 +74,13 @@ public class WandaBot extends TelegramLongPollingBot {
                 return;
             }
 
-            //int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-            //if ((minus > 59) || (minus < 3)) {
-            //    message.setText("59...3 minutes is the time to get data.");
-            //    execute(message);
-            //    return;
-            //}
+            // int minus = Utils.getIntValue(Utils.convertDateToString("mm",
+            // Calendar.getInstance().getTime()));
+            // if ((minus > 59) || (minus < 3)) {
+            // message.setText("59...3 minutes is the time to get data.");
+            // execute(message);
+            // return;
+            // }
 
             System.out.println(update.getMessage().getText());
             String command = update.getMessage().getText();
@@ -107,10 +108,9 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot)
-                        + Utils.new_line_from_bot);
+                message.setText(
+                        Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot) + Utils.new_line_from_bot);
                 execute(message);
-                binance_service.monitorToken("bitcoin");
 
             } else if (command.contains("/buy")) {
                 Calendar calendar = Calendar.getInstance();
@@ -137,8 +137,8 @@ public class WandaBot extends TelegramLongPollingBot {
                             btc.getMax_price());
 
                     message.setText("The current price is unfavorable.\nWaiting for BTC correct to "
-                            + Utils.removeLastZero(good_price.toString())
-                            + "(" + Utils.toPercent(btc_now.getPriceAtBinance(), good_price, 1) + "%).");
+                            + Utils.removeLastZero(good_price.toString()) + "("
+                            + Utils.toPercent(btc_now.getPriceAtBinance(), good_price, 1) + "%).");
                     execute(message);
 
                     if (!command.contains("/buynow")) {
@@ -164,18 +164,17 @@ public class WandaBot extends TelegramLongPollingBot {
                                 Utils.convertDateToString("yyyyMMdd", calendar.getTime())))
                         .orElse(null);
 
-                message.setText(
-                        dto.getId().getSymbol() + ": " + Utils.createMsg(dto.getPriceAtBinance(), temp.getMin_price(),
-                                temp.getMax_price()));
+                message.setText(dto.getId().getSymbol() + ": "
+                        + Utils.createMsg(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price()));
                 execute(message);
 
                 if (!Utils.isGoodPrice(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price())) {
-                    BigDecimal good_price = Utils.getGoodPrice(dto.getPriceAtBinance(),
-                            temp.getMin_price(), temp.getMax_price());
+                    BigDecimal good_price = Utils.getGoodPrice(dto.getPriceAtBinance(), temp.getMin_price(),
+                            temp.getMax_price());
 
                     message.setText("Waiting for " + dto.getId().getSymbol() + " correct to "
-                            + Utils.removeLastZero(good_price.toString())
-                            + "(" + Utils.toPercent(dto.getPriceAtBinance(), good_price, 1) + "%).");
+                            + Utils.removeLastZero(good_price.toString()) + "("
+                            + Utils.toPercent(dto.getPriceAtBinance(), good_price, 1) + "%).");
                     execute(message);
 
                     if (!command.contains("/buynow")) {
@@ -425,6 +424,5 @@ public class WandaBot extends TelegramLongPollingBot {
         message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
         execute(message);
 
-        binance_service.monitorToken(list.get(0).getGeckoid());
     }
 }

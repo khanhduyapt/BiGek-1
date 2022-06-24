@@ -12,9 +12,7 @@ public interface BinanceService {
 
     public void loadDataBtcVolumeDay(String gecko_id, String symbol);
 
-    public void monitorEma();
-
     public void monitorProfit();
 
-    public void monitorToken(String gecko_id);
+    public void monitorBollingerBandwidth();
 }
