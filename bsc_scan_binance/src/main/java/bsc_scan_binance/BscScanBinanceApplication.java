@@ -28,9 +28,14 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            msg_on = true;
-            if (!Objects.equals(null, args) && args.length > 0 && Objects.equals("msg_on", args[0])) {
-                msg_on = true;
+            //msg_on = true;
+            if (!Objects.equals(null, args) && args.length > 0) {
+                if (Objects.equals("msg_on", args[0])) {
+                    msg_on = true;
+
+                } else if (Objects.equals("msg_off", args[0])) {
+                    msg_on = false;
+                }
             }
             log.info("msg_on:" + msg_on);
             // --------------------Init--------------------
