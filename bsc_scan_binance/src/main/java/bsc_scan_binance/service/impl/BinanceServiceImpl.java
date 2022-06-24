@@ -1299,9 +1299,26 @@ public class BinanceServiceImpl implements BinanceService {
                     BollArea entiy = (new ModelMapper()).map(dto, BollArea.class);
                     list.add(entiy);
 
+                    String id = "";
                     if (dto.getIs_bottom_area()
                             && (Utils.getBigDecimal(dto.getProfit()).compareTo(BigDecimal.valueOf(5)) > 0)) {
-                        Utils.sendToTelegram(Utils.createMsgBollingerResponse(dto));
+
+                        id = dto.getGecko_id();
+                    } else {
+                        BigDecimal lost_percent = Utils
+                                .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), dto.getAvg_price(), 1));
+
+                        if (lost_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
+                            id = dto.getGecko_id();
+                        }
+                    }
+
+                    if (Utils.isNotBlank(id)) {
+                        PriorityCoin coin = priorityCoinRepository.findById(id).orElse(null);
+                        if (!Objects.equals(null, coin)) {
+                            Utils.sendToTelegram(
+                                    "(Bollinger) " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
+                        }
                     }
                 }
 

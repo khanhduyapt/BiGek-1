@@ -161,7 +161,7 @@ public class Utils {
         }
         result += new_line_from_service + "Price: " + dto.getAvg_price() + "$" + new_line_from_service;
 
-        result += "CanBuy: " + dto.getPrice_can_buy() + "(" + toPercent(dto.getAvg_price(), dto.getPrice_can_buy(), 1)
+        result += "CanBuy: " + dto.getPrice_can_buy() + "(" + toPercent(dto.getPrice_can_buy(), dto.getAvg_price(), 1)
                 + "%)" + new_line_from_service;
 
         result += "CanSell: " + dto.getPrice_can_sell() + "(" + toPercent(dto.getPrice_can_sell(), dto.getAvg_price())
