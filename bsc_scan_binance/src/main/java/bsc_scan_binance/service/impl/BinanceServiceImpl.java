@@ -784,22 +784,15 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString().replace(".00", "") + "%");
-                    css.setMax_price(Utils.removeLastZero(avgPriceList.get(idx_price_max)) + "$("
-                            + Utils.toPercent(Utils.getBigDecimalValue(avgPriceList.get(idx_price_max)), price_now)
-                            + "%)");
+                    //css.setMax_price(Utils.removeLastZero(avgPriceList.get(idx_price_max)) + "$("
+                    //        + Utils.toPercent(Utils.getBigDecimalValue(avgPriceList.get(idx_price_max)), price_now)
+                    //        + "%)");
 
                     if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)
                             && ((Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
                                     .compareTo(BigDecimal.valueOf(10)) > -1))) {
                         css.setStar("🤩");
                     }
-
-                    if (dto.getIs_bottom_area() || dto.getIs_bottom_area()) {
-                        css.setAvg_buy_sell_price("Buy:" + Utils.removeLastZero(dto.getPrice_can_buy().toString())
-                                + ", Sell:" + Utils.removeLastZero(dto.getPrice_can_sell().toString()) + "("
-                                + dto.getProfit() + "%)");
-                    }
-
                 } else {
                     css.setAvg_price("0.0");
                 }
@@ -913,27 +906,11 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar_css("text-success");
                 }
 
-                Boolean is_candidate = false;
-                if (Utils.isCandidate(css)) {
-                    is_candidate = true;
-                }
-
-                Boolean predict = false;
-                if (Utils.isCandidate(css) && (Utils.getIntValue(css.getAvg_percent()) >= 10)) {
-                    predict = true;
-                }
-                coin.setPredict(predict);
-
                 coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
                 coin.setTarget_percent(Utils.getIntValue(css.getAvg_percent().replace("-", "").replace("%", "")));
-                if (!css.getAvg_percent().contains("-")) {
-                    is_candidate = false;
-                    coin.setTarget_percent(0 - coin.getTarget_percent());
-                }
                 coin.setVmc(Utils.getIntValue(css.getVolumn_div_marketcap()));
                 coin.setLow_price(lowest_price_today);
                 coin.setHeight_price(highest_price_today);
-                coin.setCandidate(is_candidate);
                 coin.setIndex(index);
                 coin.setSymbol(css.getSymbol());
                 coin.setName(css.getName());
@@ -957,20 +934,32 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar("");
                 }
 
-                if (dto.getIs_bottom_area()) {
-                    css.setStar("Boll");
-                    css.setStar_css("text-primary");
-                }
+                String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now, 1);
+                String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now, 1);
 
-                if (is_candidate) {
-                    if (Objects.equals("", coin.getDiscovery_date_time())
-                            || !Objects.equals(coin.getEma(), dto.getEma07d())) {
-                        coin.setDiscovery_date_time(
-                                Utils.convertDateToString("MM/dd hh:mm:ss", Calendar.getInstance().getTime()));
-                    }
-                } else {
-                    coin.setDiscovery_date_time("");
+                css.setAvg_boll_min("Buy:" + Utils.removeLastZero(dto.getPrice_can_buy().toString())
+                        + "(" + avg_boll_min + "%)");
+
+                css.setAvg_boll_max("Sell:" + Utils.removeLastZero(dto.getPrice_can_sell().toString()) + "("
+                        + avg_boll_max + "%)");
+
+                Boolean is_candidate = false;
+                Boolean predict = false;
+
+                if (dto.getIs_bottom_area()
+                        || ((Utils.getBigDecimalValue(avg_boll_min).abs().multiply(BigDecimal.valueOf(3)))
+                                .compareTo(Utils.getBigDecimalValue(avg_boll_max).abs()) < 0)) {
+                    is_candidate = true;
+                    predict = true;
+
+                    css.setStar(css.getStar() + " Boll(" + Utils.getBigDecimalValue(avg_boll_max)
+                            .divide(Utils.getBigDecimalValue(avg_boll_min), 1, RoundingMode.CEILING).abs() + ")");
+
+                    css.setStar_css("text-primary");
+
                 }
+                coin.setPredict(predict);
+                coin.setCandidate(is_candidate);
 
                 coin.setGoodPrice(false);
                 if (this_token_is_good_price || btc_is_good_price) {
@@ -985,10 +974,8 @@ public class BinanceServiceImpl implements BinanceService {
                         dto.getEma07d(), dto.getGecko_id(), dto.getSymbol());
 
                 if (isOrderByBynaceVolume) {
-                    if (Utils.isCandidate(css) || Objects.equals("BTC", css.getSymbol())) {
-                        if (!css.getStar().contains("Max5")) {
-                            list.add(css);
-                        }
+                    if (is_candidate) {
+                        list.add(css);
                     }
                 } else {
                     list.add(css);

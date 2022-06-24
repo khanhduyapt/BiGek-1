@@ -168,18 +168,21 @@ public class Utils {
 
     public static String createMsgBollingerResponse(BtcVolumeDayByBollingerResponse dto) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id());
+
         if (dto.getIs_bottom_area()) {
             result += " (bottom price area)";
         } else if (dto.getIs_top_area()) {
             result += " (top price area)";
         }
+        if(dto.getVector_up()) {
+            result += " Uptrend";
+        }
+        result += new_line_from_service + "Price: " + dto.getAvg_price() + "$" + new_line_from_service;
 
-        result += new_line_from_service + "Price:" + dto.getAvg_price() + "$" + new_line_from_service;
-
-        result += "CanBuy:" + dto.getPrice_can_buy() + "(" + toPercent(dto.getAvg_price(), dto.getPrice_can_buy(), 1)
+        result += "CanBuy: " + dto.getPrice_can_buy() + "(" + toPercent(dto.getAvg_price(), dto.getPrice_can_buy(), 1)
                 + "%)" + new_line_from_service;
 
-        result += "CanSell:" + dto.getPrice_can_sell() + "(" + toPercent(dto.getPrice_can_sell(), dto.getAvg_price())
+        result += "CanSell: " + dto.getPrice_can_sell() + "(" + toPercent(dto.getPrice_can_sell(), dto.getAvg_price())
                 + "%)" + new_line_from_service;
 
         result += dto.getVector_desc();

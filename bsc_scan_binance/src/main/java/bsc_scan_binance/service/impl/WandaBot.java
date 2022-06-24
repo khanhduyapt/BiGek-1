@@ -2,6 +2,7 @@ package bsc_scan_binance.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -85,7 +86,17 @@ public class WandaBot extends TelegramLongPollingBot {
 
             if (command.equals("/all")) {
                 binance_service.getList(false);
-                binance_service.monitorToken("");
+                List<PriorityCoin> list = searchCandidate();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+
+                for (PriorityCoin coin : list) {
+                    message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
+                    execute(message);
+                }
 
             } else if (command.contains("/btc")) {
                 binance_service.getList(false);
@@ -390,6 +401,16 @@ public class WandaBot extends TelegramLongPollingBot {
     private Long take_profit_id_seq() {
         String sql = "SELECT nextval('take_profit_id_seq')";
         return Long.parseLong(entityManager.createNativeQuery(sql).getSingleResult().toString());
+    }
+
+    private List<PriorityCoin> searchCandidate() {
+        try {
+            List<PriorityCoin> results = priorityCoinRepository.findAllByCandidateOrderByVmcDesc(true);
+            return results;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<PriorityCoin>();
+        }
     }
 
     private void checkCommand(SendMessage message, String token) throws TelegramApiException {
