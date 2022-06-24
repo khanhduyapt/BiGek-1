@@ -914,20 +914,6 @@ public class BinanceServiceImpl implements BinanceService {
                 coin.setIndex(index);
                 coin.setSymbol(css.getSymbol());
                 coin.setName(css.getName());
-                coin.setNote("(v/mc:" + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap()
-                        + "%, Mc:"
-                        + Utils.getBigDecimalValue(css.getMarket_cap().replaceAll(",", ""))
-                                .divide(BigDecimal.valueOf(1000000), 1, RoundingMode.CEILING)
-                        + "M, price_24h:"
-                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%)"
-
-                        + (Objects.equals("", Utils.getStringValue(css.getNote())) ? ""
-                                : "~" + Utils.getStringValue(css.getNote()))
-                        + (Objects.equals("", Utils.getStringValue(css.getTrend())) ? ""
-                                : "~" + Utils.getStringValue(css.getTrend()))
-                        + (Objects.equals("", Utils.getStringValue(css.getPumping_history())) ? ""
-                                : "~" + Utils.getStringValue(css.getPumping_history())));
-
                 coin.setEma(dto.getEma07d());
 
                 if (css.getPumping_history().contains("Dump")) {
@@ -937,10 +923,10 @@ public class BinanceServiceImpl implements BinanceService {
                 String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now, 1);
                 String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now, 1);
 
-                css.setAvg_boll_min("Buy:" + Utils.removeLastZero(dto.getPrice_can_buy().toString())
+                css.setAvg_boll_min("Buy: " + Utils.removeLastZero(dto.getPrice_can_buy().toString())
                         + "(" + avg_boll_min + "%)");
 
-                css.setAvg_boll_max("Sell:" + Utils.removeLastZero(dto.getPrice_can_sell().toString()) + "("
+                css.setAvg_boll_max("Sell: " + Utils.removeLastZero(dto.getPrice_can_sell().toString()) + "("
                         + avg_boll_max + "%)");
 
                 Boolean is_candidate = false;
@@ -960,6 +946,29 @@ public class BinanceServiceImpl implements BinanceService {
                 }
                 coin.setPredict(predict);
                 coin.setCandidate(is_candidate);
+
+                String note = "Can" + css.getAvg_boll_min() + "~"
+                        + "Can" + css.getAvg_boll_max() + "~"
+                        + "(v/mc:" + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap()
+                        + "%, Mc:"
+                        + Utils.getBigDecimalValue(css.getMarket_cap().replaceAll(",", ""))
+                                .divide(BigDecimal.valueOf(1000000), 1, RoundingMode.CEILING)
+                        + "M, price_24h:"
+                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%)"
+
+                        + (Utils.isNotBlank(Utils.getStringValue(css.getNote()))
+                                ? "~" + Utils.getStringValue(css.getNote())
+                                : "")
+
+                        + (Utils.isNotBlank(Utils.getStringValue(css.getTrend()))
+                                ? "~" + Utils.getStringValue(css.getTrend())
+                                : "")
+
+                        + (Utils.isNotBlank(Utils.getStringValue(css.getPumping_history()))
+                                ? "~" + Utils.getStringValue(css.getPumping_history())
+                                : "");
+
+                coin.setNote(note);
 
                 coin.setGoodPrice(false);
                 if (this_token_is_good_price || btc_is_good_price) {

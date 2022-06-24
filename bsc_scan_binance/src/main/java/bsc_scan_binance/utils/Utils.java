@@ -144,10 +144,6 @@ public class Utils {
                 + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price(), 1)) + "%)"
 
                 + newline + dto.getNote().replace("~", newline);
-
-        if (isNotBlank(dto.getDiscovery_date_time())) {
-            result += newline + "Disco:" + dto.getDiscovery_date_time();
-        }
         return result;
     }
 
