@@ -920,29 +920,36 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar("");
                 }
 
-                String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now, 1);
-                String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now, 1);
-
-                css.setAvg_boll_min("Buy: " + Utils.removeLastZero(dto.getPrice_can_buy().toString())
-                        + "(" + avg_boll_min + "%)");
-
-                css.setAvg_boll_max("Sell: " + Utils.removeLastZero(dto.getPrice_can_sell().toString()) + "("
-                        + avg_boll_max + "%)");
-
                 Boolean is_candidate = false;
                 Boolean predict = false;
+                if (!Objects.equals(null, dto.getPrice_can_buy()) && !Objects.equals(null, dto.getPrice_can_sell())
+                        && BigDecimal.ZERO.compareTo(dto.getPrice_can_buy()) != 0
+                        && BigDecimal.ZERO.compareTo(dto.getPrice_can_sell()) != 0) {
 
-                if (dto.getIs_bottom_area()
-                        || ((Utils.getBigDecimalValue(avg_boll_min).abs().multiply(BigDecimal.valueOf(3)))
-                                .compareTo(Utils.getBigDecimalValue(avg_boll_max).abs()) < 0)) {
-                    is_candidate = true;
-                    predict = true;
+                    String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now, 1);
+                    String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now, 1);
 
-                    css.setStar(css.getStar() + " Boll(" + Utils.getBigDecimalValue(avg_boll_max)
-                            .divide(Utils.getBigDecimalValue(avg_boll_min), 1, RoundingMode.CEILING).abs() + ")");
+                    css.setAvg_boll_min("Buy: " + Utils.removeLastZero(dto.getPrice_can_buy().toString())
+                            + "(" + avg_boll_min + "%)");
 
-                    css.setStar_css("text-primary");
+                    css.setAvg_boll_max("Sell: " + Utils.removeLastZero(dto.getPrice_can_sell().toString()) + "("
+                            + avg_boll_max + "%)");
 
+                    if (dto.getIs_bottom_area()
+                            || ((Utils.getBigDecimalValue(avg_boll_min).abs().multiply(BigDecimal.valueOf(3)))
+                                    .compareTo(Utils.getBigDecimalValue(avg_boll_max).abs()) < 0)) {
+                        is_candidate = true;
+                        predict = true;
+
+                        if (BigDecimal.ZERO.compareTo(Utils.getBigDecimal(avg_boll_min)) != 0) {
+                            css.setStar(css.getStar() + " Boll(" + Utils.getBigDecimalValue(avg_boll_max)
+                                    .divide(Utils.getBigDecimalValue(avg_boll_min), 1, RoundingMode.CEILING).abs()
+                                    + ")");
+                        }
+
+                        css.setStar_css("text-primary");
+
+                    }
                 }
                 coin.setPredict(predict);
                 coin.setCandidate(is_candidate);
