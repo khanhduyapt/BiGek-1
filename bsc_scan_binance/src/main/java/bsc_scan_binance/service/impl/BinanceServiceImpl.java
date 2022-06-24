@@ -765,10 +765,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString().replace(".00", "") + "%");
-                    // css.setMax_price(Utils.removeLastZero(avgPriceList.get(idx_price_max)) + "$("
-                    // + Utils.toPercent(Utils.getBigDecimalValue(avgPriceList.get(idx_price_max)),
-                    // price_now)
-                    // + "%)");
 
                     if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)
                             && ((Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
@@ -1182,6 +1178,8 @@ public class BinanceServiceImpl implements BinanceService {
             List<OrdersProfitResponse> results = query.getResultList();
 
             if (!CollectionUtils.isEmpty(results)) {
+                int index = 1;
+                String msg = "";
 
                 for (OrdersProfitResponse dto : results) {
                     BigDecimal tp_percent = Utils.getBigDecimal(dto.getTp_percent());
@@ -1193,12 +1191,33 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (tp_percent.compareTo(target_percent) >= 0) {
-                        Utils.sendToTelegram("TakeProfit (target=" + target_percent + "%): " + Utils.createMsg(dto));
+
+                        msg += "TakeProfit (target=" + target_percent + "%): "
+                                + Utils.createMsg(dto, Utils.new_line_from_service) + Utils.new_line_from_service
+                                + Utils.new_line_from_service;
+
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-5)) <= 0) {
-                        Utils.sendToTelegram("STOP LOST 5%: " + Utils.createMsg(dto));
+
+                        msg += "STOP LOST 5%: " + Utils.createMsg(dto, Utils.new_line_from_service)
+                                + Utils.new_line_from_service + Utils.new_line_from_service;
+
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-2.8)) <= 0) {
-                        Utils.sendToTelegram("STOP LOST 3%: " + Utils.createMsg(dto));
+
+                        msg += "STOP LOST 3%: " + Utils.createMsg(dto, Utils.new_line_from_service)
+                                + Utils.new_line_from_service + Utils.new_line_from_service;
                     }
+
+                    if (index == 5) {
+                        Utils.sendToTelegram(msg);
+                        msg = "";
+                        index = 1;
+                    }
+                    index += 1;
+                }
+
+                if (Utils.isNotBlank(msg)) {
+                    Utils.sendToTelegram(msg);
+                    msg = "";
                 }
             }
 

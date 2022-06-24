@@ -336,14 +336,35 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
+                int index = 1;
+                String msg = "";
                 for (OrdersProfitResponse dto : list) {
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
-                        Utils.sendToTelegram("PROFIT: " + Utils.createMsg(dto));
-
+                        msg += "PROFIT: ";
                     } else {
-                        Utils.sendToTelegram("LOST  : " + Utils.createMsg(dto));
+                        msg += "LOST  : ";
                     }
+
+                    msg += Utils.createMsg(dto, Utils.new_line_from_bot) + Utils.new_line_from_bot
+                            + Utils.new_line_from_bot;
+
+                    if (index == 5) {
+                        message.setText(msg);
+                        execute(message);
+
+                        msg = "";
+                        index = 1;
+                    }
+                    index += 1;
                 }
+
+                if (Utils.isNotBlank(msg)) {
+                    message.setText(msg);
+                    execute(message);
+
+                    msg = "";
+                }
+
             } else if (command.contains("/mute")) {
                 List<PriorityCoin> list = priorityCoinRepository.findAllByMute(true);
                 if (!CollectionUtils.isEmpty(list)) {

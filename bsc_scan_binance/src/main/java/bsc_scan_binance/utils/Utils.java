@@ -93,14 +93,15 @@ public class Utils {
                 + tele.getTarget_percent() + " ema:" + tele.getEma();
     }
 
-    public static String createMsg(OrdersProfitResponse dto) {
-        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + "%0A" + "Price: "
+    public static String createMsg(OrdersProfitResponse dto, String newline) {
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + newline + "Price: "
                 + dto.getPrice_at_binance().toString() + "$, " + "Profit: "
-                + Utils.removeLastZero(dto.getTp_amount().toString()) + "$ (" + dto.getTp_percent() + "%)%0A"
+                + Utils.removeLastZero(dto.getTp_amount().toString()) + "$ (" + dto.getTp_percent() + "%)" + newline
                 + "Bought: " + dto.getOrder_price().toString() + "$, " + "T: "
-                + Utils.removeLastZero(dto.getAmount().toString()) + "$" + "%0A" + "L:" + dto.getLow_price() + "("
-                + removeLastZero(toPercent(dto.getLow_price(), dto.getOrder_price())) + "%)_H:" + dto.getHeight_price()
-                + "(" + removeLastZero(toPercent(dto.getHeight_price(), dto.getOrder_price())) + "%)";
+                + Utils.removeLastZero(dto.getAmount().toString()) + "$" + newline + "L:" + dto.getLow_price() + "("
+                + removeLastZero(toPercent(dto.getLow_price(), dto.getOrder_price(), 1)) + "%)_H:"
+                + dto.getHeight_price() + "("
+                + removeLastZero(toPercent(dto.getHeight_price(), dto.getOrder_price(), 1)) + "%)";
 
         return result;
     }
