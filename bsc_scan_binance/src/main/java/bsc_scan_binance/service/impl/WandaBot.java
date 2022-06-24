@@ -2,7 +2,6 @@ package bsc_scan_binance.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -36,9 +35,7 @@ import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WandaBot extends TelegramLongPollingBot {
@@ -86,111 +83,9 @@ public class WandaBot extends TelegramLongPollingBot {
             System.out.println(update.getMessage().getText());
             String command = update.getMessage().getText();
 
-            if (command.equals("/web3")) {
+            if (command.equals("/all")) {
                 binance_service.getList(false);
-                List<PriorityCoin> list = searchCandidate();
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                for (PriorityCoin coin : list) {
-                    if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("web3")) {
-                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                        execute(message);
-                    }
-                }
-            } else if (command.equals("/defi")) {
-                binance_service.getList(false);
-                List<PriorityCoin> list = searchCandidate();
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                for (PriorityCoin coin : list) {
-                    if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("defi")) {
-                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                        execute(message);
-                    }
-                }
-            } else if (command.equals("/fan")) {
-                binance_service.getList(false);
-                List<PriorityCoin> list = searchCandidate();
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                for (PriorityCoin coin : list) {
-                    if (Utils.getStringValue(coin.getName() + coin.getGeckoid()).toLowerCase().contains("fan")) {
-                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                        execute(message);
-                    }
-                }
-            } else if (command.equals("/game")) {
-                binance_service.getList(false);
-                List<PriorityCoin> list = searchCandidate();
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                for (PriorityCoin coin : list) {
-                    if (Utils.getStringValue(coin.getNote()).toLowerCase().contains("game")) {
-                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                        execute(message);
-                    }
-                }
-            } else if (command.equals("/other")) {
-                binance_service.getList(false);
-                List<PriorityCoin> list = searchCandidate();
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                for (PriorityCoin coin : list) {
-                    String text = (Utils.getStringValue(coin.getName() + coin.getGeckoid())
-                            + Utils.getStringValue(coin.getNote())).toLowerCase();
-
-                    if (!text.contains("game") && !text.contains("web3") && !text.contains("defi")
-                            && !text.contains("fan")) {
-                        message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                        execute(message);
-                    }
-                }
-            } else if (command.equals("/all")) {
-                binance_service.getList(false);
-                List<PriorityCoin> list = searchCandidate();
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                for (PriorityCoin coin : list) {
-                    message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                    execute(message);
-                }
-            } else if (command.equals("/pre")) {
-                binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.findAllByPredictOrderByVmcDesc(true);
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                for (PriorityCoin coin : list) {
-                    message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                    execute(message);
-                }
+                binance_service.monitorToken("");
 
             } else if (command.contains("/btc")) {
                 binance_service.getList(false);
@@ -202,22 +97,10 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
                 message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot)
-                        + Utils.new_line_from_bot + binance_service.checkBtcUpDown());
-
+                        + Utils.new_line_from_bot);
                 execute(message);
-            } else if (command.contains("/check")) {
-                String[] arr = command.split(" ");
+                binance_service.monitorToken("bitcoin");
 
-                binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
-                execute(message);
             } else if (command.contains("/buy")) {
                 Calendar calendar = Calendar.getInstance();
                 BinanceVolumnWeek btc = binanceVolumnWeekRepository.findById(new BinanceVolumnWeekKey("bitcoin", "BTC",
@@ -234,8 +117,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
                 message.setText("BTC: " + Utils.createMsg(btc_now.getPriceAtBinance(), btc.getMin_price(),
-                        btc_now.getPriceAtBinance())
-                        + Utils.new_line_from_bot + binance_service.checkBtcUpDown());
+                        btc_now.getPriceAtBinance()));
                 execute(message);
 
                 Boolean allowNext = true;
@@ -485,43 +367,13 @@ public class WandaBot extends TelegramLongPollingBot {
                 message.setText(String.format("Muting: [%s]_[%s] = [%s]", list.get(0).getSymbol(),
                         list.get(0).getGeckoid(), coin.getMute()));
                 execute(message);
-            } else if (command.contains("/inspect") || command.contains("/stop")) {
-                String[] arr = command.split(" ");
-
-                binance_service.getList(false);
-                List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
+            } else {
+                if (Utils.isNotBlank(command)) {
+                    checkCommand(message, command);
                 }
-
-                PriorityCoin coin = list.get(0);
-                if (command.contains("/inspect")) {
-                    coin.setInspectMode(true);
-                } else {
-                    coin.setInspectMode(false);
-                }
-
-                priorityCoinRepository.save(coin);
-                message.setText(
-                        "Set inspect_mode: " + coin.getInspectMode() + Utils.new_line_from_bot
-                                + Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
-                execute(message);
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();
-        }
-    }
-
-    private List<PriorityCoin> searchCandidate() {
-        try {
-            List<PriorityCoin> results = priorityCoinRepository.findAllByCandidateAndEmaGreaterThanOrderByVmcDesc(true,
-                    BigDecimal.ZERO);
-            return results;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<PriorityCoin>();
         }
     }
 
@@ -540,4 +392,18 @@ public class WandaBot extends TelegramLongPollingBot {
         return Long.parseLong(entityManager.createNativeQuery(sql).getSingleResult().toString());
     }
 
+    private void checkCommand(SendMessage message, String token) throws TelegramApiException {
+        binance_service.getList(false);
+        List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(token.toUpperCase());
+        if (CollectionUtils.isEmpty(list)) {
+            message.setText("Empty");
+            execute(message);
+            return;
+        }
+
+        message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
+        execute(message);
+
+        binance_service.monitorToken(list.get(0).getGeckoid());
+    }
 }

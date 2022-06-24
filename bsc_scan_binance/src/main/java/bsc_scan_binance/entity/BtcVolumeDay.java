@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
+import bsc_scan_binance.response.BtcVolumeDayByBollingerResponse;
 import bsc_scan_binance.response.BtcVolumeDayResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +33,25 @@ import lombok.NoArgsConstructor;
 //    ema numeric(10,5) DEFAULT 0,
 //    CONSTRAINT btc_volumn_day_pkey PRIMARY KEY (gecko_id, symbol, hh)
 //)
+
+@SqlResultSetMapping(name = "BtcVolumeDayByBollingerResponse", classes = {
+        @ConstructorResult(targetClass = BtcVolumeDayByBollingerResponse.class, columns = {
+                @ColumnResult(name = "gecko_id", type = String.class),
+                @ColumnResult(name = "symbol", type = String.class),
+                @ColumnResult(name = "name", type = String.class),
+
+                @ColumnResult(name = "avg_price", type = BigDecimal.class),
+                @ColumnResult(name = "price_can_buy", type = BigDecimal.class),
+                @ColumnResult(name = "price_can_sell", type = BigDecimal.class),
+
+                @ColumnResult(name = "is_bottom_area", type = Boolean.class),
+                @ColumnResult(name = "is_top_area", type = Boolean.class),
+                @ColumnResult(name = "profit", type = BigDecimal.class),
+
+                @ColumnResult(name = "vector_up", type = Boolean.class),
+                @ColumnResult(name = "vector_desc", type = String.class),
+        })
+})
 
 @SqlResultSetMapping(name = "BtcVolumeDayResponse", classes = {
         @ConstructorResult(targetClass = BtcVolumeDayResponse.class, columns = {
@@ -61,4 +81,9 @@ public class BtcVolumeDay {
     @Column(name = "ema")
     private BigDecimal ema = BigDecimal.ZERO;
 
+    @Column(name = "price_open_candle")
+    private BigDecimal price_open_candle = BigDecimal.ZERO;
+
+    @Column(name = "price_close_candle")
+    private BigDecimal price_close_candle = BigDecimal.ZERO;
 }

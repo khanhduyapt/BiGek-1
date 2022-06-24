@@ -26,7 +26,14 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "gecko_id", type = String.class),
                 @ColumnResult(name = "symbol", type = String.class),
                 @ColumnResult(name = "name", type = String.class),
-                @ColumnResult(name = "virgin", type = Integer.class),
+
+                @ColumnResult(name = "price_can_buy", type = BigDecimal.class),
+                @ColumnResult(name = "price_can_sell", type = BigDecimal.class),
+                @ColumnResult(name = "is_bottom_area", type = Boolean.class),
+                @ColumnResult(name = "is_top_area", type = Boolean.class),
+                @ColumnResult(name = "profit", type = BigDecimal.class),
+
+                @ColumnResult(name = "count_up", type = Integer.class),
                 @ColumnResult(name = "pumping_history", type = String.class),
 
                 @ColumnResult(name = "volumn_div_marketcap", type = String.class),

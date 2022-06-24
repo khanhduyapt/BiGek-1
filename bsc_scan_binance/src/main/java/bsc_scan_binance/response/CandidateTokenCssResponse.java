@@ -1,7 +1,5 @@
 package bsc_scan_binance.response;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +27,7 @@ public class CandidateTokenCssResponse {
 
     private String avg_percent = "";
     private String avg_price = "";
-    private String min_price = "";
+    private String avg_buy_sell_price = "";
     private String max_price = "";
     private String avg_price_css = "";
 

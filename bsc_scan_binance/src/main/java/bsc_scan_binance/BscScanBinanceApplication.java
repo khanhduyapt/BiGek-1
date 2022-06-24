@@ -28,7 +28,7 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            //msg_on = true;
+            msg_on = true;
             if (!Objects.equals(null, args) && args.length > 0 && Objects.equals("msg_on", args[0])) {
                 msg_on = true;
             }
@@ -39,7 +39,7 @@ public class BscScanBinanceApplication {
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
 
-            binance_service.loadDataBtcVolumeDay();
+            //binance_service.loadDataBtcVolumeDay("bitcoin", "BTC");
 
             if (msg_on) {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
@@ -65,24 +65,23 @@ public class BscScanBinanceApplication {
 
                 try {
                     binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
+                    binance_service.loadDataBtcVolumeDay(coin.getGeckoid(), coin.getSymbol());
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                     wait(600000);
                 }
 
-                wait(200);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                wait(300);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
 
                 log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
                 if (Objects.equals(idx, size - 1)) {
-                    //int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-                    //if ((minus > 5) && (minus < 59)) {
-                    binance_service.getList(false); // ~3p 1 lan
-                    binance_service.monitorEma();
-                    binance_service.monitorProfit();
-                    binance_service.monitorToken();
-                    binance_service.loadDataBtcVolumeDay();
-                    //}
+                    int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+                    if ((minus > 5) && (minus < 59)) {
+                        binance_service.getList(false); // ~3p 1 lan
+                        binance_service.monitorProfit();
+                        binance_service.monitorToken("");
+                    }
 
                     log.info("reload: "
                             + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));

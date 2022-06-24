@@ -29,4 +29,16 @@ public class BinanceVolumnDay {
     @Column(name = "price_at_binance")
     private BigDecimal priceAtBinance = BigDecimal.ZERO;
 
+    @Column(name = "low_price")
+    private BigDecimal low_price = BigDecimal.ZERO;
+
+    @Column(name = "hight_price")
+    private BigDecimal hight_price = BigDecimal.ZERO;
+
+    @Column(name = "price_open_candle")
+    private BigDecimal price_open_candle = BigDecimal.ZERO;
+
+    @Column(name = "price_close_candle")
+    private BigDecimal price_close_candle = BigDecimal.ZERO;
+
 }

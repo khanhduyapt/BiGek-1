@@ -13,7 +13,14 @@ public class CandidateTokenResponse {
     private String gecko_id;
     private String symbol;
     private String name;
-    private Integer virgin;
+
+    private BigDecimal price_can_buy;
+    private BigDecimal price_can_sell;
+    private Boolean is_bottom_area;
+    private Boolean is_top_area;
+    private BigDecimal profit;
+
+    private Integer count_up;
     private String pumping_history;
     private String volumn_div_marketcap;
     private String pre_4h_total_volume_up;

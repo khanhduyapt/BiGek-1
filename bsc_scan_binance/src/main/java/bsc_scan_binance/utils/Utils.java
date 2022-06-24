@@ -29,6 +29,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.PriorityCoin;
+import bsc_scan_binance.response.BtcVolumeDayByBollingerResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinResponse;
@@ -62,6 +63,43 @@ public class Utils {
             + "        and od.gecko_id = cur.gecko_id                                                       \n"
             + "        and od.symbol   = cur.symbol                                                         \n"
             + " ) odr ORDER BY odr.tp_amount desc ";
+
+    public static String sql_boll_2_body = "" +
+            " (                                     \n"
+            + "     select                          \n"
+            + "         tmp.gecko_id,               \n"
+            + "         tmp.symbol,                 \n"
+            + "         tmp.name,                   \n"
+            + "         tmp.avg_price,              \n"
+            + "         tmp.price_open_candle,      \n"
+            + "         tmp.price_close_candle,     \n"
+            + "         tmp.low_price,              \n"
+            + "         tmp.hight_price,            \n"
+            + "         ROUND((boll_low   + (ABS(price_close_candle - price_open_candle)/2)), 5) as price_can_buy,  \n"
+            + "         ROUND((boll_hight - (ABS(price_close_candle - price_open_candle)/2)), 5) as price_can_sell, \n"
+            + "         (case when (avg_price < boll_low   + (ABS(price_close_candle - price_open_candle)/2)) then true else false end) is_bottom_area ,    \n"
+            + "         (case when (avg_price > boll_hight - (ABS(price_close_candle - price_open_candle)/2)) then true else false end) is_top_area         \n"
+            + "     from                            \n"
+            + "     (                               \n"
+            + "         select                      \n"
+            + "             can.gecko_id,           \n"
+            + "             can.symbol,             \n"
+            + "             can.name,               \n"
+            + "             tok.avg_price,          \n"
+            + "             tok.price_open_candle,  \n"
+            + "             tok.price_close_candle, \n"
+            + "             tok.low_price,          \n"
+            + "             tok.hight_price,        \n"
+            + "             (SELECT ROUND(AVG(COALESCE(low_price  , 0)), 5) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by low_price   asc  limit 5)) boll_low, \n"
+            + "             (SELECT ROUND(AVG(COALESCE(hight_price, 0)), 5) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by hight_price desc limit 5)) boll_hight \n"
+            + "         from                        \n"
+            + "             candidate_coin can,     \n"
+            + "             btc_volumn_day tok      \n"
+            + "         where 1=1                   \n"
+            + "         and can.gecko_id = tok.gecko_id     \n"
+            + "         and tok.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
+            + "     ) tmp                                   \n"
+            + " ) boll                                      \n";
 
     public static String toString(PriorityCoin tele) {
         return tele.getSymbol() + ":" + tele.getName() + " P:" + tele.getCurrent_price() + "$ Target:"
@@ -124,6 +162,27 @@ public class Utils {
                 + "%)_H:" + dto.getHeight_price() + "("
                 + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price(), 1)) + "%)" + newline +
                 dto.getNote();
+
+        return result;
+    }
+
+    public static String createMsgBollingerResponse(BtcVolumeDayByBollingerResponse dto) {
+        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id());
+        if (dto.getIs_bottom_area()) {
+            result += " (bottom price area)";
+        } else if (dto.getIs_top_area()) {
+            result += " (top price area)";
+        }
+
+        result += new_line_from_service + "Price:" + dto.getAvg_price() + "$" + new_line_from_service;
+
+        result += "CanBuy:" + dto.getPrice_can_buy() + "(" + toPercent(dto.getAvg_price(), dto.getPrice_can_buy(), 1)
+                + "%)" + new_line_from_service;
+
+        result += "CanSell:" + dto.getPrice_can_sell() + "(" + toPercent(dto.getPrice_can_sell(), dto.getAvg_price())
+                + "%)" + new_line_from_service;
+
+        result += dto.getVector_desc();
 
         return result;
     }

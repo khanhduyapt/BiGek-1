@@ -34,12 +34,11 @@ import bsc_scan_binance.repository.BtcVolumeDayRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinHistoryRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
-import bsc_scan_binance.response.BtcVolumeDayResponse;
+import bsc_scan_binance.response.BtcVolumeDayByBollingerResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinHistoryResponse;
-import bsc_scan_binance.response.PriorityCoinResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -74,10 +73,10 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public void loadDataBtcVolumeDay() {
+    public void loadDataBtcVolumeDay(String gecko_id, String symbol) {
         {
-            final Integer limit = 16;
-            final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT"
+            final Integer limit = 24;
+            final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
                     + "&interval=1h&limit=" + String.valueOf(limit);
 
             List<Object> result_usdt = getBinanceData(url_usdt, limit);
@@ -91,22 +90,29 @@ public class BinanceServiceImpl implements BinanceService {
                 @SuppressWarnings("unchecked")
                 List<Object> arr_usdt = (List<Object>) obj_usdt;
 
-                BigDecimal price_open = Utils.getBigDecimal(arr_usdt.get(1));
+                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
                 BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
                 BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
-                BigDecimal price_close = Utils.getBigDecimal(arr_usdt.get(4));
+                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
+                String open_time = arr_usdt.get(0).toString();
 
-                BigDecimal avgPrice = price_low.add(price_high).add(price_open).add(price_close)
+                if (Objects.equals("0", open_time)) {
+                    break;
+                }
+
+                BigDecimal avgPrice = price_low.add(price_high).add(price_open_candle).add(price_close_candle)
                         .divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
 
                 BtcVolumeDay day = new BtcVolumeDay();
                 Calendar calendar = Calendar.getInstance();
                 calendar.add(Calendar.HOUR_OF_DAY, -hh_index);
                 day.setId(
-                        new BinanceVolumnDayKey("bitcoin", "BTC", Utils.convertDateToString("HH", calendar.getTime())));
+                        new BinanceVolumnDayKey(gecko_id, symbol, Utils.convertDateToString("HH", calendar.getTime())));
                 day.setAvg_price(avgPrice);
                 day.setLow_price(price_low);
                 day.setHight_price(price_high);
+                day.setPrice_open_candle(price_open_candle);
+                day.setPrice_close_candle(price_close_candle);
                 list_day.add(day);
 
                 hh_index += 1;
@@ -145,23 +151,23 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<Object> arr_busd = (List<Object>) obj_busd;
 
-            BigDecimal price_open = Utils.getBigDecimal(arr_usdt.get(1));
+            BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
             BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
             BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
-            BigDecimal price_close = Utils.getBigDecimal(arr_usdt.get(4));
+            BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
             String open_time = arr_usdt.get(0).toString();
 
             if (Objects.equals("0", open_time)) {
-                price_open = Utils.getBigDecimal(arr_busd.get(1));
+                price_open_candle = Utils.getBigDecimal(arr_busd.get(1));
                 price_high = Utils.getBigDecimal(arr_busd.get(2));
                 price_low = Utils.getBigDecimal(arr_busd.get(3));
-                price_close = Utils.getBigDecimal(arr_busd.get(4));
+                price_close_candle = Utils.getBigDecimal(arr_busd.get(4));
 
                 open_time = arr_busd.get(0).toString();
             }
 
             if (!Objects.equals("0", open_time)) {
-                BigDecimal avgPrice = price_low.add(price_high).add(price_open).add(price_close)
+                BigDecimal avgPrice = price_low.add(price_high).add(price_open_candle).add(price_close_candle)
                         .divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
 
                 BigDecimal quote_asset_volume1 = Utils.getBigDecimal(arr_usdt.get(7));
@@ -182,6 +188,11 @@ public class BinanceServiceImpl implements BinanceService {
                     day.setTotalVolume(total_volume);
                     day.setTotalTrasaction(total_trans);
                     day.setPriceAtBinance(price_at_binance);
+                    day.setLow_price(price_low);
+                    day.setHight_price(price_high);
+                    day.setPrice_open_candle(price_open_candle);
+                    day.setPrice_close_candle(price_close_candle);
+
                     list_day.add(day);
 
                     calendar.add(Calendar.HOUR_OF_DAY, -2);
@@ -298,8 +309,14 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.gecko_id,                                                                           \n"
                     + "   can.symbol,                                                                             \n"
                     + "   can.name,                                                                               \n"
+
+                    + "    boll.price_can_buy,         \n"
+                    + "    boll.price_can_sell,        \n"
+                    + "    boll.is_bottom_area,        \n"
+                    + "    boll.is_top_area,           \n"
+                    + "    (case when boll.price_can_buy > 0 then ROUND(100*(boll.price_can_sell - boll.price_can_buy)/boll.price_can_buy, 2) else 0 end) as profit,    \n"
                     + "                                                                                           \n"
-                    + "    (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '5 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as virgin, "
+                    + "    (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '5 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as count_up, "
                     + "    concat('Pump:', coalesce((select string_agg(his1.hh, '<-') from (select * from binance_pumping_history his1 where his1.gecko_id = can.gecko_id and his1.symbol = can.symbol and his1.total_pump > 3 order by his1.total_pump desc limit 5) as his1), ''), 'h', ' ', \n"
                     + "           'Dump:', coalesce((select string_agg(his2.hh, '<-') from (select * from binance_pumping_history his2 where his2.gecko_id = can.gecko_id and his2.symbol = can.symbol and his2.total_dump > 3 order by his2.total_dump desc limit 5) as his2), ''), 'h' \n"
                     + "          ) as pumping_history,                                                            \n"
@@ -400,13 +417,17 @@ public class BinanceServiceImpl implements BinanceService {
                     + "          from                                                                               \n"
                     + "              candidate_coin can                                                             \n"
                     + "    ) xyz                                                                                    \n"
-                    + " ) macd                                                                                    \n"
+                    + " ) macd                                                                                      \n"
+
+                    + ", " + Utils.sql_boll_2_body
+
                     + "                                                                                           \n"
                     + " where                                                                                     \n"
-                    + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 10 then TO_CHAR(NOW() - interval  '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
+                    + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   and can.gecko_id = cur.gecko_id                                                         \n"
                     + "   and can.symbol = cur.symbol                                                             \n"
                     + "   and can.gecko_id = macd.gecko_id                                                        \n"
+                    + "   and can.gecko_id = boll.gecko_id                                                        \n"
                     + " order by                                                                                  \n"
                     + "   coalesce(can.priority, 3) asc,                                            		      \n"
                     + "   can.volumn_div_marketcap desc                                                           \n";
@@ -508,7 +529,7 @@ public class BinanceServiceImpl implements BinanceService {
                 List<String> temp = splitVolAndPrice(css.getToday());
                 css.setToday_vol(temp.get(0));
                 css.setToday_price(temp.get(1));
-                css.setToday_ema("(" + dto.getVirgin() + "V) " + temp.get(4));
+                css.setToday_ema("(" + dto.getCount_up() + "Vic) " + temp.get(4));
                 volList.add("");
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -735,8 +756,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         css.setBtc_warning_css("bg-success");
 
-                        Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css) + Utils.new_line_from_service
-                                + checkBtcUpDown());
+                        //Utils.sendToTelegram("Time to buy! " + Utils.createMsg(css) + Utils.new_line_from_service  + checkBtcUpDown());
                         pre_btc_msg_type = "Low";
 
                     } else if ((price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)
@@ -745,8 +765,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setBtc_warning_css("bg-danger");
 
                         // Utils.sendToTelegram(emoji_exclamation);
-                        Utils.sendToTelegram("High price zone! " + Utils.createMsg(css) + Utils.new_line_from_service
-                                + checkBtcUpDown());
+                        // Utils.sendToTelegram("High price zone! " + Utils.createMsg(css) + Utils.new_line_from_service + checkBtcUpDown());
 
                         pre_btc_msg_type = "High";
                     }
@@ -765,8 +784,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString().replace(".00", "") + "%");
-
-                    // css.setMin_price(Utils.removeLastZero(avgPriceList.get(idx_price_min)));
                     css.setMax_price(Utils.removeLastZero(avgPriceList.get(idx_price_max)) + "$("
                             + Utils.toPercent(Utils.getBigDecimalValue(avgPriceList.get(idx_price_max)), price_now)
                             + "%)");
@@ -776,6 +793,13 @@ public class BinanceServiceImpl implements BinanceService {
                                     .compareTo(BigDecimal.valueOf(10)) > -1))) {
                         css.setStar("🤩");
                     }
+
+                    if (dto.getIs_bottom_area() || dto.getIs_bottom_area()) {
+                        css.setAvg_buy_sell_price("Buy:" + Utils.removeLastZero(dto.getPrice_can_buy().toString())
+                                + ", Sell:" + Utils.removeLastZero(dto.getPrice_can_sell().toString()) + "("
+                                + dto.getProfit() + "%)");
+                    }
+
                 } else {
                     css.setAvg_price("0.0");
                 }
@@ -884,8 +908,8 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar("🤩" + css.getStar());
                 }
 
-                if (Objects.equals(2, dto.getVirgin()) && (dto.getEma07d().compareTo(BigDecimal.ZERO) > 0)) {
-                    css.setStar("🤩" + css.getStar() + " Virgin");
+                if (Objects.equals(2, dto.getCount_up()) && (dto.getEma07d().compareTo(BigDecimal.ZERO) > 0)) {
+                    css.setStar("🤩" + css.getStar() + " Vic");
                     css.setStar_css("text-success");
                 }
 
@@ -931,6 +955,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (css.getPumping_history().contains("Dump")) {
                     css.setStar("");
+                }
+
+                if (dto.getIs_bottom_area()) {
+                    css.setStar("Boll");
+                    css.setStar_css("text-primary");
                 }
 
                 if (is_candidate) {
@@ -1341,88 +1370,93 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @Override
-    public void monitorToken() {
+    public void monitorToken(String gecko_id) {
         try {
             log.info("Start monitorToken ---->");
-            {
-                List<PriorityCoin> results = priorityCoinRepository
-                        .findAllByInspectModeAndGoodPriceAndMuteOrderByVmcDesc(true,
-                                true, false);
+            String sql = ""
+                    + " select                          \n"
+                    + "     boll.gecko_id,              \n"
+                    + "     boll.symbol,                \n"
+                    + "     boll.name,                  \n"
+                    + "     boll.avg_price,             \n"
+                    + "     boll.price_can_buy,         \n"
+                    + "     boll.price_can_sell,        \n"
+                    + "     boll.is_bottom_area,        \n"
+                    + "     boll.is_top_area,           \n"
+                    + "     ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) profit,    \n"
+                    + "     (case when vector.vector_now > 0 then true else false end) vector_up,   \n"
+                    + "     concat('v1h:', cast(vector.vector_now as varchar), ', v4h:' ,cast(vector.vector_pre4h as varchar)) as vector_desc \n"
+                    + " FROM                                                                        \n"
+                    + Utils.sql_boll_2_body
 
-                if (!CollectionUtils.isEmpty(results)) {
-                    int idx = 0;
-                    String msg = "";
-                    for (PriorityCoin dto : results) {
-                        idx += 1;
-                        msg += "[Inspector] Good Price: "
-                                + Utils.createMsgPriorityToken(dto, Utils.new_line_from_service)
-                                + Utils.new_line_from_service + Utils.new_line_from_service;
+                    + " , \n"
+                    + " (                                                                                           \n"
+                    + "  select                                                                                     \n"
+                    + "       pre.gecko_id,                                                                         \n"
+                    + "       pre.hh,                                                                               \n"
+                    + "       ROUND(100 * (price_now   - price_pre4h) /price_pre4h, 2)  as vector_now,              \n"
+                    + "       ROUND(100 * (price_pre4h - price_pre8h) /price_pre8h, 2)  as vector_pre4h             \n"
+                    + "   from (                                                                                    \n"
+                    + "       select                                                                                \n"
+                    + "       tmp.gecko_id,                                                                         \n"
+                    + "       tmp.hh,                                                                               \n"
+                    + "       (case when price_now is null then price_pre1h else price_now end) as price_now,       \n"
+                    + "          price_pre4h,                                                                       \n"
+                    + "          price_pre8h                                                                        \n"
+                    + "       from (                                                                                \n"
+                    + "           select                                                                            \n"
+                    + "               d.gecko_id,                                                                   \n"
+                    + "               d.hh, \n"
+                    + "               (select COALESCE(h.avg_price, 0) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh = TO_CHAR(NOW(), 'HH24')) as price_now,                          \n"
+                    + "               (select COALESCE(h.avg_price, 0) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh = TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre1h,  \n"
+                    + "                                                                                             \n"
+                    + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '4 hours', 'HH24') and TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre4h,   \n"
+                    + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '8 hours', 'HH24') and TO_CHAR(NOW() - interval  '5 hours', 'HH24')) as price_pre8h    \n"
+                    + "           from  \n"
+                    + "               btc_volumn_day d \n"
+                    + "           where d.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
+                    + "           ) as tmp                                                                          \n"
+                    + "   ) as pre                                                                                  \n"
+                    + " ) vector                                                                                    \n"
+                    + "                                                                                             \n"
+                    + " where 1=1                                                                                   \n";
 
-                        if (idx == 5) {
-                            idx = 0;
-                            Utils.sendToTelegram(msg);
-                            msg = "";
-                        }
-                    }
-                    if (Utils.isNotBlank(msg)) {
+            if (Utils.isNotBlank(gecko_id)) {
+                sql += " and boll.gecko_id ='" + gecko_id + "'";
+            } else {
+                sql += " and ((boll.is_bottom_area and boll.gecko_id not in (select gecko_id from orders)) or (boll.is_top_area and boll.gecko_id in (select gecko_id from orders)))  \n";
+            }
+
+            sql += " and vector.gecko_id = boll.gecko_id                                                            \n"
+                    + " order by ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) desc                  \n";
+
+            Query query = entityManager.createNativeQuery(sql, "BtcVolumeDayByBollingerResponse");
+
+            String msg = "";
+
+            @SuppressWarnings("unchecked")
+            List<BtcVolumeDayByBollingerResponse> boll_anna_list = query.getResultList();
+            if (!CollectionUtils.isEmpty(boll_anna_list)) {
+                int idx = 0;
+
+                for (BtcVolumeDayByBollingerResponse dto : boll_anna_list) {
+                    idx += 1;
+                    msg += "(Boll) " + Utils.createMsgBollingerResponse(dto)
+                            + Utils.new_line_from_service + Utils.new_line_from_service;
+
+                    if (idx == 5) {
+                        idx = 0;
                         Utils.sendToTelegram(msg);
+                        msg = "";
                     }
+                }
+                if (Utils.isNotBlank(msg)) {
+                    Utils.sendToTelegram(msg);
                 }
             }
 
-            {
-                String sql = ""
-                        + " SELECT                              \n"
-                        + "     coin.gecko_id,                  \n"
-                        + "     coin.current_price,             \n"
-                        + "     coin.target_price,              \n"
-                        + "     coin.target_percent,            \n"
-                        + "     coin.vmc,                       \n"
-                        + "     coin.is_candidate,              \n"
-                        + "     coin.index,                     \n"
-                        + "     coin.name,                      \n"
-                        + "     coin.note,                      \n"
-                        + "     coin.symbol,                    \n"
-                        + "     coin.ema,                       \n"
-                        + "     coin.low_price,                 \n"
-                        + "     coin.height_price,              \n"
-                        + "     coin.discovery_date_time,       \n"
-                        + "     coin.mute,                      \n"
-                        + "     coin.predict,                   \n"
-                        + "     coin.inspect_mode,              \n"
-                        + "     coin.good_price                 \n"
-                        + " FROM                                \n"
-                        + "    priority_coin coin,              \n"
-                        + "    binance_volumn_week week         \n"
-                        + "WHERE coin.mute = false              \n"
-                        + " and coin.ema > 0                                        \n"
-                        + " and coin.gecko_id = week.gecko_id                       \n"
-                        + " and week.yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd')          \n"
-                        + " and (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = coin.gecko_id and w.symbol = coin.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) = 1 \n"
-                        + " and coin.gecko_id not in (select gecko_id from orders)  \n";
-
-                Query query = entityManager.createNativeQuery(sql, "PriorityCoinResponse");
-
-                @SuppressWarnings("unchecked")
-                List<PriorityCoinResponse> virgin_list = query.getResultList();
-                if (!CollectionUtils.isEmpty(virgin_list)) {
-                    int idx = 0;
-                    String msg = "";
-                    for (PriorityCoinResponse dto : virgin_list) {
-                        idx += 1;
-                        msg += "[Virgin] " + Utils.createMsgPriorityCoinResponse(dto, Utils.new_line_from_service)
-                                + Utils.new_line_from_service + Utils.new_line_from_service;
-
-                        if (idx == 5) {
-                            idx = 0;
-                            Utils.sendToTelegram(msg);
-                            msg = "";
-                        }
-                    }
-                    if (Utils.isNotBlank(msg)) {
-                        Utils.sendToTelegram(msg);
-                    }
-                }
+            if (Utils.isNotBlank(gecko_id) && !Utils.isNotBlank(msg)) {
+                Utils.sendToTelegram("(Boll) Not found:" + gecko_id);
             }
 
             log.info("End monitorToken <----");
@@ -1433,63 +1467,6 @@ public class BinanceServiceImpl implements BinanceService {
             log.info("monitorToken error ------->");
             log.error(e.getMessage());
         }
-    }
-
-    @Override
-    public String checkBtcUpDown() {
-        try {
-            {
-                String sql = " select                                                                       \n"
-                        + "     ROUND(100 * (price_now   - price_pre4h) /price_pre4h, 2)  as vector_now,    \n"
-                        + "     ROUND(100 * (price_pre4h - price_pre8h) /price_pre8h, 2)  as vector_pre4h,  \n"
-                        + "     ROUND(100 * (price_pre8h - price_pre12h)/price_pre12h, 2) as vector_pre8h,  \n"
-                        + "     ROUND(price_now, 0)    as price_now,                                        \n"
-                        + "     ROUND(price_pre4h, 0)  as price_pre4h,                                      \n"
-                        + "     ROUND(price_pre8h, 0)  as price_pre8h,                                      \n"
-                        + "     ROUND(price_pre12h, 0) as price_pre12h                                      \n"
-                        + " from (                                                                                  \n"
-                        + "     select                                                                              \n"
-                        + "        (case when price_now is null then price_pre1h else price_now end) as price_now,  \n"
-                        + "        price_pre4h,                                                                     \n"
-                        + "        price_pre8h,                                                                     \n"
-                        + "        price_pre12h                                                                     \n"
-                        + "     from (                                                                              \n"
-                        + "         select                                                                          \n"
-                        + "             (select COALESCE(h.avg_price, 0) from btc_volumn_day h where hh = TO_CHAR(NOW(), 'HH24')) as price_now,                         \n"
-                        + "             (select COALESCE(h.avg_price, 0) from btc_volumn_day h where hh = TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre1h, \n"
-                        + "                                                                                         \n"
-                        + "             (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where hh between TO_CHAR(NOW() - interval  '4 hours', 'HH24') and TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre4h,  \n"
-                        + "             (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where hh between TO_CHAR(NOW() - interval  '8 hours', 'HH24') and TO_CHAR(NOW() - interval  '5 hours', 'HH24')) as price_pre8h,  \n"
-                        + "             (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where hh between TO_CHAR(NOW() - interval '12 hours', 'HH24') and TO_CHAR(NOW() - interval  '9 hours', 'HH24')) as price_pre12h  \n"
-                        + "         ) as tmp                                                                        \n"
-                        + " ) as pre                                                                                \n";
-
-                Query query = entityManager.createNativeQuery(sql, "BtcVolumeDayResponse");
-
-                @SuppressWarnings("unchecked")
-                List<BtcVolumeDayResponse> list = query.getResultList();
-                if (!CollectionUtils.isEmpty(list)) {
-
-                    BtcVolumeDayResponse dto = list.get(0);
-
-                    if (Utils.isVectorUp(dto.getVector_now())) {
-                        //BtcUp
-                        return String.format("[BtcUp] 1h:%s, 4h:%s, 8h:%s", dto.getVector_now(),
-                                dto.getVector_pre4h(), dto.getVector_pre8h());
-                    } else {
-                        //BtcDown
-                        return (String.format("[BtcDown] 1h:%s, 4h:%s, 8h:%s", dto.getVector_now(),
-                                dto.getVector_pre4h(), dto.getVector_pre8h()));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.info("checkBtcUpDown error ------->");
-            log.error(e.getMessage());
-        }
-
-        return "";
     }
 
 }
