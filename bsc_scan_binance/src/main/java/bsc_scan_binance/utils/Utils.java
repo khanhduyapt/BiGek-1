@@ -176,25 +176,26 @@ public class Utils {
             return;
         }
 
-        int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-        if ((minus > 5) && (minus < 59)) {
+        //int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+        //if ((minus > 5) && (minus < 59)) {
 
-            String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
+        String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
 
-            // Add Telegram token
-            String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
+        // Add Telegram token
+        String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
 
-            urlString = String.format(urlString, apiToken, chatId) + text;
+        urlString = String.format(urlString, apiToken, chatId) + text;
 
-            try {
-                URL url = new URL(urlString);
-                URLConnection conn = url.openConnection();
-                @SuppressWarnings("unused")
-                InputStream is = new BufferedInputStream(conn.getInputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            URL url = new URL(urlString);
+            URLConnection conn = url.openConnection();
+            @SuppressWarnings("unused")
+            InputStream is = new BufferedInputStream(conn.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        //}
 
     }
 

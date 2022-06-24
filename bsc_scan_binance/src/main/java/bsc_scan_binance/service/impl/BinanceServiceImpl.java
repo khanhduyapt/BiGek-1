@@ -403,7 +403,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + " ) macd                                                                                    \n"
                     + "                                                                                           \n"
                     + " where                                                                                     \n"
-                    + "       cur.hh = TO_CHAR(NOW(), 'HH24')                                                     \n"
+                    + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 10 then TO_CHAR(NOW() - interval  '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   and can.gecko_id = cur.gecko_id                                                         \n"
                     + "   and can.symbol = cur.symbol                                                             \n"
                     + "   and can.gecko_id = macd.gecko_id                                                        \n"

@@ -76,12 +76,12 @@ public class WandaBot extends TelegramLongPollingBot {
                 return;
             }
 
-            int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-            if ((minus > 59) || (minus < 3)) {
-                message.setText("59...3 minutes is the time to get data.");
-                execute(message);
-                return;
-            }
+            //int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+            //if ((minus > 59) || (minus < 3)) {
+            //    message.setText("59...3 minutes is the time to get data.");
+            //    execute(message);
+            //    return;
+            //}
 
             System.out.println(update.getMessage().getText());
             String command = update.getMessage().getText();
