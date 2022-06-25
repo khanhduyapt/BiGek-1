@@ -1210,12 +1210,12 @@ public class BinanceServiceImpl implements BinanceService {
 
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-5)) <= 0) {
 
-                        msg += "STOP LOST 5%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
+                        msg += "STOP LOSS 5%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
                                 + Utils.new_line_from_service + Utils.new_line_from_service;
 
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-2.8)) <= 0) {
 
-                        msg += "STOP LOST 3%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
+                        msg += "STOP LOSS 3%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
                                 + Utils.new_line_from_service + Utils.new_line_from_service;
                     }
 
@@ -1316,10 +1316,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                         id = dto.getGecko_id();
                     } else {
-                        BigDecimal lost_percent = Utils
+                        BigDecimal loss_percent = Utils
                                 .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), dto.getAvg_price(), 1));
 
-                        if (lost_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
+                        if (loss_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
                             id = dto.getGecko_id();
                         }
                     }

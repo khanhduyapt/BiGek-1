@@ -352,7 +352,7 @@ public class WandaBot extends TelegramLongPollingBot {
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
                         msg += "PROFIT: ";
                     } else {
-                        msg += "LOST  : ";
+                        msg += "LOSS  : ";
                     }
 
                     msg += Utils.createMsgBalance(dto, Utils.new_line_from_bot) + Utils.new_line_from_bot

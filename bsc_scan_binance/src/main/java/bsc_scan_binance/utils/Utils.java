@@ -95,7 +95,8 @@ public class Utils {
 
     public static String createMsgBalance(OrdersProfitResponse dto, String newline) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + newline + "Price: "
-                + dto.getPrice_at_binance().toString() + "$, " + "Profit: "
+                + dto.getPrice_at_binance().toString() + "$, "
+                + (dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0 ? "Profit: " : "Loss: ")
                 + Utils.removeLastZero(dto.getTp_amount().toString()) + "$ (" + dto.getTp_percent() + "%)" + newline
                 + "Bought: " + dto.getOrder_price().toString() + "$, " + "T: "
                 + Utils.removeLastZero(dto.getAmount().toString()) + "$" + newline
