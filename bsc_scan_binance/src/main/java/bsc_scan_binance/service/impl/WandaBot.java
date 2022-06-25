@@ -127,7 +127,7 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                message.setText("BTC: " + Utils.createMsg(btc_now.getPriceAtBinance(), btc.getMin_price(),
+                message.setText("BTC: " + Utils.createMsgSimple(btc_now.getPriceAtBinance(), btc.getMin_price(),
                         btc_now.getPriceAtBinance()));
                 execute(message);
 
@@ -165,7 +165,7 @@ public class WandaBot extends TelegramLongPollingBot {
                         .orElse(null);
 
                 message.setText(dto.getId().getSymbol() + ": "
-                        + Utils.createMsg(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price()));
+                        + Utils.createMsgSimple(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price()));
                 execute(message);
 
                 if (!Utils.isGoodPrice(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price())) {
@@ -203,12 +203,19 @@ public class WandaBot extends TelegramLongPollingBot {
                     height_price = Utils.getBigDecimal(dtoweek.getMax_price());
                 }
 
+                String note = "";
                 Orders entity = ordersRepository.findById(dto.getId().getGeckoid()).orElse(null);
                 if (Objects.equal(null, entity)) {
                     entity = new Orders();
                     entity.setGeckoid(dto.getId().getGeckoid());
                     entity.setSymbol(dto.getId().getSymbol());
                     entity.setName(dto.getId().getGeckoid());
+
+                    PriorityCoin pc = priorityCoinRepository.findById(dto.getId().getGeckoid()).orElse(null);
+                    if (!Objects.equal(null, pc)) {
+                        note = pc.getNote();
+                    }
+                    entity.setNote(note);
                 }
 
                 BigDecimal amount1 = Utils.getBigDecimal(entity.getAmount());
@@ -230,8 +237,11 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 ordersRepository.save(entity);
 
-                message.setText(String.format("Added:[%s] [%s] [Qty:%s(+%s)]_[P:%s$] [T:%s$].", entity.getSymbol(),
-                        entity.getName(), entity.getQty(), qty2, entity.getOrder_price(), entity.getAmount()));
+                message.setText(
+                        String.format("Added:[%s] [%s]" + Utils.new_line_from_bot + "[Qty:%s(+%s)]_[P:%s$] [T:%s$].",
+                                entity.getSymbol(), entity.getName(), entity.getQty(), qty2, entity.getOrder_price(),
+                                entity.getAmount()) + Utils.new_line_from_bot
+                                + note.replace("~", Utils.new_line_from_bot));
                 execute(message);
 
             } else if (command.contains("/sel")) {
@@ -345,7 +355,7 @@ public class WandaBot extends TelegramLongPollingBot {
                         msg += "LOST  : ";
                     }
 
-                    msg += Utils.createMsg(dto, Utils.new_line_from_bot) + Utils.new_line_from_bot
+                    msg += Utils.createMsgBalance(dto, Utils.new_line_from_bot) + Utils.new_line_from_bot
                             + Utils.new_line_from_bot;
 
                     if (index == 5) {

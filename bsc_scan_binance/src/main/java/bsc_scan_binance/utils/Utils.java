@@ -54,7 +54,7 @@ public class Utils {
             + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,  \n"
             + "      od.low_price,                                                                          \n"
             + "      od.height_price,                                                                       \n"
-            + "      (select concat(cast(target_price as varchar), ' ', target_percent) from priority_coin pc where pc.gecko_id = od.gecko_id) as target "
+            + "      (select note from priority_coin pc where pc.gecko_id = od.gecko_id) as target          \n"
             + "    FROM                                                                                     \n"
             + "        orders od,                                                                           \n"
             + "        binance_volumn_day cur                                                               \n"
@@ -93,15 +93,17 @@ public class Utils {
                 + tele.getTarget_percent() + " ema:" + tele.getEma();
     }
 
-    public static String createMsg(OrdersProfitResponse dto, String newline) {
+    public static String createMsgBalance(OrdersProfitResponse dto, String newline) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + newline + "Price: "
                 + dto.getPrice_at_binance().toString() + "$, " + "Profit: "
                 + Utils.removeLastZero(dto.getTp_amount().toString()) + "$ (" + dto.getTp_percent() + "%)" + newline
                 + "Bought: " + dto.getOrder_price().toString() + "$, " + "T: "
-                + Utils.removeLastZero(dto.getAmount().toString()) + "$" + newline + "L:" + dto.getLow_price() + "("
-                + removeLastZero(toPercent(dto.getLow_price(), dto.getOrder_price(), 1)) + "%)_H:"
-                + dto.getHeight_price() + "("
-                + removeLastZero(toPercent(dto.getHeight_price(), dto.getOrder_price(), 1)) + "%)";
+                + Utils.removeLastZero(dto.getAmount().toString()) + "$" + newline
+                + createMsgLowHeight(dto.getPrice_at_binance(), dto.getLow_price(), dto.getHeight_price());
+
+        if (isNotBlank(dto.getTarget()) && dto.getTarget().contains("~v/mc")) {
+            result += newline + dto.getTarget().substring(0, dto.getTarget().indexOf("~v/mc"));
+        }
 
         return result;
     }
@@ -111,39 +113,30 @@ public class Utils {
                 + Utils.convertDateToString("MM-dd hh:mm", Calendar.getInstance().getTime());
     }
 
-    public static String createMsg(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
-        return Utils.removeLastZero(curr_price.toString()) + "$\n" + "L:" + Utils.removeLastZero(low_price.toString())
-                + "(" + Utils.toPercent(low_price, curr_price, 1) + "%)" + "-H:"
-                + Utils.removeLastZero(hight_price.toString()) + "(" + Utils.toPercent(hight_price, curr_price, 1)
-                + "%)" + "$";
+    public static String createMsgSimple(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+        return Utils.removeLastZero(curr_price.toString()) + "$\n"
+                + createMsgLowHeight(curr_price, low_price, hight_price);
+    }
+
+    public static String createMsgLowHeight(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+        return "L:" + Utils.removeLastZero(low_price.toString()) + "(" + Utils.toPercent(low_price, curr_price, 1)
+                + "%)" + "-H:" + Utils.removeLastZero(hight_price.toString()) + "("
+                + Utils.toPercent(hight_price, curr_price, 1) + "%)" + "$";
     }
 
     public static String createMsgPriorityToken(PriorityCoin dto, String newline) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGeckoid())
                 + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline + "Price: "
-                + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
-                + dto.getTarget_percent() + "%)" + newline +
-
-                "L:" + dto.getLow_price() + "("
-                + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price(), 1)) + "%)_H:"
-                + dto.getHeight_price() + "("
-                + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price(), 1)) + "%)"
-
-                + newline + dto.getNote().replace("~", newline);
+                + dto.getCurrent_price().toString() + "$" + newline + dto.getNote().replace("~", newline) + newline
+                + createMsgLowHeight(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price());
         return result;
     }
 
     public static String createMsgPriorityCoinResponse(PriorityCoinResponse dto, String newline) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id())
                 + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline + "Price: "
-                + dto.getCurrent_price().toString() + "$, " + "Target: " + dto.getTarget_price() + "$=("
-                + dto.getTarget_percent() + "%)" + newline +
-
-                "L:" + dto.getLow_price() + "("
-                + removeLastZero(toPercent(dto.getLow_price(), dto.getCurrent_price(), 1)) + "%)_H:"
-                + dto.getHeight_price() + "("
-                + removeLastZero(toPercent(dto.getHeight_price(), dto.getCurrent_price(), 1)) + "%)" + newline
-                + dto.getNote();
+                + dto.getCurrent_price().toString() + "$" + newline + dto.getNote() + newline
+                + createMsgLowHeight(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price());
 
         return result;
     }

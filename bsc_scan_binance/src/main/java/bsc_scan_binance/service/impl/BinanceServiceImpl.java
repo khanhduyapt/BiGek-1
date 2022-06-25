@@ -306,8 +306,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    (case when boll.price_can_buy > 0 then ROUND(100*(boll.price_can_sell - boll.price_can_buy)/boll.price_can_buy, 2) else 0 end) as profit,    \n"
                     + "                                                                                           \n"
                     + "    (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '5 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as count_up, "
-                    + "    concat('Pump:', coalesce((select string_agg(his1.hh, '<-') from (select * from binance_pumping_history his1 where his1.gecko_id = can.gecko_id and his1.symbol = can.symbol and his1.total_pump > 3 order by his1.total_pump desc limit 5) as his1), ''), 'h', ' ', \n"
-                    + "           'Dump:', coalesce((select string_agg(his2.hh, '<-') from (select * from binance_pumping_history his2 where his2.gecko_id = can.gecko_id and his2.symbol = can.symbol and his2.total_dump > 3 order by his2.total_dump desc limit 5) as his2), ''), 'h' \n"
+                    + "    concat('Pump:', coalesce((select string_agg(his1.hh, '<') from (select * from binance_pumping_history his1 where his1.gecko_id = can.gecko_id and his1.symbol = can.symbol and his1.total_pump > 3 order by his1.total_pump desc limit 5) as his1), ''), 'h', ' ', \n"
+                    + "           'Dump:', coalesce((select string_agg(his2.hh, '<') from (select * from binance_pumping_history his2 where his2.gecko_id = can.gecko_id and his2.symbol = can.symbol and his2.total_dump > 3 order by his2.total_dump desc limit 5) as his2), ''), 'h' \n"
                     + "          ) as pumping_history,                                                            \n"
 
                     + "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n"
@@ -436,11 +436,11 @@ public class BinanceServiceImpl implements BinanceService {
 
             for (CandidateTokenResponse dto : results) {
 
-                PriorityCoin coin = listPriorityCoin.stream()
+                PriorityCoin priorityCoin = listPriorityCoin.stream()
                         .filter(item -> Objects.equals(item.getGeckoid(), dto.getGecko_id())).findFirst()
                         .orElse(new PriorityCoin());
 
-                coin.setGeckoid(dto.getGecko_id());
+                priorityCoin.setGeckoid(dto.getGecko_id());
 
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
                 mapper.map(dto, css);
@@ -752,7 +752,7 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
 
-                coin.setCurrent_price(price_now);
+                priorityCoin.setCurrent_price(price_now);
 
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
@@ -884,14 +884,14 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar_css("text-success");
                 }
 
-                coin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
-                coin.setVmc(Utils.getIntValue(css.getVolumn_div_marketcap()));
-                coin.setLow_price(lowest_price_today);
-                coin.setHeight_price(highest_price_today);
-                coin.setIndex(index);
-                coin.setSymbol(css.getSymbol());
-                coin.setName(css.getName());
-                coin.setEma(dto.getEma07d());
+                priorityCoin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
+                priorityCoin.setVmc(Utils.getIntValue(css.getVolumn_div_marketcap()));
+                priorityCoin.setLow_price(lowest_price_today);
+                priorityCoin.setHeight_price(highest_price_today);
+                priorityCoin.setIndex(index);
+                priorityCoin.setSymbol(css.getSymbol());
+                priorityCoin.setName(css.getName());
+                priorityCoin.setEma(dto.getEma07d());
 
                 if (css.getPumping_history().contains("Dump")) {
                     css.setStar(css.getStar() + " Dump_history");
@@ -906,7 +906,8 @@ public class BinanceServiceImpl implements BinanceService {
                     String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now, 1);
                     String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now, 1);
 
-                    coin.setTarget_percent(Utils.getIntValue(Utils.getBigDecimalValue(avg_boll_max).toBigInteger()));
+                    priorityCoin.setTarget_percent(
+                            Utils.getIntValue(Utils.getBigDecimalValue(avg_boll_max).toBigInteger()));
 
                     css.setAvg_boll_min("Buy: " + Utils.removeLastZero(dto.getPrice_can_buy().toString()) + "("
                             + avg_boll_min + "%)");
@@ -927,15 +928,26 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar_css("text-primary");
                     }
                 }
-                coin.setPredict(predict);
-                coin.setCandidate(is_candidate);
 
-                String note = "Can" + css.getAvg_boll_min() + "~" + "Can" + css.getAvg_boll_max() + "~" + "(v/mc:"
+                if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap()).compareTo(BigDecimal.valueOf(20)) < 0)
+                        && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(10)) < 0)) {
+                    is_candidate = false;
+                    predict = false;
+                }
+
+                priorityCoin.setPredict(predict);
+                priorityCoin.setCandidate(is_candidate);
+
+                String note = "Can" + css.getAvg_boll_min() + "~" + "Can" + css.getAvg_boll_max() + "~" + "v/mc:"
                         + css.getVolumn_div_marketcap() + "% B:" + css.getVolumn_binance_div_marketcap() + "%, Mc:"
                         + Utils.getBigDecimalValue(css.getMarket_cap().replaceAll(",", ""))
                                 .divide(BigDecimal.valueOf(1000000), 1, RoundingMode.CEILING)
-                        + "M, price_24h:"
-                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1) + "%)"
+                        + "M~24h: "
+                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_24h()), 1)
+                        + "%, 7d: "
+                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_7d()), 1)
+                        + "%, 14d: "
+                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_14d()), 1) + "%"
 
                         + (Utils.isNotBlank(Utils.getStringValue(css.getNote()))
                                 ? "~" + Utils.getStringValue(css.getNote())
@@ -949,19 +961,19 @@ public class BinanceServiceImpl implements BinanceService {
                                 ? "~" + Utils.getStringValue(css.getPumping_history())
                                 : "");
 
-                coin.setNote(note);
+                priorityCoin.setNote(note);
 
-                coin.setGoodPrice(false);
+                priorityCoin.setGoodPrice(false);
                 if (this_token_is_good_price || btc_is_good_price) {
-                    coin.setGoodPrice(true);
+                    priorityCoin.setGoodPrice(true);
                 }
 
                 index += 1;
-                priorityCoinRepository.save(coin);
+                priorityCoinRepository.save(priorityCoin);
 
                 sql_update_ema += String.format(
-                        "update binance_volumn_week set ema='%s' where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
-                        dto.getEma07d(), dto.getGecko_id(), dto.getSymbol());
+                        " update binance_volumn_week set ema='%s', price_change_24h='%s' where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
+                        dto.getEma07d(), dto.getPrice_change_percentage_24h(), dto.getGecko_id(), dto.getSymbol());
 
                 if (isOrderByBynaceVolume) {
                     if (is_candidate) {
@@ -1193,17 +1205,17 @@ public class BinanceServiceImpl implements BinanceService {
                     if (tp_percent.compareTo(target_percent) >= 0) {
 
                         msg += "TakeProfit (target=" + target_percent + "%): "
-                                + Utils.createMsg(dto, Utils.new_line_from_service) + Utils.new_line_from_service
+                                + Utils.createMsgBalance(dto, Utils.new_line_from_service) + Utils.new_line_from_service
                                 + Utils.new_line_from_service;
 
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-5)) <= 0) {
 
-                        msg += "STOP LOST 5%: " + Utils.createMsg(dto, Utils.new_line_from_service)
+                        msg += "STOP LOST 5%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
                                 + Utils.new_line_from_service + Utils.new_line_from_service;
 
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-2.8)) <= 0) {
 
-                        msg += "STOP LOST 3%: " + Utils.createMsg(dto, Utils.new_line_from_service)
+                        msg += "STOP LOST 3%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
                                 + Utils.new_line_from_service + Utils.new_line_from_service;
                     }
 
@@ -1292,7 +1304,6 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<BollAreaResponse> boll_anna_list = query.getResultList();
             if (!CollectionUtils.isEmpty(boll_anna_list)) {
-                bollAreaRepository.deleteAll();
 
                 List<BollArea> list = new ArrayList<BollArea>();
                 for (BollAreaResponse dto : boll_anna_list) {
@@ -1314,14 +1325,16 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (Utils.isNotBlank(id)) {
+                        Boolean isRegisted = bollAreaRepository.existsById(id);
                         PriorityCoin coin = priorityCoinRepository.findById(id).orElse(null);
-                        if (!Objects.equals(null, coin)) {
+                        if (!isRegisted && !Objects.equals(null, coin) && (coin.getVmc() > 25)) {
                             Utils.sendToTelegram(
                                     "(Bollinger) " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
                         }
                     }
                 }
 
+                bollAreaRepository.deleteAll();
                 bollAreaRepository.saveAll(list);
             }
             log.info("End monitorToken <----");

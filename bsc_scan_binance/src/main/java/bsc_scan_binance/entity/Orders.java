@@ -76,4 +76,7 @@ public class Orders {
 
     @Column(name = "height_price")
     private BigDecimal height_price = BigDecimal.ZERO;
+
+    @Column(name = "note")
+    private String note;
 }
