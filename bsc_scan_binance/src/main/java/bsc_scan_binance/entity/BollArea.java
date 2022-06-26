@@ -11,7 +11,6 @@ import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
 import bsc_scan_binance.response.BollAreaResponse;
-import bsc_scan_binance.response.OrdersProfitResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

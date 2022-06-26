@@ -142,7 +142,7 @@ public class Utils {
         return result;
     }
 
-    public static String createMsgBollingerResponse(BollAreaResponse dto) {
+    public static String createMsgBollingerResponse(BollAreaResponse dto, String newline) {
         String result = String.format("(Bollinger) [%s]_[%s]", dto.getSymbol(), dto.getGecko_id());
 
         if (dto.getIs_bottom_area()) {
@@ -153,13 +153,13 @@ public class Utils {
         if (dto.getVector_up()) {
             result += " Uptrend";
         }
-        result += new_line_from_service + "Price: " + dto.getAvg_price() + "$" + new_line_from_service;
+        result += newline + "Price: " + dto.getAvg_price() + "$" + newline;
 
         result += "CanBuy: " + dto.getPrice_can_buy() + "(" + toPercent(dto.getPrice_can_buy(), dto.getAvg_price(), 1)
-                + "%)" + new_line_from_service;
+                + "%)" + newline;
 
         result += "CanSell: " + dto.getPrice_can_sell() + "(" + toPercent(dto.getPrice_can_sell(), dto.getAvg_price())
-                + "%)" + new_line_from_service;
+                + "%)" + newline;
 
         result += dto.getVector_desc();
 

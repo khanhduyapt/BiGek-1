@@ -10,6 +10,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.apache.catalina.mapper.Mapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -24,14 +26,17 @@ import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
+import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.TakeProfit;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
+import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
+import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
@@ -57,6 +62,9 @@ public class WandaBot extends TelegramLongPollingBot {
 
     @Autowired
     private TakeProfitRepository takeProfitRepository;
+
+    @Autowired
+    private BollAreaRepository bollAreaRepository;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -98,7 +106,24 @@ public class WandaBot extends TelegramLongPollingBot {
                     message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
                     execute(message);
                 }
-
+            } else if (command.contains("/boll")) {
+                binance_service.getList(false);
+                List<BollArea> list = bollAreaRepository.findAll();
+                if (CollectionUtils.isEmpty(list)) {
+                    message.setText("Empty");
+                    execute(message);
+                    return;
+                }
+                for (BollArea entity : list) {
+                    if (!entity.getIs_top_area()) {
+                        PriorityCoin coin = priorityCoinRepository.findById(entity.getGecko_id()).orElse(null);
+                        if (!Objects.equal(null, coin)) {
+                            message.setText("(Bollinger) " + (entity.getVector_up() ? "Uptrend: " : " ")
+                                    + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
+                            execute(message);
+                        }
+                    }
+                }
             } else if (command.contains("/btc")) {
                 binance_service.getList(false);
                 List<PriorityCoin> list = priorityCoinRepository.searchBySymbol("BTC");
