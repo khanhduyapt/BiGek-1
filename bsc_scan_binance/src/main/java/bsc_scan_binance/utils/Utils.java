@@ -248,21 +248,26 @@ public class Utils {
         }
 
         BigDecimal ret = null;
-        if (value != null) {
-            if (value instanceof BigDecimal) {
-                ret = (BigDecimal) value;
-            } else if (value instanceof String) {
-                ret = new BigDecimal((String) value);
-            } else if (value instanceof BigInteger) {
-                ret = new BigDecimal((BigInteger) value);
-            } else if (value instanceof Number) {
-                ret = new BigDecimal(((Number) value).doubleValue());
-            } else {
-                throw new ClassCastException("Not possible to coerce [" + value + "] from class " + value.getClass()
-                        + " into a BigDecimal.");
+        try {
+            if (value != null) {
+                if (value instanceof BigDecimal) {
+                    ret = (BigDecimal) value;
+                } else if (value instanceof String) {
+                    ret = new BigDecimal((String) value);
+                } else if (value instanceof BigInteger) {
+                    ret = new BigDecimal((BigInteger) value);
+                } else if (value instanceof Number) {
+                    ret = new BigDecimal(((Number) value).doubleValue());
+                } else {
+                    throw new ClassCastException("Not possible to coerce [" + value + "] from class " + value.getClass()
+                            + " into a BigDecimal.");
+                }
             }
+            return ret;
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
         }
-        return ret;
+
     }
 
     public static String removeLastZero(String value) {

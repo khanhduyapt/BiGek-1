@@ -182,7 +182,7 @@ p {
           </td>
           <!-- OCO -->
           <td class="oco_css" th:classappend="${token.oco_css}"
-            style="text-align: right; min-width: 450px !important; max-width: 450px !important; font-size: 0.75rem !important;">
+            style="text-align: right; min-width: 450px !important; max-width: 450px !important;">
             <div>
               <span th:text="${token.oco_tp_price}"></span><span
                 th:classappend="${token.oco_tp_price_hight_css}"
@@ -193,8 +193,8 @@ p {
                 th:classappend="${token.oco_stop_limit_low_css}"
                 th:text="${token.oco_stop_limit_low}"></span>
             </div>
-            <p th:text="${token.ema_history}">
-            <p th:text="${token.avg_history}">
+            <p style="font-size: 0.75rem !important;" th:text="${token.ema_history}">
+            <p style="font-size: 0.75rem !important;" th:text="${token.avg_history}">
           </td>
 
           <td style="text-align: right;"

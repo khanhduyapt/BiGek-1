@@ -787,81 +787,30 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal price_min = Utils.getBigDecimal(avgPriceList.get(idx_price_min));
                     BigDecimal price_max = Utils.getBigDecimal(avgPriceList.get(idx_price_max));
 
-                    BigDecimal lowprice_min = Utils.getBigDecimal(lowPriceList.get(idx_lowprice_min));
-                    BigDecimal hightprice_max = Utils.getBigDecimal(hightPriceList.get(idx_hightprice_max))
-                            .multiply(BigDecimal.valueOf(0.9));
+                    String min_14d = "Min14d: " + price_min.toString() + "("
+                            + Utils.toPercent(price_min, price_now) + "%)~Max14d: ";
 
-                    BigDecimal stop_limit_1 = price_min.multiply(BigDecimal.valueOf(0.95));
-                    BigDecimal stop_price_1 = price_min.multiply(BigDecimal.valueOf(0.945));
+                    String max_14d_percent = Utils.toPercent(price_max, price_now);
+                    css.setOco_tp_price(min_14d);
+                    css.setOco_tp_price_hight(price_max.toString() + "("
+                            + max_14d_percent + "%)");
 
-                    String percent_hightprice_max = Utils.toPercent(hightprice_max, price_now);
-                    String percent_stop_limit_1 = Utils.toPercent(stop_limit_1, price_now);
-
-                    String oco_tp_price = "" + "20%:"
-                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.2)), 5).toString() + "―10%:"
-                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(1.1)), 5).toString() + "―M("
-                            + Utils.toPercent(price_max, price_now) + "%):"
-                            + Utils.formatPrice(price_max.multiply(BigDecimal.valueOf(0.95)), 5).toString() + "―";
-
-                    css.setOco_tp_price_hight(
-                            "H(" + percent_hightprice_max + "%):" + Utils.formatPrice(hightprice_max, 5).toString());
-
-                    String oco_stop_limit = "" + " SL1(-10%):"
-                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.9)), 5).toString() + "―SL_M("
-                            + percent_stop_limit_1 + "%):" + Utils.formatPrice(stop_limit_1, 5).toString() + "―";
-
-                    String oco_stop_price = " SP1(-10%):"
-                            + Utils.formatPrice(price_now.multiply(BigDecimal.valueOf(0.895)), 5).toString() + "―SP_M("
-                            + Utils.toPercent(stop_price_1, price_now) + "%):"
-                            + Utils.formatPrice(stop_price_1, 5).toString();
-
-                    BigDecimal stop_limit_2 = lowprice_min.multiply(BigDecimal.valueOf(0.95));
-                    BigDecimal stop_price_2 = lowprice_min.multiply(BigDecimal.valueOf(0.945));
-
-                    String oco_stop_limit_low_percent = Utils.toPercent(stop_limit_2, price_now);
-                    String oco_stop_limit_low = "SL_Low(" + oco_stop_limit_low_percent + "%):"
-                            + Utils.formatPrice(stop_limit_2, 5).toString();
-                    if (!Objects.equals("[dvz]", oco_stop_limit_low_percent) && Utils
-                            .getBigDecimalValue(oco_stop_limit_low_percent).compareTo(BigDecimal.valueOf(-10)) > 0) {
-                        css.setOco_stop_limit_low_css("text-primary font-weight-bold");
-                    }
-
-                    oco_stop_price += "―SP_Low(" + Utils.toPercent(stop_price_2, price_now) + "%):"
-                            + Utils.formatPrice(stop_price_2, 5).toString();
-
-                    String oco_low_hight = " (L:" + lowprice_min.toString() + "~M:" + price_min + "~H:"
-                            + hightprice_max.toString() + "=" + Utils.toPercent(hightprice_max, lowprice_min) + "%)";
-
-                    if (Utils.getBigDecimalValue(percent_hightprice_max)
-                            .compareTo(Utils.getBigDecimalValue(oco_stop_limit_low_percent.replace("-", ""))
-                                    .multiply(BigDecimal.valueOf(1.5))) < 1) {
-                        // css.setStar("✖");
-                        css.setStar_css("text-danger");
-                        // css.setOco_css("text-white");
-                        css.setOco_stop_limit_low_css("");
-                    } else if (Utils.getBigDecimalValue(percent_hightprice_max)
-                            .compareTo(BigDecimal.valueOf(50)) >= 0) {
+                    if (Utils.getBigDecimalValue(max_14d_percent).compareTo(BigDecimal.valueOf(20)) > 0) {
                         css.setOco_tp_price_hight_css("text-primary font-weight-bold");
-                    } else if (Utils.getBigDecimalValue(percent_hightprice_max)
-                            .compareTo(Utils.getBigDecimalValue(oco_stop_limit_low_percent.replace("-", ""))
-                                    .multiply(BigDecimal.valueOf(2))) >= 0) {
-                        css.setOco_tp_price_hight_css("text-primary font-weight-bold");
-                    } else if (Objects.equals("🤩", css.getStar())) {
-                        css.setStar("");
+                    } else if (Utils.getBigDecimalValue(max_14d_percent).compareTo(BigDecimal.valueOf(10)) > 0) {
+                        css.setOco_tp_price_hight_css("text-primary");
+                    } else {
+                        css.setOco_tp_price_hight_css("text-danger");
                     }
-
-                    css.setOco_tp_price(oco_tp_price);
-                    css.setOco_stop_limit(oco_stop_limit);
-                    css.setOco_stop_limit_low(oco_stop_limit_low);
-                    css.setOco_stop_price(oco_stop_price);
-                    css.setOco_low_hight(oco_low_hight);
 
                     String ema_history = "vector7: " + dto.getEma07d() + ", vector14: " + dto.getEma14d();
                     css.setEma_history(ema_history);
 
                     String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(dto.getAvg07d(), price_now)
-                            + "%)" + ", avg14: " + dto.getAvg14d() + ", avg21: " + dto.getAvg21d() + ", avg28: "
-                            + dto.getAvg28d();
+                            + "%)" + ", avg14: " + dto.getAvg14d() + "(" + Utils.toPercent(dto.getAvg14d(), price_now)
+                            + "%)" + ", avg28: "
+                            + dto.getAvg28d() + "(" + Utils.toPercent(dto.getAvg28d(), price_now)
+                            + "%)";
                     css.setAvg_history(avg_history);
                 }
 
@@ -884,9 +833,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (dto.getEma07d().compareTo(BigDecimal.ZERO) > 0) {
                     if (css.getStar().contains("Uptrend")) {
-                        css.setStar("🤩" + css.getStar() + " today");
+                        css.setStar("🤩" + css.getStar() + " Plus");
                     } else {
-                        css.setStar("🤩" + css.getStar() + " Uptrend today");
+                        css.setStar("🤩" + css.getStar() + " Plus");
                     }
 
                     css.setStar_css("text-success");
@@ -902,7 +851,7 @@ public class BinanceServiceImpl implements BinanceService {
                 priorityCoin.setEma(dto.getEma07d());
 
                 if (css.getPumping_history().contains("Dump")) {
-                    css.setStar(css.getStar() + " Dump_history");
+                    css.setStar(css.getStar() + " Dump");
                 }
 
                 Boolean is_candidate = false;
@@ -924,7 +873,7 @@ public class BinanceServiceImpl implements BinanceService {
                             + avg_boll_max + "%)");
 
                     if (dto.getIs_bottom_area()
-                            || (Utils.getBigDecimal(avg_boll_min).compareTo(BigDecimal.valueOf(-3)) > 0
+                            || (Utils.getBigDecimalValue(avg_boll_min).compareTo(BigDecimal.valueOf(-3)) > 0
                                     && Utils.getBigDecimalValue(avg_boll_max).compareTo(BigDecimal.valueOf(6)) > 0)) {
                         is_candidate = true;
                         predict = true;
