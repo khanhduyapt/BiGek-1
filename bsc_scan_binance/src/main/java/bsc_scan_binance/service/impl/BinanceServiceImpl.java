@@ -359,41 +359,43 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4), '~', ROUND(w.ema, 5), '~', coalesce(price_change_24h, 0) ) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '11 days', 'yyyyMMdd')) as day_10, \n"
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4), '~', ROUND(w.ema, 5), '~', coalesce(price_change_24h, 0) ) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '12 days', 'yyyyMMdd')) as day_11, \n"
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4), '~', ROUND(w.ema, 5), '~', coalesce(price_change_24h, 0) ) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd')) as day_12, \n"
-                    + "   can.priority,                                                                             \n"
+                    + "   can.priority,                                                                           \n"
 
-                    + "   macd.ema07d,                                                                               \n"
-                    + "   macd.ema14d,                                                                               \n"
-                    + "   macd.ema21d,                                                                               \n"
-                    + "   macd.ema28d,                                                                               \n"
-                    + "   macd.avg07d,                                                                               \n"
-                    + "   macd.avg14d,                                                                               \n"
-                    + "   macd.avg21d,                                                                               \n"
-                    + "   macd.avg28d,                                                                               \n"
+                    + "   macd.ema07d,                                                                            \n"
+                    + "   macd.ema14d,                                                                            \n"
+                    + "   macd.ema21d,                                                                            \n"
+                    + "   macd.ema28d,                                                                            \n"
+                    + "   macd.avg07d,                                                                            \n"
+                    + "   macd.avg14d,                                                                            \n"
+                    + "   macd.avg21d,                                                                            \n"
+                    + "   macd.avg28d,                                                                            \n"
                     // Bottleneck -> maybe up trend
-                    + "   (CASE WHEN  (select gecko_id from boll_area b where can.gecko_id = b.gecko_id) IS NOT NULL THEN true ELSE false END) AS uptrend   \n"
-                    + "                                                                                             \n"
-                    + " from                                                                                        \n"
-                    + "   candidate_coin can,                                                                       \n"
-                    + "   binance_volumn_day cur,                                                                   \n"
-                    + "                                                                                             \n"
-                    + " (                                                                                           \n"
-                    + "    select                                                                                   \n"
-                    + "       xyz.gecko_id,                                                                         \n"
-                    + "       xyz.symbol,                                                                           \n"
-                    + "       COALESCE(price_today   - price_pre_07d*1.05, -99) as ema07d,                          \n"
-                    + "       COALESCE(price_pre_07d - price_pre_14d, -99) as ema14d,                               \n"
-                    + "       COALESCE(price_pre_14d - price_pre_21d, -99) as ema21d,                               \n"
-                    + "       COALESCE(price_pre_21d - price_pre_28d, -99) as ema28d,                               \n"
-                    + "       COALESCE(avg07d, -99) avg07d,                                                         \n"
-                    + "       COALESCE(avg14d, -99) avg14d,                                                         \n"
-                    + "       COALESCE(avg21d, -99) avg21d,                                                         \n"
-                    + "       COALESCE(avg28d, -99) avg28d                                                          \n"
-                    + "    from                                                                                     \n"
-                    + "      (                                                                                      \n"
-                    + "          select                                                                             \n"
-                    + "              can.gecko_id,                                                                  \n"
-                    + "              can.symbol,                                                                    \n"
-                    + "              can.name,                                                                      \n"
+                    + "   (CASE WHEN  (select gecko_id from boll_area b where can.gecko_id = b.gecko_id) IS NOT NULL THEN true ELSE false END) AS uptrend,   \n"
+                    + "   vol.vol1d,                                                                              \n"
+                    + "   vol.vol7d                                                                               \n"
+                    + "                                                                                           \n"
+                    + " from                                                                                      \n"
+                    + "   candidate_coin can,                                                                     \n"
+                    + "   binance_volumn_day cur,                                                                 \n"
+                    + "                                                                                           \n"
+                    + " (                                                                                         \n"
+                    + "    select                                                                                 \n"
+                    + "       xyz.gecko_id,                                                                       \n"
+                    + "       xyz.symbol,                                                                         \n"
+                    + "       COALESCE(price_today   - price_pre_07d*1.05, -99) as ema07d,                        \n"
+                    + "       COALESCE(price_pre_07d - price_pre_14d, -99) as ema14d,                             \n"
+                    + "       COALESCE(price_pre_14d - price_pre_21d, -99) as ema21d,                             \n"
+                    + "       COALESCE(price_pre_21d - price_pre_28d, -99) as ema28d,                             \n"
+                    + "       COALESCE(avg07d, -99) avg07d,                                                       \n"
+                    + "       COALESCE(avg14d, -99) avg14d,                                                       \n"
+                    + "       COALESCE(avg21d, -99) avg21d,                                                       \n"
+                    + "       COALESCE(avg28d, -99) avg28d                                                        \n"
+                    + "    from                                                                                   \n"
+                    + "      (                                                                                    \n"
+                    + "          select                                                                           \n"
+                    + "              can.gecko_id,                                                                \n"
+                    + "              can.symbol,                                                                  \n"
+                    + "              can.name,                                                                    \n"
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd')) as price_today,      \n"
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd')) as price_pre_07d,  \n"
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd')) as price_pre_14d,  \n"
@@ -403,12 +405,30 @@ public class BinanceServiceImpl implements BinanceService {
                     + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg14d,      \n"
                     + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '20 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg21d,      \n"
                     + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '27 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg28d  \n"
-                    + "                                                                                             \n"
-                    + "          from                                                                               \n"
-                    + "              candidate_coin can                                                             \n"
-                    + "    ) xyz                                                                                    \n"
-                    + " ) macd                                                                                      \n"
-
+                    + "                                                                                           \n"
+                    + "          from                                                                             \n"
+                    + "              candidate_coin can                                                           \n"
+                    + "    ) xyz                                                                                  \n"
+                    + " ) macd                                                                                    \n"
+                    + " , ("
+                    + "     select                                                                                \n"
+                    + "        gecko_id,                                                                          \n"
+                    + "        symbol,                                                                            \n"
+                    + "        ROUND((COALESCE(volume_pre_01d, 0) - COALESCE(volume_pre_07d, 0)*1.05)/1000000, 1) as vol1d, \n"
+                    + "        ROUND((COALESCE(volume_pre_07d, 0) - COALESCE(volume_pre_14d, 0)     )/1000000, 1) as vol7d  \n"
+                    + "     from                                                                                  \n"
+                    + "       (                                                                                   \n"
+                    + "           select                                                                          \n"
+                    + "               can.gecko_id,                                                               \n"
+                    + "               can.symbol,                                                                 \n"
+                    + "               can.name,                                                                   \n"
+                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '1 days', 'dd')) as volume_pre_01d,    \n"
+                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '6 days', 'dd')) as volume_pre_07d,  \n"
+                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval '13 days', 'dd')) as volume_pre_14d   \n"
+                    + "           from                                                                            \n"
+                    + "               candidate_coin can                                                          \n"
+                    + "     ) tmp                                                                                 \n"
+                    + ") vol                                                                                      \n"
                     + ", " + Utils.sql_boll_2_body
 
                     + "                                                                                           \n"
@@ -418,6 +438,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   and can.symbol = cur.symbol                                                             \n"
                     + "   and can.gecko_id = macd.gecko_id                                                        \n"
                     + "   and can.gecko_id = boll.gecko_id                                                        \n"
+                    + "   and can.gecko_id = vol.gecko_id                                                         \n"
                     + " order by                                                                                  \n"
                     + "   coalesce(can.priority, 3) asc,                                            		      \n"
                     + "   can.volumn_div_marketcap desc                                                           \n";
@@ -452,6 +473,22 @@ public class BinanceServiceImpl implements BinanceService {
                 if ((market_cap.compareTo(BigDecimal.valueOf(36000001)) < 0)
                         && (market_cap.compareTo(BigDecimal.valueOf(1000000)) > 0)) {
                     css.setMarket_cap_css("highlight");
+                }
+
+                String volumn_vector1d = "vec1: " + dto.getVol1d();
+                css.setVector_vol1d(volumn_vector1d);
+                if (dto.getVol1d().compareTo(BigDecimal.ZERO) > 0) {
+                    css.setVector_vol1d_css("text-primary");
+                } else {
+                    css.setVector_vol1d_css("text-danger");
+                }
+
+                String volumn_vector7d = "vec7: " + dto.getVol7d();
+                css.setVector_vol2d(volumn_vector7d);
+                if (dto.getVol7d().compareTo(BigDecimal.ZERO) > 0) {
+                    css.setVector_vol2d_css("text-primary");
+                } else {
+                    css.setVector_vol2d_css("text-danger");
                 }
 
                 BigDecimal volumn_binance_div_marketcap = BigDecimal.ZERO;

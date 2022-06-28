@@ -94,6 +94,9 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "avg21d", type = BigDecimal.class),
                 @ColumnResult(name = "avg28d", type = BigDecimal.class),
                 @ColumnResult(name = "uptrend", type = Boolean.class),
+
+                @ColumnResult(name = "vol1d", type = BigDecimal.class),
+                @ColumnResult(name = "vol7d", type = BigDecimal.class),
         })
 })
 

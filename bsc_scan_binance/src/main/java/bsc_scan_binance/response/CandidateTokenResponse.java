@@ -80,4 +80,7 @@ public class CandidateTokenResponse {
     private BigDecimal avg21d;
     private BigDecimal avg28d;
     private Boolean uptrend;
+
+    private BigDecimal vol1d;
+    private BigDecimal vol7d;
 }

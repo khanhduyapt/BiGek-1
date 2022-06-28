@@ -64,6 +64,10 @@ public class CandidateTokenCssResponse {
     private String category = "";
     private String trend = "";
     private String total_supply = "";
+    private String vector_vol1d;
+    private String vector_vol1d_css;
+    private String vector_vol2d;
+    private String vector_vol2d_css;
     private String max_supply = "";
     private String circulating_supply = "";
     private String binance_trade = "";

@@ -142,6 +142,15 @@ p {
 							th:text="${#numbers.formatDecimal(token.gecko_total_volume, 0, 'COMMA', 0, 'POINT') + '$'}">
 						<p style="font-size: 0.7rem !important;"
 							th:text="${token.gecko_volumn_history}">
+						<div>
+							<span style="font-size: 0.7rem !important;"
+								th:classappend="${token.vector_vol1d_css}"
+								th:text="${token.vector_vol1d}"> </span> <span
+								style="font-size: 0.7rem !important;"
+								th:classappend="${token.vector_vol2d_css}"
+								th:text="${token.vector_vol2d}"> </span>
+						</div>
+
 					</td>
 					<!-- v/mc -->
 					<td
