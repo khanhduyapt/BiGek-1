@@ -135,6 +135,21 @@ public class CandidateTokenCssResponse {
     private String day_11_ema = "";
     private String day_12_ema = "";
 
+    private String today_ema_css = "";
+    private String day_0_ema_css = "";
+    private String day_1_ema_css = "";
+    private String day_2_ema_css = "";
+    private String day_3_ema_css = "";
+    private String day_4_ema_css = "";
+    private String day_5_ema_css = "";
+    private String day_6_ema_css = "";
+    private String day_7_ema_css = "";
+    private String day_8_ema_css = "";
+    private String day_9_ema_css = "";
+    private String day_10_ema_css = "";
+    private String day_11_ema_css = "";
+    private String day_12_ema_css = "";
+
     private String today_vol_css = "";
     private String day_0_vol_css = "";
     private String day_1_vol_css = "";

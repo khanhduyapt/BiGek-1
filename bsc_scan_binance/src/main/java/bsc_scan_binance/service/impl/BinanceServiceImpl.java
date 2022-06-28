@@ -519,10 +519,18 @@ public class BinanceServiceImpl implements BinanceService {
                 List<String> temp = splitVolAndPrice(css.getToday());
                 css.setToday_vol(temp.get(0));
                 css.setToday_price(temp.get(1));
-                css.setToday_ema(
-                        "(" + dto.getCount_up() + "Up" + (dto.getEma07d().compareTo(BigDecimal.ZERO) > 0 ? "+" : "")
-                                + ", " + (7 - Utils.getIntValue(dto.getCount_up())) + "Down) " + temp.get(4) + " (24h: "
-                                + temp.get(5) + "%)");
+                String today_ema = "";
+                if (temp.get(4).contains("-")) {
+                    today_ema = "(" + (7 - Utils.getIntValue(dto.getCount_up())) + "Down, " + dto.getCount_up()
+                            + "Up )";
+                } else {
+                    today_ema = "(" + dto.getCount_up() + "Up"
+                            + ", " + (7 - Utils.getIntValue(dto.getCount_up())) + "Down) ";
+
+                }
+                today_ema += temp.get(4) + " (" + temp.get(5) + "%)";
+                css.setToday_ema(today_ema);
+
                 volList.add("");
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -535,7 +543,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_0());
                 css.setDay_0_vol(temp.get(0));
                 css.setDay_0_price(temp.get(1));
-                css.setDay_0_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_0_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -549,11 +557,10 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar_css("text-primary");
                     }
                 }
-
                 temp = splitVolAndPrice(css.getDay_1());
                 css.setDay_1_vol(temp.get(0));
                 css.setDay_1_price(temp.get(1));
-                css.setDay_1_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_1_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -562,7 +569,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_2());
                 css.setDay_2_vol(temp.get(0));
                 css.setDay_2_price(temp.get(1));
-                css.setDay_2_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_2_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -571,7 +578,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_3());
                 css.setDay_3_vol(temp.get(0));
                 css.setDay_3_price(temp.get(1));
-                css.setDay_3_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_3_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -580,7 +587,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_4());
                 css.setDay_4_vol(temp.get(0));
                 css.setDay_4_price(temp.get(1));
-                css.setDay_4_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_4_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -589,7 +596,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_5());
                 css.setDay_5_vol(temp.get(0));
                 css.setDay_5_price(temp.get(1));
-                css.setDay_5_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_5_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -598,7 +605,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_6());
                 css.setDay_6_vol(temp.get(0));
                 css.setDay_6_price(temp.get(1));
-                css.setDay_6_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_6_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -607,7 +614,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_7());
                 css.setDay_7_vol(temp.get(0));
                 css.setDay_7_price(temp.get(1));
-                css.setDay_7_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_7_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -616,7 +623,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_8());
                 css.setDay_8_vol(temp.get(0));
                 css.setDay_8_price(temp.get(1));
-                css.setDay_8_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_8_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -625,7 +632,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_9());
                 css.setDay_9_vol(temp.get(0));
                 css.setDay_9_price(temp.get(1));
-                css.setDay_9_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_9_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -634,7 +641,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_10());
                 css.setDay_10_vol(temp.get(0));
                 css.setDay_10_price(temp.get(1));
-                css.setDay_10_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_10_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -643,7 +650,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_11());
                 css.setDay_11_vol(temp.get(0));
                 css.setDay_11_price(temp.get(1));
-                css.setDay_11_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_11_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -652,7 +659,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_12());
                 css.setDay_12_vol(temp.get(0));
                 css.setDay_12_price(temp.get(1));
-                css.setDay_12_ema(temp.get(4) + " (24h: " + temp.get(5) + "%)");
+                css.setDay_12_ema(temp.get(4) + " (" + temp.get(5) + "%)");
                 volList.add(temp.get(0));
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
@@ -662,8 +669,8 @@ public class BinanceServiceImpl implements BinanceService {
                 int idx_price_max = getIndexMax(avgPriceList);
                 int idx_vol_min = getIndexMin(volList);
                 int idx_price_min = getIndexMin(avgPriceList);
-                int idx_lowprice_min = getIndexMin(lowPriceList);
-                int idx_hightprice_max = getIndexMax(hightPriceList);
+
+                setEmaCss(css);
 
                 String str_down = "";
                 if (Utils.getBigDecimal(avgPriceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
@@ -964,6 +971,89 @@ public class BinanceServiceImpl implements BinanceService {
             log.error(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
+    }
+
+    private void setEmaCss(CandidateTokenCssResponse css) {
+        if (!css.getToday_ema().contains("-") && css.getDay_0_ema().contains("-")) {
+            css.setToday_ema_css("text-primary font-weight-bold");
+        } else if (css.getToday_ema().contains("-")) {
+            css.setToday_ema_css("text-danger");
+        } else {
+            css.setToday_ema_css("text-primary");
+        }
+
+        if (!css.getDay_0_ema().contains("-")) {
+            css.setDay_0_ema_css("text-primary");
+        } else if (css.getDay_0_ema().contains("-")) {
+            css.setDay_0_ema_css("text-danger");
+        }
+
+        if (!css.getDay_1_ema().contains("-")) {
+            css.setDay_1_ema_css("text-primary");
+        } else if (css.getDay_1_ema().contains("-")) {
+            css.setDay_1_ema_css("text-danger");
+        }
+
+        if (!css.getDay_2_ema().contains("-")) {
+            css.setDay_2_ema_css("text-primary");
+        } else if (css.getDay_2_ema().contains("-")) {
+            css.setDay_2_ema_css("text-danger");
+        }
+
+        if (!css.getDay_3_ema().contains("-")) {
+            css.setDay_3_ema_css("text-primary");
+        } else if (css.getDay_3_ema().contains("-")) {
+            css.setDay_3_ema_css("text-danger");
+        }
+
+        if (!css.getDay_4_ema().contains("-")) {
+            css.setDay_4_ema_css("text-primary");
+        } else if (css.getDay_4_ema().contains("-")) {
+            css.setDay_4_ema_css("text-danger");
+        }
+
+        if (!css.getDay_5_ema().contains("-")) {
+            css.setDay_5_ema_css("text-primary");
+        } else if (css.getDay_5_ema().contains("-")) {
+            css.setDay_5_ema_css("text-danger");
+        }
+
+        if (!css.getDay_6_ema().contains("-")) {
+            css.setDay_6_ema_css("text-primary");
+        } else if (css.getDay_6_ema().contains("-")) {
+            css.setDay_6_ema_css("text-danger");
+        }
+
+        if (!css.getDay_7_ema().contains("-")) {
+            css.setDay_7_ema_css("text-primary");
+        } else if (css.getDay_7_ema().contains("-")) {
+            css.setDay_7_ema_css("text-danger");
+        }
+
+        if (!css.getDay_8_ema().contains("-")) {
+            css.setDay_8_ema_css("text-primary");
+        } else if (css.getDay_8_ema().contains("-")) {
+            css.setDay_8_ema_css("text-danger");
+        }
+
+        if (!css.getDay_9_ema().contains("-")) {
+            css.setDay_9_ema_css("text-primary");
+        } else if (css.getDay_9_ema().contains("-")) {
+            css.setDay_9_ema_css("text-danger");
+        }
+
+        if (!css.getDay_10_ema().contains("-")) {
+            css.setDay_10_ema_css("text-primary");
+        } else if (css.getDay_10_ema().contains("-")) {
+            css.setDay_10_ema_css("text-danger");
+        }
+
+        if (!css.getDay_11_ema().contains("-")) {
+            css.setDay_11_ema_css("text-primary");
+        } else if (css.getDay_11_ema().contains("-")) {
+            css.setDay_11_ema_css("text-danger");
+        }
+
     }
 
     private Long getValue(String value) {
