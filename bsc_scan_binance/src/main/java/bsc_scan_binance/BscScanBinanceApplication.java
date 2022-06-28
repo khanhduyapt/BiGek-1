@@ -70,8 +70,8 @@ public class BscScanBinanceApplication {
                 CandidateCoin coin = list.get(idx);
 
                 try {
-//                    binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
-//                    binance_service.loadDataBtcVolumeDay(coin.getGeckoid(), coin.getSymbol());
+                    binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
+                    binance_service.loadDataBtcVolumeDay(coin.getGeckoid(), coin.getSymbol());
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                     wait(600000);

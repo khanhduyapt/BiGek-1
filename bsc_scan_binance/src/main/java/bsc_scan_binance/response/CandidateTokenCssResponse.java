@@ -94,6 +94,36 @@ public class CandidateTokenCssResponse {
     private String day_11 = "";
     private String day_12 = "";
 
+    private String today_gecko_vol = "";
+    private String day_0_gecko_vol = "";
+    private String day_1_gecko_vol = "";
+    private String day_2_gecko_vol = "";
+    private String day_3_gecko_vol = "";
+    private String day_4_gecko_vol = "";
+    private String day_5_gecko_vol = "";
+    private String day_6_gecko_vol = "";
+    private String day_7_gecko_vol = "";
+    private String day_8_gecko_vol = "";
+    private String day_9_gecko_vol = "";
+    private String day_10_gecko_vol = "";
+    private String day_11_gecko_vol = "";
+    private String day_12_gecko_vol = "";
+
+    private String today_gecko_vol_css = "";
+    private String day_0_gecko_vol_css = "";
+    private String day_1_gecko_vol_css = "";
+    private String day_2_gecko_vol_css = "";
+    private String day_3_gecko_vol_css = "";
+    private String day_4_gecko_vol_css = "";
+    private String day_5_gecko_vol_css = "";
+    private String day_6_gecko_vol_css = "";
+    private String day_7_gecko_vol_css = "";
+    private String day_8_gecko_vol_css = "";
+    private String day_9_gecko_vol_css = "";
+    private String day_10_gecko_vol_css = "";
+    private String day_11_gecko_vol_css = "";
+    private String day_12_gecko_vol_css = "";
+
     private String today_vol = "";
     private String day_0_vol = "";
     private String day_1_vol = "";
