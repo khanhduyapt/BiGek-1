@@ -50,6 +50,8 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "current_price", type = String.class),
 
                 @ColumnResult(name = "gecko_total_volume", type = String.class),
+                @ColumnResult(name = "top10_vol_up", type = Boolean.class),
+                @ColumnResult(name = "vol_up_rate", type = BigDecimal.class),
                 @ColumnResult(name = "gec_vol_pre_1h", type = String.class),
                 @ColumnResult(name = "gec_vol_pre_2h", type = String.class),
                 @ColumnResult(name = "gec_vol_pre_3h", type = String.class),
@@ -95,6 +97,7 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "avg28d", type = BigDecimal.class),
                 @ColumnResult(name = "uptrend", type = Boolean.class),
 
+                @ColumnResult(name = "vol0d", type = BigDecimal.class),
                 @ColumnResult(name = "vol1d", type = BigDecimal.class),
                 @ColumnResult(name = "vol7d", type = BigDecimal.class),
         })

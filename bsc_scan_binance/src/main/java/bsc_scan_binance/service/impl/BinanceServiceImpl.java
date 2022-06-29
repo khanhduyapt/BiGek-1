@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,15 +26,18 @@ import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcVolumeDay;
+import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
+import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
+import bsc_scan_binance.response.GeckoVolumeUpPre4hResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
@@ -60,7 +64,12 @@ public class BinanceServiceImpl implements BinanceService {
     private BtcVolumeDayRepository btcVolumeDayRepository;
 
     @Autowired
+    private GeckoVolumeUpPre4hRepository geckoVolumeUpPre4hRepository;
+
+    @Autowired
     private BollAreaRepository bollAreaRepository;
+
+    Hashtable<String, String> msg_send_dict = new Hashtable<String, String>();
 
     @Override
     @Transactional
@@ -324,6 +333,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.market_cap ,                                                                        \n"
                     + "   cur.price_at_binance            as current_price,                                       \n"
                     + "   can.total_volume                as gecko_total_volume,                                  \n"
+                    + "   (case when can.gecko_id in (SELECT pre4h.gecko_id FROM gecko_volume_up_pre4h pre4h order by vol_up_rate desc limit 20)  then true else false end) as top10_vol_up, \n"
+                    + "   (SELECT coalesce(vol_up_rate, 0) FROM gecko_volume_up_pre4h pre4h WHERE can.gecko_id = pre4h.gecko_id )                                           as vol_up_rate,  \n"
                     + "                                                                                           \n"
                     + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0) as gec_vol_pre_1h, \n"
                     + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.gecko_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0) as gec_vol_pre_2h, \n"
@@ -371,6 +382,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   macd.avg28d,                                                                            \n"
                     // Bottleneck -> maybe up trend
                     + "   (CASE WHEN  (select gecko_id from boll_area b where can.gecko_id = b.gecko_id) IS NOT NULL THEN true ELSE false END) AS uptrend,   \n"
+                    + "   vol.vol0d,                                                                              \n"
                     + "   vol.vol1d,                                                                              \n"
                     + "   vol.vol7d                                                                               \n"
                     + "                                                                                           \n"
@@ -414,8 +426,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + "     select                                                                                \n"
                     + "        gecko_id,                                                                          \n"
                     + "        symbol,                                                                            \n"
-                    + "        ROUND((COALESCE(case when volume_pre_01d is null then volume_today else volume_pre_01d end, 0) - COALESCE(volume_pre_07d, 0)*1.05)/1000000, 1) as vol1d, \n"
-                    + "        ROUND((COALESCE(volume_pre_07d, 0) - COALESCE(volume_pre_14d, 0)     )/1000000, 1) as vol7d  \n"
+                    + "        ROUND((COALESCE(volume_today  , 0))/1000000, 1) as vol0d, \n"
+                    + "        ROUND((COALESCE(volume_pre_01d, 0))/1000000, 1) as vol1d, \n"
+                    + "        ROUND((COALESCE(volume_pre_07d, 0))/1000000, 1) as vol7d  \n"
                     + "     from                                                                                  \n"
                     + "       (                                                                                   \n"
                     + "           select                                                                          \n"
@@ -423,9 +436,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "               can.symbol,                                                                 \n"
                     + "               can.name,                                                                   \n"
                     + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW(), 'dd'))                      as volume_today,  \n"
-                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '1 days', 'dd')) as volume_pre_01d,  \n"
-                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '6 days', 'dd')) as volume_pre_07d,  \n"
-                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval '13 days', 'dd')) as volume_pre_14d   \n"
+                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '1 days', 'dd')) as volume_pre_01d, \n"
+                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '6 days', 'dd')) as volume_pre_07d  \n"
                     + "           from                                                                            \n"
                     + "               candidate_coin can                                                          \n"
                     + "     ) tmp                                                                                 \n"
@@ -557,7 +569,8 @@ public class BinanceServiceImpl implements BinanceService {
                 List<String> temp = splitVolAndPrice(css.getToday());
                 css.setToday_vol(temp.get(0));
                 css.setToday_price(temp.get(1));
-                css.setToday_gecko_vol(temp.get(6));
+                css.setToday_gecko_vol(
+                        temp.get(6) + " (Vol4h: " + Utils.getBigDecimal(dto.getVol_up_rate()).toString() + ")");
                 String today_ema = "";
                 if (temp.get(4).contains("-")) {
                     today_ema = "(" + (7 - Utils.getIntValue(dto.getCount_up())) + "Down, " + dto.getCount_up()
@@ -962,6 +975,10 @@ public class BinanceServiceImpl implements BinanceService {
                     predict = false;
                 }
 
+                if (dto.getTop10_vol_up() && dto.getEma07d().compareTo(BigDecimal.ZERO) > 0) {
+                    css.setStar(css.getStar() + " TopVolUp");
+                }
+
                 priorityCoin.setPredict(predict);
                 priorityCoin.setCandidate(is_candidate);
 
@@ -984,7 +1001,9 @@ public class BinanceServiceImpl implements BinanceService {
                         + "%, 7d: "
                         + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_7d()), 1)
                         + "%, 14d: "
-                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_14d()), 1) + "%";
+                        + Utils.formatPrice(Utils.getBigDecimalValue(css.getPrice_change_percentage_14d()), 1) + "%"
+
+                        + ", Vol4h: " + Utils.getBigDecimal(dto.getVol_up_rate()).toString();
 
                 note += (Utils.isNotBlank(Utils.getStringValue(css.getNote()))
                         ? "~" + Utils.getStringValue(css.getNote())
@@ -1010,11 +1029,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                 sql_update_ema += String.format(
                         " update binance_volumn_week set ema='%s', price_change_24h='%s', gecko_volume='%s' where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
-                        dto.getEma07d(), dto.getPrice_change_percentage_24h(), dto.getVol1d(), dto.getGecko_id(),
+                        dto.getEma07d(), dto.getPrice_change_percentage_24h(), dto.getVol0d(), dto.getGecko_id(),
                         dto.getSymbol());
 
                 if (isOrderByBynaceVolume) {
-                    if (is_candidate) {
+                    if (is_candidate || (dto.getTop10_vol_up() && dto.getEma07d().compareTo(BigDecimal.ZERO) > 0)) {
                         list.add(css);
                     }
                 } else {
@@ -1365,96 +1384,162 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public void monitorBollingerBandwidth() {
         try {
+            int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+
             log.info("Start monitorToken ---->");
-            String sql = "" + " select                                                              \n"
-                    + "     boll.gecko_id,                                                          \n"
-                    + "     boll.symbol,                                                            \n"
-                    + "     boll.name,                                                              \n"
-                    + "     boll.avg_price,                                                         \n"
-                    + "     boll.price_open_candle,                                                 \n"
-                    + "     boll.price_close_candle,                                                \n"
-                    + "     boll.low_price,                                                         \n"
-                    + "     boll.hight_price,                                                       \n"
-                    + "     boll.price_can_buy,                                                     \n"
-                    + "     boll.price_can_sell,                                                    \n"
-                    + "     boll.is_bottom_area,                                                    \n"
-                    + "     boll.is_top_area,                                                       \n"
-                    + "     ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) as profit,                                             \n"
-                    + "     (case when vector.vector_now > 0 then true else false end)   as vector_up,                                          \n"
-                    + "     concat('v1h:', cast(vector.vector_now as varchar), ', v4h:' ,cast(vector.vector_pre4h as varchar)) as vector_desc   \n"
-                    + " FROM                                                                        \n"
-                    + Utils.sql_boll_2_body + " , \n"
-                    + " (                                                                                           \n"
-                    + "  select                                                                                     \n"
-                    + "       pre.gecko_id,                                                                         \n"
-                    + "       pre.hh,                                                                               \n"
-                    + "       ROUND(100 * (price_now   - price_pre4h) /price_pre4h, 2)  as vector_now,              \n"
-                    + "       ROUND(100 * (price_pre4h - price_pre8h) /price_pre8h, 2)  as vector_pre4h             \n"
-                    + "   from (                                                                                    \n"
-                    + "       select                                                                                \n"
-                    + "       tmp.gecko_id,                                                                         \n"
-                    + "       tmp.hh,                                                                               \n"
-                    + "       (case when price_now is null then price_pre1h else price_now end) as price_now,       \n"
-                    + "          price_pre4h,                                                                       \n"
-                    + "          price_pre8h                                                                        \n"
-                    + "       from (                                                                                \n"
-                    + "           select                                                                            \n"
-                    + "               d.gecko_id,                                                                   \n"
-                    + "               d.hh, \n"
-                    + "               (select COALESCE(h.avg_price, 0) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh = TO_CHAR(NOW(), 'HH24')) as price_now,                          \n"
-                    + "               (select COALESCE(h.avg_price, 0) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh = TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre1h,  \n"
-                    + "                                                                                             \n"
-                    + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '4 hours', 'HH24') and TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre4h,   \n"
-                    + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '8 hours', 'HH24') and TO_CHAR(NOW() - interval  '5 hours', 'HH24')) as price_pre8h    \n"
-                    + "           from  \n" + "               btc_volumn_day d \n"
-                    + "           where d.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
-                    + "           ) as tmp                                                                          \n"
-                    + "   ) as pre                                                                                  \n"
-                    + " ) vector                                                                                    \n"
-                    + "                                                                                             \n"
-                    + " where 1=1                                                                                   \n"
-                    + " and (abs(price_can_sell-price_can_buy) < 3*abs(price_close_candle-price_open_candle))       \n"
-                    + " and vector.gecko_id = boll.gecko_id                                                         \n"
-                    + " order by ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) desc                  \n";
+            if (minus >= 30) {
+                String sql = "" + " select                                                              \n"
+                        + "     boll.gecko_id,                                                          \n"
+                        + "     boll.symbol,                                                            \n"
+                        + "     boll.name,                                                              \n"
+                        + "     boll.avg_price,                                                         \n"
+                        + "     boll.price_open_candle,                                                 \n"
+                        + "     boll.price_close_candle,                                                \n"
+                        + "     boll.low_price,                                                         \n"
+                        + "     boll.hight_price,                                                       \n"
+                        + "     boll.price_can_buy,                                                     \n"
+                        + "     boll.price_can_sell,                                                    \n"
+                        + "     boll.is_bottom_area,                                                    \n"
+                        + "     boll.is_top_area,                                                       \n"
+                        + "     ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) as profit,                                             \n"
+                        + "     (case when vector.vector_now > 0 then true else false end)   as vector_up,                                          \n"
+                        + "     concat('v1h:', cast(vector.vector_now as varchar), ', v4h:' ,cast(vector.vector_pre4h as varchar)) as vector_desc   \n"
+                        + " FROM                                                                        \n"
+                        + Utils.sql_boll_2_body + " , \n"
+                        + " (                                                                                           \n"
+                        + "  select                                                                                     \n"
+                        + "       pre.gecko_id,                                                                         \n"
+                        + "       pre.hh,                                                                               \n"
+                        + "       ROUND(100 * (price_now   - price_pre4h) /price_pre4h, 2)  as vector_now,              \n"
+                        + "       ROUND(100 * (price_pre4h - price_pre8h) /price_pre8h, 2)  as vector_pre4h             \n"
+                        + "   from (                                                                                    \n"
+                        + "       select                                                                                \n"
+                        + "       tmp.gecko_id,                                                                         \n"
+                        + "       tmp.hh,                                                                               \n"
+                        + "       (case when price_now is null then price_pre1h else price_now end) as price_now,       \n"
+                        + "          price_pre4h,                                                                       \n"
+                        + "          price_pre8h                                                                        \n"
+                        + "       from (                                                                                \n"
+                        + "           select                                                                            \n"
+                        + "               d.gecko_id,                                                                   \n"
+                        + "               d.hh, \n"
+                        + "               (select COALESCE(h.avg_price, 0) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh = TO_CHAR(NOW(), 'HH24')) as price_now,                          \n"
+                        + "               (select COALESCE(h.avg_price, 0) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh = TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre1h,  \n"
+                        + "                                                                                             \n"
+                        + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '4 hours', 'HH24') and TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre4h,   \n"
+                        + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '8 hours', 'HH24') and TO_CHAR(NOW() - interval  '5 hours', 'HH24')) as price_pre8h    \n"
+                        + "           from  \n"
+                        + "               btc_volumn_day d \n"
+                        + "           where d.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
+                        + "           ) as tmp                                                                          \n"
+                        + "   ) as pre                                                                                  \n"
+                        + " ) vector                                                                                    \n"
+                        + "                                                                                             \n"
+                        + " where 1=1                                                                                   \n"
+                        + " and (abs(price_can_sell-price_can_buy) < 3*abs(price_close_candle-price_open_candle))       \n"
+                        + " and vector.gecko_id = boll.gecko_id                                                         \n"
+                        + " order by ROUND(100*(price_can_sell - price_can_buy)/price_can_buy, 2) desc                  \n";
 
-            Query query = entityManager.createNativeQuery(sql, "BollAreaResponse");
+                Query query = entityManager.createNativeQuery(sql, "BollAreaResponse");
 
-            @SuppressWarnings("unchecked")
-            List<BollAreaResponse> boll_anna_list = query.getResultList();
-            if (!CollectionUtils.isEmpty(boll_anna_list)) {
+                @SuppressWarnings("unchecked")
+                List<BollAreaResponse> boll_anna_list = query.getResultList();
+                if (!CollectionUtils.isEmpty(boll_anna_list)) {
 
-                List<BollArea> list = new ArrayList<BollArea>();
-                for (BollAreaResponse dto : boll_anna_list) {
-                    BollArea entiy = (new ModelMapper()).map(dto, BollArea.class);
-                    list.add(entiy);
+                    List<BollArea> list = new ArrayList<BollArea>();
+                    for (BollAreaResponse dto : boll_anna_list) {
+                        BollArea entiy = (new ModelMapper()).map(dto, BollArea.class);
+                        list.add(entiy);
 
-                    String id = "";
-                    if (dto.getIs_bottom_area()
-                            && (Utils.getBigDecimal(dto.getProfit()).compareTo(BigDecimal.valueOf(5)) > 0)) {
+                        String id = "";
+                        if (dto.getIs_bottom_area()
+                                && (Utils.getBigDecimal(dto.getProfit()).compareTo(BigDecimal.valueOf(5)) > 0)) {
 
-                        id = dto.getGecko_id();
-                    } else {
-                        BigDecimal loss_percent = Utils
-                                .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), dto.getAvg_price(), 1));
-
-                        if (loss_percent.compareTo(BigDecimal.valueOf(-1.5)) > 0) {
                             id = dto.getGecko_id();
+                        } else {
+                            BigDecimal loss_percent = Utils
+                                    .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), dto.getAvg_price(), 1));
+
+                            if (loss_percent.compareTo(BigDecimal.valueOf(-1.5)) > 0) {
+                                id = dto.getGecko_id();
+                            }
+                        }
+
+                        if (Utils.isNotBlank(id)) {
+                            //Boolean isRegisted = bollAreaRepository.existsById(id);
+                            //PriorityCoin coin = priorityCoinRepository.findById(id).orElse(null);
+                            //if (!isRegisted && !Objects.equals(null, coin) && (coin.getVmc() > 25)) {
+                            //    Utils.sendToTelegram(
+                            //            "(Bollinger) " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
+                            //}
                         }
                     }
 
-                    if (Utils.isNotBlank(id)) {
-                        Boolean isRegisted = bollAreaRepository.existsById(id);
-                        PriorityCoin coin = priorityCoinRepository.findById(id).orElse(null);
-                        if (!isRegisted && !Objects.equals(null, coin) && (coin.getVmc() > 25)) {
-                            Utils.sendToTelegram(
-                                    "(Bollinger) " + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
-                        }
-                    }
+                    bollAreaRepository.deleteAll();
+                    bollAreaRepository.saveAll(list);
                 }
-
-                bollAreaRepository.deleteAll();
-                bollAreaRepository.saveAll(list);
             }
+
+            if (minus >= 30) {
+                String sql = " select                                                                       \n"
+                        + "     gecko_id,                                                                   \n"
+                        + "     symbol,                                                                     \n"
+                        + "     hh,                                                                         \n"
+                        + "     curr_voulme,                                                                \n"
+                        + "     avg_vol_pre4h,                                                              \n"
+                        + "     ROUND(vol.curr_voulme / avg_vol_pre4h, 1) as vol_up_rate                    \n"
+                        + " from                                                                            \n"
+                        + " (                                                                               \n"
+                        + "     select                                                                      \n"
+                        + "         gecko_id,                                                               \n"
+                        + "         symbol,                                                                 \n"
+                        + "         hh,                                                                     \n"
+                        + "         ROUND(total_volume/1000000, 1) as curr_voulme,                          \n"
+                        + "         (select ROUND(AVG(COALESCE(h.total_volume, 0))/1000000, 1) from gecko_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '4 hours', 'HH24') and TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as avg_vol_pre4h \n"
+                        + "     from gecko_volumn_day d                                                     \n"
+                        + "     where d.hh = (case when EXTRACT(MINUTE FROM NOW()) < 15 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
+                        + " ) vol                                                                           \n"
+                        + " where                                                                           \n"
+                        + "     avg_vol_pre4h > 0                                                           \n"
+                        + " order by                                                                        \n"
+                        + "     vol.curr_voulme / avg_vol_pre4h desc                                        \n";
+
+                Query query = entityManager.createNativeQuery(sql, "GeckoVolumeUpPre4hResponse");
+
+                @SuppressWarnings("unchecked")
+                List<GeckoVolumeUpPre4hResponse> vol_list = query.getResultList();
+                if (!CollectionUtils.isEmpty(vol_list)) {
+                    geckoVolumeUpPre4hRepository.deleteAll();
+                    List<GeckoVolumeUpPre4h> saveList = new ArrayList<GeckoVolumeUpPre4h>();
+
+                    int index = 0;
+                    for (GeckoVolumeUpPre4hResponse dto : vol_list) {
+                        GeckoVolumeUpPre4h entity = (new ModelMapper()).map(dto, GeckoVolumeUpPre4h.class);
+                        entity.setGeckoid(dto.getGecko_id());
+                        saveList.add(entity);
+                        index += 1;
+
+                        if (index <= 5) {
+                            if (!msg_send_dict.containsKey(dto.getGecko_id())) {
+
+                                PriorityCoin coin = priorityCoinRepository.findById(dto.getGecko_id()).orElse(null);
+                                if (!Objects.equals(null, coin)) {
+                                    Utils.sendToTelegram(
+                                            "(VolumeUp) "
+                                                    + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
+                                }
+
+                                msg_send_dict.put(dto.getGecko_id(), dto.getGecko_id());
+                            }
+                        }
+                    }
+                    geckoVolumeUpPre4hRepository.saveAll(saveList);
+
+                }
+            } else {
+                msg_send_dict.clear();
+            }
+
             log.info("End monitorToken <----");
         } catch (Exception e) {
             e.printStackTrace();

@@ -36,6 +36,8 @@ public class CandidateTokenResponse {
     private String current_price;
 
     private String gecko_total_volume;
+    private Boolean top10_vol_up;
+    private BigDecimal vol_up_rate;
     private String gec_vol_pre_1h;
     private String gec_vol_pre_2h;
     private String gec_vol_pre_3h;
@@ -81,6 +83,7 @@ public class CandidateTokenResponse {
     private BigDecimal avg28d;
     private Boolean uptrend;
 
+    private BigDecimal vol0d;
     private BigDecimal vol1d;
     private BigDecimal vol7d;
 }
