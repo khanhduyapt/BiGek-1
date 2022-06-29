@@ -982,6 +982,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (dto.getTop10_vol_up()) {
                     css.setStar(css.getStar() + " TopVolUp");
+                } else if (Utils.getBigDecimal(dto.getVol_up_rate()).compareTo(BigDecimal.valueOf(1.2)) > 0) {
+                    css.setStar(css.getStar() + " VolUp");
                 }
 
                 priorityCoin.setPredict(predict);
@@ -1525,17 +1527,17 @@ public class BinanceServiceImpl implements BinanceService {
                         index += 1;
 
                         if (index <= 5) {
-                            if (!msg_send_dict.containsKey(dto.getGecko_id())) {
-
-                                PriorityCoin coin = priorityCoinRepository.findById(dto.getGecko_id()).orElse(null);
-                                if (!Objects.equals(null, coin)) {
-                                    Utils.sendToTelegram(
-                                            "(VolumeUp) "
-                                                    + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
-                                }
-
-                                msg_send_dict.put(dto.getGecko_id(), dto.getGecko_id());
-                            }
+                            //    if (!msg_send_dict.containsKey(dto.getGecko_id())) {
+                            //
+                            //        PriorityCoin coin = priorityCoinRepository.findById(dto.getGecko_id()).orElse(null);
+                            //        if (!Objects.equals(null, coin)) {
+                            //            Utils.sendToTelegram(
+                            //                    "(VolumeUp) "
+                            //                            + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
+                            //        }
+                            //
+                            //        msg_send_dict.put(dto.getGecko_id(), dto.getGecko_id());
+                            //    }
                         }
                     }
                     geckoVolumeUpPre4hRepository.saveAll(saveList);

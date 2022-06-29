@@ -10,8 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-import org.apache.catalina.mapper.Mapper;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,7 +34,6 @@ import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
-import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
@@ -75,7 +72,7 @@ public class WandaBot extends TelegramLongPollingBot {
             SendMessage message = new SendMessage();
             message.setChatId(update.getMessage().getChatId().toString());
 
-            if ((!Objects.equal("khanhduyapt", update.getMessage().getChat().getUserName()))
+            if ((!Objects.equal("tg25251325", update.getMessage().getChat().getUserName()))
                     || (!Utils.chatId.equals(update.getMessage().getChatId().toString()))) {
                 message.setText("You are not my master.");
                 execute(message);
