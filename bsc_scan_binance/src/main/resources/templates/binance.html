@@ -81,6 +81,8 @@ p {
           <th class="text-center" scope="col">%30d</th>
 
           <th class="text-center text-primary" scope="col">Star</th>
+          <th class="text-center" scope="col">Symbol</th>
+          <th class="text-center" scope="col">Name</th>
           <th class="text-center" scope="col"
             th:text="${#dates.format(#dates.createNow(), 'dd/MM')}">
           <th class="text-center" scope="col"
@@ -226,8 +228,22 @@ p {
           <td style="text-align: center; min-width: 160px !important;"
             th:classappend="${token.star_css}" th:text="${token.star}">
             <!-- Volume/AvgPrice/Low-Hight today -->
+          <td class="" style="max-width: 80px !important;"><a
+            th:target="_blank" th:href="${token.binance_trade}"><span
+              th:text="${token.symbol}"></span></a>
+            <p style="font-size: 0.7rem !important;" th:text="${token.trend}"></td>
+
+            <!-- Name -->
+          <td class=""
+            style="min-width: 180px !important; max-width: 180px !important;"><a
+            th:target="_blank" th:href="${token.coin_gecko_link}"> <span
+              th:text="${token.name}"></span></a>
+            <p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
+            <p style="font-size: 0.7rem !important;"
+              th:text="${token.pumping_history}"></p></td>
+
           <td
-            style="text-align: right; min-width: 200px !important; max-width: 200px !important;"
+            style="text-align: right; min-width: 150px !important; max-width: 150px !important;"
             class="text-info">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.today_gecko_vol_css}"
