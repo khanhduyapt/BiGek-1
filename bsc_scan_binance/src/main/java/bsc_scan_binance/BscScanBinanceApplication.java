@@ -13,6 +13,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import bsc_scan_binance.entity.CandidateCoin;
+import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.service.CoinGeckoService;
 import bsc_scan_binance.service.impl.WandaBot;
@@ -70,6 +71,17 @@ public class BscScanBinanceApplication {
                 CandidateCoin coin = list.get(idx);
 
                 try {
+                    if (idx == 0) {
+                        List<Orders> orders = binance_service.getOrderList();
+                        if (!CollectionUtils.isEmpty(orders)) {
+                            for (Orders order : orders) {
+                                gecko_service.loadData(order.getGeckoid());
+                                log.info("Gecko " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
+                                        + coin.getSymbol());
+                            }
+                        }
+                    }
+
                     binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
                     binance_service.loadDataBtcVolumeDay(coin.getGeckoid(), coin.getSymbol());
                 } catch (Exception e) {

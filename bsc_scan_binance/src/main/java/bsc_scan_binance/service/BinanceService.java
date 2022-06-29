@@ -2,6 +2,7 @@ package bsc_scan_binance.service;
 
 import java.util.List;
 
+import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 
 public interface BinanceService {
@@ -15,4 +16,6 @@ public interface BinanceService {
     public void monitorProfit();
 
     public void monitorBollingerBandwidth();
+
+    List<Orders> getOrderList();
 }

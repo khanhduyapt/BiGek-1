@@ -27,12 +27,14 @@ import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcVolumeDay;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
+import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
 import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
+import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
@@ -68,6 +70,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private BollAreaRepository bollAreaRepository;
+
+    @Autowired
+    private OrdersRepository ordersRepository;
 
     Hashtable<String, String> msg_send_dict = new Hashtable<String, String>();
 
@@ -1546,6 +1551,11 @@ public class BinanceServiceImpl implements BinanceService {
             log.info("monitorToken error ------->");
             log.error(e.getMessage());
         }
+    }
+
+    @Override
+    public List<Orders> getOrderList() {
+        return ordersRepository.findAll();
     }
 
 }
