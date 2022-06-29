@@ -980,7 +980,7 @@ public class BinanceServiceImpl implements BinanceService {
                     predict = false;
                 }
 
-                if (dto.getTop10_vol_up() && dto.getEma07d().compareTo(BigDecimal.ZERO) > 0) {
+                if (dto.getTop10_vol_up()) {
                     css.setStar(css.getStar() + " TopVolUp");
                 }
 
