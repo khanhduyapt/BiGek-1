@@ -11,7 +11,7 @@ public interface BinanceService {
 
     public void loadData(String gecko_id, String symbol);
 
-    public void loadDataBtcVolumeDay(String gecko_id, String symbol);
+    public void loadDataVolumeHour(String gecko_id, String symbol);
 
     public void monitorProfit();
 

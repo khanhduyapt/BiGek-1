@@ -83,13 +83,20 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public void loadDataBtcVolumeDay(String gecko_id, String symbol) {
+    public void loadDataVolumeHour(String gecko_id, String symbol) {
         {
             final Integer limit = 24;
-            final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
+            String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
                     + "&interval=1h&limit=" + String.valueOf(limit);
 
             List<Object> result_usdt = getBinanceData(url_usdt, limit);
+
+            if (!isHasData(result_usdt, limit - 1)) {
+                url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD"
+                        + "&interval=1h&limit=" + String.valueOf(limit);
+
+                result_usdt = getBinanceData(url_usdt, limit);
+            }
 
             List<BtcVolumeDay> list_day = new ArrayList<BtcVolumeDay>();
 
@@ -141,9 +148,12 @@ public class BinanceServiceImpl implements BinanceService {
         final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD"
                 + "&interval=1d&limit=" + String.valueOf(limit);
 
-        final String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
+        String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
         BigDecimal price_at_binance = getBinancePrice(url_price);
-
+        if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
+            url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "BUSD";
+            price_at_binance = getBinancePrice(url_price);
+        }
         List<Object> result_usdt = getBinanceData(url_usdt, limit);
         List<Object> result_busd = getBinanceData(url_busd, limit);
 
@@ -308,6 +318,21 @@ public class BinanceServiceImpl implements BinanceService {
             return list;
         }
 
+    }
+
+    private Boolean isHasData(List<Object> result_usdt, int index) {
+        Object obj_usdt = result_usdt.get(index);
+
+        @SuppressWarnings("unchecked")
+        List<Object> arr_usdt = (List<Object>) obj_usdt;
+
+        String open_time = arr_usdt.get(0).toString();
+
+        if (Objects.equals("0", open_time)) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

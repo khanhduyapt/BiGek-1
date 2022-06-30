@@ -29,7 +29,7 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            msg_on = true;
+            msg_on = false;
             if (!Objects.equals(null, args) && args.length > 0) {
                 if (Objects.equals("msg_on", args[0])) {
                     msg_on = true;
@@ -57,6 +57,8 @@ public class BscScanBinanceApplication {
                 }
             }
             // --------------------Start--------------------
+            //binance_service.loadDataVolumeHour("unlend-finance", "UFT");
+            //binance_service.loadData("unlend-finance", "UFT");
 
             List<CandidateCoin> list = gecko_service.getList();
             if (CollectionUtils.isEmpty(list)) {
@@ -83,7 +85,7 @@ public class BscScanBinanceApplication {
                     }
 
                     binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
-                    binance_service.loadDataBtcVolumeDay(coin.getGeckoid(), coin.getSymbol());
+                    binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                     wait(600000);
