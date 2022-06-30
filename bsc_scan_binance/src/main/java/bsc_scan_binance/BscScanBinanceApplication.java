@@ -29,7 +29,7 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            msg_on = false;
+            msg_on = true;
             if (!Objects.equals(null, args) && args.length > 0) {
                 if (Objects.equals("msg_on", args[0])) {
                     msg_on = true;
@@ -59,13 +59,12 @@ public class BscScanBinanceApplication {
             // --------------------Start--------------------
             //binance_service.loadDataVolumeHour("unlend-finance", "UFT");
             //binance_service.loadData("unlend-finance", "UFT");
+            //binance_service.monitorBollingerBandwidth(false);
 
             List<CandidateCoin> list = gecko_service.getList();
             if (CollectionUtils.isEmpty(list)) {
                 gecko_service.initCandidateCoin();
             }
-
-            binance_service.monitorBollingerBandwidth();
 
             int size = list.size();
             int idx = 0;
@@ -100,7 +99,7 @@ public class BscScanBinanceApplication {
                     if ((minus > 5) && (minus < 59)) {
                         binance_service.getList(false); // ~3p 1 lan
                         binance_service.monitorProfit();
-                        binance_service.monitorBollingerBandwidth();
+                        binance_service.monitorBollingerBandwidth(false);
                     }
 
                     log.info("reload: "

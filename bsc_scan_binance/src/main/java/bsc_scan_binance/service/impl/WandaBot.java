@@ -24,14 +24,12 @@ import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
-import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.TakeProfit;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
-import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PrepareOrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
@@ -61,9 +59,6 @@ public class WandaBot extends TelegramLongPollingBot {
 
     @Autowired
     private TakeProfitRepository takeProfitRepository;
-
-    @Autowired
-    private BollAreaRepository bollAreaRepository;
 
     @Autowired
     private PrepareOrdersRepository prepareOrdersRepository;
@@ -109,25 +104,37 @@ public class WandaBot extends TelegramLongPollingBot {
                     execute(message);
                 }
             } else if (command.contains("/pre")) {
-                //pre all | token | -token
+                // pre all | token | -token
                 String[] arr = command.split(" ");
                 if ((arr.length <= 1) || command.contains("all")) {
                     List<PrepareOrders> list = prepareOrdersRepository.findAll();
                     if (!CollectionUtils.isEmpty(list)) {
                         String msg = "(Prepare Orders)" + Utils.new_line_from_bot;
 
+                        int index = 0;
                         for (PrepareOrders entity : list) {
 
                             PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
                             if (!Objects.equal(null, coin)) {
+                                index += 1;
+
                                 msg += Utils.new_line_from_bot
                                         + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot)
                                         + Utils.new_line_from_bot;
+
+                                if (index == 5) {
+                                    index = 0;
+                                    message.setText(msg);
+                                    execute(message);
+                                    msg = "";
+                                }
                             }
                         }
-                        message.setText(msg);
-                        execute(message);
-                        return;
+                        if (!Objects.equal("", msg)) {
+                            message.setText(msg);
+                            execute(message);
+                            return;
+                        }
                     } else {
                         message.setText("Empty");
                         execute(message);
@@ -185,22 +192,8 @@ public class WandaBot extends TelegramLongPollingBot {
 
             } else if (command.contains("/boll")) {
                 binance_service.getList(false);
-                List<BollArea> list = bollAreaRepository.findAll();
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-                for (BollArea entity : list) {
-                    if (!entity.getIs_top_area()) {
-                        PriorityCoin coin = priorityCoinRepository.findById(entity.getGecko_id()).orElse(null);
-                        if (!Objects.equal(null, coin)) {
-                            message.setText("(Bollinger) " + (entity.getVector_up() ? "Uptrend: " : " ")
-                                    + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                            execute(message);
-                        }
-                    }
-                }
+                binance_service.monitorBollingerBandwidth(true);
+
             } else if (command.contains("/btc")) {
                 binance_service.getList(false);
                 List<PriorityCoin> list = priorityCoinRepository.searchBySymbol("BTC");

@@ -15,7 +15,7 @@ public interface BinanceService {
 
     public void monitorProfit();
 
-    public void monitorBollingerBandwidth();
+    public void monitorBollingerBandwidth(Boolean isCallFormBot);
 
     List<Orders> getOrderList();
 }

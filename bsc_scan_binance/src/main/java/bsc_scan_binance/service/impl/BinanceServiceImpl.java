@@ -79,8 +79,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private PrepareOrdersRepository prepareOrdersRepository;
 
-    private Hashtable<String, String> msg_send_dict = new Hashtable<String, String>();
-
+    private Hashtable<String, String> msg_boll_dict = new Hashtable<String, String>();
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
 
     @Override
@@ -88,14 +87,14 @@ public class BinanceServiceImpl implements BinanceService {
     public void loadDataVolumeHour(String gecko_id, String symbol) {
         {
             final Integer limit = 24;
-            String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
-                    + "&interval=1h&limit=" + String.valueOf(limit);
+            String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT" + "&interval=1h&limit="
+                    + String.valueOf(limit);
 
             List<Object> result_usdt = getBinanceData(url_usdt, limit);
 
             if (!isHasData(result_usdt, limit - 1)) {
-                url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD"
-                        + "&interval=1h&limit=" + String.valueOf(limit);
+                url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD" + "&interval=1h&limit="
+                        + String.valueOf(limit);
 
                 result_usdt = getBinanceData(url_usdt, limit);
             }
@@ -643,16 +642,25 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (vol_yesterday.compareTo(BigDecimal.ZERO) > 0) {
                     BigDecimal vol_up = vol_today.divide(vol_yesterday, 1, RoundingMode.CEILING);
-                    if (vol_up.compareTo(BigDecimal.valueOf(2)) > 0) {
+                    if (vol_up.compareTo(BigDecimal.valueOf(1.5)) > 0) {
                         css.setStar("BUp: " + String.valueOf(vol_up));
                         css.setStar_css("text-primary");
 
                         if (!msg_vol_up_dict.containsKey(css.getGecko_id())) {
-                            Utils.sendToTelegram(
-                                    "(Binance Volume Up) :" + String.valueOf(vol_up) + ", " + css.getSymbol()
-                                            + ", " + css.getGecko_id());
+                            Utils.sendToTelegram("(Binance Volume Up) :" + String.valueOf(vol_up) + ", "
+                                    + css.getSymbol() + ", " + css.getName() + ", " + css.getGecko_id());
 
                             msg_vol_up_dict.put(css.getGecko_id(), css.getGecko_id());
+
+                            PrepareOrders entity = new PrepareOrders();
+                            entity.setGeckoid(dto.getGecko_id());
+                            entity.setSymbol(dto.getSymbol());
+                            entity.setName(dto.getName());
+                            prepareOrdersRepository.save(entity);
+                        }
+                    } else {
+                        if (msg_vol_up_dict.contains(css.getGecko_id())) {
+                            msg_vol_up_dict.remove(css.getGecko_id());
                         }
                     }
                 }
@@ -918,7 +926,7 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal price_max = Utils.getBigDecimal(avgPriceList.get(idx_price_max));
 
                     String min_14d = "Min14d: " + price_min.toString() + "(" + Utils.toPercent(price_min, price_now)
-                            + "%)~Max14d: ";
+                            + "%) Max14d: ";
 
                     String max_14d_percent = Utils.toPercent(price_max, price_now);
                     css.setOco_tp_price(min_14d);
@@ -1063,6 +1071,8 @@ public class BinanceServiceImpl implements BinanceService {
                         + (Utils.isNotBlank(Utils.getStringValue(css.getPumping_history()))
                                 ? "~" + Utils.getStringValue(css.getPumping_history())
                                 : "");
+
+                note += "~" + css.getOco_tp_price() + css.getOco_tp_price_hight();
 
                 priorityCoin.setNote(note);
 
@@ -1429,32 +1439,11 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public void monitorBollingerBandwidth() {
+    public void monitorBollingerBandwidth(Boolean isCallFormBot) {
         try {
             int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
 
             log.info("Start monitorToken ---->");
-            if (minus >= 5) {
-                List<PrepareOrders> list = prepareOrdersRepository.findAll();
-                if (!CollectionUtils.isEmpty(list)) {
-                    for (PrepareOrders dto : list) {
-                        BollArea boll = bollAreaRepository.findById(dto.getGeckoid()).orElse(null);
-
-                        if (!Objects.equals(null, boll)) {
-                            if (Utils.getBigDecimal(boll.getAvg_price())
-                                    .compareTo(Utils.getBigDecimal(boll.getPrice_can_buy())) <= 0) {
-
-                                BollAreaResponse response = (new ModelMapper()).map(boll, BollAreaResponse.class);
-
-                                Utils.sendToTelegram("(PrepareOrders) Can buy:" + Utils.new_line_from_service
-                                        + Utils.createMsgBollingerResponse(response, Utils.new_line_from_service));
-                            }
-                        }
-
-                    }
-                }
-            }
-
             if (minus >= 30) {
                 String sql = "" + " select                                                              \n"
                         + "     boll.gecko_id,                                                          \n"
@@ -1473,8 +1462,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "     (case when vector.vector_now > 0 then true else false end)   as vector_up,                                          \n"
                         + "     concat('v1h:', cast(vector.vector_now as varchar), ', v4h:' ,cast(vector.vector_pre4h as varchar)) as vector_desc   \n"
                         + " FROM                                                                        \n"
-                        + Utils.sql_boll_2_body
-                        + " , \n"
+                        + Utils.sql_boll_2_body + " , \n"
                         + " (                                                                                      \n"
                         + "  select                                                                                \n"
                         + "       pre.gecko_id,                                                                    \n"
@@ -1497,8 +1485,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "                                                                                             \n"
                         + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '4 hours', 'HH24') and TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre4h,   \n"
                         + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '8 hours', 'HH24') and TO_CHAR(NOW() - interval  '5 hours', 'HH24')) as price_pre8h    \n"
-                        + "           from  \n"
-                        + "               btc_volumn_day d \n"
+                        + "           from  \n" + "               btc_volumn_day d \n"
                         + "           where d.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                         + "           ) as tmp                                                                     \n"
                         + "   ) as pre                                                                             \n"
@@ -1563,8 +1550,39 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                     geckoVolumeUpPre4hRepository.saveAll(saveList);
                 }
-            } else {
-                msg_send_dict.clear();
+            }
+
+            if (minus >= 5) {
+                List<PrepareOrders> list = prepareOrdersRepository.findAll();
+                if (!CollectionUtils.isEmpty(list)) {
+                    for (PrepareOrders dto : list) {
+                        BollArea boll = bollAreaRepository.findById(dto.getGeckoid()).orElse(null);
+
+                        if (!Objects.equals(null, boll)) {
+                            if (Utils.getBigDecimal(boll.getAvg_price())
+                                    .compareTo(Utils.getBigDecimal(boll.getPrice_can_buy())) <= 0) {
+
+                                PriorityCoin coin = priorityCoinRepository.findById(boll.getGecko_id()).orElse(null);
+                                if (!Objects.equals(null, coin)) {
+
+                                    if (isCallFormBot || !msg_boll_dict.contains(boll.getGecko_id())) {
+
+                                        Utils.sendToTelegram("(PrepareOrders) Can buy:" + Utils.new_line_from_service
+                                                + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
+
+                                        msg_boll_dict.put(boll.getGecko_id(), boll.getGecko_id());
+                                    }
+                                }
+
+                            } else if (Utils.getBigDecimal(boll.getAvg_price())
+                                    .compareTo(Utils.getBigDecimal(boll.getPrice_can_sell())) > 0) {
+
+                                prepareOrdersRepository.delete(dto);
+                            }
+                        }
+
+                    }
+                }
             }
 
             log.info("End monitorToken <----");
