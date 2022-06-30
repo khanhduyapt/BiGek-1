@@ -26,12 +26,14 @@ import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.Orders;
+import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.TakeProfit;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.OrdersRepository;
+import bsc_scan_binance.repository.PrepareOrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
 import bsc_scan_binance.response.OrdersProfitResponse;
@@ -62,6 +64,9 @@ public class WandaBot extends TelegramLongPollingBot {
 
     @Autowired
     private BollAreaRepository bollAreaRepository;
+
+    @Autowired
+    private PrepareOrdersRepository prepareOrdersRepository;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -103,6 +108,80 @@ public class WandaBot extends TelegramLongPollingBot {
                     message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
                     execute(message);
                 }
+            } else if (command.contains("/pre")) {
+                //pre all | token | -token
+                String[] arr = command.split(" ");
+                if ((arr.length <= 1) || command.contains("all")) {
+                    List<PrepareOrders> list = prepareOrdersRepository.findAll();
+                    if (!CollectionUtils.isEmpty(list)) {
+                        String msg = "(Prepare Orders)" + Utils.new_line_from_bot;
+
+                        for (PrepareOrders entity : list) {
+
+                            PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
+                            if (!Objects.equal(null, coin)) {
+                                msg += Utils.new_line_from_bot
+                                        + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot);
+                            }
+                        }
+                        message.setText(msg);
+                        execute(message);
+                        return;
+                    } else {
+                        message.setText("Empty");
+                        execute(message);
+                        return;
+                    }
+                } else if (command.contains("-")) {
+                    arr = command.replace("-", "").split(" ");
+                    String token = arr[1];
+                    List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(token.toUpperCase());
+                    if (!CollectionUtils.isEmpty(list)) {
+                        PriorityCoin coin = priorityCoinRepository.findById(list.get(0).getGeckoid()).orElse(null);
+                        if (!Objects.equal(null, coin)) {
+                            String msg = "(Prepare Orders) Delete:" + Utils.new_line_from_bot
+                                    + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot);
+
+                            PrepareOrders entity = prepareOrdersRepository.findById(list.get(0).getGeckoid())
+                                    .orElse(null);
+                            if (!Objects.equal(null, entity)) {
+                                prepareOrdersRepository.delete(entity);
+                            }
+
+                            message.setText(msg);
+                            execute(message);
+                            return;
+                        }
+                    } else {
+                        message.setText("Not found: " + token);
+                        execute(message);
+                        return;
+                    }
+                } else {
+                    String token = arr[1];
+                    List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(token.toUpperCase());
+                    if (!CollectionUtils.isEmpty(list)) {
+
+                        PrepareOrders entity = new PrepareOrders();
+                        entity.setGeckoid(list.get(0).getGeckoid());
+                        entity.setSymbol(list.get(0).getSymbol());
+                        entity.setName(list.get(0).getName());
+
+                        prepareOrdersRepository.save(entity);
+
+                        String msg = "(Prepare Orders) Add:" + Utils.new_line_from_bot
+                                + Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot);
+                        message.setText(msg);
+                        execute(message);
+                        return;
+
+                    } else {
+                        message.setText("Not found: " + token);
+                        execute(message);
+                        return;
+                    }
+                }
+
             } else if (command.contains("/boll")) {
                 binance_service.getList(false);
                 List<BollArea> list = bollAreaRepository.findAll();
@@ -431,7 +510,7 @@ public class WandaBot extends TelegramLongPollingBot {
                         list.get(0).getGeckoid(), coin.getMute()));
                 execute(message);
             } else {
-                if (Utils.isNotBlank(command)) {
+                if (Utils.isNotBlank(command) && !command.contains("/")) {
                     checkCommand(message, command);
                 }
             }
