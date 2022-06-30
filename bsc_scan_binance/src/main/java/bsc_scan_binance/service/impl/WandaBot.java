@@ -121,7 +121,8 @@ public class WandaBot extends TelegramLongPollingBot {
                             PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
                             if (!Objects.equal(null, coin)) {
                                 msg += Utils.new_line_from_bot
-                                        + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot);
+                                        + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot)
+                                        + Utils.new_line_from_bot;
                             }
                         }
                         message.setText(msg);

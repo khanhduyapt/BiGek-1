@@ -79,7 +79,9 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private PrepareOrdersRepository prepareOrdersRepository;
 
-    Hashtable<String, String> msg_send_dict = new Hashtable<String, String>();
+    private Hashtable<String, String> msg_send_dict = new Hashtable<String, String>();
+
+    private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
 
     @Override
     @Transactional
@@ -644,6 +646,14 @@ public class BinanceServiceImpl implements BinanceService {
                     if (vol_up.compareTo(BigDecimal.valueOf(2)) > 0) {
                         css.setStar("BUp: " + String.valueOf(vol_up));
                         css.setStar_css("text-primary");
+
+                        if (!msg_vol_up_dict.containsKey(css.getGecko_id())) {
+                            Utils.sendToTelegram(
+                                    "(Binance Volume Up) :" + String.valueOf(vol_up) + ", " + css.getSymbol()
+                                            + ", " + css.getGecko_id());
+
+                            msg_vol_up_dict.put(css.getGecko_id(), css.getGecko_id());
+                        }
                     }
                 }
                 temp = splitVolAndPrice(css.getDay_1());
@@ -808,24 +818,24 @@ public class BinanceServiceImpl implements BinanceService {
                     if (!Objects.equals(null, css.getStar()) && !Objects.equals("", String.valueOf(css.getStar()))) {
                         css.setStar("🤩🤩" + " " + css.getStar());
                     } else {
-                        css.setStar("🤩");
+                        css.setStar("🤩" + css.getStar());
                     }
                     css.setStar_css("text-primary font-weight-bold");
 
                 } else if ((price_now.compareTo(BigDecimal.ZERO) > 0)
                         && (max_subtract_5_percent.compareTo(price_now) < 0)) {
 
-                    css.setStar("!Max5%");
+                    css.setStar(css.getStar() + " Max5%");
                     css.setStar_css("bg-warning rounded-lg");
 
                 } else if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (price_now.compareTo(min_add_5_percent) < 0)) {
 
-                    css.setStar("🤩");
+                    css.setStar("🤩" + css.getStar());
                     css.setStar_css("text-primary font-weight-bold");
 
                 } else if (idx_vol_min == 1) {
 
-                    css.setStar("🤩");
+                    css.setStar("🤩" + css.getStar());
 
                 } else if (idx_price_min == 1) {
 
@@ -892,7 +902,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)
                             && ((Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
                                     .compareTo(BigDecimal.valueOf(10)) > -1))) {
-                        css.setStar("🤩");
+                        css.setStar("🤩" + css.getStar());
                     }
                 } else {
                     css.setAvg_price("0.0");
