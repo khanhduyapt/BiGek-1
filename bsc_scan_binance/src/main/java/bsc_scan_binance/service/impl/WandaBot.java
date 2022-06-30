@@ -90,20 +90,7 @@ public class WandaBot extends TelegramLongPollingBot {
             System.out.println(update.getMessage().getText());
             String command = update.getMessage().getText();
 
-            if (command.equals("/all")) {
-                binance_service.getList(false);
-                List<PriorityCoin> list = searchCandidate();
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                for (PriorityCoin coin : list) {
-                    message.setText(Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot));
-                    execute(message);
-                }
-            } else if (command.contains("/pre")) {
+            if (command.contains("/pre")) {
                 // pre all | token | -token
                 String[] arr = command.split(" ");
                 if ((arr.length <= 1) || command.contains("all")) {
@@ -195,7 +182,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 binance_service.monitorBollingerBandwidth(true);
 
             } else if (command.contains("/btc")) {
-                binance_service.getList(false);
+                //binance_service.getList(false);
                 List<PriorityCoin> list = priorityCoinRepository.searchBySymbol("BTC");
                 if (CollectionUtils.isEmpty(list)) {
                     message.setText("Empty");
@@ -488,7 +475,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 if (arr.length < 2) {
                     return;
                 }
-                binance_service.getList(false);
+                //binance_service.getList(false);
                 list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
                 if (CollectionUtils.isEmpty(list)) {
                     message.setText("Empty");
@@ -539,7 +526,7 @@ public class WandaBot extends TelegramLongPollingBot {
     }
 
     private void checkCommand(SendMessage message, String token) throws TelegramApiException {
-        binance_service.getList(false);
+        //binance_service.getList(false);
         List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(token.toUpperCase());
         if (CollectionUtils.isEmpty(list)) {
             message.setText("Empty");

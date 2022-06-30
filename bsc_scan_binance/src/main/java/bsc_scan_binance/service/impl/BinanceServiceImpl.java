@@ -647,8 +647,8 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar_css("text-primary");
 
                         if (!msg_vol_up_dict.containsKey(css.getGecko_id())) {
-                            Utils.sendToTelegram("(Binance Volume Up) :" + String.valueOf(vol_up) + ", "
-                                    + css.getSymbol() + ", " + css.getName() + ", " + css.getGecko_id());
+                            Utils.sendToTelegram(
+                                    "Binance_Volume_Up: " + String.valueOf(vol_up) + "_" + css.getSymbol());
 
                             msg_vol_up_dict.put(css.getGecko_id(), css.getGecko_id());
 
@@ -1554,9 +1554,13 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (minus >= 5) {
                 List<PrepareOrders> list = prepareOrdersRepository.findAll();
-                if (!CollectionUtils.isEmpty(list)) {
+                List<BollArea> boll_list = bollAreaRepository.findBottomArea();
+
+                if (!CollectionUtils.isEmpty(list) && !CollectionUtils.isEmpty(boll_list)) {
                     for (PrepareOrders dto : list) {
-                        BollArea boll = bollAreaRepository.findById(dto.getGeckoid()).orElse(null);
+                        BollArea boll = boll_list.stream()
+                                .filter(item -> Objects.equals(item.getGecko_id(), dto.getGeckoid())).findFirst()
+                                .orElse(null);
 
                         if (!Objects.equals(null, boll)) {
                             if (Utils.getBigDecimal(boll.getAvg_price())
@@ -1583,6 +1587,29 @@ public class BinanceServiceImpl implements BinanceService {
 
                     }
                 }
+
+                if (!CollectionUtils.isEmpty(boll_list)) {
+                    for (BollArea boll : boll_list) {
+                        PrepareOrders pre = list.stream()
+                                .filter(item -> Objects.equals(item.getGeckoid(), boll.getGecko_id())).findFirst()
+                                .orElse(null);
+                        if (Objects.equals(null, pre)) {
+
+                            PriorityCoin coin = priorityCoinRepository.findById(boll.getGecko_id()).orElse(null);
+                            if (!Objects.equals(null, coin)) {
+
+                                if (isCallFormBot || !msg_boll_dict.contains(boll.getGecko_id())) {
+
+                                    Utils.sendToTelegram("(BollArea) Can buy:" + Utils.new_line_from_service
+                                            + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
+
+                                    msg_boll_dict.put(boll.getGecko_id(), boll.getGecko_id());
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
 
             log.info("End monitorToken <----");

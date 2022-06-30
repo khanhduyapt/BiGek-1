@@ -44,7 +44,7 @@ public class BscScanBinanceApplication {
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
 
-            //binance_service.loadDataBtcVolumeDay("bitcoin", "BTC");
+            // binance_service.loadDataBtcVolumeDay("bitcoin", "BTC");
 
             if (msg_on) {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
@@ -57,8 +57,9 @@ public class BscScanBinanceApplication {
                 }
             }
             // --------------------Start--------------------
-            //binance_service.loadDataVolumeHour("unlend-finance", "UFT");
-            //binance_service.loadData("unlend-finance", "UFT");
+            // binance_service.loadDataVolumeHour("unlend-finance", "UFT");
+            // binance_service.loadData("unlend-finance", "UFT");
+            //binance_service.getList(false);
             //binance_service.monitorBollingerBandwidth(false);
 
             List<CandidateCoin> list = gecko_service.getList();
@@ -77,8 +78,7 @@ public class BscScanBinanceApplication {
                         if (!CollectionUtils.isEmpty(orders)) {
                             for (Orders order : orders) {
                                 gecko_service.loadData(order.getGeckoid());
-                                log.info("Gecko " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
-                                        + coin.getSymbol());
+                                log.info("Gecko " + " id:" + order.getGeckoid() + "; Symbol:" + order.getSymbol());
                             }
                         }
                     }
