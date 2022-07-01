@@ -165,7 +165,7 @@ public class WandaBot extends TelegramLongPollingBot {
                         entity.setGeckoid(list.get(0).getGeckoid());
                         entity.setSymbol(list.get(0).getSymbol());
                         entity.setName(list.get(0).getName());
-
+                        entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_BOT);
                         prepareOrdersRepository.save(entity);
 
                         String msg = "(Prepare Orders) Add:" + Utils.new_line_from_bot
