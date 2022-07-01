@@ -422,8 +422,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   (CASE WHEN  (select gecko_id from boll_area b where can.gecko_id = b.gecko_id) IS NOT NULL THEN true ELSE false END) AS uptrend,   \n"
                     + "   vol.vol0d,                                                                              \n"
                     + "   vol.vol1d,                                                                              \n"
-                    + "   vol.vol7d,                                                                              \n"
-                    + "   gecko_week.vol_gecko_increate                                                           \n"
+                    + "   vol.vol7d                                                                               \n"
+                    + "   , gecko_week.vol_gecko_increate                                                          \n"
+                    + "   , (SELECT concat('lost:', lost_normal, '%, profit:', profit_normal, '%, opp:1x', opportunity) FROM public.view_opportunity where gecko_id = can.gecko_id) opportunity \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
@@ -521,7 +522,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   and can.gecko_id = gecko_week.gecko_id                                                  \n"
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) asc                                            		      \n"
-                    + "   , gecko_week.vol_gecko_increate desc                                                    \n"
+                    //+ "   , gecko_week.vol_gecko_increate desc                                                    \n"
                     + "   , can.volumn_div_marketcap desc                                                         \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -674,7 +675,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (vol_yesterday.compareTo(BigDecimal.ZERO) > 0) {
                     BigDecimal vol_up = vol_today.divide(vol_yesterday, 1, RoundingMode.CEILING);
-                    if (vol_up.compareTo(BigDecimal.valueOf(1.5)) > 0) {
+                    if (vol_up.compareTo(BigDecimal.valueOf(2)) > 0) {
                         css.setStar("BUp: " + String.valueOf(vol_up));
                         css.setStar_css("text-primary");
 
@@ -983,16 +984,6 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setAvg_history(avg_history);
                 }
 
-                if (dto.getUptrend()) {
-                    if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
-                        css.setStar(css.getStar() + " Bottleneck Uptrend");
-                    } else {
-                        css.setStar(css.getStar() + " Bottleneck");
-                    }
-                } else if ((dto.getAvg07d().multiply(BigDecimal.valueOf(1.05))).compareTo(dto.getAvg14d()) > 0) {
-                    // css.setStar(css.getStar() + " 714");
-                }
-
                 BigDecimal avg_percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
                 if (avg_percent.compareTo(BigDecimal.valueOf(10)) < 0) {
                     css.setStar(css.getStar().replace("🤩", ""));
@@ -1001,12 +992,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 if (dto.getEma07d().compareTo(BigDecimal.ZERO) > 0) {
-                    if (css.getStar().contains("Uptrend")) {
-                        css.setStar("🤩" + css.getStar() + " Plus");
-                    } else {
-                        css.setStar("🤩" + css.getStar() + " Plus");
-                    }
-
+                    css.setStar(css.getStar() + " Uptrend");
                     css.setStar_css("text-success");
                 }
 
@@ -1065,6 +1051,10 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar(css.getStar() + " TopVolUp");
                 } else if (Utils.getBigDecimal(dto.getVol_up_rate()).compareTo(BigDecimal.valueOf(1.2)) > 0) {
                     css.setStar(css.getStar() + " VolUp");
+                }
+
+                if (Utils.isNotBlank(dto.getOpportunity())) {
+                    css.setOco_opportunity(dto.getOpportunity());
                 }
 
                 if (Utils.getBigDecimal(dto.getVol_gecko_increate()).compareTo(BigDecimal.valueOf(1.8)) > 0) {
@@ -1620,7 +1610,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                                     if (isCallFormBot || !msg_boll_dict.contains(boll.getGecko_id())) {
 
-                                        Utils.sendToTelegram("(PrepareOrders) Can buy:" + Utils.new_line_from_service
+                                        Utils.sendToTelegram("(PrepareOrders) " + Utils.getDataType(dto) + " Can buy:"
+                                                + Utils.new_line_from_service
                                                 + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
 
                                         msg_boll_dict.put(boll.getGecko_id(), boll.getGecko_id());
@@ -1636,28 +1627,80 @@ public class BinanceServiceImpl implements BinanceService {
 
                     }
                 }
+            }
 
-                if (!CollectionUtils.isEmpty(boll_list)) {
-                    for (BollArea boll : boll_list) {
-                        PrepareOrders pre = list.stream()
-                                .filter(item -> Objects.equals(item.getGeckoid(), boll.getGecko_id())).findFirst()
-                                .orElse(null);
-                        if (Objects.equals(null, pre)) {
+            {
+                String sql = " delete from view_opportunity;                                                \n"
+                        + " insert into view_opportunity(gecko_id, symbol, name, vol_today, vol_avg_07d, vol_gecko_increate, avg_price, price_can_buy, price_can_sell, lost_normal, profit_normal, profit_max, opportunity) \n"
+                        + " select                                                                          \n"
+                        + "       pro.gecko_id                                                              \n"
+                        + "     , pro.symbol                                                                \n"
+                        + "     , pro.name                                                                  \n"
+                        + "     , pro.vol_today                                                             \n"
+                        + "     , pro.vol_avg_07d                                                           \n"
+                        + "     , pro.vol_gecko_increate                                                    \n"
+                        + "     , pro.avg_price                                                             \n"
+                        + "     , pro.price_can_buy                                                         \n"
+                        + "     , pro.price_can_sell                                                        \n"
+                        + "     , ROUND(100*(price_can_buy  - avg_price)/avg_price, 1) as lost_normal       \n"
+                        + "     , ROUND(100*(price_can_sell - avg_price)/avg_price, 1) as profit_normal     \n"
+                        + "     , pro.profit_max profit_max                                                 \n"
+                        + "     , ROUND((profit_normal / abs(lost_normal)), 1) as opportunity               \n"
+                        + " from                                                                            \n"
+                        + " (                                                                               \n"
+                        + "     SELECT                                                                      \n"
+                        + "           gecko_week.gecko_id                                                   \n"
+                        + "         , gecko_week.symbol                                                     \n"
+                        + "         , boll.name                                                             \n"
+                        + "         , vol_today                                                             \n"
+                        + "         , vol_avg_07d                                                           \n"
+                        + "         , vol_gecko_increate                                                    \n"
+                        + "         , avg_price                                                             \n"
+                        + "         , price_can_buy                                                         \n"
+                        + "         , price_can_sell                                                        \n"
+                        + "         , ROUND(100*(price_can_buy - avg_price)/avg_price, 2)  as lost_normal   \n"
+                        + "         , ROUND(100*(price_can_sell - avg_price)/avg_price, 2) as profit_normal \n"
+                        + "         , ROUND(profit, 2) as profit_max                                        \n"
+                        + "     FROM                                                                        \n"
+                        + "     (                                                                           \n"
+                        + "         SELECT                                                                  \n"
+                        + "               gecko_id                                                          \n"
+                        + "             , symbol                                                            \n"
+                        + "             , vol_today                                                         \n"
+                        + "             , vol_avg_07d                                                       \n"
+                        + "             , (case when vol_today > vol_avg_07d then true else false end) as vol_up    \n"
+                        + "             , ROUND((case when vol_avg_07d > 0 and vol_today/vol_avg_07d > 2 then vol_today/vol_avg_07d else 0 end), 1) as vol_gecko_increate \n"
+                        + "         FROM                                                                    \n"
+                        + "         (                                                                       \n"
+                        + "             SELECT                                                              \n"
+                        + "                 gecko_id                                                        \n"
+                        + "                 , symbol                                                        \n"
+                        + "                 , (select ROUND(COALESCE(w.total_volume, 0), 0) from gecko_volume_month w where w.gecko_id = mon.gecko_id and w.symbol = mon.symbol and w.dd = TO_CHAR(NOW(), 'dd')) as vol_today \n"
+                        + "                 , (select ROUND(AVG(COALESCE(w.total_volume, 0)), 0) from gecko_volume_month w where w.gecko_id = mon.gecko_id and w.symbol = mon.symbol  \n"
+                        + "                  and w.dd in (  TO_CHAR(NOW() - interval  '6 days', 'dd')       \n"
+                        + "                               , TO_CHAR(NOW() - interval  '5 days', 'dd')       \n"
+                        + "                               , TO_CHAR(NOW() - interval  '4 days', 'dd')       \n"
+                        + "                               , TO_CHAR(NOW() - interval  '3 days', 'dd')       \n"
+                        + "                               , TO_CHAR(NOW() - interval  '2 days', 'dd')       \n"
+                        + "                               , TO_CHAR(NOW() - interval  '1 days', 'dd')       \n"
+                        + "                               , TO_CHAR(NOW(), 'dd')                            \n"
+                        + "                               )                                                 \n"
+                        + "                 ) as vol_avg_07d                                                \n"
+                        + "             FROM public.gecko_volume_month mon                                  \n"
+                        + "             where mon.dd = TO_CHAR(NOW(), 'dd')                                 \n"
+                        + "         )tmp                                                                    \n"
+                        + "     ) gecko_week                                                                \n"
+                        + "     , boll_area boll                                                            \n"
+                        + "     where vol_gecko_increate > 0                                                \n"
+                        + "       and boll.gecko_id = gecko_week.gecko_id                                   \n"
+                        + " ) pro                                                                           \n"
+                        + " where                                                                           \n"
+                        + "  (lost_normal*8 + profit_normal > 0)                                            \n"
+                        + " order by                                                                        \n"
+                        + " profit_normal desc;                                                             \n";
 
-                            PriorityCoin coin = priorityCoinRepository.findById(boll.getGecko_id()).orElse(null);
-                            if (!Objects.equals(null, coin)) {
-
-                                if (isCallFormBot || !msg_boll_dict.contains(boll.getGecko_id())) {
-
-                                    Utils.sendToTelegram("(BollArea) Can buy:" + Utils.new_line_from_service
-                                            + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
-
-                                    msg_boll_dict.put(boll.getGecko_id(), boll.getGecko_id());
-                                }
-                            }
-                        }
-                    }
-                }
+                Query query = entityManager.createNativeQuery(sql);
+                query.executeUpdate();
 
             }
 

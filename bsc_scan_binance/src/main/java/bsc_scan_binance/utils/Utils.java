@@ -28,6 +28,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
 import bsc_scan_binance.BscScanBinanceApplication;
+import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
@@ -35,15 +36,15 @@ import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinResponse;
 
 public class Utils {
-    public static String chatId = "5099224587";
-    public static String new_line_from_bot = "\n";
-    public static String new_line_from_service = "%0A";
+    public static final String chatId = "5099224587";
+    public static final String new_line_from_bot = "\n";
+    public static final String new_line_from_service = "%0A";
 
-    public static String PREPARE_ORDERS_DATA_TYPE_BOT = "1";
-    public static String PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP = "2";
-    public static String PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP = "3";
-    public static String PREPARE_ORDERS_DATA_TYPE_MIN14D = "4";
-    public static String PREPARE_ORDERS_DATA_TYPE_MAX14D = "5";
+    public static final String PREPARE_ORDERS_DATA_TYPE_BOT = "1";
+    public static final String PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP = "2";
+    public static final String PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP = "3";
+    public static final String PREPARE_ORDERS_DATA_TYPE_MIN14D = "4";
+    public static final String PREPARE_ORDERS_DATA_TYPE_MAX14D = "5";
 
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
@@ -156,6 +157,32 @@ public class Utils {
                 + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline + "Price: "
                 + dto.getCurrent_price().toString() + "$" + newline + dto.getNote() + newline
                 + createMsgLowHeight(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price());
+
+        return result;
+    }
+
+    public static String getDataType(PrepareOrders entity) {
+        String result = "";
+
+        switch (entity.getDataType()) {
+        case PREPARE_ORDERS_DATA_TYPE_BOT:
+            result  = "(Bot)";
+            break;
+        case PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP:
+            result  = "(BinamceVol)";
+            break;
+        case PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP:
+            result  = "(GeckoVol)";
+            break;
+        case PREPARE_ORDERS_DATA_TYPE_MIN14D:
+            result  = "(Min14d)";
+            break;
+        case PREPARE_ORDERS_DATA_TYPE_MAX14D:
+            result  = "(Max14d)";
+            break;
+        default:
+            break;
+        }
 
         return result;
     }

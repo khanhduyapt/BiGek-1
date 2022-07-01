@@ -101,6 +101,7 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "vol1d", type = BigDecimal.class),
                 @ColumnResult(name = "vol7d", type = BigDecimal.class),
                 @ColumnResult(name = "vol_gecko_increate", type = BigDecimal.class),
+                @ColumnResult(name = "opportunity", type = String.class),
         })
 })
 
