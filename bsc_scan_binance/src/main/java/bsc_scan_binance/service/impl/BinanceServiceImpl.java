@@ -1133,6 +1133,61 @@ public class BinanceServiceImpl implements BinanceService {
                         " where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getGecko_id(), dto.getSymbol());
 
+                //+1 yesterday vol min
+                //+1 Uptrend
+                //+1 gecko vol up
+                //+1 Boll
+                //+1 V/mc > 40%
+
+                //-1 dto.getEma07d() < 0
+                //-1 %24h > 20
+                //-1 %7d > 20
+                {
+                    int star = 0;
+                    if (idx_vol_min == 1) {
+                        star += 1;
+                        css.setStar(css.getStar() + " Yesterday");
+                    }
+                    if (css.getStar().toUpperCase().contains("UPTREND")) {
+                        star += 2;
+                    }
+                    if (css.getStar().toUpperCase().contains("GECKO")) {
+                        star += 1;
+                    }
+                    if (css.getStar().toUpperCase().contains("BOLL")) {
+                        star += 1;
+                    }
+                    if (Utils.getBigDecimal(dto.getVolumn_div_marketcap()).compareTo(BigDecimal.valueOf(40)) > 0) {
+                        star += 1;
+                    }
+
+                    if (Utils.getBigDecimal(dto.getEma07d()).compareTo(BigDecimal.ZERO) < 0) {
+                        star -= 1;
+                    }
+                    if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_24h())
+                            .compareTo(BigDecimal.valueOf(30)) > 0) {
+                        star -= 2;
+                    } else if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_24h())
+                            .compareTo(BigDecimal.valueOf(20)) > 0) {
+                        star -= 1;
+                    }
+                    if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_7d())
+                            .compareTo(BigDecimal.valueOf(50)) > 0) {
+                        star -= 3;
+                    } else if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_7d())
+                            .compareTo(BigDecimal.valueOf(20)) > 0) {
+                        star -= 1;
+                    }
+                    if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_14d())
+                            .compareTo(BigDecimal.valueOf(30)) > 0) {
+                        star -= 1;
+                    }
+
+                    if (star > 1) {
+                        css.setStar(css.getStar() + " " + star + "S");
+                    }
+                }
+
                 if (isOrderByBynaceVolume) {
                     if (is_candidate || (dto.getTop10_vol_up() && dto.getEma07d().compareTo(BigDecimal.ZERO) > 0)) {
                         list.add(css);
