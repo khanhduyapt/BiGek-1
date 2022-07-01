@@ -30,6 +30,7 @@ import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
+import bsc_scan_binance.entity.ViewOpportunity;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
@@ -38,6 +39,7 @@ import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PrepareOrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
+import bsc_scan_binance.repository.ViewOpportunityRepository;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
@@ -78,6 +80,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private PrepareOrdersRepository prepareOrdersRepository;
+
+    @Autowired
+    private ViewOpportunityRepository viewOpportunityRepository;
 
     private Hashtable<String, String> msg_boll_dict = new Hashtable<String, String>();
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
@@ -424,7 +429,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   vol.vol1d,                                                                              \n"
                     + "   vol.vol7d                                                                               \n"
                     + "   , gecko_week.vol_gecko_increate                                                          \n"
-                    + "   , (SELECT concat('lost:', lost_normal, '%, profit:', profit_normal, '%, opp:1x', opportunity) FROM public.view_opportunity where gecko_id = can.gecko_id) opportunity \n"
+                    + "   , (SELECT concat('loss:', lost_normal, '%, profit:', profit_normal, '%, opp:1x', opportunity) FROM public.view_opportunity where gecko_id = can.gecko_id) opportunity \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
@@ -1620,8 +1625,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                             } else if (Utils.getBigDecimal(boll.getAvg_price())
                                     .compareTo(Utils.getBigDecimal(boll.getPrice_can_sell())) > 0) {
-
-                                prepareOrdersRepository.delete(dto);
+                                if (Objects.equals(dto.getDataType(), Utils.PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP)
+                                        || Objects.equals(dto.getDataType(),
+                                                Utils.PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP)) {
+                                    prepareOrdersRepository.delete(dto);
+                                }
                             }
                         }
 
@@ -1702,6 +1710,13 @@ public class BinanceServiceImpl implements BinanceService {
                 Query query = entityManager.createNativeQuery(sql);
                 query.executeUpdate();
 
+                List<ViewOpportunity> list = viewOpportunityRepository.findAll();
+                if (!CollectionUtils.isEmpty(list)) {
+                    for (ViewOpportunity dto : list) {
+                        Utils.sendToTelegram("(Opportunity) " + dto.getSymbol() + "%, loss:" + dto.getLost_normal()
+                                + ", profit:" + dto.getProfit_normal() + "%, opp:1x" + dto.getOpportunity());
+                    }
+                }
             }
 
             log.info("End monitorToken <----");

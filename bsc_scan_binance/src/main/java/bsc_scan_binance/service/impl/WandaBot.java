@@ -101,6 +101,10 @@ public class WandaBot extends TelegramLongPollingBot {
                         int index = 0;
                         for (PrepareOrders entity : list) {
 
+                            if (!Objects.equal(Utils.PREPARE_ORDERS_DATA_TYPE_BOT, entity.getDataType())) {
+                                continue;
+                            }
+
                             PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
                             if (!Objects.equal(null, coin)) {
                                 index += 1;
