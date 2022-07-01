@@ -346,8 +346,10 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.symbol,                                                                             \n"
                     + "   can.name,                                                                               \n"
 
-                    + "    boll.price_can_buy,         \n" + "    boll.price_can_sell,        \n"
-                    + "    boll.is_bottom_area,        \n" + "    boll.is_top_area,           \n"
+                    + "    boll.price_can_buy,                                                                    \n"
+                    + "    boll.price_can_sell,                                                                   \n"
+                    + "    boll.is_bottom_area,                                                                   \n"
+                    + "    boll.is_top_area,                                                                      \n"
                     + "    (case when boll.price_can_buy > 0 then ROUND(100*(boll.price_can_sell - boll.price_can_buy)/boll.price_can_buy, 2) else 0 end) as profit,    \n"
                     + "                                                                                           \n"
                     + "    (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as count_up, "
@@ -420,7 +422,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   (CASE WHEN  (select gecko_id from boll_area b where can.gecko_id = b.gecko_id) IS NOT NULL THEN true ELSE false END) AS uptrend,   \n"
                     + "   vol.vol0d,                                                                              \n"
                     + "   vol.vol1d,                                                                              \n"
-                    + "   vol.vol7d                                                                               \n"
+                    + "   vol.vol7d,                                                                              \n"
+                    + "   gecko_week.vol_gecko_increate                                                           \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
@@ -479,7 +482,34 @@ public class BinanceServiceImpl implements BinanceService {
                     + "     ) tmp                                                                                 \n"
                     + ") vol                                                                                      \n"
                     + ", " + Utils.sql_boll_2_body
-
+                    + ", (                                                                                        \n"
+                    + "     SELECT                                                                                \n"
+                    + "           gecko_id                                                                        \n"
+                    + "         , symbol                                                                          \n"
+                    + "         , vol_today                                                                       \n"
+                    + "         , vol_avg_07d                                                                     \n"
+                    + "         , (case when vol_today > vol_avg_07d then true else false end) as vol_up          \n"
+                    + "         , ROUND((case when vol_avg_07d > 0 and vol_today/vol_avg_07d > 1.5 then vol_today/vol_avg_07d else 0 end), 1) as vol_gecko_increate \n"
+                    + "     from                                                                                  \n"
+                    + "     (                                                                                     \n"
+                    + "         SELECT                                                                            \n"
+                    + "             gecko_id                                                                      \n"
+                    + "             , symbol                                                                      \n"
+                    + "             , (select ROUND(COALESCE(w.total_volume, 0), 0) from gecko_volume_month w where w.gecko_id = mon.gecko_id and w.symbol = mon.symbol and w.dd = TO_CHAR(NOW(), 'dd')) as vol_today \n"
+                    + "             , (select ROUND(AVG(COALESCE(w.total_volume, 0)), 0) from gecko_volume_month w where w.gecko_id = mon.gecko_id and w.symbol = mon.symbol  \n"
+                    + "              and w.dd in (  TO_CHAR(NOW() - interval  '6 days', 'dd')                     \n"
+                    + "                           , TO_CHAR(NOW() - interval  '5 days', 'dd')                     \n"
+                    + "                           , TO_CHAR(NOW() - interval  '4 days', 'dd')                     \n"
+                    + "                           , TO_CHAR(NOW() - interval  '3 days', 'dd')                     \n"
+                    + "                           , TO_CHAR(NOW() - interval  '2 days', 'dd')                     \n"
+                    + "                           , TO_CHAR(NOW() - interval  '1 days', 'dd')                     \n"
+                    + "                           , TO_CHAR(NOW(), 'dd')                                          \n"
+                    + "                           )                                                               \n"
+                    + "             ) as vol_avg_07d                                                              \n"
+                    + "         FROM public.gecko_volume_month mon                                                \n"
+                    + "         where mon.dd = TO_CHAR(NOW(), 'dd')                                               \n"
+                    + "     )tmp                                                                                  \n"
+                    + " ) gecko_week                                                                              \n"
                     + "                                                                                           \n"
                     + " where                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
@@ -488,9 +518,11 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   and can.gecko_id = macd.gecko_id                                                        \n"
                     + "   and can.gecko_id = boll.gecko_id                                                        \n"
                     + "   and can.gecko_id = vol.gecko_id                                                         \n"
+                    + "   and can.gecko_id = gecko_week.gecko_id                                                  \n"
                     + " order by                                                                                  \n"
-                    + "   coalesce(can.priority, 3) asc,                                            		      \n"
-                    + "   can.volumn_div_marketcap desc                                                           \n";
+                    + "     coalesce(can.priority, 3) asc                                            		      \n"
+                    + "   , gecko_week.vol_gecko_increate desc                                                    \n"
+                    + "   , can.volumn_div_marketcap desc                                                         \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
 
@@ -616,7 +648,7 @@ public class BinanceServiceImpl implements BinanceService {
                             + "Down) ";
 
                 }
-                today_ema += temp.get(4) + " (" + temp.get(5) + "%)";
+                today_ema += temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)";
                 css.setToday_ema(today_ema);
 
                 volList.add("");
@@ -631,7 +663,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_0());
                 css.setDay_0_vol(temp.get(0));
                 css.setDay_0_price(temp.get(1));
-                css.setDay_0_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_0_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_0_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -656,6 +688,7 @@ public class BinanceServiceImpl implements BinanceService {
                             entity.setGeckoid(dto.getGecko_id());
                             entity.setSymbol(dto.getSymbol());
                             entity.setName(dto.getName());
+                            entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP);
                             prepareOrdersRepository.save(entity);
                         }
                     } else {
@@ -667,7 +700,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_1());
                 css.setDay_1_vol(temp.get(0));
                 css.setDay_1_price(temp.get(1));
-                css.setDay_1_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_1_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_1_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -678,7 +711,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_2());
                 css.setDay_2_vol(temp.get(0));
                 css.setDay_2_price(temp.get(1));
-                css.setDay_2_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_2_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_2_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -689,7 +722,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_3());
                 css.setDay_3_vol(temp.get(0));
                 css.setDay_3_price(temp.get(1));
-                css.setDay_3_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_3_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_3_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -700,7 +733,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_4());
                 css.setDay_4_vol(temp.get(0));
                 css.setDay_4_price(temp.get(1));
-                css.setDay_4_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_4_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_4_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -711,7 +744,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_5());
                 css.setDay_5_vol(temp.get(0));
                 css.setDay_5_price(temp.get(1));
-                css.setDay_5_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_5_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_5_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -722,7 +755,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_6());
                 css.setDay_6_vol(temp.get(0));
                 css.setDay_6_price(temp.get(1));
-                css.setDay_6_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_6_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_6_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -733,7 +766,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_7());
                 css.setDay_7_vol(temp.get(0));
                 css.setDay_7_price(temp.get(1));
-                css.setDay_7_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_7_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_7_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -744,7 +777,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_8());
                 css.setDay_8_vol(temp.get(0));
                 css.setDay_8_price(temp.get(1));
-                css.setDay_8_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_8_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_8_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -755,7 +788,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_9());
                 css.setDay_9_vol(temp.get(0));
                 css.setDay_9_price(temp.get(1));
-                css.setDay_9_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_9_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_9_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -766,7 +799,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_10());
                 css.setDay_10_vol(temp.get(0));
                 css.setDay_10_price(temp.get(1));
-                css.setDay_10_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_10_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_10_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -777,7 +810,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_11());
                 css.setDay_11_vol(temp.get(0));
                 css.setDay_11_price(temp.get(1));
-                css.setDay_11_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_11_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_11_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -788,7 +821,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_12());
                 css.setDay_12_vol(temp.get(0));
                 css.setDay_12_price(temp.get(1));
-                css.setDay_12_ema(temp.get(4) + " (" + temp.get(5) + "%)");
+                css.setDay_12_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_12_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -1034,6 +1067,17 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStar(css.getStar() + " VolUp");
                 }
 
+                if (Utils.getBigDecimal(dto.getVol_gecko_increate()).compareTo(BigDecimal.valueOf(1.8)) > 0) {
+                    css.setStar(css.getStar() + " Gecko_" + dto.getVol_gecko_increate());
+
+                    PrepareOrders entity = new PrepareOrders();
+                    entity.setGeckoid(dto.getGecko_id());
+                    entity.setSymbol(dto.getSymbol());
+                    entity.setName(dto.getName());
+                    entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP);
+                    prepareOrdersRepository.save(entity);
+                }
+
                 priorityCoin.setPredict(predict);
                 priorityCoin.setCandidate(is_candidate);
 
@@ -1085,9 +1129,14 @@ public class BinanceServiceImpl implements BinanceService {
                 priorityCoinRepository.save(priorityCoin);
 
                 sql_update_ema += String.format(
-                        " update binance_volumn_week set ema='%s', price_change_24h='%s', gecko_volume='%s' where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
-                        dto.getEma07d(), dto.getPrice_change_percentage_24h(), dto.getVol0d(), dto.getGecko_id(),
-                        dto.getSymbol());
+                        " update binance_volumn_week set ema='%s', price_change_24h='%s', gecko_volume='%s', min_price_14d='%s', max_price_14d='%s' ",
+                        dto.getEma07d(), dto.getPrice_change_percentage_24h(), dto.getVol0d(),
+                        Utils.getBigDecimal(avgPriceList.get(idx_price_min)),
+                        Utils.getBigDecimal(avgPriceList.get(idx_price_max)));
+
+                sql_update_ema += String.format(
+                        " where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
+                        dto.getGecko_id(), dto.getSymbol());
 
                 if (isOrderByBynaceVolume) {
                     if (is_candidate || (dto.getTop10_vol_up() && dto.getEma07d().compareTo(BigDecimal.ZERO) > 0)) {

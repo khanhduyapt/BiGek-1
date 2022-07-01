@@ -26,4 +26,7 @@ public class PrepareOrders {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "data_type")
+    private String dataType;
+
 }

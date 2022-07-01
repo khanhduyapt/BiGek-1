@@ -86,4 +86,6 @@ public class CandidateTokenResponse {
     private BigDecimal vol0d;
     private BigDecimal vol1d;
     private BigDecimal vol7d;
+
+    private BigDecimal vol_gecko_increate;
 }

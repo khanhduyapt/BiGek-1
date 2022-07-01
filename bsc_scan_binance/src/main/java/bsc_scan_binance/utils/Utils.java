@@ -39,6 +39,12 @@ public class Utils {
     public static String new_line_from_bot = "\n";
     public static String new_line_from_service = "%0A";
 
+    public static String PREPARE_ORDERS_DATA_TYPE_BOT = "1";
+    public static String PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP = "2";
+    public static String PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP = "3";
+    public static String PREPARE_ORDERS_DATA_TYPE_MIN14D = "4";
+    public static String PREPARE_ORDERS_DATA_TYPE_MAX14D = "5";
+
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
             + "    SELECT                                                                                   \n"
