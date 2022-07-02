@@ -124,4 +124,9 @@ public class PriorityCoin {
     @Column(name = "good_price")
     private Boolean goodPrice = false;
 
+    @Column(name = "min_price_14d")
+    private BigDecimal min_price_14d = BigDecimal.ZERO;
+
+    @Column(name = "max_price_14d")
+    private BigDecimal max_price_14d = BigDecimal.ZERO;
 }

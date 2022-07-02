@@ -369,7 +369,7 @@ public class BinanceServiceImpl implements BinanceService {
             String sql = " select                                                                                 \n"
                     + "   can.gecko_id,                                                                           \n"
                     + "   can.symbol,                                                                             \n"
-                    + "   can.name,                                                                               \n"
+                    + "   concat (can.name, (case when (select gecko_id from binance_futures where gecko_id=can.gecko_id) is not null then ' (Futures)' else '' end)) as name,  \n"
 
                     + "    boll.price_can_buy,                                                                    \n"
                     + "    boll.price_can_sell,                                                                   \n"
@@ -983,6 +983,9 @@ public class BinanceServiceImpl implements BinanceService {
                     // star.contains("🤩")
                     BigDecimal price_min = Utils.getBigDecimal(avgPriceList.get(idx_price_min));
                     BigDecimal price_max = Utils.getBigDecimal(avgPriceList.get(idx_price_max));
+
+                    priorityCoin.setMin_price_14d(price_min);
+                    priorityCoin.setMax_price_14d(price_max);
 
                     if (price_min.compareTo(price_now) > 0) {
                         css.setStar(css.getStar() + " MinToday");
@@ -1679,7 +1682,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            if (minus >= 5) {
+            if (minus >= 15) {
                 List<PrepareOrders> list = prepareOrdersRepository.findAll();
                 List<BollArea> boll_list = bollAreaRepository.findBottomArea();
 
@@ -1696,7 +1699,8 @@ public class BinanceServiceImpl implements BinanceService {
                                 PriorityCoin coin = priorityCoinRepository.findById(boll.getGecko_id()).orElse(null);
                                 if (!Objects.equals(null, coin)) {
 
-                                    if (isCallFormBot || !msg_boll_dict.contains(boll.getGecko_id())) {
+                                    if ((isCallFormBot || !msg_boll_dict.contains(boll.getGecko_id()))
+                                            && (Utils.isGoodPrice(coin.getCurrent_price(), coin.getMin_price_14d(), coin.getMax_price_14d()))) {
 
                                         Utils.sendToTelegram("(PrepareOrders) " + Utils.getDataType(dto) + " Can buy:"
                                                 + Utils.new_line_from_service
@@ -1720,7 +1724,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            {
+            if (minus >= 15) {
                 String sql = " delete from view_opportunity;                                                \n"
                         + " insert into view_opportunity(gecko_id, symbol, name, vol_today, vol_avg_07d, vol_gecko_increate, avg_price, price_can_buy, price_can_sell, lost_normal, profit_normal, profit_max, opportunity) \n"
                         + " select                                                                          \n"
@@ -1736,7 +1740,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "     , ROUND(100*(price_can_buy  - avg_price)/avg_price, 1) as lost_normal       \n"
                         + "     , ROUND(100*(price_can_sell - avg_price)/avg_price, 1) as profit_normal     \n"
                         + "     , pro.profit_max profit_max                                                 \n"
-                        + "     , ROUND((profit_normal / abs(lost_normal)), 1) as opportunity               \n"
+                        + "     , (case when lost_normal <> 0 then ROUND((profit_normal / abs(lost_normal)), 1) else 0 end) as opportunity  \n"
                         + " from                                                                            \n"
                         + " (                                                                               \n"
                         + "     SELECT                                                                      \n"
@@ -1774,7 +1778,6 @@ public class BinanceServiceImpl implements BinanceService {
                         + "                               , TO_CHAR(NOW() - interval  '3 days', 'dd')       \n"
                         + "                               , TO_CHAR(NOW() - interval  '2 days', 'dd')       \n"
                         + "                               , TO_CHAR(NOW() - interval  '1 days', 'dd')       \n"
-                        // + " , TO_CHAR(NOW(), 'dd') \n"
                         + "                               )                                                 \n"
                         + "                 ) as vol_avg_07d                                                \n"
                         + "             FROM public.gecko_volume_month mon                                  \n"

@@ -164,21 +164,21 @@ public class Utils {
     public static String getDataType(PrepareOrders entity) {
         String result = "";
 
-        switch (entity.getDataType()) {
+        switch (getStringValue(entity.getDataType())) {
         case PREPARE_ORDERS_DATA_TYPE_BOT:
-            result  = "(Bot)";
+            result = "(Bot)";
             break;
         case PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP:
-            result  = "(BinamceVol)";
+            result = "(BinamceVol)";
             break;
         case PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP:
-            result  = "(GeckoVol)";
+            result = "(GeckoVol)";
             break;
         case PREPARE_ORDERS_DATA_TYPE_MIN14D:
-            result  = "(Min14d)";
+            result = "(Min14d)";
             break;
         case PREPARE_ORDERS_DATA_TYPE_MAX14D:
-            result  = "(Max14d)";
+            result = "(Max14d)";
             break;
         default:
             break;
