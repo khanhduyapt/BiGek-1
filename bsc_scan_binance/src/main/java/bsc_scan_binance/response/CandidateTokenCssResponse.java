@@ -51,6 +51,7 @@ public class CandidateTokenCssResponse {
     private String ema_history;
     private String avg_history;
     private String oco_opportunity;
+    private String binance_vol_rate;
 
     private String price_change_percentage_24h = "";
     private String price_change_percentage_7d = "";

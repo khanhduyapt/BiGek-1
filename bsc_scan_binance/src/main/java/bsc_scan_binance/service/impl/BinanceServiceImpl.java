@@ -450,11 +450,12 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   vol.vol7d                                                                               \n"
                     + "   , gecko_week.vol_gecko_increate                                                          \n"
                     + "   , (SELECT concat('loss:', lost_normal, '%, profit:', profit_normal, '%, opp:1x', opportunity) FROM public.view_opportunity where gecko_id = can.gecko_id) opportunity \n"
+                    + "   , concat('1h: ', rate1h, '%, 2h: ', rate2h, '%, 4h: ', rate4h, '%, 1d0h: ', rate1d0h, '%, 1d4h: ', rate1d4h, '%') as binance_vol_rate \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
                     + "   binance_volumn_day cur,                                                                 \n"
-                    + "                                                                                           \n"
+                    + "   view_binance_volume_rate vbvr,                                                          \n"
                     + " (                                                                                         \n"
                     + "    select                                                                                 \n"
                     + "       xyz.gecko_id,                                                                       \n"
@@ -540,15 +541,17 @@ public class BinanceServiceImpl implements BinanceService {
                     + " where                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   and can.gecko_id = cur.gecko_id                                                         \n"
+                    + "   and can.gecko_id = vbvr.gecko_id                                                        \n"
                     + "   and can.symbol = cur.symbol                                                             \n"
                     + "   and can.gecko_id = macd.gecko_id                                                        \n"
                     + "   and can.gecko_id = boll.gecko_id                                                        \n"
                     + "   and can.gecko_id = vol.gecko_id                                                         \n"
                     + "   and can.gecko_id = gecko_week.gecko_id                                                  \n"
                     + " order by                                                                                  \n"
-                    + "     coalesce(can.priority, 3) asc                                            		      \n"
-                    // + " , gecko_week.vol_gecko_increate desc \n"
-                    + "   , can.volumn_div_marketcap desc                                                         \n";
+                    + "     coalesce(can.priority, 3) ASC                                            		      \n"
+                    // + " , gecko_week.vol_gecko_increate DESC \n"
+                    //+ "   , can.volumn_div_marketcap DESC                                                       \n";
+                    + "   , vbvr.rate1d0h DESC                                                                    \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
 
