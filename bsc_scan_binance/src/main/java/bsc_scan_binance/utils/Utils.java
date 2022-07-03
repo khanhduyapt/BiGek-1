@@ -169,7 +169,7 @@ public class Utils {
             result = "(Bot)";
             break;
         case PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP:
-            result = "(BinamceVol)";
+            result = "(BinanceVol)";
             break;
         case PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP:
             result = "(GeckoVol)";

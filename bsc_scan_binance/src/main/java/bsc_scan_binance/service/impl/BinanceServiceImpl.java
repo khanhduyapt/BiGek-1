@@ -538,19 +538,20 @@ public class BinanceServiceImpl implements BinanceService {
                     + "     )tmp                                                                                  \n"
                     + " ) gecko_week                                                                              \n"
                     + "                                                                                           \n"
-                    + " where                                                                                     \n"
+                    + " WHERE                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
-                    + "   and can.gecko_id = cur.gecko_id                                                         \n"
-                    + "   and can.gecko_id = vbvr.gecko_id                                                        \n"
-                    + "   and can.symbol = cur.symbol                                                             \n"
-                    + "   and can.gecko_id = macd.gecko_id                                                        \n"
-                    + "   and can.gecko_id = boll.gecko_id                                                        \n"
-                    + "   and can.gecko_id = vol.gecko_id                                                         \n"
-                    + "   and can.gecko_id = gecko_week.gecko_id                                                  \n"
+                    + "   AND can.gecko_id = cur.gecko_id                                                         \n"
+                    + "   AND can.gecko_id = vbvr.gecko_id                                                        \n"
+                    + "   AND can.symbol = cur.symbol                                                             \n"
+                    + "   AND can.gecko_id = macd.gecko_id                                                        \n"
+                    + "   AND can.gecko_id = boll.gecko_id                                                        \n"
+                    + "   AND can.gecko_id = vol.gecko_id                                                         \n"
+                    + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
+                    + (isOrderByBynaceVolume ? " AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n" : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                            		      \n"
                     // + " , gecko_week.vol_gecko_increate DESC \n"
-                    //+ "   , can.volumn_div_marketcap DESC                                                       \n";
+                    // + " , can.volumn_div_marketcap DESC \n";
                     + "   , vbvr.rate1d0h DESC                                                                    \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -707,19 +708,22 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar("BUp: " + String.valueOf(vol_up));
                         css.setStar_css("text-primary");
 
-                        if (!msg_vol_up_dict.containsKey(css.getGecko_id())) {
-                            Utils.sendToTelegram(
-                                    "Binance_Volume_Up: " + String.valueOf(vol_up) + "_" + css.getSymbol());
-
-                            msg_vol_up_dict.put(css.getGecko_id(), css.getGecko_id());
-
-                            PrepareOrders entity = new PrepareOrders();
-                            entity.setGeckoid(dto.getGecko_id());
-                            entity.setSymbol(dto.getSymbol());
-                            entity.setName(dto.getName());
-                            entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP);
-                            prepareOrdersRepository.save(entity);
-                        }
+                        // if (!msg_vol_up_dict.containsKey(css.getGecko_id())
+                        // && Utils.isGoodPrice(price_now, dto.getPrice_can_buy(),
+                        // dto.getPrice_can_sell())) {
+                        //
+                        // Utils.sendToTelegram(
+                        // "Binance_Volume_Up: " + String.valueOf(vol_up) + " " + css.getSymbol());
+                        //
+                        // msg_vol_up_dict.put(css.getGecko_id(), css.getGecko_id());
+                        //
+                        // PrepareOrders entity = new PrepareOrders();
+                        // entity.setGeckoid(dto.getGecko_id());
+                        // entity.setSymbol(dto.getSymbol());
+                        // entity.setName(dto.getName());
+                        // entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP);
+                        // prepareOrdersRepository.save(entity);
+                        // }
                     } else {
                         if (msg_vol_up_dict.contains(css.getGecko_id())) {
                             msg_vol_up_dict.remove(css.getGecko_id());
@@ -938,11 +942,12 @@ public class BinanceServiceImpl implements BinanceService {
                 this_token_is_good_price = Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today);
 
                 // btc_warning_css
-                if (Objects.equals("BTC", dto.getSymbol().toUpperCase())
-                        && Utils.getBigDecimalValue(Utils.toPercent(highest_price_today, lowest_price_today, 1))
-                                .compareTo(BigDecimal.valueOf(1.8)) > 0) {
+                if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
+                    if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
 
-                    btc_is_good_price = Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today);
+                        Utils.sendToTelegram("(Good time to buy) Btc: " + Utils.removeLastZero(price_now.toString())
+                                + Utils.new_line_from_service + css.getLow_to_hight_price());
+                    }
 
                     if (((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
 
@@ -957,6 +962,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                 priorityCoin.setCurrent_price(price_now);
 
+                if (dto.getName().contains("Futures")) {
+                    css.setFutures("(Futures)");
+                }
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
                     if (avg_price.compareTo(price_now) < 1) {
@@ -979,6 +987,11 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 {
+                    if (dto.getBinance_vol_rate().contains("1d0h: -")) {
+                        css.setBinance_vol_rate_css("text-danger");
+                    } else {
+                        css.setBinance_vol_rate_css("text-primary");
+                    }
                     // tp_price: x2:aaa$ or 50%: bbb$ or 20%:ccc$ 10%:ddd$
                     // stop_limit: price_min * 0.95
                     // stop_price: price_min * 0.945
@@ -1092,16 +1105,18 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setOco_opportunity(dto.getOpportunity());
                 }
 
-                if (Utils.getBigDecimal(dto.getVol_gecko_increate()).compareTo(BigDecimal.valueOf(1.8)) > 0) {
-                    css.setStar(css.getStar() + " Gecko_" + dto.getVol_gecko_increate());
-
-                    PrepareOrders entity = new PrepareOrders();
-                    entity.setGeckoid(dto.getGecko_id());
-                    entity.setSymbol(dto.getSymbol());
-                    entity.setName(dto.getName());
-                    entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP);
-                    prepareOrdersRepository.save(entity);
-                }
+                // if
+                // (Utils.getBigDecimal(dto.getVol_gecko_increate()).compareTo(BigDecimal.valueOf(1.8))
+                // > 0) {
+                // css.setStar(css.getStar() + " Gecko_" + dto.getVol_gecko_increate());
+                //
+                // PrepareOrders entity = new PrepareOrders();
+                // entity.setGeckoid(dto.getGecko_id());
+                // entity.setSymbol(dto.getSymbol());
+                // entity.setName(dto.getName());
+                // entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP);
+                // prepareOrdersRepository.save(entity);
+                // }
 
                 priorityCoin.setPredict(predict);
                 priorityCoin.setCandidate(is_candidate);
@@ -1223,7 +1238,8 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 if (isOrderByBynaceVolume) {
-                    if (is_candidate || (dto.getTop10_vol_up() && dto.getEma07d().compareTo(BigDecimal.ZERO) > 0)) {
+                    if (Utils.isGoodPrice(price_now, Utils.getBigDecimal(avgPriceList.get(idx_price_min)),
+                            Utils.getBigDecimal(avgPriceList.get(idx_price_max)))) {
                         list.add(css);
                     }
                 } else {
@@ -1686,40 +1702,26 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (minus >= 15) {
-                List<PrepareOrders> list = prepareOrdersRepository.findAll();
-                List<BollArea> boll_list = bollAreaRepository.findBottomArea();
+                List<PrepareOrders> list = prepareOrdersRepository
+                        .findAllByDataType(Utils.PREPARE_ORDERS_DATA_TYPE_BOT);
 
-                if (!CollectionUtils.isEmpty(list) && !CollectionUtils.isEmpty(boll_list)) {
+                if (!CollectionUtils.isEmpty(list)) {
                     for (PrepareOrders dto : list) {
-                        BollArea boll = boll_list.stream()
-                                .filter(item -> Objects.equals(item.getGecko_id(), dto.getGeckoid())).findFirst()
-                                .orElse(null);
 
-                        if (!Objects.equals(null, boll)) {
-                            if (Utils.getBigDecimal(boll.getAvg_price())
-                                    .compareTo(Utils.getBigDecimal(boll.getPrice_can_buy())) <= 0) {
+                        PriorityCoin coin = priorityCoinRepository.findById(dto.getGeckoid()).orElse(null);
+                        if (!Objects.equals(null, coin)
+                                && Utils.isGoodPrice(coin.getCurrent_price(), coin.getMin_price_14d(),
+                                        coin.getMax_price_14d())
+                                && Utils.isGoodPrice(coin.getCurrent_price(), coin.getLow_price(),
+                                        coin.getHeight_price())) {
 
-                                PriorityCoin coin = priorityCoinRepository.findById(boll.getGecko_id()).orElse(null);
-                                if (!Objects.equals(null, coin)) {
+                            if ((isCallFormBot || !msg_boll_dict.contains(coin.getGeckoid()))) {
 
-                                    if ((isCallFormBot || !msg_boll_dict.contains(boll.getGecko_id()))
-                                            && (Utils.isGoodPrice(coin.getCurrent_price(), coin.getMin_price_14d(), coin.getMax_price_14d()))) {
+                                Utils.sendToTelegram("(PrepareOrders) " + Utils.getDataType(dto) + " Can buy:"
+                                        + Utils.new_line_from_service
+                                        + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
 
-                                        Utils.sendToTelegram("(PrepareOrders) " + Utils.getDataType(dto) + " Can buy:"
-                                                + Utils.new_line_from_service
-                                                + Utils.createMsgPriorityToken(coin, Utils.new_line_from_service));
-
-                                        msg_boll_dict.put(boll.getGecko_id(), boll.getGecko_id());
-                                    }
-                                }
-
-                            } else if (Utils.getBigDecimal(boll.getAvg_price())
-                                    .compareTo(Utils.getBigDecimal(boll.getPrice_can_sell())) > 0) {
-                                if (Objects.equals(dto.getDataType(), Utils.PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP)
-                                        || Objects.equals(dto.getDataType(),
-                                                Utils.PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP)) {
-                                    prepareOrdersRepository.delete(dto);
-                                }
+                                msg_boll_dict.put(coin.getGeckoid(), coin.getGeckoid());
                             }
                         }
 
@@ -1802,9 +1804,15 @@ public class BinanceServiceImpl implements BinanceService {
                 List<ViewOpportunity> list = viewOpportunityRepository.findAll();
                 if (!CollectionUtils.isEmpty(list)) {
                     for (ViewOpportunity dto : list) {
+                        PriorityCoin coin = priorityCoinRepository.findById(dto.getGeckoid()).orElse(null);
+                        if (Objects.equals(null, coin)) {
+                            continue;
+                        }
 
-                        if (isCallFormBot || !msg_boll_dict.contains(dto.getGeckoid())) {
-                            Utils.sendToTelegram("(Opportunity) " + dto.getSymbol() + "%, loss:" + dto.getLost_normal()
+                        if ((isCallFormBot || !msg_boll_dict.contains(dto.getGeckoid()))
+                                && (Utils.isGoodPrice(coin.getCurrent_price(), coin.getMin_price_14d(),
+                                        coin.getMax_price_14d()))) {
+                            Utils.sendToTelegram("(Opportunity) " + dto.getSymbol() + ", loss:" + dto.getLost_normal()
                                     + ", profit:" + dto.getProfit_normal() + "%, opp:1x" + dto.getOpportunity());
                             msg_boll_dict.put(dto.getGeckoid(), dto.getGeckoid());
                         }
@@ -1813,7 +1821,9 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             log.info("End monitorToken <----");
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
             log.info("monitorToken error ------->");
             log.error(e.getMessage());

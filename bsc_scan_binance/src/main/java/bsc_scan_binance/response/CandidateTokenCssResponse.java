@@ -25,6 +25,7 @@ public class CandidateTokenCssResponse {
     private String price_target = "";
     private String btc_warning_css = "";
 
+    private String futures = "";
     private String avg_percent = "";
     private String avg_price = "";
     private String avg_boll_min = "";
@@ -36,9 +37,9 @@ public class CandidateTokenCssResponse {
     private String gecko_total_volume = "";
     private String gecko_volumn_history = "";
 
-    //tp_price: x2:aaa$ or 50%: bbb$ or 20%:ccc$ 10%:ddd$
-    //stop_limit: price_min * 0.95
-    //stop_price: price_min * 0.945
+    // tp_price: x2:aaa$ or 50%: bbb$ or 20%:ccc$ 10%:ddd$
+    // stop_limit: price_min * 0.95
+    // stop_price: price_min * 0.945
     private String oco_css = "";
     private String oco_tp_price = "";
     private String oco_tp_price_hight = "";
@@ -52,6 +53,7 @@ public class CandidateTokenCssResponse {
     private String avg_history;
     private String oco_opportunity;
     private String binance_vol_rate;
+    private String binance_vol_rate_css = "";
 
     private String price_change_percentage_24h = "";
     private String price_change_percentage_7d = "";

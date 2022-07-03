@@ -178,6 +178,8 @@ p {
           <!-- Avg -->
           <td class="bg-light important;"
             style="text-align: right; min-width: 150px !important; max-width: 150px !important;">
+            <p style="font-size: 0.85rem !important;" class="text-primary"
+              th:text="${token.futures}">
             <div>
               <span
                 style="font-size: 0.9rem !important; text-align: left; min-width: 50px !important; max-width: 50px !important;"
@@ -210,7 +212,7 @@ p {
               th:text="${token.avg_history}">
             <p style="font-size: 0.85rem !important;" class="text-primary"
               th:text="${token.oco_opportunity}">
-            <p style="font-size: 0.85rem !important;" class="text-primary"
+            <p style="font-size: 0.85rem !important;" th:classappend="${token.binance_vol_rate_css}"
               th:text="${token.binance_vol_rate}">
           </td>
 
