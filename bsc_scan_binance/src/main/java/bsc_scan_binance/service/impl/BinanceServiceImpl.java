@@ -1253,14 +1253,7 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
 
-                if (isOrderByBynaceVolume) {
-                    if (Utils.isGoodPrice(price_now, Utils.getBigDecimal(avgPriceList.get(idx_price_min)),
-                            Utils.getBigDecimal(avgPriceList.get(idx_price_max)))) {
-                        list.add(css);
-                    }
-                } else {
-                    list.add(css);
-                }
+                list.add(css);
             }
             query = entityManager.createNativeQuery(sql_update_ema);
             query.executeUpdate();
