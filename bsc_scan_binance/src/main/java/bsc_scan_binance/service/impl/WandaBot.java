@@ -233,7 +233,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
                 // /buy LIT 600$
-                // /buy WING 600$
+                // /buy LIT 600$ 0.808$
                 String[] arr = command.split(" ");
 
                 List<BinanceVolumnDay> list = binanceVolumnDayRepository.searchBySymbol(arr[1].toUpperCase());
@@ -268,8 +268,8 @@ public class WandaBot extends TelegramLongPollingBot {
                     }
                 }
 
-                if (arr.length != 3) {
-                    message.setText("format: /buy TOKEN USD");
+                if (arr.length > 4) {
+                    message.setText("format: /buy TOKEN USD Price");
                     execute(message);
                     return;
                 }
@@ -314,6 +314,13 @@ public class WandaBot extends TelegramLongPollingBot {
                 BigDecimal amount = amount1.add(amount2);
                 BigDecimal qty = qty1.add(qty2);
                 BigDecimal avg_price = amount.divide(qty, 5, RoundingMode.CEILING);
+
+                if (arr.length == 4) {
+                    BigDecimal purchase_price = Utils.getBigDecimal(arr[3].replace("$", ""));
+                    if (purchase_price.compareTo(BigDecimal.ZERO) > 0) {
+                        avg_price = purchase_price;
+                    }
+                }
 
                 entity.setOrder_price(avg_price);
                 entity.setAmount(amount);

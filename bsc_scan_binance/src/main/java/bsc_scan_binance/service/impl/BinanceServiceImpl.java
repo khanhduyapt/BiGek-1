@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import bsc_scan_binance.entity.BinanceFutures;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
 import bsc_scan_binance.entity.BinanceVolumeDateTimeKey;
 import bsc_scan_binance.entity.BinanceVolumnDay;
@@ -33,6 +34,7 @@ import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.ViewOpportunity;
+import bsc_scan_binance.repository.BinanceFuturesRepository;
 import bsc_scan_binance.repository.BinanceVolumeDateTimeRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
@@ -90,6 +92,10 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private ViewOpportunityRepository viewOpportunityRepository;
 
+    @Autowired
+    private BinanceFuturesRepository binanceFuturesRepository;
+
+    private String pre_percent_btc = "";
     private Hashtable<String, String> msg_boll_dict = new Hashtable<String, String>();
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
 
@@ -943,10 +949,20 @@ public class BinanceServiceImpl implements BinanceService {
 
                 // btc_warning_css
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
-                    if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
 
-                        Utils.sendToTelegram("(Good time to buy) Btc: " + Utils.removeLastZero(price_now.toString())
-                                + Utils.new_line_from_service + css.getLow_to_hight_price());
+                    if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
+                        BigDecimal btc_range = ((highest_price_today.subtract(lowest_price_today)).divide(price_now, 3,
+                                RoundingMode.CEILING));
+
+                        String curr_percent_btc = Utils.toPercent(price_now, lowest_price_today);
+
+                        if ((btc_range.compareTo(BigDecimal.valueOf(0.015)) > 0)
+                                && (!Objects.equals(curr_percent_btc, pre_percent_btc))) {
+
+                            pre_percent_btc = curr_percent_btc;
+                            Utils.sendToTelegram("(Good time to buy) Btc: " + Utils.removeLastZero(price_now.toString())
+                                    + Utils.new_line_from_service + css.getLow_to_hight_price());
+                        }
                     }
 
                     if (((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
@@ -1537,8 +1553,8 @@ public class BinanceServiceImpl implements BinanceService {
                 String msg = "";
 
                 for (OrdersProfitResponse dto : results) {
-                    BigDecimal tp_percent = Utils.getBigDecimal(dto.getTp_percent());
-                    BigDecimal target_percent = Utils.getBigDecimal(dto.getTarget_percent())
+                    BigDecimal tp_percent = Utils.getBigDecimalValue(String.valueOf(dto.getTp_percent()));
+                    BigDecimal target_percent = Utils.getBigDecimalValue(String.valueOf(dto.getTarget_percent()))
                             .multiply(BigDecimal.valueOf(0.9));
 
                     if (target_percent.compareTo(BigDecimal.valueOf(5)) < 0) {
@@ -1812,7 +1828,17 @@ public class BinanceServiceImpl implements BinanceService {
                         if ((isCallFormBot || !msg_boll_dict.contains(dto.getGeckoid()))
                                 && (Utils.isGoodPrice(coin.getCurrent_price(), coin.getMin_price_14d(),
                                         coin.getMax_price_14d()))) {
-                            Utils.sendToTelegram("(Opportunity) " + dto.getSymbol() + ", loss:" + dto.getLost_normal()
+
+                            BinanceFutures binanceFutures = binanceFuturesRepository.findById(dto.getGeckoid())
+                                    .orElse(null);
+
+                            String futures = "";
+                            if (!Objects.equals(null, binanceFutures)) {
+                                futures = "Futures ";
+                            }
+
+                            Utils.sendToTelegram("(Opportunity) " + futures + dto.getSymbol() + ", loss:"
+                                    + dto.getLost_normal()
                                     + ", profit:" + dto.getProfit_normal() + "%, opp:1x" + dto.getOpportunity());
                             msg_boll_dict.put(dto.getGeckoid(), dto.getGeckoid());
                         }

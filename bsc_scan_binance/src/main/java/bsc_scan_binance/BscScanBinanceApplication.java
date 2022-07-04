@@ -29,7 +29,7 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            msg_on = true;
+            msg_on = false;
             if (!Objects.equals(null, args) && args.length > 0) {
                 if (Objects.equals("msg_on", args[0])) {
                     msg_on = true;
@@ -78,7 +78,7 @@ public class BscScanBinanceApplication {
                         if (!CollectionUtils.isEmpty(orders)) {
                             for (Orders order : orders) {
                                 gecko_service.loadData(order.getGeckoid());
-                                log.info("Gecko " + " id:" + order.getGeckoid() + "; Symbol:" + order.getSymbol());
+                                log.info("Binance -> Gecko " + " id:" + order.getGeckoid() + "; Symbol:" + order.getSymbol());
                             }
                         }
                     }

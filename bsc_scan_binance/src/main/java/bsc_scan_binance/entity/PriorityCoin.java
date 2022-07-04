@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
-import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
