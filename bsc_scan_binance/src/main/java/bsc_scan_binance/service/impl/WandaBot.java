@@ -441,12 +441,15 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 int index = 1;
                 String msg = "";
+                BigDecimal total = BigDecimal.ZERO;
                 for (OrdersProfitResponse dto : list) {
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
                         msg += "PROFIT: ";
                     } else {
                         msg += "LOSS  : ";
                     }
+
+                    total = total.add(Utils.getBigDecimalValue(String.valueOf(dto.getTp_amount())));
 
                     msg += Utils.createMsgBalance(dto, Utils.new_line_from_bot) + Utils.new_line_from_bot
                             + Utils.new_line_from_bot;
@@ -467,6 +470,9 @@ public class WandaBot extends TelegramLongPollingBot {
 
                     msg = "";
                 }
+
+                message.setText("Balance: " + total + "$");
+                execute(message);
 
             } else if (command.contains("/mute")) {
                 List<PriorityCoin> list = priorityCoinRepository.findAllByMute(true);

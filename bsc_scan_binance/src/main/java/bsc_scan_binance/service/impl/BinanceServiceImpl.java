@@ -651,7 +651,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (getValue(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
                     css.setVolumn_div_marketcap_css("text-primary");
+                } else if (getValue(css.getVolumn_div_marketcap()) < Long.valueOf(20)) {
+                    css.setVolumn_div_marketcap_css("font-weight-bold text-danger");
                 }
+
                 css.setCurrent_price(Utils.removeLastZero(dto.getCurrent_price()));
                 css.setPrice_change_24h_css(Utils.getTextCss(css.getPrice_change_percentage_24h()));
                 css.setPrice_change_07d_css(Utils.getTextCss(css.getPrice_change_percentage_7d()));
@@ -969,7 +972,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         css.setBtc_warning_css("bg-success");
 
-                    } else if ((price_now.multiply(BigDecimal.valueOf(1.015)).compareTo(highest_price_today) > 0)) {
+                    } else if ((price_now.multiply(BigDecimal.valueOf(1.01)).compareTo(highest_price_today) > 0)) {
 
                         css.setBtc_warning_css("bg-danger");
 
@@ -1109,6 +1112,7 @@ public class BinanceServiceImpl implements BinanceService {
                         && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(10)) < 0)) {
                     is_candidate = false;
                     predict = false;
+                    css.setVolumn_binance_div_marketcap_css("font-weight-bold text-danger");
                 }
 
                 if (dto.getTop10_vol_up()) {
