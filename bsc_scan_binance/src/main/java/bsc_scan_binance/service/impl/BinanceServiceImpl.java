@@ -947,42 +947,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                 this_token_is_good_price = Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today);
 
-                // btc_warning_css
-                if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
-
-                    if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
-                        BigDecimal btc_range = ((highest_price_today.subtract(lowest_price_today)).divide(price_now, 3,
-                                RoundingMode.CEILING));
-
-                        String curr_percent_btc = Utils.toPercent(price_now, lowest_price_today);
-
-                        if ((btc_range.compareTo(BigDecimal.valueOf(0.015)) > 0)
-                                && (!Objects.equals(curr_percent_btc, pre_percent_btc))) {
-
-                            pre_percent_btc = curr_percent_btc;
-                            Utils.sendToTelegram("(Good time to buy) Btc: " + Utils.removeLastZero(price_now.toString())
-                                    + Utils.new_line_from_service + css.getLow_to_hight_price());
-                        }
-                    }
-
-                    if (((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
-
-                        css.setBtc_warning_css("bg-success");
-
-                    } else if ((price_now.multiply(BigDecimal.valueOf(1.008)).compareTo(highest_price_today) > 0)) {
-
-                        css.setBtc_warning_css("bg-danger");
-
-                        String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
-                        if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
-
-                            Utils.sendToTelegram("(Time to Sell) Btc: " + Utils.removeLastZero(price_now.toString())
-                                    + Utils.new_line_from_service + css.getLow_to_hight_price());
-                        }
-
-                    }
-                }
-
                 priorityCoin.setCurrent_price(price_now);
 
                 if (dto.getName().contains("Futures")) {
@@ -1089,8 +1053,6 @@ public class BinanceServiceImpl implements BinanceService {
                     String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now, 1);
                     String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now, 1);
 
-                    monitorTokenSales(dto);
-
                     priorityCoin.setTarget_percent(
                             Utils.getIntValue(Utils.getBigDecimalValue(avg_boll_max).toBigInteger()));
 
@@ -1117,6 +1079,52 @@ public class BinanceServiceImpl implements BinanceService {
                         }
 
                         css.setStar_css("text-primary");
+                    }
+
+                    // btc_warning_css
+                    if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
+
+                        if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
+                            BigDecimal btc_range = ((highest_price_today.subtract(lowest_price_today)).divide(price_now,
+                                    3,
+                                    RoundingMode.CEILING));
+
+                            String curr_percent_btc = Utils.toPercent(price_now, lowest_price_today);
+
+                            if ((btc_range.compareTo(BigDecimal.valueOf(0.015)) > 0)
+                                    && (!Objects.equals(curr_percent_btc, pre_percent_btc))) {
+
+                                pre_percent_btc = curr_percent_btc;
+                                Utils.sendToTelegram(
+                                        "(Good time to buy) Btc: " + Utils.removeLastZero(price_now.toString())
+                                                + Utils.new_line_from_service + css.getLow_to_hight_price()
+                                                + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
+                                                + "Can" + css.getAvg_boll_max());
+
+                                monitorTokenSales(results);
+                            }
+                        }
+
+                        if (((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
+
+                            css.setBtc_warning_css("bg-success");
+
+                        } else if ((price_now.multiply(BigDecimal.valueOf(1.008)).compareTo(highest_price_today) > 0)) {
+
+                            css.setBtc_warning_css("bg-danger");
+
+                            String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
+                            if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
+
+                                Utils.sendToTelegram("(Time to Sell) Btc: " + Utils.removeLastZero(price_now.toString())
+                                        + Utils.new_line_from_service + css.getLow_to_hight_price()
+                                        + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
+                                        + "Can" + css.getAvg_boll_max());
+
+                                monitorTokenSales(results);
+                            }
+
+                        }
                     }
                 }
 
@@ -1546,39 +1554,43 @@ public class BinanceServiceImpl implements BinanceService {
                 Utils.removeLastZero(max_price), arr[4], arr[5], arr[6]);
     }
 
-    public void monitorTokenSales(CandidateTokenResponse dto) {
-        BigDecimal price_now = Utils.getBigDecimal(dto.getCurrent_price());
-        BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
-        BigDecimal percent_profits = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
+    public void monitorTokenSales(List<CandidateTokenResponse> results) {
 
-        if (percent_loss.compareTo(BigDecimal.valueOf(-0.7)) > 0) {
-            String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$" + Utils.new_line_from_service
-                    + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
-                            .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
+        for (CandidateTokenResponse dto : results) {
 
-            if (!msg_vol_up_dict.containsKey(msg)) {
+            BigDecimal price_now = Utils.getBigDecimal(dto.getCurrent_price());
+            BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
+            BigDecimal percent_profits = Utils
+                    .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
 
-                if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
-                    Utils.sendToTelegram(msg);
+            if (percent_loss.compareTo(BigDecimal.valueOf(-0.7)) > 0) {
+                String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$" + Utils.new_line_from_service
+                        + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
+                                .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
 
-                    msg_vol_up_dict.put(msg, msg);
+                if (!msg_vol_up_dict.containsKey(msg)) {
+
+                    if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
+                        Utils.sendToTelegram(msg);
+
+                        msg_vol_up_dict.put(msg, msg);
+                    }
                 }
             }
-        }
 
-        if (Objects.equals("BTC", dto.getSymbol().toUpperCase())
-                && percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
+            if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
 
-            String msg = "(SELL ALL)" + dto.getSymbol()
-                    + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());
+                if (ordersRepository.existsById(dto.getGecko_id())) {
 
-            if (!msg_vol_up_dict.containsKey(msg)) {
-                Utils.sendToTelegram(msg);
+                    String msg = "(SELL ALL)" + dto.getSymbol()
+                            + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());
 
-                msg_vol_up_dict.put(msg, msg);
+                    Utils.sendToTelegram(msg);
+
+                }
             }
-        }
 
+        }
     }
 
     @SuppressWarnings("unchecked")
