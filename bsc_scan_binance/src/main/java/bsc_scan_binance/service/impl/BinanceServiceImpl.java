@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
-import bsc_scan_binance.entity.BinanceFutures;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
 import bsc_scan_binance.entity.BinanceVolumeDateTimeKey;
 import bsc_scan_binance.entity.BinanceVolumnDay;
@@ -32,7 +31,6 @@ import bsc_scan_binance.entity.BtcVolumeDay;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
-import bsc_scan_binance.entity.ViewOpportunity;
 import bsc_scan_binance.repository.BinanceFuturesRepository;
 import bsc_scan_binance.repository.BinanceVolumeDateTimeRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
@@ -971,7 +969,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         css.setBtc_warning_css("bg-success");
 
-                    } else if ((price_now.multiply(BigDecimal.valueOf(1.01)).compareTo(highest_price_today) > 0)) {
+                    } else if ((price_now.multiply(BigDecimal.valueOf(1.008)).compareTo(highest_price_today) > 0)) {
 
                         css.setBtc_warning_css("bg-danger");
 
@@ -1549,12 +1547,12 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     public void monitorTokenSales(CandidateTokenResponse dto) {
-        BigDecimal price_now = Utils.getBigDecimal(dto.getPrice_now());
+        BigDecimal price_now = Utils.getBigDecimal(dto.getCurrent_price());
         BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
         BigDecimal percent_profits = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
 
-        if (percent_loss.compareTo(BigDecimal.valueOf(-1)) > 0) {
-            String msg = "(MinArea)" + dto.getSymbol() + " "
+        if (percent_loss.compareTo(BigDecimal.valueOf(-0.7)) > 0) {
+            String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$" + Utils.new_line_from_service
                     + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
                             .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
 
@@ -1569,7 +1567,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals("BTC", dto.getSymbol().toUpperCase())
-                && percent_profits.compareTo(BigDecimal.valueOf(0.6)) < 0) {
+                && percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
 
             String msg = "(SELL ALL)" + dto.getSymbol()
                     + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());
@@ -1765,7 +1763,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            if (minus >= 15) {
+            if (minus >= 45) {
                 String sql = " delete from view_opportunity;                                                \n"
                         + " insert into view_opportunity(gecko_id, symbol, name, vol_today, vol_avg_07d, vol_gecko_increate, avg_price, price_can_buy, price_can_sell, lost_normal, profit_normal, profit_max, opportunity) \n"
                         + " select                                                                          \n"
@@ -1836,34 +1834,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                 Query query = entityManager.createNativeQuery(sql);
                 query.executeUpdate();
-
-                List<ViewOpportunity> list = viewOpportunityRepository.findAll();
-                if (!CollectionUtils.isEmpty(list)) {
-                    for (ViewOpportunity dto : list) {
-                        PriorityCoin coin = priorityCoinRepository.findById(dto.getGeckoid()).orElse(null);
-                        if (Objects.equals(null, coin)) {
-                            continue;
-                        }
-
-                        if ((isCallFormBot || !msg_boll_dict.contains(dto.getGeckoid()))
-                                && (Utils.isGoodPrice(coin.getCurrent_price(), coin.getMin_price_14d(),
-                                        coin.getMax_price_14d()))) {
-
-                            BinanceFutures binanceFutures = binanceFuturesRepository.findById(dto.getGeckoid())
-                                    .orElse(null);
-
-                            String futures = "";
-                            if (!Objects.equals(null, binanceFutures)) {
-                                futures = "Futures ";
-                            }
-
-                            Utils.sendToTelegram("(Opportunity) " + futures + dto.getSymbol() + ", loss:"
-                                    + dto.getLost_normal()
-                                    + ", profit:" + dto.getProfit_normal() + "%, opp:1x" + dto.getOpportunity());
-                            msg_boll_dict.put(dto.getGeckoid(), dto.getGeckoid());
-                        }
-                    }
-                }
             }
 
             log.info("End monitorToken <----");

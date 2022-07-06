@@ -25,7 +25,6 @@ import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.Orders;
-import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.TakeProfit;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
@@ -79,113 +78,10 @@ public class WandaBot extends TelegramLongPollingBot {
                 return;
             }
 
-            // int minus = Utils.getIntValue(Utils.convertDateToString("mm",
-            // Calendar.getInstance().getTime()));
-            // if ((minus > 59) || (minus < 3)) {
-            // message.setText("59...3 minutes is the time to get data.");
-            // execute(message);
-            // return;
-            // }
-
             System.out.println(update.getMessage().getText());
             String command = update.getMessage().getText();
 
-            if (command.contains("/pre")) {
-                // pre all | token | -token
-                String[] arr = command.split(" ");
-                if ((arr.length <= 1) || command.contains("all")) {
-                    List<PrepareOrders> list = prepareOrdersRepository.findAll();
-                    if (!CollectionUtils.isEmpty(list)) {
-                        String msg = "(Prepare Orders)" + Utils.new_line_from_bot;
-
-                        int index = 0;
-                        for (PrepareOrders entity : list) {
-
-                            if (!Objects.equal(Utils.PREPARE_ORDERS_DATA_TYPE_BOT, entity.getDataType())) {
-                                continue;
-                            }
-
-                            PriorityCoin coin = priorityCoinRepository.findById(entity.getGeckoid()).orElse(null);
-                            if (!Objects.equal(null, coin)) {
-                                index += 1;
-
-                                msg += Utils.new_line_from_bot
-                                        + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot)
-                                        + Utils.new_line_from_bot;
-
-                                if (index == 5) {
-                                    index = 0;
-                                    message.setText(msg);
-                                    execute(message);
-                                    msg = "";
-                                }
-                            }
-                        }
-                        if (!Objects.equal("", msg)) {
-                            message.setText(msg);
-                            execute(message);
-                            return;
-                        }
-                    } else {
-                        message.setText("Empty");
-                        execute(message);
-                        return;
-                    }
-                } else if (command.contains("-")) {
-                    arr = command.replace("-", "").split(" ");
-                    String token = arr[1];
-                    List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(token.toUpperCase());
-                    if (!CollectionUtils.isEmpty(list)) {
-                        PriorityCoin coin = priorityCoinRepository.findById(list.get(0).getGeckoid()).orElse(null);
-                        if (!Objects.equal(null, coin)) {
-                            String msg = "(Prepare Orders) Delete:" + Utils.new_line_from_bot
-                                    + Utils.createMsgPriorityToken(coin, Utils.new_line_from_bot);
-
-                            PrepareOrders entity = prepareOrdersRepository.findById(list.get(0).getGeckoid())
-                                    .orElse(null);
-                            if (!Objects.equal(null, entity)) {
-                                prepareOrdersRepository.delete(entity);
-                            }
-
-                            message.setText(msg);
-                            execute(message);
-                            return;
-                        }
-                    } else {
-                        message.setText("Not found: " + token);
-                        execute(message);
-                        return;
-                    }
-                } else {
-                    String token = arr[1];
-                    List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(token.toUpperCase());
-                    if (!CollectionUtils.isEmpty(list)) {
-
-                        PrepareOrders entity = new PrepareOrders();
-                        entity.setGeckoid(list.get(0).getGeckoid());
-                        entity.setSymbol(list.get(0).getSymbol());
-                        entity.setName(list.get(0).getName());
-                        entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_BOT);
-                        prepareOrdersRepository.save(entity);
-
-                        String msg = "(Prepare Orders) Add:" + Utils.new_line_from_bot
-                                + Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot);
-                        message.setText(msg);
-                        execute(message);
-                        return;
-
-                    } else {
-                        message.setText("Not found: " + token);
-                        execute(message);
-                        return;
-                    }
-                }
-
-            } else if (command.contains("/boll")) {
-                binance_service.getList(false);
-                binance_service.monitorBollingerBandwidth(true);
-
-            } else if (command.contains("/btc")) {
+            if (command.contains("/btc")) {
                 //binance_service.getList(false);
                 List<PriorityCoin> list = priorityCoinRepository.searchBySymbol("BTC");
                 if (CollectionUtils.isEmpty(list)) {
@@ -337,7 +233,7 @@ public class WandaBot extends TelegramLongPollingBot {
                                 + note.replace("~", Utils.new_line_from_bot));
                 execute(message);
 
-            } else if (command.contains("/selall")) {
+            } else if (command.contains("/sellall")) {
                 List<Orders> orders = ordersRepository.findAll();
 
                 for (Orders order : orders) {
