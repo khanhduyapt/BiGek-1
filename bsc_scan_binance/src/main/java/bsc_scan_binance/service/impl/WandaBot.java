@@ -337,6 +337,41 @@ public class WandaBot extends TelegramLongPollingBot {
                                 + note.replace("~", Utils.new_line_from_bot));
                 execute(message);
 
+            } else if (command.contains("/selall")) {
+                List<Orders> orders = ordersRepository.findAll();
+
+                for (Orders order : orders) {
+
+                    ordersRepository.delete(order);
+
+                    TakeProfit profit = new TakeProfit();
+                    profit.setProfit_id(take_profit_id_seq());
+                    profit.setGeckoid(order.getGeckoid());
+                    profit.setSymbol(order.getSymbol());
+                    profit.setName(order.getGeckoid());
+                    profit.setOrder_price(order.getOrder_price());
+
+                    profit.setQty(order.getQty());
+                    profit.setAmount(order.getAmount());
+
+                    List<BinanceVolumnDay> list = binanceVolumnDayRepository.searchBySymbol(order.getSymbol());
+                    BigDecimal price_now = order.getOrder_price();
+                    if (!CollectionUtils.isEmpty(list)) {
+                        price_now = Utils.getBigDecimal(list.get(0).getPriceAtBinance());
+                    }
+                    BigDecimal amount2 = price_now.multiply(order.getQty());
+
+                    profit.setSale_price(order.getOrder_price());
+                    profit.setProfit(amount2.subtract(order.getAmount()));
+
+                    takeProfitRepository.save(profit);
+
+                    message.setText(
+                            String.format("Sell:[%s] [%s] [Qty:-%s]_[P:%s$]_[T:%s$] [PT:%s$].", profit.getSymbol(),
+                                    profit.getName(), profit.getQty(), price_now, amount2, profit.getProfit()));
+                    execute(message);
+                }
+
             } else if (command.contains("/sel")) {
                 // /sell UNFI
                 // /sell UNFI 100$
@@ -441,7 +476,9 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 int index = 1;
                 String msg = "";
+                BigDecimal profit = BigDecimal.ZERO;
                 BigDecimal total = BigDecimal.ZERO;
+                BigDecimal sub_total = BigDecimal.ZERO;
                 for (OrdersProfitResponse dto : list) {
                     if (dto.getTp_percent().compareTo(BigDecimal.valueOf(0)) >= 0) {
                         msg += "PROFIT: ";
@@ -449,7 +486,11 @@ public class WandaBot extends TelegramLongPollingBot {
                         msg += "LOSS  : ";
                     }
 
-                    total = total.add(Utils.getBigDecimalValue(String.valueOf(dto.getTp_amount())));
+                    sub_total = Utils.getBigDecimal(dto.getQty())
+                            .multiply(Utils.getBigDecimal(dto.getPrice_at_binance()));
+                    total = total.add(sub_total);
+
+                    profit = profit.add(Utils.getBigDecimalValue(String.valueOf(dto.getTp_amount())));
 
                     msg += Utils.createMsgBalance(dto, Utils.new_line_from_bot) + Utils.new_line_from_bot
                             + Utils.new_line_from_bot;
@@ -471,7 +512,7 @@ public class WandaBot extends TelegramLongPollingBot {
                     msg = "";
                 }
 
-                message.setText("Balance: " + total + "$");
+                message.setText("Total: " + Utils.formatPrice(total, 0) + "$, Profits: " + profit + "$");
                 execute(message);
 
             } else if (command.contains("/mute")) {

@@ -29,7 +29,9 @@ public class CandidateTokenCssResponse {
     private String avg_percent = "";
     private String avg_price = "";
     private String avg_boll_min = "";
+    private String avg_boll_min_css = "";
     private String avg_boll_max = "";
+    private String avg_boll_max_css = "";
     private String max_price = "";
     private String avg_price_css = "";
 
