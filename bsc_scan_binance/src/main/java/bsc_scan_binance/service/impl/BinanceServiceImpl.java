@@ -1553,7 +1553,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (!ordersRepository.existsById(dto.getGecko_id())) {
 
-            if (percent_loss.compareTo(BigDecimal.valueOf(-0.95)) > 0) {
+            if ((percent_loss.compareTo(BigDecimal.valueOf(-0.95)) > 0) && (!msg_vol_up_dict.contains(dto.getGecko_id()))) {
                 if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
 
                     if (Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1))
@@ -1572,12 +1572,14 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } else {
-            if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
+            if ((percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) && (!msg_vol_up_dict.contains(dto.getGecko_id()))) {
 
                 String msg = "SELL:" + dto.getSymbol() + " "
                         + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());
 
                 Utils.sendToTelegram(msg);
+
+                msg_vol_up_dict.put(dto.getGecko_id(), dto.getGecko_id());
             }
         }
 
