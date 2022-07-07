@@ -50,8 +50,13 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     private GeckoVolumnDayRepository geckoVolumnDayRepository;
 
     @Override
-    public List<CandidateCoin> getList() {
-        return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
+    public List<CandidateCoin> getList(Boolean msg_on) {
+
+        if (msg_on) {
+            return candidateCoinRepository.findCandidateCoinInBinanceFutures();
+        } else {
+            return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
+        }
     }
 
     public CandidateCoin loadData(String gecko_id) {

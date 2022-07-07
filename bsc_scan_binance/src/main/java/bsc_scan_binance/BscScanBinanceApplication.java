@@ -62,7 +62,7 @@ public class BscScanBinanceApplication {
             //binance_service.getList(false);
             //binance_service.monitorBollingerBandwidth(false);
 
-            List<CandidateCoin> list = gecko_service.getList();
+            List<CandidateCoin> list = gecko_service.getList(msg_on);
             if (CollectionUtils.isEmpty(list)) {
                 gecko_service.initCandidateCoin();
             }
@@ -106,7 +106,7 @@ public class BscScanBinanceApplication {
                             + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
                     idx = 0;
                     list.clear();
-                    list = gecko_service.getList();
+                    list = gecko_service.getList(msg_on);
                     size = list.size();
                 } else {
                     idx += 1;

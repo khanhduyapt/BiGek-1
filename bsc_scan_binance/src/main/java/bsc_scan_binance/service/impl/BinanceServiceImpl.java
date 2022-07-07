@@ -39,9 +39,7 @@ import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
 import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
-import bsc_scan_binance.repository.PrepareOrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
-import bsc_scan_binance.repository.ViewOpportunityRepository;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
@@ -84,22 +82,15 @@ public class BinanceServiceImpl implements BinanceService {
     private OrdersRepository ordersRepository;
 
     @Autowired
-    private PrepareOrdersRepository prepareOrdersRepository;
-
-    @Autowired
-    private ViewOpportunityRepository viewOpportunityRepository;
-
-    @Autowired
     private BinanceFuturesRepository binanceFuturesRepository;
 
     private String pre_percent_btc = "";
-    private Hashtable<String, String> msg_boll_dict = new Hashtable<String, String>();
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
 
     @Override
     @Transactional
     public void loadDataVolumeHour(String gecko_id, String symbol) {
-        {
+        try {
             final Integer limit = 24;
             String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT" + "&interval=1h&limit="
                     + String.valueOf(limit);
@@ -150,151 +141,162 @@ public class BinanceServiceImpl implements BinanceService {
                 hh_index += 1;
             }
             btcVolumeDayRepository.saveAll(list_day);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     @Transactional
     public void loadData(String gecko_id, String symbol) {
-        final Integer limit = 14;
-        final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
-                + "&interval=1d&limit=" + String.valueOf(limit);
+        try {
+            final Integer limit = 14;
+            final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
+                    + "&interval=1d&limit=" + String.valueOf(limit);
 
-        final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD"
-                + "&interval=1d&limit=" + String.valueOf(limit);
+            final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD"
+                    + "&interval=1d&limit=" + String.valueOf(limit);
 
-        String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
-        BigDecimal price_at_binance = getBinancePrice(url_price);
-        if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
-            url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "BUSD";
-            price_at_binance = getBinancePrice(url_price);
-        }
-        List<Object> result_usdt = getBinanceData(url_usdt, limit);
-        List<Object> result_busd = getBinanceData(url_busd, limit);
-
-        List<BinanceVolumnDay> list_day = new ArrayList<BinanceVolumnDay>();
-        List<BinanceVolumnWeek> list_week = new ArrayList<BinanceVolumnWeek>();
-        String sql_pump_dump = "";
-
-        int day_index = 0;
-        for (int idx = limit - 1; idx >= 0; idx--) {
-            Object obj_usdt = result_usdt.get(idx);
-            Object obj_busd = result_busd.get(idx);
-
-            @SuppressWarnings("unchecked")
-            List<Object> arr_usdt = (List<Object>) obj_usdt;
-            @SuppressWarnings("unchecked")
-            List<Object> arr_busd = (List<Object>) obj_busd;
-
-            BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
-            BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
-            BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
-            BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
-            String open_time = arr_usdt.get(0).toString();
-
-            if (Objects.equals("0", open_time)) {
-                price_open_candle = Utils.getBigDecimal(arr_busd.get(1));
-                price_high = Utils.getBigDecimal(arr_busd.get(2));
-                price_low = Utils.getBigDecimal(arr_busd.get(3));
-                price_close_candle = Utils.getBigDecimal(arr_busd.get(4));
-
-                open_time = arr_busd.get(0).toString();
+            String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
+            BigDecimal price_at_binance = getBinancePrice(url_price);
+            if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
+                url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "BUSD";
+                price_at_binance = getBinancePrice(url_price);
             }
+            List<Object> result_usdt = getBinanceData(url_usdt, limit);
+            List<Object> result_busd = getBinanceData(url_busd, limit);
 
-            if (!Objects.equals("0", open_time)) {
-                BigDecimal avgPrice = price_low.add(price_high).add(price_open_candle).add(price_close_candle)
-                        .divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
+            List<BinanceVolumnDay> list_day = new ArrayList<BinanceVolumnDay>();
+            List<BinanceVolumnWeek> list_week = new ArrayList<BinanceVolumnWeek>();
+            String sql_pump_dump = "";
 
-                BigDecimal quote_asset_volume1 = Utils.getBigDecimal(arr_usdt.get(7));
-                BigDecimal number_of_trades1 = Utils.getBigDecimal(arr_usdt.get(8));
+            int day_index = 0;
+            for (int idx = limit - 1; idx >= 0; idx--) {
+                Object obj_usdt = result_usdt.get(idx);
+                Object obj_busd = result_busd.get(idx);
 
-                BigDecimal quote_asset_volume2 = Utils.getBigDecimal(arr_busd.get(7));
-                BigDecimal number_of_trades2 = Utils.getBigDecimal(arr_busd.get(8));
+                @SuppressWarnings("unchecked")
+                List<Object> arr_usdt = (List<Object>) obj_usdt;
+                @SuppressWarnings("unchecked")
+                List<Object> arr_busd = (List<Object>) obj_busd;
 
-                BigDecimal total_volume = quote_asset_volume1.add(quote_asset_volume2);
-                BigDecimal total_trans = number_of_trades1.add(number_of_trades2);
+                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
+                BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
+                BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
+                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
+                String open_time = arr_usdt.get(0).toString();
 
-                if (idx == limit - 1) {
-                    BinanceVolumnDay day = new BinanceVolumnDay();
-                    Calendar calendar = Calendar.getInstance();
+                if (Objects.equals("0", open_time)) {
+                    price_open_candle = Utils.getBigDecimal(arr_busd.get(1));
+                    price_high = Utils.getBigDecimal(arr_busd.get(2));
+                    price_low = Utils.getBigDecimal(arr_busd.get(3));
+                    price_close_candle = Utils.getBigDecimal(arr_busd.get(4));
 
-                    day.setId(new BinanceVolumnDayKey(gecko_id, symbol,
-                            Utils.convertDateToString("HH", calendar.getTime())));
-                    day.setTotalVolume(total_volume);
-                    day.setTotalTrasaction(total_trans);
-                    day.setPriceAtBinance(price_at_binance);
-                    day.setLow_price(price_low);
-                    day.setHight_price(price_high);
-                    day.setPrice_open_candle(price_open_candle);
-                    day.setPrice_close_candle(price_close_candle);
-                    list_day.add(day);
-
-                    {
-                        BinanceVolumeDateTime ddhh = new BinanceVolumeDateTime();
-                        BinanceVolumeDateTimeKey key = new BinanceVolumeDateTimeKey();
-                        key.setGeckoid(gecko_id);
-                        key.setSymbol(symbol);
-                        key.setDd(Utils.convertDateToString("dd", calendar.getTime()));
-                        key.setHh(Utils.convertDateToString("HH", calendar.getTime()));
-                        ddhh.setId(key);
-                        ddhh.setVolume(total_volume);
-
-                        binanceVolumeDateTimeRepository.save(ddhh);
-                    }
-
-                    {
-                        calendar.add(Calendar.HOUR_OF_DAY, -2);
-                        BinanceVolumnDay pre2h = binanceVolumnDayRepository.findById(new BinanceVolumnDayKey(gecko_id,
-                                symbol, Utils.convertDateToString("HH", calendar.getTime()))).orElse(null);
-
-                        if (!Objects.equals(null, pre2h)
-                                && (Utils.getBigDecimal(pre2h.getPriceAtBinance()).compareTo(BigDecimal.ZERO) > 0)) {
-
-                            String str_pump_dump = "";
-                            if (price_at_binance
-                                    .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
-
-                                str_pump_dump = " total_pump = total_pump + 1 ";
-
-                            } else if (price_at_binance
-                                    .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(0.9))) < 0) {
-
-                                str_pump_dump = " total_dump = total_dump + 1 ";
-                            }
-
-                            if (!Objects.equals("", str_pump_dump)) {
-                                sql_pump_dump = " WITH UPD AS (UPDATE binance_pumping_history SET " + str_pump_dump
-                                        + " WHERE gecko_id='" + gecko_id + "' AND symbol='" + symbol
-                                        + "' AND HH=TO_CHAR(NOW(), 'HH24') \n" + " RETURNING gecko_id, symbol, hh), \n"
-                                        + " INS AS (SELECT '" + gecko_id + "', '" + symbol
-                                        + "', TO_CHAR(NOW(), 'HH24'), 1, 1 WHERE NOT EXISTS (SELECT * FROM UPD)) \n"
-                                        + " INSERT INTO binance_pumping_history(gecko_id, symbol, hh, total_pump, total_dump) SELECT * FROM INS; \n";
-                            }
-                        }
-                    }
-
+                    open_time = arr_busd.get(0).toString();
                 }
 
-                BinanceVolumnWeek entity = new BinanceVolumnWeek();
-                Calendar calendar_day = Calendar.getInstance();
-                calendar_day.add(Calendar.DAY_OF_MONTH, -day_index);
-                entity.setId(new BinanceVolumnWeekKey(gecko_id, symbol,
-                        Utils.convertDateToString("yyyyMMdd", calendar_day.getTime())));
-                entity.setAvgPrice(avgPrice);
-                entity.setTotalVolume(total_volume);
-                entity.setTotalTrasaction(total_trans);
-                entity.setMin_price(price_low);
-                entity.setMax_price(price_high);
-                list_week.add(entity);
-            }
-            day_index += 1;
-        }
+                if (!Objects.equals("0", open_time)) {
+                    BigDecimal avgPrice = price_low.add(price_high).add(price_open_candle).add(price_close_candle)
+                            .divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
 
-        binanceVolumnDayRepository.saveAll(list_day);
-        binanceVolumnWeekRepository.saveAll(list_week);
-        if (!Objects.equals("", sql_pump_dump)) {
-            Query query = entityManager.createNativeQuery(sql_pump_dump);
-            query.executeUpdate();
+                    BigDecimal quote_asset_volume1 = Utils.getBigDecimal(arr_usdt.get(7));
+                    BigDecimal number_of_trades1 = Utils.getBigDecimal(arr_usdt.get(8));
+
+                    BigDecimal quote_asset_volume2 = Utils.getBigDecimal(arr_busd.get(7));
+                    BigDecimal number_of_trades2 = Utils.getBigDecimal(arr_busd.get(8));
+
+                    BigDecimal total_volume = quote_asset_volume1.add(quote_asset_volume2);
+                    BigDecimal total_trans = number_of_trades1.add(number_of_trades2);
+
+                    if (idx == limit - 1) {
+                        BinanceVolumnDay day = new BinanceVolumnDay();
+                        Calendar calendar = Calendar.getInstance();
+
+                        day.setId(new BinanceVolumnDayKey(gecko_id, symbol,
+                                Utils.convertDateToString("HH", calendar.getTime())));
+                        day.setTotalVolume(total_volume);
+                        day.setTotalTrasaction(total_trans);
+                        day.setPriceAtBinance(price_at_binance);
+                        day.setLow_price(price_low);
+                        day.setHight_price(price_high);
+                        day.setPrice_open_candle(price_open_candle);
+                        day.setPrice_close_candle(price_close_candle);
+                        list_day.add(day);
+
+                        {
+                            BinanceVolumeDateTime ddhh = new BinanceVolumeDateTime();
+                            BinanceVolumeDateTimeKey key = new BinanceVolumeDateTimeKey();
+                            key.setGeckoid(gecko_id);
+                            key.setSymbol(symbol);
+                            key.setDd(Utils.convertDateToString("dd", calendar.getTime()));
+                            key.setHh(Utils.convertDateToString("HH", calendar.getTime()));
+                            ddhh.setId(key);
+                            ddhh.setVolume(total_volume);
+
+                            binanceVolumeDateTimeRepository.save(ddhh);
+                        }
+
+                        {
+                            calendar.add(Calendar.HOUR_OF_DAY, -2);
+                            BinanceVolumnDay pre2h = binanceVolumnDayRepository
+                                    .findById(new BinanceVolumnDayKey(gecko_id,
+                                            symbol, Utils.convertDateToString("HH", calendar.getTime())))
+                                    .orElse(null);
+
+                            if (!Objects.equals(null, pre2h)
+                                    && (Utils.getBigDecimal(pre2h.getPriceAtBinance())
+                                            .compareTo(BigDecimal.ZERO) > 0)) {
+
+                                String str_pump_dump = "";
+                                if (price_at_binance
+                                        .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
+
+                                    str_pump_dump = " total_pump = total_pump + 1 ";
+
+                                } else if (price_at_binance
+                                        .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(0.9))) < 0) {
+
+                                    str_pump_dump = " total_dump = total_dump + 1 ";
+                                }
+
+                                if (!Objects.equals("", str_pump_dump)) {
+                                    sql_pump_dump = " WITH UPD AS (UPDATE binance_pumping_history SET " + str_pump_dump
+                                            + " WHERE gecko_id='" + gecko_id + "' AND symbol='" + symbol
+                                            + "' AND HH=TO_CHAR(NOW(), 'HH24') \n"
+                                            + " RETURNING gecko_id, symbol, hh), \n"
+                                            + " INS AS (SELECT '" + gecko_id + "', '" + symbol
+                                            + "', TO_CHAR(NOW(), 'HH24'), 1, 1 WHERE NOT EXISTS (SELECT * FROM UPD)) \n"
+                                            + " INSERT INTO binance_pumping_history(gecko_id, symbol, hh, total_pump, total_dump) SELECT * FROM INS; \n";
+                                }
+                            }
+                        }
+
+                    }
+
+                    BinanceVolumnWeek entity = new BinanceVolumnWeek();
+                    Calendar calendar_day = Calendar.getInstance();
+                    calendar_day.add(Calendar.DAY_OF_MONTH, -day_index);
+                    entity.setId(new BinanceVolumnWeekKey(gecko_id, symbol,
+                            Utils.convertDateToString("yyyyMMdd", calendar_day.getTime())));
+                    entity.setAvgPrice(avgPrice);
+                    entity.setTotalVolume(total_volume);
+                    entity.setTotalTrasaction(total_trans);
+                    entity.setMin_price(price_low);
+                    entity.setMax_price(price_high);
+                    list_week.add(entity);
+                }
+                day_index += 1;
+            }
+
+            binanceVolumnDayRepository.saveAll(list_day);
+            binanceVolumnWeekRepository.saveAll(list_week);
+            if (!Objects.equals("", sql_pump_dump)) {
+                Query query = entityManager.createNativeQuery(sql_pump_dump);
+                query.executeUpdate();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -570,6 +572,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<PriorityCoin> listPriorityCoin = priorityCoinRepository.findAll();
 
             for (CandidateTokenResponse dto : results) {
+                monitorTokenSale(dto);
 
                 PriorityCoin priorityCoin = listPriorityCoin.stream()
                         .filter(item -> Objects.equals(item.getGeckoid(), dto.getGecko_id())).findFirst()
@@ -1285,9 +1288,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             return list;
 
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("Get list Inquiry Consigned Delivery error ------->");
             log.error(e.getMessage());
@@ -1557,13 +1558,20 @@ public class BinanceServiceImpl implements BinanceService {
     public void monitorTokenSales(List<CandidateTokenResponse> results) {
 
         for (CandidateTokenResponse dto : results) {
+            monitorTokenSale(dto);
+        }
+    }
 
-            BigDecimal price_now = Utils.getBigDecimal(dto.getCurrent_price());
-            BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
-            BigDecimal percent_profits = Utils
-                    .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
+    public void monitorTokenSale(CandidateTokenResponse dto) {
+        BigDecimal price_now = Utils.getBigDecimal(dto.getCurrent_price());
+        BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
+        BigDecimal percent_profits = Utils
+                .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
 
-            if (percent_loss.compareTo(BigDecimal.valueOf(-0.7)) > 0) {
+        if (percent_loss.compareTo(BigDecimal.valueOf(-0.7)) > 0) {
+
+            if (!ordersRepository.existsById(dto.getGecko_id())) {
+
                 String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$" + Utils.new_line_from_service
                         + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
                                 .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
@@ -1577,19 +1585,18 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
             }
+        }
 
-            if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
+        if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
 
-                if (ordersRepository.existsById(dto.getGecko_id())) {
+            if (ordersRepository.existsById(dto.getGecko_id())) {
 
-                    String msg = "(SELL ALL)" + dto.getSymbol()
-                            + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());
+                String msg = "(SELL ALL)" + dto.getSymbol()
+                        + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());
 
-                    Utils.sendToTelegram(msg);
+                Utils.sendToTelegram(msg);
 
-                }
             }
-
         }
     }
 

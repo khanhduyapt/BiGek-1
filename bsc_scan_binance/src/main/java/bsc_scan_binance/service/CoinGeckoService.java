@@ -18,7 +18,7 @@ public interface CoinGeckoService {
 
 	public List<CandidateCoin> initCandidateCoin();
 
-	public List<CandidateCoin> getList();
+	public List<CandidateCoin> getList(Boolean msg_on);
 
 	public CandidateCoin loadData(String gecko_id);
 }
