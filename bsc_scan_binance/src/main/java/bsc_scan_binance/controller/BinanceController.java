@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.request.CoinGeckoTokenRequest;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.service.CoinGeckoService;
@@ -26,12 +27,16 @@ public class BinanceController {
 
     @GetMapping
     public String list(Model model) {
+        BscScanBinanceApplication.callFormBinance = "";
+
         model.addAttribute("data_list", service.getList(true));
         return "binance";
     }
 
     @GetMapping("/binance")
     public String listOrderByBinaceVolume(Model model) {
+        BscScanBinanceApplication.callFormBinance = "binance";
+
         model.addAttribute("data_list", service.getList(false));
         return "binance";
     }

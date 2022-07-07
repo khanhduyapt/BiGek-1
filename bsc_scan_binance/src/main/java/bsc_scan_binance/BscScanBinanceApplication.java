@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootApplication
 public class BscScanBinanceApplication {
     public static boolean msg_on = false;
+    public static String callFormBinance = "";
 
     public static void main(String[] args) {
         try {
@@ -62,7 +63,7 @@ public class BscScanBinanceApplication {
             //binance_service.getList(false);
             //binance_service.monitorBollingerBandwidth(false);
 
-            List<CandidateCoin> list = gecko_service.getList(msg_on);
+            List<CandidateCoin> list = gecko_service.getList(callFormBinance);
             if (CollectionUtils.isEmpty(list)) {
                 gecko_service.initCandidateCoin();
             }
@@ -106,7 +107,7 @@ public class BscScanBinanceApplication {
                             + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
                     idx = 0;
                     list.clear();
-                    list = gecko_service.getList(msg_on);
+                    list = gecko_service.getList(callFormBinance);
                     size = list.size();
                 } else {
                     idx += 1;

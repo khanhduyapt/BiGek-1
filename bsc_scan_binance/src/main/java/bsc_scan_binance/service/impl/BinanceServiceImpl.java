@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
 import bsc_scan_binance.entity.BinanceVolumeDateTimeKey;
 import bsc_scan_binance.entity.BinanceVolumnDay;
@@ -552,7 +553,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    + (isOrderByBynaceVolume ? " AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n" : "")
+                    + (Objects.equals("binance", BscScanBinanceApplication.callFormBinance)
+                            ? " AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
+                            : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                            		      \n"
                     // + " , gecko_week.vol_gecko_increate DESC \n"
@@ -716,27 +719,6 @@ public class BinanceServiceImpl implements BinanceService {
                     if (vol_up.compareTo(BigDecimal.valueOf(2)) > 0) {
                         css.setStar("BUp: " + String.valueOf(vol_up));
                         css.setStar_css("text-primary");
-
-                        // if (!msg_vol_up_dict.containsKey(css.getGecko_id())
-                        // && Utils.isGoodPrice(price_now, dto.getPrice_can_buy(),
-                        // dto.getPrice_can_sell())) {
-                        //
-                        // Utils.sendToTelegram(
-                        // "Binance_Volume_Up: " + String.valueOf(vol_up) + " " + css.getSymbol());
-                        //
-                        // msg_vol_up_dict.put(css.getGecko_id(), css.getGecko_id());
-                        //
-                        // PrepareOrders entity = new PrepareOrders();
-                        // entity.setGeckoid(dto.getGecko_id());
-                        // entity.setSymbol(dto.getSymbol());
-                        // entity.setName(dto.getName());
-                        // entity.setDataType(Utils.PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP);
-                        // prepareOrdersRepository.save(entity);
-                        // }
-                    } else {
-                        if (msg_vol_up_dict.contains(css.getGecko_id())) {
-                            msg_vol_up_dict.remove(css.getGecko_id());
-                        }
                     }
                 }
                 temp = splitVolAndPrice(css.getDay_1());
@@ -1114,15 +1096,18 @@ public class BinanceServiceImpl implements BinanceService {
 
                             css.setBtc_warning_css("bg-danger");
 
-                            String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
-                            if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
+                            if (!CollectionUtils.isEmpty(ordersRepository.findRealOrders())) {
+                                String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
+                                if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
 
-                                Utils.sendToTelegram("(Time to Sell) Btc: " + Utils.removeLastZero(price_now.toString())
-                                        + Utils.new_line_from_service + css.getLow_to_hight_price()
-                                        + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " " + "Can"
-                                        + css.getAvg_boll_max());
+                                    Utils.sendToTelegram("(Time to Sell) Btc: "
+                                            + Utils.removeLastZero(price_now.toString())
+                                            + Utils.new_line_from_service + css.getLow_to_hight_price()
+                                            + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " " + "Can"
+                                            + css.getAvg_boll_max());
 
-                                monitorTokenSales(results);
+                                    monitorTokenSales(results);
+                                }
                             }
 
                         }
@@ -1568,34 +1553,34 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (!ordersRepository.existsById(dto.getGecko_id())) {
 
-            if (percent_loss.compareTo(BigDecimal.valueOf(-0.7)) > 0) {
+            if (percent_loss.compareTo(BigDecimal.valueOf(-0.95)) > 0) {
+                if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
 
-                String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$" + Utils.new_line_from_service
-                        + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
-                                .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
+                    if (Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1))
+                            .compareTo(BigDecimal.valueOf(2)) > 0) {
 
-                if (!msg_vol_up_dict.containsKey(msg)) {
+                        String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$"
+                                + Utils.new_line_from_service
+                                + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
+                                        .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
 
-                    if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
                         Utils.sendToTelegram(msg);
 
-                        msg_vol_up_dict.put(msg, msg);
+                        msg_vol_up_dict.put(dto.getGecko_id(), dto.getGecko_id());
+
                     }
                 }
             }
-        }
+        } else {
+            if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
 
-        if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
-
-            if (ordersRepository.existsById(dto.getGecko_id())) {
-
-                String msg = "(SELL ALL)" + dto.getSymbol()
+                String msg = "SELL:" + dto.getSymbol() + " "
                         + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());
 
                 Utils.sendToTelegram(msg);
-
             }
         }
+
     }
 
     @SuppressWarnings("unchecked")

@@ -259,9 +259,10 @@ public class Utils {
             return;
         }
 
-        // int minus = Utils.getIntValue(Utils.convertDateToString("mm",
-        // Calendar.getInstance().getTime()));
-        // if ((minus > 5) && (minus < 59)) {
+        int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        if ((hh > 22) && (hh < 8)) {
+            return;
+        }
 
         String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
 

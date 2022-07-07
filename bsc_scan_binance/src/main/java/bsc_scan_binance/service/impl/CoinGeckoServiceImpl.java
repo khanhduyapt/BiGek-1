@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.CandidateCoin;
@@ -50,9 +51,9 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     private GeckoVolumnDayRepository geckoVolumnDayRepository;
 
     @Override
-    public List<CandidateCoin> getList(Boolean msg_on) {
+    public List<CandidateCoin> getList(String formBinance) {
 
-        if (msg_on) {
+        if (Objects.equals("binance", BscScanBinanceApplication.callFormBinance)) {
             return candidateCoinRepository.findCandidateCoinInBinanceFutures();
         } else {
             return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
