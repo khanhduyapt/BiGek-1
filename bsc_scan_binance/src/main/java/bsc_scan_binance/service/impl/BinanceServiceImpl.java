@@ -1089,8 +1089,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
                             BigDecimal btc_range = ((highest_price_today.subtract(lowest_price_today)).divide(price_now,
-                                    3,
-                                    RoundingMode.CEILING));
+                                    3, RoundingMode.CEILING));
 
                             String curr_percent_btc = Utils.toPercent(price_now, lowest_price_today);
 
@@ -1098,11 +1097,10 @@ public class BinanceServiceImpl implements BinanceService {
                                     && (!Objects.equals(curr_percent_btc, pre_percent_btc))) {
 
                                 pre_percent_btc = curr_percent_btc;
-                                Utils.sendToTelegram(
-                                        "(Good time to buy) Btc: " + Utils.removeLastZero(price_now.toString())
-                                                + Utils.new_line_from_service + css.getLow_to_hight_price()
-                                                + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
-                                                + "Can" + css.getAvg_boll_max());
+                                Utils.sendToTelegram("(Good time to buy) Btc: "
+                                        + Utils.removeLastZero(price_now.toString()) + Utils.new_line_from_service
+                                        + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
+                                        + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
 
                                 monitorTokenSales(results);
                             }
@@ -1121,8 +1119,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 Utils.sendToTelegram("(Time to Sell) Btc: " + Utils.removeLastZero(price_now.toString())
                                         + Utils.new_line_from_service + css.getLow_to_hight_price()
-                                        + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
-                                        + "Can" + css.getAvg_boll_max());
+                                        + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " " + "Can"
+                                        + css.getAvg_boll_max());
 
                                 monitorTokenSales(results);
                             }
@@ -1568,9 +1566,9 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal percent_profits = Utils
                 .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
 
-        if (percent_loss.compareTo(BigDecimal.valueOf(-0.7)) > 0) {
+        if (!ordersRepository.existsById(dto.getGecko_id())) {
 
-            if (!ordersRepository.existsById(dto.getGecko_id())) {
+            if (percent_loss.compareTo(BigDecimal.valueOf(-0.7)) > 0) {
 
                 String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$" + Utils.new_line_from_service
                         + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
