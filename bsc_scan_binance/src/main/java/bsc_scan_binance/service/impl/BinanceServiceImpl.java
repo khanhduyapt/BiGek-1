@@ -967,19 +967,23 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 {
-                    if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(10)) > 0) {
+                    if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(30)) > 0) {
                         css.setRate1d0h_css("text-primary font-weight-bold");
+                    } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(0)) > 0) {
+                        css.setRate1d0h_css("text-primary");
+                    } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(-30)) < 0) {
+                        css.setRate1d0h_css("text-danger font-weight-bold");
                     } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(0)) < 0) {
                         css.setRate1d0h_css("text-danger");
                     }
 
-                    if (Utils.getBigDecimal(dto.getRate1h()).compareTo(BigDecimal.valueOf(30)) > 0) {
+                    if (Utils.getBigDecimal(dto.getRate1h()).compareTo(BigDecimal.valueOf(40)) > 0) {
                         css.setRate1h_css("text-primary font-weight-bold");
                     } else if (Utils.getBigDecimal(dto.getRate1h()).compareTo(BigDecimal.valueOf(0)) < 0) {
                         css.setRate1h_css("text-danger");
                     }
 
-                    if (Utils.getBigDecimal(dto.getRate2h()).compareTo(BigDecimal.valueOf(20)) > 0) {
+                    if (Utils.getBigDecimal(dto.getRate2h()).compareTo(BigDecimal.valueOf(30)) > 0) {
                         css.setRate2h_css("text-primary font-weight-bold");
                     } else if (Utils.getBigDecimal(dto.getRate2h()).compareTo(BigDecimal.valueOf(0)) < 0) {
                         css.setRate2h_css("text-danger");
@@ -1096,15 +1100,16 @@ public class BinanceServiceImpl implements BinanceService {
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                        if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
-                            BigDecimal btc_range = ((highest_price_today.subtract(lowest_price_today)).divide(price_now,
-                                    3, RoundingMode.CEILING));
+                        BigDecimal btc_range = ((highest_price_today.subtract(lowest_price_today)).divide(price_now,
+                                3, RoundingMode.CEILING));
 
-                            String curr_percent_btc = Utils.toPercent(price_now, lowest_price_today);
+                        if (btc_range.compareTo(BigDecimal.valueOf(0.015)) > 0) {
 
-                            if ((btc_range.compareTo(BigDecimal.valueOf(0.015)) > 0)
-                                    && (!Objects.equals(curr_percent_btc, pre_percent_btc))) {
+                            if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
 
+                                String curr_percent_btc = Utils.toPercent(price_now, lowest_price_today);
+
+                                //if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
                                 pre_percent_btc = curr_percent_btc;
                                 Utils.sendToTelegram("(Good time to buy) Btc: "
                                         + Utils.removeLastZero(price_now.toString()) + Utils.new_line_from_service
@@ -1112,31 +1117,36 @@ public class BinanceServiceImpl implements BinanceService {
                                         + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
 
                                 monitorTokenSales(results);
+                                //}
                             }
-                        }
 
-                        if (((lowest_price_today.multiply(BigDecimal.valueOf(1.01))).compareTo(price_now) >= 0)) {
+                            if (((lowest_price_today.multiply(BigDecimal.valueOf(1.005))).compareTo(price_now) >= 0)) {
 
-                            css.setBtc_warning_css("bg-success");
+                                css.setBtc_warning_css("bg-success");
 
-                        } else if ((price_now.multiply(BigDecimal.valueOf(1.008)).compareTo(highest_price_today) > 0)) {
+                            }
 
-                            css.setBtc_warning_css("bg-danger");
+                            if ((price_now.multiply(BigDecimal.valueOf(1.005))
+                                    .compareTo(highest_price_today) > 0)) {
 
-                            if (!CollectionUtils.isEmpty(ordersRepository.findRealOrders())) {
-                                String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
-                                if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
+                                css.setBtc_warning_css("bg-danger");
 
-                                    Utils.sendToTelegram("(Time to Sell) Btc: "
-                                            + Utils.removeLastZero(price_now.toString())
-                                            + Utils.new_line_from_service + css.getLow_to_hight_price()
-                                            + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " " + "Can"
-                                            + css.getAvg_boll_max());
+                                if (!CollectionUtils.isEmpty(ordersRepository.findRealOrders())) {
+                                    String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
+                                    if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
 
-                                    monitorTokenSales(results);
+                                        Utils.sendToTelegram("(Time to Sell) Btc: "
+                                                + Utils.removeLastZero(price_now.toString())
+                                                + Utils.new_line_from_service + css.getLow_to_hight_price()
+                                                + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
+                                                + "Can"
+                                                + css.getAvg_boll_max());
+
+                                        monitorTokenSales(results);
+                                    }
                                 }
-                            }
 
+                            }
                         }
                     }
                 }
