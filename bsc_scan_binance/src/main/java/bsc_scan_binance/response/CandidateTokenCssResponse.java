@@ -1,5 +1,7 @@
 package bsc_scan_binance.response;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -219,4 +221,16 @@ public class CandidateTokenCssResponse {
     private String day_10_price_css = "";
     private String day_11_price_css = "";
     private String day_12_price_css = "";
+
+    private BigDecimal rate1h;
+    private BigDecimal rate2h;
+    private BigDecimal rate4h;
+    private BigDecimal rate1d0h;
+    private BigDecimal rate1d4h;
+
+    private String rate1h_css;
+    private String rate2h_css;
+    private String rate4h_css;
+    private String rate1d0h_css;
+    private String rate1d4h_css;
 }

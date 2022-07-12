@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8" http-equiv="refresh" content="900">
+<meta charset="UTF-8" http-equiv="refresh" content="1800">
 <title>Wanda</title>
 <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
@@ -212,8 +212,13 @@ p {
               th:text="${token.avg_history}">
             <p style="font-size: 0.85rem !important;" class="text-primary"
               th:text="${token.oco_opportunity}">
-            <p style="font-size: 0.85rem !important;" th:classappend="${token.binance_vol_rate_css}"
-              th:text="${token.binance_vol_rate}">
+            <div>
+                <span th:classappend="${token.rate1h_css}">1h: <span th:text="${token.rate1h}"></span>% </span>
+                <span th:classappend="${token.rate2h_css}">2h: <span th:text="${token.rate2h}"></span>% </span>
+                <span th:classappend="${token.rate4h_css}">4h: <span th:text="${token.rate4h}"></span>% </span>
+                <span th:classappend="${token.rate1d0h_css}">1d0h: <span th:text="${token.rate1d0h}"></span>% </span>
+                <span th:classappend="${token.rate1d4h_css}">1d4h: <span th:text="${token.rate1d4h}"></span>% </span>
+            </div>
           </td>
 
           <td style="text-align: right;"

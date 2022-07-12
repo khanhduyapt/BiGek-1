@@ -89,5 +89,12 @@ public class CandidateTokenResponse {
 
     private BigDecimal vol_gecko_increate;
     private String opportunity;
+
     private String binance_vol_rate;
+    private BigDecimal rate1h;
+    private BigDecimal rate2h;
+    private BigDecimal rate4h;
+    private BigDecimal rate1d0h;
+    private BigDecimal rate1d4h;
+
 }

@@ -454,9 +454,15 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   vol.vol0d,                                                                              \n"
                     + "   vol.vol1d,                                                                              \n"
                     + "   vol.vol7d                                                                               \n"
-                    + "   , gecko_week.vol_gecko_increate                                                          \n"
+                    + "   , gecko_week.vol_gecko_increate                                                         \n"
                     + "   , (SELECT concat('loss:', lost_normal, '%, profit:', profit_normal, '%, opp:1x', opportunity) FROM public.view_opportunity where gecko_id = can.gecko_id) opportunity \n"
+                    + "                                                                                           \n"
                     + "   , concat('1h: ', rate1h, '%, 2h: ', rate2h, '%, 4h: ', rate4h, '%, 1d0h: ', rate1d0h, '%, 1d4h: ', rate1d4h, '%') as binance_vol_rate \n"
+                    + "   , rate1h                                                                                \n"
+                    + "   , rate2h                                                                                \n"
+                    + "   , rate4h                                                                                \n"
+                    + "   , rate1d0h                                                                              \n"
+                    + "   , rate1d4h                                                                              \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
@@ -556,11 +562,12 @@ public class BinanceServiceImpl implements BinanceService {
                     + (Objects.equals("binance", BscScanBinanceApplication.callFormBinance)
                             ? " AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
                             : "")
+
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                            		      \n"
                     // + " , gecko_week.vol_gecko_increate DESC \n"
                     // + " , can.volumn_div_marketcap DESC \n";
-                    + "   , vbvr.rate1d0h DESC                                                                    \n";
+                    + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
 
@@ -569,6 +576,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
             ModelMapper mapper = new ModelMapper();
             Integer index = 1;
+            Integer row_index = 1;
             String sql_update_ema = "";
             Boolean btc_is_good_price = false;
             Boolean this_token_is_good_price = false;
@@ -959,11 +967,30 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 {
-                    if (dto.getBinance_vol_rate().contains("1d0h: -")) {
-                        css.setBinance_vol_rate_css("text-danger");
-                    } else {
-                        css.setBinance_vol_rate_css("text-primary");
+                    if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(10)) > 0) {
+                        css.setRate1d0h_css("text-primary font-weight-bold");
+                    } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(0)) < 0) {
+                        css.setRate1d0h_css("text-danger");
                     }
+
+                    if (Utils.getBigDecimal(dto.getRate1h()).compareTo(BigDecimal.valueOf(30)) > 0) {
+                        css.setRate1h_css("text-primary font-weight-bold");
+                    } else if (Utils.getBigDecimal(dto.getRate1h()).compareTo(BigDecimal.valueOf(0)) < 0) {
+                        css.setRate1h_css("text-danger");
+                    }
+
+                    if (Utils.getBigDecimal(dto.getRate2h()).compareTo(BigDecimal.valueOf(20)) > 0) {
+                        css.setRate2h_css("text-primary font-weight-bold");
+                    } else if (Utils.getBigDecimal(dto.getRate2h()).compareTo(BigDecimal.valueOf(0)) < 0) {
+                        css.setRate2h_css("text-danger");
+                    }
+
+                    if (Utils.getBigDecimal(dto.getRate4h()).compareTo(BigDecimal.valueOf(40)) > 0) {
+                        css.setRate4h_css("text-primary font-weight-bold");
+                    } else if (Utils.getBigDecimal(dto.getRate4h()).compareTo(BigDecimal.valueOf(0)) < 0) {
+                        css.setRate4h_css("text-danger");
+                    }
+
                     // tp_price: x2:aaa$ or 50%: bbb$ or 20%:ccc$ 10%:ddd$
                     // stop_limit: price_min * 0.95
                     // stop_price: price_min * 0.945
@@ -1263,7 +1290,29 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
 
-                list.add(css);
+                if (isOrderByBynaceVolume) {
+                    if (Objects.equals("BTC", css.getSymbol())) {
+                        list.add(css);
+                    } else if (row_index <= 20) {
+                        if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
+                                .compareTo(BigDecimal.valueOf(10)) > 0)
+                                || (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(1)) > 0)) {
+                            list.add(css);
+
+                            row_index += 1;
+                        }
+                    } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
+                            .compareTo(BigDecimal.valueOf(20)) > 0)
+                            || (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(5)) > 0)) {
+                        list.add(css);
+
+                        row_index += 1;
+
+                    }
+                } else {
+                    list.add(css);
+                }
+
             }
             query = entityManager.createNativeQuery(sql_update_ema);
             query.executeUpdate();
@@ -1547,32 +1596,34 @@ public class BinanceServiceImpl implements BinanceService {
 
     public void monitorTokenSale(CandidateTokenResponse dto) {
         BigDecimal price_now = Utils.getBigDecimal(dto.getCurrent_price());
-        BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
+        //BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
         BigDecimal percent_profits = Utils
                 .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
 
         if (!ordersRepository.existsById(dto.getGecko_id())) {
 
-            if ((percent_loss.compareTo(BigDecimal.valueOf(-0.95)) > 0) && (!msg_vol_up_dict.contains(dto.getGecko_id()))) {
-                if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
-
-                    if (Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1))
-                            .compareTo(BigDecimal.valueOf(2)) > 0) {
-
-                        String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$"
-                                + Utils.new_line_from_service
-                                + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
-                                        .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
-
-                        Utils.sendToTelegram(msg);
-
-                        msg_vol_up_dict.put(dto.getGecko_id(), dto.getGecko_id());
-
-                    }
-                }
-            }
+            //if ((percent_loss.compareTo(BigDecimal.valueOf(-0.95)) > 0)
+            //        && (!msg_vol_up_dict.contains(dto.getGecko_id()))) {
+            //    if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
+            //
+            //        if (Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1))
+            //                .compareTo(BigDecimal.valueOf(2)) > 0) {
+            //
+            //            String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$"
+            //                    + Utils.new_line_from_service
+            //                    + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
+            //                            .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
+            //
+            //            Utils.sendToTelegram(msg);
+            //
+            //            msg_vol_up_dict.put(dto.getGecko_id(), dto.getGecko_id());
+            //
+            //        }
+            //    }
+            //}
         } else {
-            if ((percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) && (!msg_vol_up_dict.contains(dto.getGecko_id()))) {
+            if ((percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0)
+                    && (!msg_vol_up_dict.contains(dto.getGecko_id()))) {
 
                 String msg = "SELL:" + dto.getSymbol() + " "
                         + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());

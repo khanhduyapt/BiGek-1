@@ -102,7 +102,13 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "vol7d", type = BigDecimal.class),
                 @ColumnResult(name = "vol_gecko_increate", type = BigDecimal.class),
                 @ColumnResult(name = "opportunity", type = String.class),
+
                 @ColumnResult(name = "binance_vol_rate", type = String.class),
+                @ColumnResult(name = "rate1h", type = BigDecimal.class),
+                @ColumnResult(name = "rate2h", type = BigDecimal.class),
+                @ColumnResult(name = "rate4h", type = BigDecimal.class),
+                @ColumnResult(name = "rate1d0h", type = BigDecimal.class),
+                @ColumnResult(name = "rate1d4h", type = BigDecimal.class),
         })
 })
 
