@@ -576,7 +576,6 @@ public class BinanceServiceImpl implements BinanceService {
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
             ModelMapper mapper = new ModelMapper();
             Integer index = 1;
-            Integer row_index = 1;
             String sql_update_ema = "";
             Boolean btc_is_good_price = false;
             Boolean this_token_is_good_price = false;
@@ -1303,21 +1302,10 @@ public class BinanceServiceImpl implements BinanceService {
                 if (isOrderByBynaceVolume) {
                     if (Objects.equals("BTC", css.getSymbol())) {
                         list.add(css);
-                    } else if (row_index <= 20) {
-                        if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
-                                .compareTo(BigDecimal.valueOf(10)) > 0)
-                                || (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(1)) > 0)) {
-                            list.add(css);
-
-                            row_index += 1;
-                        }
                     } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
-                            .compareTo(BigDecimal.valueOf(20)) > 0)
-                            || (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(5)) > 0)) {
+                            .compareTo(BigDecimal.valueOf(5)) > 0)
+                            && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
                         list.add(css);
-
-                        row_index += 1;
-
                     }
                 } else {
                     list.add(css);
