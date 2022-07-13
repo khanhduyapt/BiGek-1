@@ -1302,11 +1302,18 @@ public class BinanceServiceImpl implements BinanceService {
                 if (isOrderByBynaceVolume) {
                     if (Objects.equals("BTC", css.getSymbol())) {
                         list.add(css);
+                    } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.ZERO) > 0)
+                            || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.ZERO) > 0)) {
+
+                        list.add(css);
+
                     } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
                             .compareTo(BigDecimal.valueOf(5)) > 0)
                             && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
-                        list.add(css);
+
+                        //list.add(css);
                     }
+
                 } else {
                     list.add(css);
                 }
