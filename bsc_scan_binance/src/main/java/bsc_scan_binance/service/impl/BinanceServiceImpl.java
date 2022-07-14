@@ -1074,7 +1074,7 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setAvg_boll_min("Buy: " + Utils.removeLastZero(dto.getPrice_can_buy().toString()) + "("
                             + avg_boll_min + "%)");
                     if (Utils.getBigDecimalValue(avg_boll_min).compareTo(BigDecimal.valueOf(-1)) > 0) {
-                        css.setAvg_boll_min_css("text-primary");
+                        css.setAvg_boll_min_css("text-white bg-success");
 
                         css.setAvg_boll_min("BuyNow: " + Utils.removeLastZero(dto.getPrice_can_buy().toString()) + "("
                                 + avg_boll_min + "%)");
