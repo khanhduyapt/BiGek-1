@@ -1108,15 +1108,15 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 String curr_percent_btc = Utils.toPercent(price_now, lowest_price_today);
 
-                                //if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
-                                pre_percent_btc = curr_percent_btc;
-                                Utils.sendToTelegram("(Good time to buy) Btc: "
-                                        + Utils.removeLastZero(price_now.toString()) + Utils.new_line_from_service
-                                        + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
-                                        + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
+                                if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
+                                    pre_percent_btc = curr_percent_btc;
+                                    Utils.sendToTelegram("(Good time to buy) Btc: "
+                                            + Utils.removeLastZero(price_now.toString()) + Utils.new_line_from_service
+                                            + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
+                                            + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
 
-                                monitorTokenSales(results);
-                                //}
+                                    monitorTokenSales(results);
+                                }
                             }
 
                             if (((lowest_price_today.multiply(BigDecimal.valueOf(1.005))).compareTo(price_now) >= 0)) {
@@ -1676,7 +1676,7 @@ public class BinanceServiceImpl implements BinanceService {
                         msg += "STOP LOSS 5%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
                                 + Utils.new_line_from_service + Utils.new_line_from_service;
 
-                    } else if (tp_percent.compareTo(BigDecimal.valueOf(-2.8)) <= 0) {
+                    } else if (tp_percent.compareTo(BigDecimal.valueOf(-1)) <= 0) {
 
                         msg += "STOP LOSS 3%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
                                 + Utils.new_line_from_service + Utils.new_line_from_service;
