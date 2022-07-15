@@ -1028,7 +1028,7 @@ public class BinanceServiceImpl implements BinanceService {
                             }
                             msg_short += dto.getSymbol();
 
-                            css.setAvg_boll_max_css("text-white bg-danger");
+                            css.setAvg_boll_max_css("text-danger");
                         }
                     }
 
@@ -1340,7 +1340,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (btc_danger) {
                 if (Utils.isNotBlank(msg_short) && !msg_vol_up_dict.contains(msg_short)) {
-                    Utils.sendToTelegram("(Short) " + msg_short);
+                    //Utils.sendToTelegram("(Short) " + msg_short);
                     msg_vol_up_dict.put(msg_short, msg_short);
                 }
             }
