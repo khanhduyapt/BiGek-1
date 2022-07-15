@@ -30,7 +30,7 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            msg_on = false;
+            msg_on = true;
             if (!Objects.equals(null, args) && args.length > 0) {
                 if (Objects.equals("msg_on", args[0])) {
                     msg_on = true;

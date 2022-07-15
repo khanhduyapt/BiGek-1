@@ -579,9 +579,10 @@ public class BinanceServiceImpl implements BinanceService {
             Boolean btc_is_good_price = false;
             Boolean this_token_is_good_price = false;
             List<PriorityCoin> listPriorityCoin = priorityCoinRepository.findAll();
-
+            String msg_short = "";
+            Boolean btc_danger = false;
+            monitorTokenSales(results);
             for (CandidateTokenResponse dto : results) {
-                monitorTokenSale(dto);
 
                 PriorityCoin priorityCoin = listPriorityCoin.stream()
                         .filter(item -> Objects.equals(item.getGeckoid(), dto.getGecko_id())).findFirst()
@@ -1015,6 +1016,22 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setOco_tp_price(min_14d);
                     css.setOco_tp_price_hight(price_max.toString() + "(" + max_14d_percent + "%)");
 
+                    if (Utils.getBigDecimalValue(max_14d_percent).compareTo(BigDecimal.ZERO) <= 0) {
+
+                        BigDecimal avg_boll_max = Utils
+                                .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
+
+                        if (avg_boll_max.compareTo(BigDecimal.valueOf(0.1)) <= 0) {
+
+                            if (Utils.isNotBlank(msg_short)) {
+                                msg_short += ", ";
+                            }
+                            msg_short += dto.getSymbol();
+
+                            css.setAvg_boll_max_css("text-white bg-danger");
+                        }
+                    }
+
                     if (Utils.getBigDecimalValue(max_14d_percent).compareTo(BigDecimal.valueOf(20)) > 0) {
                         css.setOco_tp_price_hight_css("text-primary font-weight-bold");
                     } else if (Utils.getBigDecimalValue(max_14d_percent).compareTo(BigDecimal.valueOf(10)) > 0) {
@@ -1128,6 +1145,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     .compareTo(highest_price_today) > 0)) {
 
                                 css.setBtc_warning_css("bg-danger");
+
+                                btc_danger = true;
 
                                 if (!CollectionUtils.isEmpty(ordersRepository.findRealOrders())) {
                                     String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
@@ -1318,6 +1337,14 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
             }
+
+            if (btc_danger) {
+                if (Utils.isNotBlank(msg_short) && !msg_vol_up_dict.contains(msg_short)) {
+                    Utils.sendToTelegram("(Short) " + msg_short);
+                    msg_vol_up_dict.put(msg_short, msg_short);
+                }
+            }
+
             query = entityManager.createNativeQuery(sql_update_ema);
             query.executeUpdate();
             log.info("End getList <--");
@@ -1593,51 +1620,60 @@ public class BinanceServiceImpl implements BinanceService {
 
     public void monitorTokenSales(List<CandidateTokenResponse> results) {
 
+        String buy_msg = "";
+        String sell_msg = "";
         for (CandidateTokenResponse dto : results) {
-            monitorTokenSale(dto);
+            String msg = monitorTokenSale1(dto);
+            if (Utils.isNotBlank(msg)) {
+
+                if (msg.contains("BUY:")) {
+                    if (Utils.isNotBlank(buy_msg)) {
+                        buy_msg += ", ";
+                    }
+                    buy_msg += msg.replace("BUY:", "");
+
+                } else if (msg.contains("SELL:")) {
+                    if (Utils.isNotBlank(sell_msg)) {
+                        sell_msg += ", ";
+                    }
+                    sell_msg += msg.replace("SELL:", "");
+                }
+
+            }
         }
+
+        if (Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
+            Utils.sendToTelegram("(BuyNow) " + buy_msg);
+            msg_vol_up_dict.put(buy_msg, buy_msg);
+        }
+
+        if (Utils.isNotBlank(sell_msg) && !msg_vol_up_dict.contains(sell_msg)) {
+            Utils.sendToTelegram("(SellNow) " + sell_msg);
+            msg_vol_up_dict.put(sell_msg, sell_msg);
+        }
+
     }
 
-    public void monitorTokenSale(CandidateTokenResponse dto) {
+    public String monitorTokenSale1(CandidateTokenResponse dto) {
         BigDecimal price_now = Utils.getBigDecimal(dto.getCurrent_price());
-        //BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
+        BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
         BigDecimal percent_profits = Utils
                 .getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
 
         if (!ordersRepository.existsById(dto.getGecko_id())) {
 
-            //if ((percent_loss.compareTo(BigDecimal.valueOf(-0.95)) > 0)
-            //        && (!msg_vol_up_dict.contains(dto.getGecko_id()))) {
-            //    if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
-            //
-            //        if (Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1))
-            //                .compareTo(BigDecimal.valueOf(2)) > 0) {
-            //
-            //            String msg = "(MinArea)" + dto.getSymbol() + " , P:" + price_now + "$"
-            //                    + Utils.new_line_from_service
-            //                    + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
-            //                            .replace("L:", "CanBuy:").replace("-H:", "_CanSell:");
-            //
-            //            Utils.sendToTelegram(msg);
-            //
-            //            msg_vol_up_dict.put(dto.getGecko_id(), dto.getGecko_id());
-            //
-            //        }
-            //    }
-            //}
-        } else {
-            if ((percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0)
-                    && (!msg_vol_up_dict.contains(dto.getGecko_id()))) {
+            if (percent_loss.compareTo(BigDecimal.valueOf(-0.85)) > 0) {
+                if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
 
-                String msg = "SELL:" + dto.getSymbol() + " "
-                        + Utils.createMsgLowHeight(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell());
-
-                Utils.sendToTelegram(msg);
-
-                msg_vol_up_dict.put(dto.getGecko_id(), dto.getGecko_id());
+                    return "BUY:" + dto.getSymbol();
+                }
             }
+
+        } else if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
+            return "SELL:" + dto.getSymbol();
         }
 
+        return "";
     }
 
     @SuppressWarnings("unchecked")
