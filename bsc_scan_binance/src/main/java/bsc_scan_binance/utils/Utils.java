@@ -356,7 +356,7 @@ public class Utils {
     }
 
     public static String toPercent(BigDecimal value, BigDecimal compareToValue) {
-        return toPercent(value, compareToValue, 0);
+        return toPercent(value, compareToValue, 1);
     }
 
     public static String toPercent(BigDecimal value, BigDecimal compareToValue, int scale) {

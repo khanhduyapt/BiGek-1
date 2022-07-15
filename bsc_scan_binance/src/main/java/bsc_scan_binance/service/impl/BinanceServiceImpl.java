@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
-import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
 import bsc_scan_binance.entity.BinanceVolumeDateTimeKey;
 import bsc_scan_binance.entity.BinanceVolumnDay;
@@ -559,12 +558,12 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    + (Objects.equals("binance", BscScanBinanceApplication.callFormBinance)
-                            ? " AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
-                            : "")
-
+                    //+ (Objects.equals("binance", BscScanBinanceApplication.callFormBinance)
+                    //        ? " AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
+                    //        : "")
+                    + "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures)                              \n"
                     + " order by                                                                                  \n"
-                    + "     coalesce(can.priority, 3) ASC                                            		      \n"
+                    + "     coalesce(can.priority, 3) ASC                                                         \n"
                     // + " , gecko_week.vol_gecko_increate DESC \n"
                     // + " , can.volumn_div_marketcap DESC \n";
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
@@ -1678,7 +1677,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     } else if (tp_percent.compareTo(BigDecimal.valueOf(-1)) <= 0) {
 
-                        msg += "STOP LOSS 3%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
+                        msg += "STOP LOSS 1%: " + Utils.createMsgBalance(dto, Utils.new_line_from_service)
                                 + Utils.new_line_from_service + Utils.new_line_from_service;
                     }
 
