@@ -1132,8 +1132,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                             if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
 
-                                String curr_percent_btc = Utils.toPercent(price_now, lowest_price_today);
-
+                                String curr_percent_btc = Utils.convertDateToString("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime());
+                                curr_percent_btc = curr_percent_btc.substring(0, curr_percent_btc.length()-1);
                                 if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
                                     pre_percent_btc = curr_percent_btc;
                                     Utils.sendToTelegram("(Good time to buy) Btc: "
@@ -1632,7 +1632,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (msg.contains("BUY:")) {
                     if (Utils.isNotBlank(buy_msg)) {
-                        buy_msg += ", ";
+                        buy_msg += ",";
                     }
                     buy_msg += msg.replace("BUY:", "");
 
