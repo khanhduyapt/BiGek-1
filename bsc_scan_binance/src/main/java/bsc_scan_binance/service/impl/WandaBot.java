@@ -71,8 +71,10 @@ public class WandaBot extends TelegramLongPollingBot {
             SendMessage message = new SendMessage();
             message.setChatId(update.getMessage().getChatId().toString());
 
-            if ((!Objects.equal("tg25251325", update.getMessage().getChat().getUserName()))
-                    || (!Utils.chatId.equals(update.getMessage().getChatId().toString()))) {
+            Boolean is_linhdk = Objects.equal("LokaDon", update.getMessage().getChat().getUserName());
+            Boolean is_duydk = Objects.equal("tg25251325", update.getMessage().getChat().getUserName());
+
+            if (!is_linhdk && !is_duydk) {
                 message.setText("You are not my master.");
                 execute(message);
                 return;
@@ -82,7 +84,9 @@ public class WandaBot extends TelegramLongPollingBot {
             String command = update.getMessage().getText();
 
             if (command.contains("/btc")) {
-                //binance_service.getList(false);
+                // binance_service.getList(false);
+                String premarket = binance_service.loadPremarket();
+
                 List<PriorityCoin> list = priorityCoinRepository.searchBySymbol("BTC");
                 if (CollectionUtils.isEmpty(list)) {
                     message.setText("Empty");
@@ -91,7 +95,8 @@ public class WandaBot extends TelegramLongPollingBot {
                 }
 
                 message.setText(
-                        Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot) + Utils.new_line_from_bot);
+                        Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot)
+                        + Utils.new_line_from_bot + Utils.new_line_from_bot + premarket);
                 execute(message);
 
             } else if (command.contains("/buy")) {
@@ -429,7 +434,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 if (arr.length < 2) {
                     return;
                 }
-                //binance_service.getList(false);
+                // binance_service.getList(false);
                 list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
                 if (CollectionUtils.isEmpty(list)) {
                     message.setText("Empty");
@@ -480,7 +485,7 @@ public class WandaBot extends TelegramLongPollingBot {
     }
 
     private void checkCommand(SendMessage message, String token) throws TelegramApiException {
-        //binance_service.getList(false);
+        // binance_service.getList(false);
         List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(token.toUpperCase());
         if (CollectionUtils.isEmpty(list)) {
             message.setText("Empty");

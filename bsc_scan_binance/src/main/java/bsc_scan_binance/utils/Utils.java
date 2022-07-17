@@ -36,7 +36,12 @@ import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinResponse;
 
 public class Utils {
-    public static final String chatId = "5099224587";
+    public static final String chatId_duydk = "5099224587";
+    public static final String chatUser_duydk = "tg25251325";
+
+    public static final String chatId_linkdk = "816816414";
+    public static final String chatUser_linkdk = "LokaDon";
+
     public static final String new_line_from_bot = "\n";
     public static final String new_line_from_service = "%0A";
 
@@ -264,26 +269,30 @@ public class Utils {
             return;
         }
 
-        String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
-
-        // Add Telegram token
-        String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
-
-        urlString = String.format(urlString, apiToken, chatId) + text;
-
-        try {
-            URL url = new URL(urlString);
-            URLConnection conn = url.openConnection();
-            @SuppressWarnings("unused")
-            InputStream is = new BufferedInputStream(conn.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // }
-
+        sendToChatId(Utils.chatId_linkdk, text);
+        sendToChatId(Utils.chatId_duydk, text);
     }
 
+    private static void sendToChatId(String chat_id, String text) {
+        try {
+            String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
+
+            // Telegram token
+            String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
+
+            urlString = String.format(urlString, apiToken, chat_id) + text;
+            try {
+                URL url = new URL(urlString);
+                URLConnection conn = url.openConnection();
+                @SuppressWarnings("unused")
+                InputStream is = new BufferedInputStream(conn.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public static BigDecimal getBigDecimal(Object value) {
         if (Objects.equals(null, value)) {
             return BigDecimal.ZERO;

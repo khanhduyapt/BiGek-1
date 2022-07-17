@@ -18,4 +18,6 @@ public interface BinanceService {
     public void monitorBollingerBandwidth(Boolean isCallFormBot);
 
     List<Orders> getOrderList();
+
+    public String loadPremarket();
 }
