@@ -16,9 +16,7 @@ import javax.transaction.Transactional;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -458,7 +456,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   vol.vol1d,                                                                              \n"
                     + "   vol.vol7d                                                                               \n"
                     + "   , gecko_week.vol_gecko_increate                                                         \n"
-                    + "   , (SELECT concat('loss:', lost_normal, '%, profit:', profit_normal, '%, opp:1x', opportunity) FROM public.view_opportunity where gecko_id = can.gecko_id) opportunity \n"
+                    + "   , '' opportunity                                                                        \n"
                     + "                                                                                           \n"
                     + "   , concat('1h: ', rate1h, '%, 2h: ', rate2h, '%, 4h: ', rate4h, '%, 1d0h: ', rate1d0h, '%, 1d4h: ', rate1d4h, '%') as binance_vol_rate \n"
                     + "   , rate1h                                                                                \n"
@@ -568,8 +566,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures)                              \n"
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
-                    // + " , gecko_week.vol_gecko_increate DESC \n"
-                    // + " , can.volumn_div_marketcap DESC \n";
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -1130,10 +1126,14 @@ public class BinanceServiceImpl implements BinanceService {
 
                         if (btc_range.compareTo(BigDecimal.valueOf(0.015)) >= 0) {
 
-                            if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
+                            if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)
+                                    && Utils.isGoodPrice(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())) {
 
-                                String curr_percent_btc = Utils.convertDateToString("yyyy-MM-dd HH:mm", Calendar.getInstance().getTime());
-                                curr_percent_btc = curr_percent_btc.substring(0, curr_percent_btc.length()-1);
+                                css.setBtc_warning_css("bg-success");
+
+                                String curr_percent_btc = Utils.convertDateToString("yyyy-MM-dd HH:mm",
+                                        Calendar.getInstance().getTime());
+                                curr_percent_btc = curr_percent_btc.substring(0, curr_percent_btc.length() - 1);
                                 if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
                                     pre_percent_btc = curr_percent_btc;
                                     Utils.sendToTelegram("(Good time to buy) Btc: "
@@ -1145,11 +1145,6 @@ public class BinanceServiceImpl implements BinanceService {
                                 }
                             }
 
-                            if (((lowest_price_today.multiply(BigDecimal.valueOf(1.005))).compareTo(price_now) >= 0)) {
-
-                                css.setBtc_warning_css("bg-success");
-
-                            }
 
                             if ((price_now.multiply(BigDecimal.valueOf(1.005)).compareTo(highest_price_today) > 0)) {
 
@@ -1754,7 +1749,7 @@ public class BinanceServiceImpl implements BinanceService {
             int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
 
             log.info("Start monitorToken ---->");
-            if (minus >= 30) {
+            if (minus >= 45) {
                 String sql = "" + " select                                                              \n"
                         + "     boll.gecko_id,                                                          \n"
                         + "     boll.symbol,                                                            \n"
@@ -1821,7 +1816,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            if (minus >= 30) {
+            if (minus >= 45) {
                 String sql = " select                                                                       \n"
                         + "     gecko_id,                                                                   \n"
                         + "     symbol,                                                                     \n"
@@ -1862,79 +1857,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            if (minus >= 45) {
-                String sql = " delete from view_opportunity;                                                \n"
-                        + " insert into view_opportunity(gecko_id, symbol, name, vol_today, vol_avg_07d, vol_gecko_increate, avg_price, price_can_buy, price_can_sell, lost_normal, profit_normal, profit_max, opportunity) \n"
-                        + " select                                                                          \n"
-                        + "       pro.gecko_id                                                              \n"
-                        + "     , pro.symbol                                                                \n"
-                        + "     , pro.name                                                                  \n"
-                        + "     , pro.vol_today                                                             \n"
-                        + "     , pro.vol_avg_07d                                                           \n"
-                        + "     , pro.vol_gecko_increate                                                    \n"
-                        + "     , pro.avg_price                                                             \n"
-                        + "     , pro.price_can_buy                                                         \n"
-                        + "     , pro.price_can_sell                                                        \n"
-                        + "     , ROUND(100*(price_can_buy  - avg_price)/avg_price, 1) as lost_normal       \n"
-                        + "     , ROUND(100*(price_can_sell - avg_price)/avg_price, 1) as profit_normal     \n"
-                        + "     , pro.profit_max profit_max                                                 \n"
-                        + "     , (case when lost_normal <> 0 then ROUND((profit_normal / abs(lost_normal)), 1) else 0 end) as opportunity  \n"
-                        + " from                                                                            \n"
-                        + " (                                                                               \n"
-                        + "     SELECT                                                                      \n"
-                        + "           gecko_week.gecko_id                                                   \n"
-                        + "         , gecko_week.symbol                                                     \n"
-                        + "         , boll.name                                                             \n"
-                        + "         , vol_today                                                             \n"
-                        + "         , vol_avg_07d                                                           \n"
-                        + "         , vol_gecko_increate                                                    \n"
-                        + "         , avg_price                                                             \n"
-                        + "         , price_can_buy                                                         \n"
-                        + "         , price_can_sell                                                        \n"
-                        + "         , ROUND(100*(price_can_buy - avg_price)/avg_price, 2)  as lost_normal   \n"
-                        + "         , ROUND(100*(price_can_sell - avg_price)/avg_price, 2) as profit_normal \n"
-                        + "         , ROUND(profit, 2) as profit_max                                        \n"
-                        + "     FROM                                                                        \n"
-                        + "     (                                                                           \n"
-                        + "         SELECT                                                                  \n"
-                        + "               gecko_id                                                          \n"
-                        + "             , symbol                                                            \n"
-                        + "             , vol_today                                                         \n"
-                        + "             , vol_avg_07d                                                       \n"
-                        + "             , (case when vol_today > vol_avg_07d then true else false end) as vol_up    \n"
-                        + "             , ROUND((case when vol_avg_07d > 0 and vol_today/vol_avg_07d > 2 then vol_today/vol_avg_07d else 0 end), 1) as vol_gecko_increate \n"
-                        + "         FROM                                                                    \n"
-                        + "         (                                                                       \n"
-                        + "             SELECT                                                              \n"
-                        + "                 gecko_id                                                        \n"
-                        + "                 , symbol                                                        \n"
-                        + "                 , (select ROUND(COALESCE(w.total_volume, 0), 0) from gecko_volume_month w where w.gecko_id = mon.gecko_id and w.symbol = mon.symbol and w.dd = TO_CHAR(NOW(), 'dd')) as vol_today \n"
-                        + "                 , (select ROUND(AVG(COALESCE(w.total_volume, 0)), 0) from gecko_volume_month w where w.gecko_id = mon.gecko_id and w.symbol = mon.symbol  \n"
-                        + "                  and w.dd in (  TO_CHAR(NOW() - interval  '6 days', 'dd')       \n"
-                        + "                               , TO_CHAR(NOW() - interval  '5 days', 'dd')       \n"
-                        + "                               , TO_CHAR(NOW() - interval  '4 days', 'dd')       \n"
-                        + "                               , TO_CHAR(NOW() - interval  '3 days', 'dd')       \n"
-                        + "                               , TO_CHAR(NOW() - interval  '2 days', 'dd')       \n"
-                        + "                               , TO_CHAR(NOW() - interval  '1 days', 'dd')       \n"
-                        + "                               )                                                 \n"
-                        + "                 ) as vol_avg_07d                                                \n"
-                        + "             FROM public.gecko_volume_month mon                                  \n"
-                        + "             where mon.dd = TO_CHAR(NOW(), 'dd')                                 \n"
-                        + "         )tmp                                                                    \n"
-                        + "     ) gecko_week                                                                \n"
-                        + "     , boll_area boll                                                            \n"
-                        + "     where vol_gecko_increate > 0                                                \n"
-                        + "       and boll.gecko_id = gecko_week.gecko_id                                   \n"
-                        + " ) pro                                                                           \n"
-                        + " where                                                                           \n"
-                        + "  (lost_normal*8 + profit_normal > 0)                                            \n"
-                        + " order by                                                                        \n"
-                        + " profit_normal desc;                                                             \n";
-
-                Query query = entityManager.createNativeQuery(sql);
-                query.executeUpdate();
-            }
-
             log.info("End monitorToken <----");
         } catch (
 
@@ -1960,17 +1882,17 @@ public class BinanceServiceImpl implements BinanceService {
         System.out.println(dow_jones);
         System.out.println(nasdaq);
         String result = "";
-        if(Utils.isNotBlank(sp500)) {
+        if (Utils.isNotBlank(sp500)) {
             result = sp500.replace("E-mini ", "");
         }
-        if(Utils.isNotBlank(dow_jones)) {
-            if(Utils.isNotBlank(result)) {
+        if (Utils.isNotBlank(dow_jones)) {
+            if (Utils.isNotBlank(result)) {
                 result += Utils.new_line_from_bot;
             }
             result += dow_jones.replace("E-mini ", "");
         }
-        if(Utils.isNotBlank(nasdaq)) {
-            if(Utils.isNotBlank(result)) {
+        if (Utils.isNotBlank(nasdaq)) {
+            if (Utils.isNotBlank(result)) {
                 result += Utils.new_line_from_bot;
             }
             result += nasdaq.replace("E-mini ", "");

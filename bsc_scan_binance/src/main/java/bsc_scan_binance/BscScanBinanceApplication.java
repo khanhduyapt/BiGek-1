@@ -62,7 +62,7 @@ public class BscScanBinanceApplication {
             // binance_service.loadData("unlend-finance", "UFT");
             //binance_service.getList(false);
             //binance_service.monitorBollingerBandwidth(false);
-            binance_service.monitorProfit();
+            //binance_service.monitorProfit();
 
             List<CandidateCoin> list = gecko_service.getList(callFormBinance);
             if (CollectionUtils.isEmpty(list)) {
