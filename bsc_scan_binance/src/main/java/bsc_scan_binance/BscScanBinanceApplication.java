@@ -115,7 +115,7 @@ public class BscScanBinanceApplication {
                 }
             }
 
-            log.info("End " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
+            log.info("End BscScanBinanceApplication " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " <----");
         } catch (Exception e) {
             log.error(e.getMessage());
