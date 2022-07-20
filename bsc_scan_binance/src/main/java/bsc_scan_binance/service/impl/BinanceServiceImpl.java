@@ -171,6 +171,8 @@ public class BinanceServiceImpl implements BinanceService {
             List<Object> result_busd = getBinanceData(url_busd, limit);
 
             List<BinanceVolumnWeek> list_week = new ArrayList<BinanceVolumnWeek>();
+            List<BigDecimal> list_price_close_candle = new ArrayList<BigDecimal>();
+
             String sql_pump_dump = "";
             BinanceVolumnDay day = new BinanceVolumnDay();
             int day_index = 0;
@@ -286,6 +288,8 @@ public class BinanceServiceImpl implements BinanceService {
                     entity.setMin_price(price_low);
                     entity.setMax_price(price_high);
                     list_week.add(entity);
+
+                    list_price_close_candle.add(avgPrice);
                 }
                 day_index += 1;
             }
@@ -301,11 +305,11 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal gain = BigDecimal.ZERO;
                 BigDecimal loss = BigDecimal.ZERO;
                 for (int index = size; index >= 1; index--) {
-                    BigDecimal cur_price = list_week.get(index).getAvgPrice();
-                    if(index == size) {
+                    BigDecimal cur_price = list_price_close_candle.get(index);
+                    if (index == size) {
                         cur_price = price_at_binance;
                     }
-                    BigDecimal pre_price = list_week.get(index - 1).getAvgPrice();
+                    BigDecimal pre_price = list_price_close_candle.get(index - 1);
                     BigDecimal temp = cur_price.subtract(pre_price);
                     if (temp.compareTo(BigDecimal.ZERO) > 0) {
                         gain = gain.add(temp);
@@ -1009,19 +1013,19 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (Utils.getBigDecimal(dto.getRate1h()).compareTo(BigDecimal.valueOf(40)) > 0) {
-                        css.setRate1h_css("text-primary font-weight-bold");
+                        css.setRate1h_css("text-primary");
                     } else if (Utils.getBigDecimal(dto.getRate1h()).compareTo(BigDecimal.valueOf(0)) < 0) {
                         css.setRate1h_css("text-danger");
                     }
 
                     if (Utils.getBigDecimal(dto.getRate2h()).compareTo(BigDecimal.valueOf(30)) > 0) {
-                        css.setRate2h_css("text-primary font-weight-bold");
+                        css.setRate2h_css("text-primary");
                     } else if (Utils.getBigDecimal(dto.getRate2h()).compareTo(BigDecimal.valueOf(0)) < 0) {
                         css.setRate2h_css("text-danger");
                     }
 
                     if (Utils.getBigDecimal(dto.getRate4h()).compareTo(BigDecimal.valueOf(40)) > 0) {
-                        css.setRate4h_css("text-primary font-weight-bold");
+                        css.setRate4h_css("text-primary");
                     } else if (Utils.getBigDecimal(dto.getRate4h()).compareTo(BigDecimal.valueOf(0)) < 0) {
                         css.setRate4h_css("text-danger");
                     }
@@ -1150,7 +1154,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar_css("text-primary");
                     }
 
-                    if(Utils.getBigDecimal(dto.getRsi()).compareTo(BigDecimal.valueOf(30)) < 0) {
+                    if (Utils.getBigDecimal(dto.getRsi()).compareTo(BigDecimal.valueOf(30)) < 0) {
                         css.setRsi_css("text-white bg-success");
                     }
 
