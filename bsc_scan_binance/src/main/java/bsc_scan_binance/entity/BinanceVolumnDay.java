@@ -41,4 +41,11 @@ public class BinanceVolumnDay {
     @Column(name = "price_close_candle")
     private BigDecimal price_close_candle = BigDecimal.ZERO;
 
+    @Column(name = "rsi")
+    private BigDecimal rsi = BigDecimal.ZERO;
+
+    public BinanceVolumnDay(BinanceVolumnDayKey id) {
+        this.id = id;
+    }
+
 }

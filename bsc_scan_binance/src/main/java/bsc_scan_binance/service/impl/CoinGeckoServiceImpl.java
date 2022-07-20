@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.CandidateCoin;
@@ -52,13 +53,11 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Override
     public List<CandidateCoin> getList(String formBinance) {
 
-        return candidateCoinRepository.findCandidateCoinInBinanceFutures();
-
-        //if (Objects.equals("binance", BscScanBinanceApplication.callFormBinance)) {
-        //    return candidateCoinRepository.findCandidateCoinInBinanceFutures();
-        //} else {
-        //    return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
-        //}
+        if (BscScanBinanceApplication.msg_on) {
+            return candidateCoinRepository.findCandidateCoinInBinanceFutures();
+        } else {
+            return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
+        }
     }
 
     public CandidateCoin loadData(String gecko_id) {
@@ -498,8 +497,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                     dd = "0" + dd;
                 }
                 BinanceVolumnDayKey id = new BinanceVolumnDayKey(request.getId(), request.getSymbol(), dd);
-                days.add(new BinanceVolumnDay(id, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
-                        BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
+                days.add(new BinanceVolumnDay(id));
             }
 
             binanceVolumnDayRepository.saveAll(days);

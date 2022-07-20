@@ -157,11 +157,15 @@ p {
           <!-- v/mc -->
           <td
             style="text-align: right; min-width: 80px !important; max-width: 80px !important;"
-            class="bg-light important;"
-            th:classappend="${token.volumn_div_marketcap_css}">
-            <p th:text="${token.volumn_div_marketcap} + '%'">
-            <p th:classappend="${token.volumn_binance_div_marketcap_css}"
-              th:text="${token.volumn_binance_div_marketcap}">
+            class="bg-light important;">
+            <div th:classappend="${token.volumn_div_marketcap_css}">
+	            <p th:text="${token.volumn_div_marketcap} + '%'">
+	            <p th:classappend="${token.volumn_binance_div_marketcap_css}"
+	              th:text="${token.volumn_binance_div_marketcap}">
+            </div>
+            <div style="font-size: 0.7rem !important;" th:classappend="${token.rsi_css}"
+              th:text="'rsi: ' + ${token.rsi}">
+            </div>
           </td>
           <!-- Price -->
           <td th:classappend="${token.btc_warning_css}"
@@ -170,10 +174,12 @@ p {
               <span th:text="${token.current_price} + '$'"></span> <span
                 th:text="${token.price_target}"></span>
             </div>
-            <p style="font-size: 0.7rem !important;"
-              th:text="${token.pre_price_history}" />
-            <p style="color: black !important; font-size: 0.7rem !important;"
-              th:text="${token.low_to_hight_price}">
+            <div>
+	            <p style="font-size: 0.7rem !important;"
+	              th:text="${token.pre_price_history}" />
+	            <p style="color: black !important; font-size: 0.7rem !important;"
+	              th:text="${token.low_to_hight_price}">
+            </div>
           </td>
           <!-- Avg -->
           <td class="bg-light important;"

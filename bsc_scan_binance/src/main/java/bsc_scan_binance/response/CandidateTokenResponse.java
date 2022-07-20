@@ -96,5 +96,6 @@ public class CandidateTokenResponse {
     private BigDecimal rate4h;
     private BigDecimal rate1d0h;
     private BigDecimal rate1d4h;
+    private BigDecimal rsi;
 
 }

@@ -227,10 +227,12 @@ public class CandidateTokenCssResponse {
     private BigDecimal rate4h;
     private BigDecimal rate1d0h;
     private BigDecimal rate1d4h;
+    private BigDecimal rsi;
 
     private String rate1h_css;
     private String rate2h_css;
     private String rate4h_css;
     private String rate1d0h_css;
     private String rate1d4h_css;
+    private String rsi_css;
 }

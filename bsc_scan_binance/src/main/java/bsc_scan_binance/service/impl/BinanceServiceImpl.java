@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
 import bsc_scan_binance.entity.BinanceVolumeDateTimeKey;
 import bsc_scan_binance.entity.BinanceVolumnDay;
@@ -169,10 +170,9 @@ public class BinanceServiceImpl implements BinanceService {
             List<Object> result_usdt = getBinanceData(url_usdt, limit);
             List<Object> result_busd = getBinanceData(url_busd, limit);
 
-            List<BinanceVolumnDay> list_day = new ArrayList<BinanceVolumnDay>();
             List<BinanceVolumnWeek> list_week = new ArrayList<BinanceVolumnWeek>();
             String sql_pump_dump = "";
-
+            BinanceVolumnDay day = new BinanceVolumnDay();
             int day_index = 0;
             for (int idx = limit - 1; idx >= 0; idx--) {
                 Object obj_usdt = result_usdt.get(idx);
@@ -212,7 +212,7 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal total_trans = number_of_trades1.add(number_of_trades2);
 
                     if (idx == limit - 1) {
-                        BinanceVolumnDay day = new BinanceVolumnDay();
+
                         Calendar calendar = Calendar.getInstance();
 
                         day.setId(new BinanceVolumnDayKey(gecko_id, symbol,
@@ -224,7 +224,6 @@ public class BinanceServiceImpl implements BinanceService {
                         day.setHight_price(price_high);
                         day.setPrice_open_candle(price_open_candle);
                         day.setPrice_close_candle(price_close_candle);
-                        list_day.add(day);
 
                         {
                             BinanceVolumeDateTime ddhh = new BinanceVolumeDateTime();
@@ -239,6 +238,7 @@ public class BinanceServiceImpl implements BinanceService {
                             binanceVolumeDateTimeRepository.save(ddhh);
                         }
 
+                        // pump/dump
                         {
                             calendar.add(Calendar.HOUR_OF_DAY, -2);
                             BinanceVolumnDay pre2h = binanceVolumnDayRepository
@@ -290,11 +290,43 @@ public class BinanceServiceImpl implements BinanceService {
                 day_index += 1;
             }
 
-            binanceVolumnDayRepository.saveAll(list_day);
-            binanceVolumnWeekRepository.saveAll(list_week);
-            if (!Objects.equals("", sql_pump_dump)) {
-                Query query = entityManager.createNativeQuery(sql_pump_dump);
-                query.executeUpdate();
+            //https://www.omnicalculator.com/finance/rsi#:~:text=Calculate%20relative%20strength%20(RS)%20by,1%20%2D%20RS)%20from%20100.
+
+            int size = list_week.size() - 1;
+            if (size > 0) {
+                if (Objects.equals(symbol, "UNFI")) {
+                    //String debug = "";
+                }
+
+                BigDecimal gain = BigDecimal.ZERO;
+                BigDecimal loss = BigDecimal.ZERO;
+                for (int index = size; index >= 1; index--) {
+                    BigDecimal cur_price = list_week.get(index).getAvgPrice();
+                    if(index == size) {
+                        cur_price = price_at_binance;
+                    }
+                    BigDecimal pre_price = list_week.get(index - 1).getAvgPrice();
+                    BigDecimal temp = cur_price.subtract(pre_price);
+                    if (temp.compareTo(BigDecimal.ZERO) > 0) {
+                        gain = gain.add(temp);
+                    } else {
+                        loss = loss.add(temp.abs());
+                    }
+                }
+                BigDecimal avg_gain = gain.divide(BigDecimal.valueOf(size), 5, RoundingMode.CEILING);
+                BigDecimal avg_loss = loss.divide(BigDecimal.valueOf(size), 5, RoundingMode.CEILING);
+                BigDecimal rs = avg_gain.divide(avg_loss, 5, RoundingMode.CEILING);
+                BigDecimal rsi = BigDecimal.valueOf(100)
+                        .subtract(BigDecimal.valueOf(100).divide((rs.add(BigDecimal.valueOf(1))), 5,
+                                RoundingMode.CEILING));
+                day.setRsi(rsi);
+
+                binanceVolumnDayRepository.save(day);
+                binanceVolumnWeekRepository.saveAll(list_week);
+                if (!Objects.equals("", sql_pump_dump)) {
+                    Query query = entityManager.createNativeQuery(sql_pump_dump);
+                    query.executeUpdate();
+                }
             }
 
         } catch (Exception e) {
@@ -464,6 +496,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , rate4h                                                                                \n"
                     + "   , rate1d0h                                                                              \n"
                     + "   , rate1d4h                                                                              \n"
+                    + "   , cur.rsi                                                                               \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
@@ -560,10 +593,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    // + (Objects.equals("binance", BscScanBinanceApplication.callFormBinance)
-                    // ? " AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
-                    // : "")
-                    + "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures)                              \n"
+                    + ((BscScanBinanceApplication.msg_on)
+                            ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
+                            : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
@@ -1118,6 +1150,10 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar_css("text-primary");
                     }
 
+                    if(Utils.getBigDecimal(dto.getRsi()).compareTo(BigDecimal.valueOf(30)) < 0) {
+                        css.setRsi_css("text-white bg-success");
+                    }
+
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
@@ -1144,7 +1180,6 @@ public class BinanceServiceImpl implements BinanceService {
                                     monitorTokenSales(results);
                                 }
                             }
-
 
                             if ((price_now.multiply(BigDecimal.valueOf(1.005)).compareTo(highest_price_today) > 0)) {
 
