@@ -1181,7 +1181,9 @@ public class BinanceServiceImpl implements BinanceService {
                                             + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
                                             + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
 
-                                    monitorTokenSales(results);
+                                    if(BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
+                                        monitorTokenSales(results);
+                                    }
                                 }
                             }
 
@@ -1201,7 +1203,9 @@ public class BinanceServiceImpl implements BinanceService {
                                                         + Utils.new_line_from_service + "Can" + css.getAvg_boll_min()
                                                         + " " + "Can" + css.getAvg_boll_max());
 
-                                        monitorTokenSales(results);
+                                        if(BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
+                                            monitorTokenSales(results);
+                                        }
                                     }
                                 }
 
