@@ -98,10 +98,13 @@ public class BscScanBinanceApplication {
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
                     } catch (Exception e) {
                         log.error("dkd error LoadData:" + e.getMessage());
-                        //wait(600000);
                     }
 
-                    wait(600);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    if(BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
+                        wait(600);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    } else {
+                        wait(300);
+                    }
 
                     log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                             + coin.getSymbol());
@@ -120,7 +123,6 @@ public class BscScanBinanceApplication {
                         list.clear();
                         list = gecko_service.getList(callFormBinance);
                         size = list.size();
-                        wait(60000); // 300000 = 5 minutes;
                     } else {
                         idx += 1;
                     }
