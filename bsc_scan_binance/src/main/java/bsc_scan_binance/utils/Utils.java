@@ -270,7 +270,7 @@ public class Utils {
         }
 
         int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        if ((hh > 22) || (hh < 7)) {
+        if ((hh >= 20) || (hh <= 8)) {
             return;
         }
 

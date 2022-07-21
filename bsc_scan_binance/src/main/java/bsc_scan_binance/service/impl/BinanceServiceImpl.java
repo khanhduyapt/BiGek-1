@@ -1702,8 +1702,16 @@ public class BinanceServiceImpl implements BinanceService {
             if ((percent_loss.compareTo(BigDecimal.valueOf(-0.85)) > 0)
                     && (dto.getRate1d0h().compareTo(BigDecimal.ZERO) > 0)) {
                 if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
+                    BigDecimal price = Utils.getBigDecimal(dto.getPrice_can_buy());
 
-                    return "BUY:" + dto.getSymbol();
+                    BollArea boll = bollAreaRepository.findById(dto.getGecko_id()).orElse(null);
+                    if(!Objects.equals(null, boll)) {
+                        if(price.compareTo(Utils.getBigDecimal(boll.getLow_price()))<0) {
+                            price = boll.getLow_price();
+                        }
+                    }
+
+                    return "BUY:" + dto.getSymbol() + "(" + price + "$)";
                 }
             }
 
