@@ -30,16 +30,15 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            app_flag = 2;
             if (!Objects.equals(null, args) && args.length > 0) {
-                if (Objects.equals("msg_on", args[0])) {
-                    app_flag = Utils.const_app_flag_msg_on;
-
-                } else if (Objects.equals("msg_off", args[0])) {
-                    app_flag = Utils.const_app_flag_msg_off;
+                if (Utils.isNotBlank(args[0])) {
+                    app_flag = Utils.getIntValue(args[0]);
                 }
             }
-            log.info("msg_on:" + app_flag + " (1: msg_on; 2: msg_off; 3: webonly)");
+            if (app_flag == 0) {
+                app_flag = Utils.const_app_flag_webonly;
+            }
+            log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: webonly)");
             // --------------------Init--------------------
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
@@ -91,7 +90,7 @@ public class BscScanBinanceApplication {
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
                     } catch (Exception e) {
                         log.error("dkd error LoadData:" + e.getMessage());
-                        wait(600000);
+                        //wait(600000);
                     }
 
                     wait(200);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
