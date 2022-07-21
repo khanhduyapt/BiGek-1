@@ -62,11 +62,13 @@ public class BscScanBinanceApplication {
             //binance_service.getList(false);
             //binance_service.monitorBollingerBandwidth(false);
             //binance_service.monitorProfit();
+            //app_flag = Utils.const_app_flag_msg_on;
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-                if (CollectionUtils.isEmpty(list)) {
-                    //gecko_service.initCandidateCoin();
+                CandidateCoin btc = new CandidateCoin();
+                if (!CollectionUtils.isEmpty(list)) {
+                    btc = list.stream().filter(item -> Objects.equals("BTC", item.getSymbol())).findFirst().orElse(new CandidateCoin());
                 }
 
                 int size = list.size();
@@ -86,6 +88,12 @@ public class BscScanBinanceApplication {
                             }
                         }
 
+                        if(idx % 12 == 0) {
+                            binance_service.loadData(btc.getGeckoid(), btc.getSymbol());
+                            binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
+                            binance_service.getList(false); // ~3p 1 lan
+                        }
+
                         binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
                     } catch (Exception e) {
@@ -93,7 +101,7 @@ public class BscScanBinanceApplication {
                         //wait(600000);
                     }
 
-                    wait(200);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    wait(6000);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
 
                     log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                             + coin.getSymbol());
@@ -102,7 +110,6 @@ public class BscScanBinanceApplication {
                         int minus = Utils
                                 .getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
                         if ((minus > 5) && (minus < 59)) {
-                            binance_service.getList(false); // ~3p 1 lan
                             binance_service.monitorProfit();
                             binance_service.monitorBollingerBandwidth(false);
                         }
