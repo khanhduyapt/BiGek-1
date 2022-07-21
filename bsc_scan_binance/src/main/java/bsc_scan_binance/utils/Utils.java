@@ -45,6 +45,10 @@ public class Utils {
     public static final String new_line_from_bot = "\n";
     public static final String new_line_from_service = "%0A";
 
+    public static final int const_app_flag_msg_on = 1;//  1: msg_on; 2: msg_off; 3: webonly
+    public static final int const_app_flag_msg_off = 2;
+    public static final int const_app_flag_webonly = 3;
+
     public static final String PREPARE_ORDERS_DATA_TYPE_BOT = "1";
     public static final String PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP = "2";
     public static final String PREPARE_ORDERS_DATA_TYPE_GECKO_VOL_UP = "3";
@@ -260,7 +264,7 @@ public class Utils {
     }
 
     public static void sendToTelegram(String text) {
-        if (!BscScanBinanceApplication.msg_on) {
+        if (BscScanBinanceApplication.app_flag != const_app_flag_msg_on) {
             return;
         }
 
@@ -293,6 +297,7 @@ public class Utils {
             e.printStackTrace();
         }
     }
+
     public static BigDecimal getBigDecimal(Object value) {
         if (Objects.equals(null, value)) {
             return BigDecimal.ZERO;

@@ -23,23 +23,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 public class BscScanBinanceApplication {
-    public static boolean msg_on = false;
+    public static int app_flag = Utils.const_app_flag_webonly; //1: msg_on; 2: msg_off; 3: webonly
     public static String callFormBinance = "";
 
     public static void main(String[] args) {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
-            msg_on = false;
+            app_flag = 2;
             if (!Objects.equals(null, args) && args.length > 0) {
                 if (Objects.equals("msg_on", args[0])) {
-                    msg_on = true;
+                    app_flag = Utils.const_app_flag_msg_on;
 
                 } else if (Objects.equals("msg_off", args[0])) {
-                    msg_on = false;
+                    app_flag = Utils.const_app_flag_msg_off;
                 }
             }
-            log.info("msg_on:" + msg_on);
+            log.info("msg_on:" + app_flag + " (1: msg_on; 2: msg_off; 3: webonly)");
             // --------------------Init--------------------
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
@@ -47,7 +47,7 @@ public class BscScanBinanceApplication {
 
             // binance_service.loadDataBtcVolumeDay("bitcoin", "BTC");
 
-            if (msg_on) {
+            if (app_flag == Utils.const_app_flag_msg_on) {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
 
                 try {
@@ -64,59 +64,65 @@ public class BscScanBinanceApplication {
             //binance_service.monitorBollingerBandwidth(false);
             //binance_service.monitorProfit();
 
-            List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-            if (CollectionUtils.isEmpty(list)) {
-                //gecko_service.initCandidateCoin();
-            }
+            if (app_flag != Utils.const_app_flag_webonly) {
+                List<CandidateCoin> list = gecko_service.getList(callFormBinance);
+                if (CollectionUtils.isEmpty(list)) {
+                    //gecko_service.initCandidateCoin();
+                }
 
-            int size = list.size();
-            int idx = 0;
-            while (idx < size) {
-                CandidateCoin coin = list.get(idx);
+                int size = list.size();
+                int idx = 0;
+                while (idx < size) {
+                    CandidateCoin coin = list.get(idx);
 
-                try {
-                    if (idx == 0) {
-                        List<Orders> orders = binance_service.getOrderList();
-                        if (!CollectionUtils.isEmpty(orders)) {
-                            for (Orders order : orders) {
-                                gecko_service.loadData(order.getGeckoid());
-                                log.info("Binance -> Gecko " + " id:" + order.getGeckoid() + "; Symbol:" + order.getSymbol());
+                    try {
+                        if (idx == 0) {
+                            List<Orders> orders = binance_service.getOrderList();
+                            if (!CollectionUtils.isEmpty(orders)) {
+                                for (Orders order : orders) {
+                                    gecko_service.loadData(order.getGeckoid());
+                                    log.info("Binance -> Gecko " + " id:" + order.getGeckoid() + "; Symbol:"
+                                            + order.getSymbol());
+                                }
                             }
                         }
+
+                        binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
+                        binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
+                    } catch (Exception e) {
+                        log.error("dkd error LoadData:" + e.getMessage());
+                        wait(600000);
                     }
 
-                    binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
-                    binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
-                } catch (Exception e) {
-                    log.error("dkd error LoadData:" + e.getMessage());
-                    wait(600000);
-                }
+                    wait(200);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
 
-                wait(200);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
+                            + coin.getSymbol());
 
-                log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
+                    if (Objects.equals(idx, size - 1)) {
+                        int minus = Utils
+                                .getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+                        if ((minus > 5) && (minus < 59)) {
+                            binance_service.getList(false); // ~3p 1 lan
+                            binance_service.monitorProfit();
+                            binance_service.monitorBollingerBandwidth(false);
+                        }
 
-                if (Objects.equals(idx, size - 1)) {
-                    int minus = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-                    if ((minus > 5) && (minus < 59)) {
-                        binance_service.getList(false); // ~3p 1 lan
-                        binance_service.monitorProfit();
-                        binance_service.monitorBollingerBandwidth(false);
+                        log.info("reload: "
+                                + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
+                        idx = 0;
+                        list.clear();
+                        list = gecko_service.getList(callFormBinance);
+                        size = list.size();
+                    } else {
+                        idx += 1;
                     }
-
-                    log.info("reload: "
-                            + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
-                    idx = 0;
-                    list.clear();
-                    list = gecko_service.getList(callFormBinance);
-                    size = list.size();
-                } else {
-                    idx += 1;
                 }
+
+                log.info("End BscScanBinanceApplication "
+                        + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
+                        + " <----");
             }
-
-            log.info("End BscScanBinanceApplication " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
-                    + " <----");
         } catch (Exception e) {
             log.error(e.getMessage());
         }

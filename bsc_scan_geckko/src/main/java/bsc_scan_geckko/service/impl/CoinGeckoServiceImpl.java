@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -474,6 +475,32 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             log.info("end CoinGeckoServiceImpl.initCandidateCoin error --->");
             log.error(e.getMessage());
             return new ArrayList<CandidateCoin>();
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delete(String gecko_id) {
+
+        try {
+            log.info("Start delete  --->");
+            if (!Objects.equals(null, gecko_id)) {
+                String sql = " DELETE FROM candidate_coin WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM gecko_volumn_day WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM binance_volumn_week WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM binance_volumn_day WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM priority_coin WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM priority_coin_history WHERE gecko_id=:gecko_id ;";
+
+                Query query = entityManager.createNativeQuery(sql);
+                query.setParameter("gecko_id", gecko_id);
+                query.executeUpdate();
+            }
+
+            log.info("End delete success <---");
+        } catch (Exception e) {
+            log.info("Add token  error --->");
+            log.error(e.getMessage());
         }
     }
 

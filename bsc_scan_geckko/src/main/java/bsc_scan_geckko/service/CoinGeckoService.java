@@ -10,4 +10,6 @@ public interface CoinGeckoService {
 	public List<CandidateCoin> getList();
 
 	public CandidateCoin loadData(String gecko_id);
+
+	public void delete(String gecko_id);
 }
