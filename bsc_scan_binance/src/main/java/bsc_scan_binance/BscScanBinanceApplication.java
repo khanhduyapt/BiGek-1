@@ -88,7 +88,7 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        if(idx % 12 == 0) {
+                        if(idx % 30 == 0) {
                             binance_service.loadData(btc.getGeckoid(), btc.getSymbol());
                             binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
                             binance_service.getList(false); // ~3p 1 lan
@@ -101,7 +101,7 @@ public class BscScanBinanceApplication {
                         //wait(600000);
                     }
 
-                    wait(6000);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    wait(600);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
 
                     log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                             + coin.getSymbol());
@@ -120,6 +120,7 @@ public class BscScanBinanceApplication {
                         list.clear();
                         list = gecko_service.getList(callFormBinance);
                         size = list.size();
+                        wait(300000); // 300000 = 5 minutes;
                     } else {
                         idx += 1;
                     }

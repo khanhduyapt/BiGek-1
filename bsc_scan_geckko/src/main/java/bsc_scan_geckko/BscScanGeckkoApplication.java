@@ -42,7 +42,8 @@ public class BscScanGeckkoApplication {
                     //gecko_service.delete(coin.getGeckoid());
                 }
 
-                wait(600000);// 60000:2000ms=30 request/minus 1500=40
+                wait(2000);// 60000:2000ms=30 request/minus 1500=40
+
 
                 log.info("Gecko:" + String.valueOf(idx) + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                         + coin.getSymbol());
@@ -53,6 +54,8 @@ public class BscScanGeckkoApplication {
                     list.clear();
                     list = gecko_service.getList();
                     size = list.size();
+
+                    wait(900000); // 900000 = 15 minutes;
                 } else {
                     idx += 1;
                 }
