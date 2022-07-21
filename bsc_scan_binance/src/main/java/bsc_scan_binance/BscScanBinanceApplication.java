@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 public class BscScanBinanceApplication {
-    public static int app_flag = Utils.const_app_flag_webonly; //1: msg_on; 2: msg_off; 3: webonly
+    public static int app_flag = Utils.const_app_flag_webonly; //1: msg_on; 2: msg_off; 3: web only; 4: all coin
     public static String callFormBinance = "";
 
     public static void main(String[] args) {
@@ -38,7 +38,7 @@ public class BscScanBinanceApplication {
             if (app_flag == 0) {
                 app_flag = Utils.const_app_flag_webonly;
             }
-            log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: webonly)");
+            log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
@@ -120,7 +120,7 @@ public class BscScanBinanceApplication {
                         list.clear();
                         list = gecko_service.getList(callFormBinance);
                         size = list.size();
-                        wait(300000); // 300000 = 5 minutes;
+                        wait(60000); // 300000 = 5 minutes;
                     } else {
                         idx += 1;
                     }
