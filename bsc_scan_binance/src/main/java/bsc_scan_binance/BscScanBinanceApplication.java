@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 public class BscScanBinanceApplication {
-    public static int app_flag = Utils.const_app_flag_webonly; //1: msg_on; 2: msg_off; 3: webonly
+    public static int app_flag = Utils.const_app_flag_webonly; //1: msg_on; 2: msg_off; 3: web only; 4: all coin
     public static String callFormBinance = "";
 
     public static void main(String[] args) {
@@ -38,7 +38,7 @@ public class BscScanBinanceApplication {
             if (app_flag == 0) {
                 app_flag = Utils.const_app_flag_webonly;
             }
-            log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: webonly)");
+            log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
@@ -88,7 +88,7 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        if(idx % 12 == 0) {
+                        if(idx % 30 == 0) {
                             binance_service.loadData(btc.getGeckoid(), btc.getSymbol());
                             binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
                             binance_service.getList(false); // ~3p 1 lan
@@ -100,7 +100,11 @@ public class BscScanBinanceApplication {
                         log.error("dkd error LoadData:" + e.getMessage());
                     }
 
-                    wait(3000);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    if(BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
+                        wait(300);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    } else {
+                        wait(200);
+                    }
 
                     log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                             + coin.getSymbol());

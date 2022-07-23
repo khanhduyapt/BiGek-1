@@ -597,7 +597,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    + ((BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on)
+                    + ((BscScanBinanceApplication.app_flag != Utils.const_app_flag_all_coin)
                             ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
                             : "")
                     + " order by                                                                                  \n"
@@ -978,7 +978,7 @@ public class BinanceServiceImpl implements BinanceService {
                 priorityCoin.setCurrent_price(price_now);
 
                 if (dto.getName().contains("Futures")) {
-                    css.setFutures("(Futures)");
+                    css.setFutures(dto.getSymbol() + "(Futures)");
                 }
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
@@ -1181,7 +1181,9 @@ public class BinanceServiceImpl implements BinanceService {
                                             + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
                                             + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
 
-                                    monitorTokenSales(results);
+                                    if(BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
+                                        monitorTokenSales(results);
+                                    }
                                 }
                             }
 
@@ -1201,7 +1203,9 @@ public class BinanceServiceImpl implements BinanceService {
                                                         + Utils.new_line_from_service + "Can" + css.getAvg_boll_min()
                                                         + " " + "Can" + css.getAvg_boll_max());
 
-                                        monitorTokenSales(results);
+                                        if(BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
+                                            monitorTokenSales(results);
+                                        }
                                     }
                                 }
 
