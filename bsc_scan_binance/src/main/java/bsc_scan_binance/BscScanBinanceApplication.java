@@ -101,9 +101,9 @@ public class BscScanBinanceApplication {
                     }
 
                     if(BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
-                        wait(600);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                        wait(300);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
                     } else {
-                        wait(300);
+                        wait(200);
                     }
 
                     log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"

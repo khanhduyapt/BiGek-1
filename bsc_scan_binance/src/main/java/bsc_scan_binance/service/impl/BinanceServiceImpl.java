@@ -978,7 +978,7 @@ public class BinanceServiceImpl implements BinanceService {
                 priorityCoin.setCurrent_price(price_now);
 
                 if (dto.getName().contains("Futures")) {
-                    css.setFutures("(Futures)");
+                    css.setFutures(dto.getSymbol() + "(Futures)");
                 }
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
