@@ -98,10 +98,9 @@ public class BscScanBinanceApplication {
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
                     } catch (Exception e) {
                         log.error("dkd error LoadData:" + e.getMessage());
-                        //wait(600000);
                     }
 
-                    wait(6000);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    wait(3000);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
 
                     log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
                             + coin.getSymbol());

@@ -1702,8 +1702,16 @@ public class BinanceServiceImpl implements BinanceService {
             if ((percent_loss.compareTo(BigDecimal.valueOf(-0.85)) > 0)
                     && (dto.getRate1d0h().compareTo(BigDecimal.ZERO) > 0)) {
                 if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
+                    BigDecimal price = dto.getPrice_can_buy();
+                    BinanceVolumnWeekKey id = new BinanceVolumnWeekKey(dto.getGecko_id(), dto.getSymbol(),
+                            Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime()));
+                    BinanceVolumnWeek today = binanceVolumnWeekRepository.findById(id).orElse(null);
+                    if (!Objects.equals(null, today)
+                            && price.compareTo(Utils.getBigDecimal(today.getMin_price())) > 0) {
+                        price = today.getMin_price();
+                    }
 
-                    return "BUY:" + dto.getSymbol();
+                    return "BUY:" + dto.getSymbol() + "(" + price + ")";
                 }
             }
 
