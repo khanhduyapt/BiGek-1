@@ -1175,14 +1175,17 @@ public class BinanceServiceImpl implements BinanceService {
                                         Calendar.getInstance().getTime());
                                 curr_percent_btc = curr_percent_btc.substring(0, curr_percent_btc.length() - 1);
                                 if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
-                                    pre_percent_btc = curr_percent_btc;
-                                    Utils.sendToTelegram("(Good time to buy) Btc: "
-                                            + Utils.removeLastZero(price_now.toString()) + Utils.new_line_from_service
-                                            + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
-                                            + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
 
                                     if(BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
-                                        monitorTokenSales(results);
+                                        String result = monitorTokenSales(results);
+                                        if(Utils.isNotBlank(result)) {
+
+                                            pre_percent_btc = curr_percent_btc;
+                                            Utils.sendToTelegram("(Good time to buy) Btc: "
+                                                    + Utils.removeLastZero(price_now.toString()) + Utils.new_line_from_service
+                                                    + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
+                                                    + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
+                                        }
                                     }
                                 }
                             }
@@ -1660,7 +1663,7 @@ public class BinanceServiceImpl implements BinanceService {
                 Utils.removeLastZero(max_price), arr[4], arr[5], arr[6]);
     }
 
-    public void monitorTokenSales(List<CandidateTokenResponse> results) {
+    public String monitorTokenSales(List<CandidateTokenResponse> results) {
 
         String buy_msg = "";
         String sell_msg = "";
@@ -1683,17 +1686,19 @@ public class BinanceServiceImpl implements BinanceService {
 
             }
         }
-
+        String result = "";
         if (Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
             Utils.sendToTelegram("(Buy) " + buy_msg);
             msg_vol_up_dict.put(buy_msg, buy_msg);
+            result = buy_msg;
         }
 
         if (Utils.isNotBlank(sell_msg) && !msg_vol_up_dict.contains(sell_msg)) {
             Utils.sendToTelegram("(Sell) " + sell_msg);
             msg_vol_up_dict.put(sell_msg, sell_msg);
+            result += sell_msg;
         }
-
+        return result;
     }
 
     public String monitorTokenSale1(CandidateTokenResponse dto) {

@@ -269,10 +269,10 @@ public class Utils {
             return;
         }
 
-        int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        if ((hh >= 21) || (hh <= 7)) {
-            return;
-        }
+        //int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        //if ((hh >= 21) || (hh <= 7)) {
+        //    return;
+        //}
 
         sendToChatId(Utils.chatId_linkdk, text);
         sendToChatId(Utils.chatId_duydk, text);
