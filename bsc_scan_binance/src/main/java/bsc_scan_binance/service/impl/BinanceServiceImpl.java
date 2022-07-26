@@ -88,6 +88,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private BinanceFuturesRepository binanceFuturesRepository;
 
+    private BigDecimal pre_btc_price = BigDecimal.ZERO;
     private String pre_percent_btc = "";
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
 
@@ -485,7 +486,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   macd.avg07d,                                                                            \n"
                     + "   macd.avg14d,                                                                            \n"
                     + "   macd.avg21d,                                                                            \n"
-                    + "   macd.avg28d,                                                                            \n"
+                    + "   macd.avg28d,                                                                            \n" //min 28
                     // Bottleneck -> maybe up trend
                     + "   (CASE WHEN  (select gecko_id from boll_area b where can.gecko_id = b.gecko_id) IS NOT NULL THEN true ELSE false END) AS uptrend,   \n"
                     + "   vol.vol0d,                                                                              \n"
@@ -532,7 +533,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg07d,      \n"
                     + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg14d,      \n"
                     + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '20 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg21d,      \n"
-                    + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '27 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg28d  \n"
+                    + "             ROUND((select MIN(COALESCE(w.min_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '27 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg28d  \n" //min28d
                     + "                                                                                           \n"
                     + "          from                                                                             \n"
                     + "              candidate_coin can                                                           \n"
@@ -617,6 +618,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<PriorityCoin> listPriorityCoin = priorityCoinRepository.findAll();
             String msg_short = "";
             Boolean btc_danger = false;
+
             // monitorTokenSales(results);
             for (CandidateTokenResponse dto : results) {
 
@@ -1079,10 +1081,17 @@ public class BinanceServiceImpl implements BinanceService {
                     String ema_history = "vector7: " + dto.getEma07d() + ", vector14: " + dto.getEma14d();
                     css.setEma_history(ema_history);
 
+                    BigDecimal min28d_percent = Utils.getBigDecimalValue(Utils.toPercent(dto.getAvg28d(), price_now));
+
                     String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(dto.getAvg07d(), price_now)
                             + "%)" + ", avg14: " + dto.getAvg14d() + "(" + Utils.toPercent(dto.getAvg14d(), price_now)
-                            + "%)" + ", avg28: " + dto.getAvg28d() + "(" + Utils.toPercent(dto.getAvg28d(), price_now)
                             + "%)";
+                    if (min28d_percent.compareTo(BigDecimal.ZERO) > 0) {
+                        avg_history += ", min🤩28d: " + dto.getAvg28d() + "(" + min28d_percent + "%)";
+                    } else {
+                        avg_history += ", min28d: " + dto.getAvg28d() + "(" + min28d_percent + "%)";
+                    }
+
                     css.setAvg_history(avg_history);
                 }
 
@@ -1160,6 +1169,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
+                        if (Objects.equals(pre_btc_price, BigDecimal.ZERO)) {
+                            pre_btc_price = price_now;
+                        }
 
                         BigDecimal btc_range = ((highest_price_today.subtract(lowest_price_today)).divide(price_now, 3,
                                 RoundingMode.CEILING));
@@ -1176,15 +1188,20 @@ public class BinanceServiceImpl implements BinanceService {
                                 curr_percent_btc = curr_percent_btc.substring(0, curr_percent_btc.length() - 1);
                                 if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
 
-                                    if(BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
-                                        String result = monitorTokenSales(results);
-                                        if(Utils.isNotBlank(result)) {
+                                    if (BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
 
+                                        if (price_now.compareTo(pre_btc_price) < 0) {
+                                            //(Good time to buy)
                                             pre_percent_btc = curr_percent_btc;
-                                            Utils.sendToTelegram("(Good time to buy) Btc: "
-                                                    + Utils.removeLastZero(price_now.toString()) + Utils.new_line_from_service
+                                            Utils.sendToTelegram("Btc: "
+                                                    + Utils.removeLastZero(price_now.toString())
+                                                    + Utils.new_line_from_service
                                                     + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
                                                     + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
+
+                                            monitorTokenSales(results);
+
+                                            pre_btc_price = price_now;
                                         }
                                     }
                                 }
@@ -1206,13 +1223,15 @@ public class BinanceServiceImpl implements BinanceService {
                                                         + Utils.new_line_from_service + "Can" + css.getAvg_boll_min()
                                                         + " " + "Can" + css.getAvg_boll_max());
 
-                                        if(BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
+                                        if (BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
                                             monitorTokenSales(results);
                                         }
                                     }
                                 }
 
                             }
+                        } else {
+                            pre_btc_price = BigDecimal.ZERO;
                         }
                     }
                 }
@@ -1688,7 +1707,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
         String result = "";
         if (Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
-            Utils.sendToTelegram("(Buy) " + buy_msg);
+            Utils.sendToTelegram("(CanBuy) " + buy_msg);
             msg_vol_up_dict.put(buy_msg, buy_msg);
             result = buy_msg;
         }
@@ -1720,7 +1739,7 @@ public class BinanceServiceImpl implements BinanceService {
                         price = today.getMin_price();
                     }
 
-                    return "BUY:" + dto.getSymbol() + "(" + price + ")";
+                    return "BUY:" + dto.getSymbol() + "(" + Utils.removeLastZero(price.toString()) + ")";
                 }
             }
 
