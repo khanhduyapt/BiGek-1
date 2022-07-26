@@ -55,6 +55,8 @@ public class CandidateTokenCssResponse {
     private String oco_low_hight = "";
     private String ema_history;
     private String avg_history;
+    private String min28day;
+    private String min28day_css;
     private String oco_opportunity;
     private String binance_vol_rate;
     private String binance_vol_rate_css = "";

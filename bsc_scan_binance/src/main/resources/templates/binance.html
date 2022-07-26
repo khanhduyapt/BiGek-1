@@ -159,9 +159,9 @@ p {
             style="text-align: right; min-width: 80px !important; max-width: 80px !important;"
             class="bg-light important;">
             <div th:classappend="${token.volumn_div_marketcap_css}">
-	            <p th:text="${token.volumn_div_marketcap} + '%'">
-	            <p th:classappend="${token.volumn_binance_div_marketcap_css}"
-	              th:text="${token.volumn_binance_div_marketcap}">
+              <p th:text="${token.volumn_div_marketcap} + '%'">
+              <p th:classappend="${token.volumn_binance_div_marketcap_css}"
+                th:text="${token.volumn_binance_div_marketcap}">
             </div>
             <div style="font-size: 0.7rem !important;" th:classappend="${token.rsi_css}"
               th:text="'rsi: ' + ${token.rsi}">
@@ -175,10 +175,10 @@ p {
                 th:text="${token.price_target}"></span>
             </div>
             <div>
-	            <p style="font-size: 0.7rem !important;"
-	              th:text="${token.pre_price_history}" />
-	            <p style="color: black !important; font-size: 0.7rem !important;"
-	              th:text="${token.low_to_hight_price}">
+              <p style="font-size: 0.7rem !important;"
+                th:text="${token.pre_price_history}" />
+              <p style="color: black !important; font-size: 0.7rem !important;"
+                th:text="${token.low_to_hight_price}">
             </div>
           </td>
           <!-- Avg -->
@@ -214,8 +214,11 @@ p {
             </div>
             <p style="font-size: 0.75rem !important;"
               th:text="${token.ema_history}">
-            <p style="font-size: 0.75rem !important;"
-              th:text="${token.avg_history}">
+            <div style="font-size: 0.75rem !important;">
+              <span th:text="${token.avg_history}"></span>
+              <span th:text="${token.min28day}" th:classappend="${token.min28day_css}" ></span>
+            </div>
+
             <p style="font-size: 0.85rem !important;" class="text-primary"
               th:text="${token.oco_opportunity}">
             <div style="font-size: 0.85rem !important;">

@@ -1086,12 +1086,27 @@ public class BinanceServiceImpl implements BinanceService {
                     String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(dto.getAvg07d(), price_now)
                             + "%)" + ", avg14: " + dto.getAvg14d() + "(" + Utils.toPercent(dto.getAvg14d(), price_now)
                             + "%)";
+
+                    String min28day = "min28d: " + dto.getAvg28d() + "(" + min28d_percent + "%)";
+
                     if (min28d_percent.compareTo(BigDecimal.ZERO) > 0) {
-                        avg_history += ", min🤩28d: " + dto.getAvg28d() + "(" + min28d_percent + "%)";
-                    } else {
-                        avg_history += ", min28d: " + dto.getAvg28d() + "(" + min28d_percent + "%)";
+                        min28day = "min🤩28d: " + dto.getAvg28d() + "(" + min28d_percent + "%)";
+
+                        Utils.sendToTelegram("HOLD:" + dto.getSymbol() + ", " + Utils.removeLastZero(price_now.toString()) + "%, " + min28day);
+
+                        css.setMin28day_css("text-primary font-weight-bold");
+
+                    } else if (min28d_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
+
+                        css.setMin28day_css("text-primary font-weight-bold");
+
+                    } else if (min28d_percent.compareTo(BigDecimal.valueOf(-2)) > 0) {
+
+                        css.setMin28day_css("text-primary");
                     }
 
+                    avg_history += ", ";
+                    css.setMin28day(min28day);
                     css.setAvg_history(avg_history);
                 }
 
