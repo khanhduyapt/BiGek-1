@@ -45,7 +45,7 @@ public class Utils {
     public static final String new_line_from_bot = "\n";
     public static final String new_line_from_service = "%0A";
 
-    public static final int const_app_flag_msg_on = 1;  // 1: msg_on; 2: msg_off; 3: web only; 4: all coin
+    public static final int const_app_flag_msg_on = 1; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin
     public static final int const_app_flag_msg_off = 2;
     public static final int const_app_flag_webonly = 3;
     public static final int const_app_flag_all_coin = 4;
@@ -264,18 +264,26 @@ public class Utils {
         return false;
     }
 
+    public static void sendToMyTelegram(String text) {
+        if (BscScanBinanceApplication.app_flag != const_app_flag_msg_on) {
+            return;
+        }
+
+        sendToChatId(Utils.chatId_duydk, text);
+    }
+
     public static void sendToTelegram(String text) {
         if (BscScanBinanceApplication.app_flag != const_app_flag_msg_on) {
             return;
         }
 
-        //int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        //if ((hh >= 21) || (hh <= 7)) {
-        //    return;
-        //}
-
-        sendToChatId(Utils.chatId_linkdk, text);
         sendToChatId(Utils.chatId_duydk, text);
+
+        int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        if ((hh >= 19) || (hh <= 7)) {
+            return;
+        }
+        sendToChatId(Utils.chatId_linkdk, text);
     }
 
     private static void sendToChatId(String chat_id, String text) {

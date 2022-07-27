@@ -47,6 +47,11 @@ p {
   color: red !important;
 }
 
+.fix_width {
+    min-width: 135px !important; 
+    max-width: 135px !important;
+}
+
 .table td, .table th {
   padding: 0.25rem !important;
   vertical-align: middle !important;
@@ -163,45 +168,41 @@ p {
               <p th:classappend="${token.volumn_binance_div_marketcap_css}"
                 th:text="${token.volumn_binance_div_marketcap}">
             </div>
-            <div style="font-size: 0.7rem !important;" th:classappend="${token.rsi_css}"
-              th:text="'rsi: ' + ${token.rsi}">
-            </div>
           </td>
           <!-- Price -->
           <td th:classappend="${token.btc_warning_css}"
-            style="text-align: right; min-width: 220px !important; max-width: 220px !important;">
+            style="text-align: right; min-width: 230px !important; max-width: 230px !important;">
             <div>
-              <span th:text="${token.current_price} + '$'"></span> <span
-                th:text="${token.price_target}"></span>
+              <span th:text="${token.current_price} + '$'"></span>
             </div>
-            <div>
-              <p style="font-size: 0.7rem !important;"
+            <div style="font-size: 0.9rem !important;">
+              <span
+                style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
+                th:classappend="${token.avg_price_css}"
+                th:text="${token.avg_percent}"></span>= <span
+                th:text="${token.avg_price + '$'}"></span>
+            </div>
+            <p style="font-size: 0.8rem !important;"
                 th:text="${token.pre_price_history}" />
-              <p style="color: black !important; font-size: 0.7rem !important;"
-                th:text="${token.low_to_hight_price}">
-            </div>
           </td>
           <!-- Avg -->
           <td class="bg-light important;"
-            style="text-align: right; min-width: 150px !important; max-width: 150px !important;">
-            <p style="font-size: 0.85rem !important;" class="text-primary"
-              th:text="${token.futures}">
+            style="text-align: right; min-width: 250px !important; max-width: 250px !important;">
+            <p class="text-primary" th:text="${token.futures}">
             <div>
-              <span
-                style="font-size: 0.9rem !important; text-align: left; min-width: 50px !important; max-width: 50px !important;"
-                th:classappend="${token.avg_price_css}"
-                th:text="${token.avg_percent}"></span>= <span
-                style="font-size: 0.9rem !important;"
-                th:text="${token.avg_price + '$'}"></span>
+              <p style="color: black !important; font-size: 0.9rem !important;"
+                th:text="${token.low_to_hight_price}">
             </div>
-            <span style="font-size: 0.8rem !important;" th:classappend="${token.avg_boll_min_css}"
-              th:text="${token.avg_boll_min}"></span>
-            <p style="font-size: 0.8rem !important;" th:classappend="${token.avg_boll_max_css}"
-              th:text="${token.avg_boll_max}">
+            <div style="font-size: 0.7rem !important;">
+	            <span th:classappend="${token.avg_boll_min_css}"
+	              th:text="${token.avg_boll_min}"></span>
+	            <span th:classappend="${token.avg_boll_max_css}"
+	              th:text="${token.avg_boll_max}"></span>
+            </div>
           </td>
           <!-- OCO -->
           <td class="oco_css" th:classappend="${token.oco_css}"
-            style="text-align: right; min-width: 450px !important; max-width: 450px !important;">
+            style="text-align: left; padding-left: 0.5rem !important; min-width: 500px !important; max-width: 500px !important;">
             <div>
               <span th:text="${token.oco_tp_price}"></span><span
                 th:classappend="${token.oco_tp_price_hight_css}"
@@ -263,11 +264,13 @@ p {
           <td
             style="text-align: right; min-width: 150px !important; max-width: 150px !important;"
             class="text-info">
-            <p style="font-size: 0.6rem !important;"
-              th:classappend="${token.today_gecko_vol_css}"
-              th:text="${token.today_gecko_vol}">
-            <p th:classappend="${token.today_vol_css}"
-              th:text="${token.today_vol}">
+            <div>
+                <span style="font-size: 0.6rem !important;"
+                  th:classappend="${token.today_gecko_vol_css}"
+                  th:text="${token.today_gecko_vol}"></span>
+                <span th:classappend="${token.today_vol_css}"
+                  th:text="${token.today_vol}"></span>
+            </div>
             <p th:classappend="${token.today_price_css}"
               th:text="${token.today_price}">
             <p style="font-size: 0.6rem !important;"
@@ -275,96 +278,129 @@ p {
               th:text="${token.today_ema}">
           </td>
 
-          <td style="text-align: right;">
-            <p style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_0_gecko_vol_css}"
-              th:text="${token.day_0_gecko_vol}">
-            <p th:classappend="${token.day_0_vol_css}"
-              th:text="${token.day_0_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_0_gecko_vol_css}"
+                  th:text="${token.day_0_gecko_vol}"></span>
+                <span th:classappend="${token.day_0_vol_css}"
+                  th:text="${token.day_0_vol}"></span>
+            </div>
             <p th:classappend="${token.day_0_price_css}"
               th:text="${token.day_0_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_0_ema_css}"
               th:text="${token.day_0_ema}">
           </td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_1_gecko_vol_css}"
-              th:text="${token.day_1_gecko_vol}">
-            <p th:classappend="${token.day_1_vol_css}"
-              th:text="${token.day_1_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_1_gecko_vol_css}"
+                  th:text="${token.day_1_gecko_vol}"></span>
+                <span th:classappend="${token.day_1_vol_css}"
+                  th:text="${token.day_1_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_1_price_css}"
               th:text="${token.day_1_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_1_ema_css}"
               th:text="${token.day_1_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_2_gecko_vol_css}"
-              th:text="${token.day_2_gecko_vol}">
-            <p th:classappend="${token.day_2_vol_css}"
-              th:text="${token.day_2_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_2_gecko_vol_css}"
+                  th:text="${token.day_2_gecko_vol}"></span>
+                <span th:classappend="${token.day_2_vol_css}"
+                  th:text="${token.day_2_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_2_price_css}"
               th:text="${token.day_2_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_2_ema_css}"
               th:text="${token.day_2_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_3_gecko_vol_css}"
-              th:text="${token.day_3_gecko_vol}">
-            <p th:classappend="${token.day_3_vol_css}"
-              th:text="${token.day_3_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_3_gecko_vol_css}"
+                  th:text="${token.day_3_gecko_vol}"></span>
+                <span th:classappend="${token.day_3_vol_css}"
+                  th:text="${token.day_3_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_3_price_css}"
               th:text="${token.day_3_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_3_ema_css}"
               th:text="${token.day_3_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_4_gecko_vol_css}"
-              th:text="${token.day_4_gecko_vol}">
-            <p th:classappend="${token.day_4_vol_css}"
-              th:text="${token.day_4_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_4_gecko_vol_css}"
+                  th:text="${token.day_4_gecko_vol}"></span>
+                <span th:classappend="${token.day_4_vol_css}"
+                  th:text="${token.day_4_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_4_price_css}"
               th:text="${token.day_4_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_4_ema_css}"
               th:text="${token.day_4_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_5_gecko_vol_css}"
-              th:text="${token.day_5_gecko_vol}">
-            <p th:classappend="${token.day_5_vol_css}"
-              th:text="${token.day_5_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_5_gecko_vol_css}"
+                  th:text="${token.day_5_gecko_vol}"></span>
+                <span th:classappend="${token.day_5_vol_css}"
+                  th:text="${token.day_5_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_5_price_css}"
               th:text="${token.day_5_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_5_ema_css}"
               th:text="${token.day_5_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_6_gecko_vol_css}"
-              th:text="${token.day_6_gecko_vol}">
-            <p th:classappend="${token.day_6_vol_css}"
-              th:text="${token.day_6_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_6_gecko_vol_css}"
+                  th:text="${token.day_6_gecko_vol}"></span>
+                <span th:classappend="${token.day_6_vol_css}"
+                  th:text="${token.day_6_vol}"></span>            
+            </div>
+
             <p th:classappend="${token.day_6_price_css}"
               th:text="${token.day_6_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_6_ema_css}"
               th:text="${token.day_6_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_7_gecko_vol_css}"
-              th:text="${token.day_7_gecko_vol}">
-            <p th:classappend="${token.day_7_vol_css}"
-              th:text="${token.day_7_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_7_gecko_vol_css}"
+                  th:text="${token.day_7_gecko_vol}"></span>
+                <span th:classappend="${token.day_7_vol_css}"
+                  th:text="${token.day_7_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_7_price_css}"
               th:text="${token.day_7_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_7_ema_css}"
               th:text="${token.day_7_ema}"></td>
-          <td style="text-align: right;"><p
+          <td class="fix_width" style="text-align: right;">
+            <div>
+            </div>
+            <p
               style="font-size: 0.6rem !important;"
               th:classappend="${token.day_8_gecko_vol_css}"
               th:text="${token.day_8_gecko_vol}">
@@ -375,45 +411,61 @@ p {
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_8_ema_css}"
               th:text="${token.day_8_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_9_gecko_vol_css}"
-              th:text="${token.day_9_gecko_vol}">
-            <p th:classappend="${token.day_9_vol_css}"
-              th:text="${token.day_9_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_9_gecko_vol_css}"
+                  th:text="${token.day_9_gecko_vol}"></span>
+                <span th:classappend="${token.day_9_vol_css}"
+                  th:text="${token.day_9_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_9_price_css}"
               th:text="${token.day_9_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_9_ema_css}"
               th:text="${token.day_9_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_10_gecko_vol_css}"
-              th:text="${token.day_10_gecko_vol}">
-            <p th:classappend="${token.day_10_vol_css}"
-              th:text="${token.day_10_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_10_gecko_vol_css}"
+                  th:text="${token.day_10_gecko_vol}"></span>
+                <span th:classappend="${token.day_10_vol_css}"
+                  th:text="${token.day_10_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_10_price_css}"
               th:text="${token.day_10_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_10_ema_css}"
               th:text="${token.day_10_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_11_gecko_vol_css}"
-              th:text="${token.day_11_gecko_vol}">
-            <p th:classappend="${token.day_11_vol_css}"
-              th:text="${token.day_11_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_11_gecko_vol_css}"
+                  th:text="${token.day_11_gecko_vol}"></span>
+                <span th:classappend="${token.day_11_vol_css}"
+                  th:text="${token.day_11_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_11_price_css}"
               th:text="${token.day_11_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_11_ema_css}"
               th:text="${token.day_11_ema}"></td>
-          <td style="text-align: right;"><p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_12_gecko_vol_css}"
-              th:text="${token.day_12_gecko_vol}">
-            <p th:classappend="${token.day_12_vol_css}"
-              th:text="${token.day_12_vol}">
+          <td class="fix_width" style="text-align: right;">
+            <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_12_gecko_vol_css}"
+                  th:text="${token.day_12_gecko_vol}"></span>
+                <span th:classappend="${token.day_12_vol_css}"
+                  th:text="${token.day_12_vol}"></span>
+            </div>
+
             <p th:classappend="${token.day_12_price_css}"
               th:text="${token.day_12_price}">
             <p style="font-size: 0.6rem !important;"
