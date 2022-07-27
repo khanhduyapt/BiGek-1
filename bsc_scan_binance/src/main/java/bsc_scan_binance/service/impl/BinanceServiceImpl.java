@@ -1036,7 +1036,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 + min_14d_per + "%)";
 
                         String hold = "HOLD:" + dto.getSymbol() + ", " + Utils.removeLastZero(price_now.toString())
-                                + "$, " + min14day + ", Mc:" + dto.getMarket_cap();
+                                + "$, " + min14day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
 
                         String key_hold = Utils.convertDateToString("yyyyMMdd_hh", Calendar.getInstance().getTime())
                                 + "_HOLD_" + dto.getSymbol();
@@ -1095,7 +1095,7 @@ public class BinanceServiceImpl implements BinanceService {
                         min28day = "min28d: " + Utils.removeLastZero(dto.getMin28d().toString()) + "("
                                 + min28d_percent + "%)";
                         String hold = "HOLD:" + dto.getSymbol() + ", " + Utils.removeLastZero(price_now.toString())
-                                + "$, " + min28day + ", Mc:" + dto.getMarket_cap();
+                                + "$, " + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
 
                         String key_hold = Utils.convertDateToString("yyyyMMdd_hh", Calendar.getInstance().getTime())
                                 + "_HOLD_" + dto.getSymbol();

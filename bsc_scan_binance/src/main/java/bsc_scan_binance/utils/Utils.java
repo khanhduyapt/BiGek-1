@@ -331,6 +331,13 @@ public class Utils {
 
     }
 
+    public static String toMillions(Object value) {
+        BigDecimal val = getBigDecimal(value);
+        val = val.divide(BigDecimal.valueOf(1000000), 2, RoundingMode.CEILING);
+
+        return String.format("%,.0f", val) + "M$";
+    }
+
     public static String removeLastZero(String value) {
         if ((value == null) || (Objects.equals("", value))) {
             return "";
