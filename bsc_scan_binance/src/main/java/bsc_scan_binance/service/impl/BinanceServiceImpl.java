@@ -925,11 +925,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (idx_price_min == 0) {
                     setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
-                    if (!Objects.equals(null, css.getStar()) && !Objects.equals("", String.valueOf(css.getStar()))) {
-                        css.setStar("🤩🤩" + " " + css.getStar());
-                    } else {
-                        css.setStar("🤩" + css.getStar());
-                    }
+                    css.setStar("m14d" + css.getStar());
                     css.setStar_css("text-primary font-weight-bold");
 
                 } else if ((price_now.compareTo(BigDecimal.ZERO) > 0)
@@ -937,15 +933,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setStar(css.getStar() + " Max5%");
                     css.setStar_css("bg-warning rounded-lg");
-
-                } else if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (price_now.compareTo(min_add_5_percent) < 0)) {
-
-                    css.setStar("🤩" + css.getStar());
-                    css.setStar_css("text-primary font-weight-bold");
-
-                } else if (idx_vol_min == 1) {
-
-                    css.setStar("🤩" + css.getStar());
 
                 } else if (idx_price_min == 1) {
 
@@ -994,11 +981,6 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString().replace(".00", "") + "%");
 
-                    if (Objects.equals("", css.getStar()) && (percent.compareTo(BigDecimal.valueOf(5)) < 1)
-                            && ((Utils.getBigDecimalValue(css.getVolumn_div_marketcap())
-                                    .compareTo(BigDecimal.valueOf(10)) > -1))) {
-                        css.setStar("🤩" + css.getStar());
-                    }
                 } else {
                     css.setAvg_price("0.0");
                 }
@@ -1042,10 +1024,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                     priorityCoin.setMin_price_14d(price_min);
                     priorityCoin.setMax_price_14d(price_max);
-
-                    if (price_min.compareTo(price_now) > 0) {
-                        css.setStar(css.getStar() + " MinToday");
-                    }
 
                     String min_14d = "Min14d: " + price_min.toString() + "(" + Utils.toPercent(price_min, price_now)
                             + "%) Max14d: ";
@@ -1093,7 +1071,7 @@ public class BinanceServiceImpl implements BinanceService {
                             + min28d_percent + "%)";
 
                     if (min28d_percent.compareTo(BigDecimal.valueOf(-0.8)) > 0) {
-                        min28day = "min🤩28d: " + Utils.removeLastZero(dto.getAvg28d().toString()) + "("
+                        min28day = "min28d: " + Utils.removeLastZero(dto.getAvg28d().toString()) + "("
                                 + min28d_percent + "%)";
                         String hold = "HOLD:" + dto.getSymbol() + ", " + Utils.removeLastZero(price_now.toString())
                                 + "$, " + min28day + ", Mc:" + dto.getMarket_cap();
@@ -1115,18 +1093,16 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setMin28day_css("text-primary font-weight-bold");
 
                         css.setStar("m28d " + css.getStar());
+
+                    } else if (min28d_percent.compareTo(BigDecimal.valueOf(-10)) < 0) {
+
+                        css.setMin28day_css("text-danger");
+
                     }
 
                     avg_history += ", ";
                     css.setMin28day(min28day);
                     css.setAvg_history(avg_history);
-                }
-
-                BigDecimal avg_percent = Utils.getBigDecimalValue(css.getAvg_percent().replace("%", ""));
-                if (avg_percent.compareTo(BigDecimal.valueOf(10)) < 0) {
-                    css.setStar(css.getStar().replace("🤩", ""));
-                } else if (!css.getStar().contains("🤩")) {
-                    css.setStar("🤩" + css.getStar());
                 }
 
                 if (dto.getEma07d().compareTo(BigDecimal.ZERO) > 0) {
@@ -1348,65 +1324,6 @@ public class BinanceServiceImpl implements BinanceService {
                 sql_update_ema += String.format(
                         " where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getGecko_id(), dto.getSymbol());
-
-                // +1 yesterday vol min
-                // +1 Uptrend
-                // +1 gecko vol up
-                // +1 Boll
-                // +1 V/mc > 40%
-
-                // -1 dto.getEma07d() < 0
-                // -1 %24h > 20
-                // -1 %7d > 20
-                {
-                    int star = 0;
-                    if (idx_vol_min == 1) {
-                        star += 1;
-                        css.setStar(css.getStar() + " Yesterday");
-                    }
-                    if (css.getStar().toUpperCase().contains("UPTREND")) {
-                        star += 2;
-                    }
-                    if (css.getStar().toUpperCase().contains("GECKO")) {
-                        star += 1;
-                    }
-                    if (css.getStar().toUpperCase().contains("BOLL")) {
-                        star += 1;
-                    }
-                    if (css.getStar().toUpperCase().contains("MINTODAY")) {
-                        star += 3;
-                    }
-
-                    if (Utils.getBigDecimal(dto.getVolumn_div_marketcap()).compareTo(BigDecimal.valueOf(40)) > 0) {
-                        star += 1;
-                    }
-
-                    if (Utils.getBigDecimal(dto.getEma07d()).compareTo(BigDecimal.ZERO) < 0) {
-                        star -= 1;
-                    }
-                    if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_24h())
-                            .compareTo(BigDecimal.valueOf(30)) > 0) {
-                        star -= 2;
-                    } else if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_24h())
-                            .compareTo(BigDecimal.valueOf(20)) > 0) {
-                        star -= 1;
-                    }
-                    if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_7d())
-                            .compareTo(BigDecimal.valueOf(50)) > 0) {
-                        star -= 3;
-                    } else if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_7d())
-                            .compareTo(BigDecimal.valueOf(20)) > 0) {
-                        star -= 1;
-                    }
-                    if (Utils.getBigDecimalValue(dto.getPrice_change_percentage_14d())
-                            .compareTo(BigDecimal.valueOf(30)) > 0) {
-                        star -= 1;
-                    }
-
-                    if (star > 1) {
-                        css.setStar(css.getStar() + " " + star + "S");
-                    }
-                }
 
                 if (isOrderByBynaceVolume) {
                     if (Objects.equals("BTC", css.getSymbol())) {
