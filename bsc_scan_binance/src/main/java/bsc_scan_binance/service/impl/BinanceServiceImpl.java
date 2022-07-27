@@ -924,9 +924,8 @@ public class BinanceServiceImpl implements BinanceService {
                 max_subtract_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(0.95)));
 
                 if (idx_price_min == 0) {
+
                     setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
-                    css.setStar("m14d" + css.getStar());
-                    css.setStar_css("text-primary font-weight-bold");
 
                 } else if ((price_now.compareTo(BigDecimal.ZERO) > 0)
                         && (max_subtract_5_percent.compareTo(price_now) < 0)) {
@@ -1025,8 +1024,29 @@ public class BinanceServiceImpl implements BinanceService {
                     priorityCoin.setMin_price_14d(price_min);
                     priorityCoin.setMax_price_14d(price_max);
 
+                    BigDecimal min_14d_per = Utils.getBigDecimalValue(Utils.toPercent(dto.getAvg21d(), price_now));
                     String min_14d = "Min14d: " + Utils.removeLastZero(dto.getAvg21d().toString()) + "("
-                            + Utils.toPercent(dto.getAvg21d(), price_now) + "%) Max14d: ";
+                            + min_14d_per + "%) Max14d: ";
+
+                    if (min_14d_per.compareTo(BigDecimal.valueOf(-0.8)) > 0) {
+                        css.setStar("m14d" + css.getStar());
+                        css.setStar_css("text-primary font-weight-bold");
+
+                        String min14day = "min14d: " + Utils.removeLastZero(dto.getAvg14d().toString()) + "("
+                                + min_14d_per + "%)";
+
+                        String hold = "HOLD:" + dto.getSymbol() + ", " + Utils.removeLastZero(price_now.toString())
+                                + "$, " + min14day + ", Mc:" + dto.getMarket_cap();
+
+                        String key_hold = Utils.convertDateToString("yyyyMMdd_hh", Calendar.getInstance().getTime())
+                                + "_HOLD_" + dto.getSymbol();
+
+                        if (!msg_vol_up_dict.contains(key_hold)) {
+                            Utils.sendToTelegram(hold);
+                            msg_vol_up_dict.put(key_hold, key_hold);
+                        }
+
+                    }
 
                     String max_14d_percent = Utils.toPercent(price_max, price_now);
                     css.setOco_tp_price(min_14d);
