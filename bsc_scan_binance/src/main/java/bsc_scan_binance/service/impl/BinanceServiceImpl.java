@@ -1081,17 +1081,18 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     BigDecimal min28d_percent = Utils.getBigDecimalValue(Utils.toPercent(dto.getMin28d(), price_now));
+                    BigDecimal max28d_percent = Utils.getBigDecimalValue(Utils.toPercent(dto.getMax28d(), price_now));
 
                     String avg_history = "L60d:" + Utils.removeLastZero(dto.getMin60d().toString()) + "("
                             + Utils.toPercent(dto.getMin60d(), price_now) + "%)";
 
                     avg_history += ", L28d: " + Utils.removeLastZero(dto.getMax28d().toString()) + "("
-                            + Utils.toPercent(dto.getMax28d(), price_now)
-                            + "%), min28d: ";
+                            + max28d_percent + "%), min28d: ";
 
                     String min28day = Utils.removeLastZero(dto.getMin28d().toString()) + "(" + min28d_percent + "%)";
 
-                    if (price_now.compareTo(dto.getMax28d()) < 0) {
+                    if ((price_now.compareTo(dto.getMax28d()) < 0)
+                            || (max28d_percent.compareTo(BigDecimal.valueOf(0)) >= 0)) {
 
                         String hold = "HOLD_28d:" + dto.getSymbol() + ", " + Utils.removeLastZero(price_now.toString())
                                 + "$";
@@ -1099,7 +1100,7 @@ public class BinanceServiceImpl implements BinanceService {
                         hold += ", " + avg_history + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
 
                         String key_hold = Utils.convertDateToString("yyyyMMdd_hh", Calendar.getInstance().getTime())
-                                + "_HOLD_" + dto.getSymbol();
+                                + "HOLD" + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
                             Utils.sendToTelegram(hold);
@@ -1107,12 +1108,11 @@ public class BinanceServiceImpl implements BinanceService {
                         }
 
                         css.setMin28day_css("text-primary font-weight-bold");
-
                         css.setStar("m28d " + css.getStar());
 
                     } else if (min28d_percent.compareTo(BigDecimal.valueOf(-10)) < 0) {
 
-                        css.setMin28day_css("text-danger");
+                        //css.setMin28day_css("text-danger");
 
                     }
 
