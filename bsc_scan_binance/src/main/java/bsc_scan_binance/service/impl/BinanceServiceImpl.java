@@ -1004,7 +1004,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
-                            Utils.sendToMyTelegram(hold);
+                            //Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
                     }
@@ -1061,7 +1061,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
-                            Utils.sendToMyTelegram(hold);
+                            //Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
 
