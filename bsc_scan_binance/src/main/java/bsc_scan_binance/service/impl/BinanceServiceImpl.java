@@ -530,10 +530,10 @@ public class BinanceServiceImpl implements BinanceService {
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd')) as price_pre_14d,  \n"
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '20 days', 'yyyyMMdd')) as price_pre_21d,  \n"
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '28 days', 'yyyyMMdd')) as price_pre_28d,  \n"
-                    + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg07d,      \n"
-                    + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg14d,      \n"
+                    + "             ROUND((select MIN(COALESCE(w.min_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '60 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg07d,      \n"   //min60d
+                    + "             ROUND((select MAX(COALESCE(w.max_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '30 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg14d,      \n"   //max28d
                     + "             ROUND((select AVG(COALESCE(w.avg_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '20 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg21d,      \n"
-                    + "             ROUND((select MIN(COALESCE(w.min_price, 0)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '27 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg28d  \n" //min28d
+                    + "             ROUND((select MIN(COALESCE(w.min_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '30 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as avg28d  \n"        //min28d
                     + "                                                                                           \n"
                     + "          from                                                                             \n"
                     + "              candidate_coin can                                                           \n"
@@ -1083,26 +1083,27 @@ public class BinanceServiceImpl implements BinanceService {
 
                     BigDecimal min28d_percent = Utils.getBigDecimalValue(Utils.toPercent(dto.getAvg28d(), price_now));
 
-                    String avg_history = "avg7: " + dto.getAvg07d() + "(" + Utils.toPercent(dto.getAvg07d(), price_now)
-                            + "%)" + ", avg14: " + dto.getAvg14d() + "(" + Utils.toPercent(dto.getAvg14d(), price_now)
+                    String avg_history = "min60d: " + Utils.removeLastZero(dto.getAvg07d().toString()) + "(" + Utils.toPercent(dto.getAvg07d(), price_now)
+                            + "%)" + ", max28d: " + Utils.removeLastZero(dto.getAvg14d().toString()) + "(" + Utils.toPercent(dto.getAvg14d(), price_now)
                             + "%)";
 
-                    String min28day = "min28d: " + dto.getAvg28d() + "(" + min28d_percent + "%)";
+                    String min28day = "min28d: " + Utils.removeLastZero(dto.getAvg28d().toString()) + "(" + min28d_percent + "%)";
 
-                    if (min28d_percent.compareTo(BigDecimal.ZERO) > 0) {
-                        min28day = "min🤩28d: " + dto.getAvg28d() + "(" + min28d_percent + "%)";
+                    if (min28d_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
+                        min28day = "min🤩28d: " + Utils.removeLastZero(dto.getAvg28d().toString()) + "(" + min28d_percent + "%)";
+                        String hold = "HOLD:" + dto.getSymbol() + ", " + Utils.removeLastZero(price_now.toString()) + "%, " + min28day;
 
-                        Utils.sendToTelegram("HOLD:" + dto.getSymbol() + ", " + Utils.removeLastZero(price_now.toString()) + "%, " + min28day);
+                        if(!msg_vol_up_dict.contains("HOLD:" + dto.getSymbol())) {
+                            Utils.sendToTelegram(hold);
+                            msg_vol_up_dict.put("HOLD:" + dto.getSymbol(), "HOLD:" + dto.getSymbol());
+                        }
 
                         css.setMin28day_css("text-primary font-weight-bold");
 
-                    } else if (min28d_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
+                    } else if (min28d_percent.compareTo(BigDecimal.valueOf(-5)) > 0) {
 
                         css.setMin28day_css("text-primary font-weight-bold");
 
-                    } else if (min28d_percent.compareTo(BigDecimal.valueOf(-2)) > 0) {
-
-                        css.setMin28day_css("text-primary");
                     }
 
                     avg_history += ", ";
