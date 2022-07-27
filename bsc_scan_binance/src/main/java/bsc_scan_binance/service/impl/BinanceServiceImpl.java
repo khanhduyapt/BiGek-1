@@ -674,8 +674,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                 String gecko_volumn_history = dto.getGec_vol_pre_1h() + "←" + dto.getGec_vol_pre_2h() + " ←"
                         + dto.getGec_vol_pre_3h() + "←" + dto.getGec_vol_pre_4h() + "M";
-                if (gecko_volumn_history.length() > 35) {
-                    gecko_volumn_history = gecko_volumn_history.substring(0, 35);
+                if (gecko_volumn_history.length() > 20) {
+                    gecko_volumn_history = gecko_volumn_history.substring(0, 20);
                 }
                 css.setGecko_volumn_history(gecko_volumn_history);
 
@@ -989,10 +989,14 @@ public class BinanceServiceImpl implements BinanceService {
                                 + Utils.convertDateToString("_yyyyMMdd_", Calendar.getInstance().getTime())
                                 + dto.getSymbol();
 
+                        css.setMin_14d_css("text-primary");
+
                         if (!msg_vol_up_dict.contains(key_hold)) {
                             Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
+                    } else if (min_14d_per.compareTo(BigDecimal.valueOf(-3)) > 0) {
+                        css.setMin_14d_css("text-primary");
                     }
 
                     String max_14d_percent = Utils.toPercent(price_max, price_now);
