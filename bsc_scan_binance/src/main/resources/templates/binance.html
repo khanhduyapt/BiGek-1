@@ -78,8 +78,8 @@ p {
           <th class="text-center" scope="col">Volume</th>
 
           <th class="text-center text-primary" scope="col">v/mc</th>
+          <th class="text-center text-primary" scope="col">Range</th>
           <th class="text-center" scope="col">Price</th>
-          <th class="text-center text-primary" scope="col">Avg</th>
           <th class="text-center text-primary" scope="col">OCO</th>
           <th class="text-center" scope="col">%24h</th>
           <th class="text-center" scope="col">%7d</th>
@@ -168,21 +168,6 @@ p {
                 th:text="${token.volumn_binance_div_marketcap}">
             </div>
           </td>
-          <!-- Price -->
-          <td th:classappend="${token.btc_warning_css}"
-            style="text-align: right; min-width: 230px !important; max-width: 230px !important;">
-            <div>
-              <span th:text="${token.current_price} + '$'"></span>
-            </div>
-            <div style="font-size: 0.7rem !important;" th:classappend="${token.avg_price_css}">
-              Avg: <span th:text="${token.avg_price + '$'}"></span>
-                (<span style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
-                th:text="${token.avg_percent}"></span>)
-            </div>
-            <div style="font-size: 0.7rem !important;">
-               <span th:text="${token.pre_price_history}"></span>
-            </div>
-          </td>
           <!-- Avg -->
           <td 
             style="text-align: right; min-width: 250px !important; max-width: 250px !important;">
@@ -196,6 +181,21 @@ p {
 	              th:text="${token.avg_boll_min}"></span>
 	            <span th:classappend="${token.avg_boll_max_css}"
 	              th:text="${token.avg_boll_max}"></span>
+            </div>
+          </td>
+          <!-- Price -->
+          <td th:classappend="${token.btc_warning_css}"
+            style="text-align: right; min-width: 230px !important; max-width: 230px !important;">
+            <div>
+              <span th:text="${token.current_price} + '$'"></span>
+            </div>
+            <div style="font-size: 0.7rem !important;" th:classappend="${token.avg_price_css}">
+              Avg: <span th:text="${token.avg_price + '$'}"></span>
+                (<span style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
+                th:text="${token.avg_percent}"></span>)
+            </div>
+            <div style="font-size: 0.7rem !important;">
+               <span th:text="${token.pre_price_history}"></span>
             </div>
           </td>
           <!-- OCO -->

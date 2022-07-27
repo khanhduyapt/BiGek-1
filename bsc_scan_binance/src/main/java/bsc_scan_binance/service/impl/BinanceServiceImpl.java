@@ -588,8 +588,6 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<CandidateTokenResponse> results = query.getResultList();
 
-            //List<CandidateTokenCssResponse> result = new ArrayList<CandidateTokenCssResponse>();
-            List<CandidateTokenCssResponse> priorityList = new ArrayList<CandidateTokenCssResponse>();
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
 
             ModelMapper mapper = new ModelMapper();
@@ -657,8 +655,8 @@ public class BinanceServiceImpl implements BinanceService {
                         + Utils.removeLastZero(dto.getPrice_pre_2h()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_3h()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_4h());
-                if (pre_price_history.length() > 32) {
-                    pre_price_history = pre_price_history.substring(0, 32) + "...";
+                if (pre_price_history.length() > 28) {
+                    pre_price_history = pre_price_history.substring(0, 28) + "...";
                 }
                 css.setPre_price_history(pre_price_history);
 
@@ -982,17 +980,17 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar("m14d" + css.getStar());
                         css.setStar_css("text-white rounded-lg bg-info");
 
-                        //String min14day = "min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "("
-                        //        + min_14d_per + "%)";
-                        //String hold = "HOLD:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
-                        //        + "$), " + min14day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
+                        String min14day = "min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "("
+                                + min_14d_per + "%)";
+                        String hold = "HOLD:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
+                                + "$), " + min14day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
 
                         String key_hold = "HOLD"
-                                + Utils.convertDateToString("_yyyyMMdd_HH_", Calendar.getInstance().getTime())
+                                + Utils.convertDateToString("_yyyyMMdd_", Calendar.getInstance().getTime())
                                 + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
-                            // Utils.sendToMyTelegram(hold);
+                            Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
                     }
@@ -1039,14 +1037,15 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((price_now.compareTo(dto.getMax28d()) < 0)
                             || (max28d_percent.compareTo(BigDecimal.valueOf(-0.5)) >= 0)) {
 
-                        //String hold = "HOLD_28d:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString()) + "$)";
-                        //hold += ", " + avg_history + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
+                        String hold = "HOLD_28d:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
+                                + "$)";
+                        hold += ", " + avg_history + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
                         String key_hold = "HOLD"
-                                + Utils.convertDateToString("_yyyyMMdd_HH_", Calendar.getInstance().getTime())
+                                + Utils.convertDateToString("_yyyyMMdd_", Calendar.getInstance().getTime())
                                 + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
-                            // Utils.sendToMyTelegram(hold);
+                            Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
 
@@ -1246,46 +1245,29 @@ public class BinanceServiceImpl implements BinanceService {
                         " where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getGecko_id(), dto.getSymbol());
 
-                if (css.getStar().contains("m28d") && (market_cap.compareTo(BigDecimal.valueOf(200000000)) < 0)) {
-                    priorityList.add(css);
-                } else {
-                    if (isOrderByBynaceVolume) {
-                        if (Objects.equals("BTC", css.getSymbol())) {
-                            list.add(css);
-                        } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.ZERO) > 0)
-                                || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.ZERO) > 0)) {
-
-                            list.add(css);
-
-                        } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
-                                .compareTo(BigDecimal.valueOf(5)) > 0)
-                                && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
-
-                            // list.add(css);
-                        }
-
-                    } else {
+                if (isOrderByBynaceVolume) {
+                    if (Objects.equals("BTC", css.getSymbol())) {
                         list.add(css);
+                    } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.ZERO) > 0)
+                            || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.ZERO) > 0)) {
+
+                        list.add(css);
+
+                    } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
+                            .compareTo(BigDecimal.valueOf(5)) > 0)
+                            && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
+
+                        // list.add(css);
                     }
+
+                } else {
+                    list.add(css);
                 }
             }
 
             query = entityManager.createNativeQuery(sql_update_ema);
             query.executeUpdate();
             log.info("End getList <--");
-
-            //if (list.size() > 0) {
-            //    result.add(list.get(0));
-            //    list.remove(0);
-            //
-            //    for (CandidateTokenCssResponse css : priorityList) {
-            //        result.add(css);
-            //    }
-            //
-            //    for (CandidateTokenCssResponse css : list) {
-            //        result.add(css);
-            //    }
-            //}
 
             return list;
 
