@@ -50,6 +50,7 @@ p {
 .fix_width {
     min-width: 135px !important; 
     max-width: 135px !important;
+    font-size: 0.8rem !important;
 }
 
 .table td, .table th {
@@ -175,17 +176,17 @@ p {
             <div>
               <span th:text="${token.current_price} + '$'"></span>
             </div>
-            <div style="font-size: 0.7rem !important;">
-              <span th:text="${token.avg_price + '$'}"></span>
+            <div style="font-size: 0.7rem !important;" th:classappend="${token.avg_price_css}">
+              Avg: <span th:text="${token.avg_price + '$'}"></span>
                 (<span style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
-                th:classappend="${token.avg_price_css}"
                 th:text="${token.avg_percent}"></span>)
             </div>
-            <p style="font-size: 0.7rem !important;"
-                th:text="${token.pre_price_history}" />
+            <div style="font-size: 0.7rem !important;">
+               <span th:text="${token.pre_price_history}"></span>
+            </div>
           </td>
           <!-- Avg -->
-          <td class="bg-light important;"
+          <td 
             style="text-align: right; min-width: 250px !important; max-width: 250px !important;">
             <p class="text-primary" th:text="${token.futures}">
             <div>
@@ -260,9 +261,7 @@ p {
             <p style="font-size: 0.7rem !important;"
               th:text="${token.pumping_history}"></p></td>
 
-          <td
-            style="text-align: right; min-width: 150px !important; max-width: 150px !important;"
-            class="text-info">
+          <td class="fix_width" style="text-align: right;">
             <div>
                 <span style="font-size: 0.6rem !important;"
                   th:classappend="${token.today_gecko_vol_css}"

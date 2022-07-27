@@ -299,7 +299,7 @@ public class BinanceServiceImpl implements BinanceService {
                 day_index += 1;
             }
 
-            //https://www.omnicalculator.com/finance/rsi#:~:text=Calculate%20relative%20strength%20(RS)%20by,1%20%2D%20RS)%20from%20100.
+            // https://www.omnicalculator.com/finance/rsi#:~:text=Calculate%20relative%20strength%20(RS)%20by,1%20%2D%20RS)%20from%20100.
 
             int size = list_week.size() - 1;
             if (size > 0) {
@@ -463,7 +463,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   macd.min60d,                                                                            \n"
                     + "   macd.max28d,                                                                            \n"
                     + "   macd.min14d,                                                                            \n"
-                    + "   macd.min28d,                                                                            \n" //min 28
+                    + "   macd.min28d,                                                                            \n" // min
+                                                                                                                      // 28
                     // Bottleneck -> maybe up trend
                     + "   false AS uptrend,                                                                       \n"
                     + "   vol.vol0d,                                                                              \n"
@@ -507,10 +508,10 @@ public class BinanceServiceImpl implements BinanceService {
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd')) as price_pre_14d,  \n"
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '20 days', 'yyyyMMdd')) as price_pre_21d,  \n"
                     + "             (select COALESCE(w.avg_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '28 days', 'yyyyMMdd')) as price_pre_28d,  \n"
-                    + "             ROUND((select MIN(COALESCE(w.avg_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '60 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as min60d, \n" //min60d
-                    + "             ROUND((select MIN(COALESCE(w.avg_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '30 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as max28d, \n" //max28d
-                    + "             ROUND((select MIN(COALESCE(w.min_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '14 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as min14d, \n" //min14d
-                    + "             ROUND((select MIN(COALESCE(w.min_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '30 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as min28d  \n" //min28d
+                    + "             ROUND((select MIN(COALESCE(w.avg_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '60 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as min60d, \n" // min60d
+                    + "             ROUND((select MIN(COALESCE(w.avg_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '30 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as max28d, \n" // max28d
+                    + "             ROUND((select MIN(COALESCE(w.min_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '14 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as min14d, \n" // min14d
+                    + "             ROUND((select MIN(COALESCE(w.min_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '30 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as min28d  \n" // min28d
                     + "                                                                                           \n"
                     + "          from                                                                             \n"
                     + "              candidate_coin can                                                           \n"
@@ -888,20 +889,8 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal max_subtract_5_percent = Utils.getBigDecimal(avgPriceList.get(idx_price_max));
                 max_subtract_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(0.95)));
 
-                if (idx_price_min == 0) {
-
+                if ((idx_price_min == 0) || (idx_price_min == 1)) {
                     setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
-
-                } else if ((price_now.compareTo(BigDecimal.ZERO) > 0)
-                        && (max_subtract_5_percent.compareTo(price_now) < 0)) {
-
-                    css.setStar(css.getStar() + " Max5%");
-                    css.setStar_css("bg-warning rounded-lg");
-
-                } else if (idx_price_min == 1) {
-
-                    setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
-
                 }
 
                 // --------------AVG PRICE---------------
@@ -936,15 +925,16 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
-                    if (avg_price.compareTo(price_now) < 1) {
-                        css.setAvg_price_css("text-danger font-weight-bold");
-                    } else {
-                        css.setAvg_price_css("text-primary font-weight-bold");
-                    }
                     BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(avg_price, price_now, 1));
 
+                    if (percent.compareTo(BigDecimal.valueOf(-5)) < 0) {
+                        css.setAvg_price_css("text-danger");
+                    } else if (percent.compareTo(BigDecimal.valueOf(5)) > 0) {
+                        css.setAvg_price_css("text-primary");
+                    }
+
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
-                    css.setAvg_percent(percent.toString().replace(".00", "") + "%");
+                    css.setAvg_percent(percent.toString() + "%");
 
                 } else {
                     css.setAvg_price("0.0");
@@ -986,12 +976,12 @@ public class BinanceServiceImpl implements BinanceService {
                     priorityCoin.setMax_price_14d(price_max);
 
                     BigDecimal min_14d_per = Utils.getBigDecimalValue(Utils.toPercent(dto.getMin14d(), price_now));
-                    String min_14d = "Min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "("
-                            + min_14d_per + "%) Max14d: ";
+                    String min_14d = "Min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "(" + min_14d_per
+                            + "%) Max14d: ";
 
                     if (min_14d_per.compareTo(BigDecimal.valueOf(-0.8)) > 0) {
                         css.setStar("m14d" + css.getStar());
-                        css.setStar_css("text-primary font-weight-bold");
+                        css.setStar_css("text-white rounded-lg bg-info");
 
                         String min14day = "min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "("
                                 + min_14d_per + "%)";
@@ -1004,7 +994,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
-                            //Utils.sendToMyTelegram(hold);
+                            // Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
                     }
@@ -1043,8 +1033,8 @@ public class BinanceServiceImpl implements BinanceService {
                     String avg_history = "L60d: " + Utils.removeLastZero(dto.getMin60d().toString()) + "("
                             + Utils.toPercent(dto.getMin60d(), price_now) + "%)";
 
-                    avg_history += ", L28d: " + Utils.removeLastZero(dto.getMax28d().toString()) + "("
-                            + max28d_percent + "%), min28d: ";
+                    avg_history += ", L28d: " + Utils.removeLastZero(dto.getMax28d().toString()) + "(" + max28d_percent
+                            + "%), min28d: ";
 
                     String min28day = Utils.removeLastZero(dto.getMin28d().toString()) + "(" + min28d_percent + "%)";
 
@@ -1061,17 +1051,16 @@ public class BinanceServiceImpl implements BinanceService {
                                 + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
-                            //Utils.sendToMyTelegram(hold);
+                            // Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
 
                         css.setMin28day_css("text-primary font-weight-bold");
                         css.setStar("m28d " + css.getStar());
-                        css.setStar_css("text-primary font-weight-bold");
-
+                        css.setStar_css("text-white rounded-lg bg-info");
                     } else if (min28d_percent.compareTo(BigDecimal.valueOf(-10)) < 0) {
 
-                        //css.setMin28day_css("text-danger");
+                        // css.setMin28day_css("text-danger");
 
                     }
 
@@ -1105,7 +1094,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((Utils.getBigDecimalValue(avg_boll_min).compareTo(BigDecimal.valueOf(-1)) > 0)) {
 
                         if (dto.getRate1d0h().compareTo(BigDecimal.ZERO) > 0) {
-                            css.setAvg_boll_min_css("text-white bg-success");
+                            css.setAvg_boll_min_css("text-white bg-success rounded-lg");
                         } else {
                             css.setAvg_boll_min_css("text-primary");
                         }
@@ -1126,7 +1115,7 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (Utils.getBigDecimal(dto.getRsi()).compareTo(BigDecimal.valueOf(30)) < 0) {
-                        css.setRsi_css("text-white bg-success");
+                        css.setRsi_css("text-white bg-success rounded-lg");
                     }
 
                     // btc_warning_css
@@ -1143,7 +1132,7 @@ public class BinanceServiceImpl implements BinanceService {
                             if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)
                                     && Utils.isGoodPrice(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())) {
 
-                                css.setBtc_warning_css("bg-success");
+                                css.setBtc_warning_css("bg-success rounded-lg");
 
                                 String curr_percent_btc = Utils.convertDateToString("yyyy-MM-dd HH:mm",
                                         Calendar.getInstance().getTime());
@@ -1153,13 +1142,12 @@ public class BinanceServiceImpl implements BinanceService {
                                     if (BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
 
                                         if (price_now.compareTo(pre_btc_price) < 0) {
-                                            //(Good time to buy)
+                                            // (Good time to buy)
                                             pre_percent_btc = curr_percent_btc;
-                                            Utils.sendToTelegram("Btc: "
-                                                    + Utils.removeLastZero(price_now.toString())
-                                                    + Utils.new_line_from_service
-                                                    + css.getLow_to_hight_price() + Utils.new_line_from_service + "Can"
-                                                    + css.getAvg_boll_min() + " " + "Can" + css.getAvg_boll_max());
+                                            Utils.sendToTelegram("Btc: " + Utils.removeLastZero(price_now.toString())
+                                                    + Utils.new_line_from_service + css.getLow_to_hight_price()
+                                                    + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
+                                                    + "Can" + css.getAvg_boll_max());
 
                                             monitorTokenSales(results);
 
@@ -1171,7 +1159,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                             if ((price_now.multiply(BigDecimal.valueOf(1.005)).compareTo(highest_price_today) > 0)) {
 
-                                css.setBtc_warning_css("bg-danger");
+                                css.setBtc_warning_css("bg-danger rounded-lg");
 
                                 btc_danger = true;
 
