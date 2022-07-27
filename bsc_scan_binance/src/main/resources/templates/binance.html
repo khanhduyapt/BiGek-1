@@ -124,29 +124,27 @@ p {
 
           <td class="" style="text-align: center;"
             th:text="${iter.index + 1}">
-            <!-- Symbol -->
+          <!-- Symbol -->
           <td class="" style="max-width: 80px !important;"><a
             th:target="_blank" th:href="${token.binance_trade}"><span
               th:text="${token.symbol}"></span></a>
             <p style="font-size: 0.7rem !important;" th:text="${token.trend}"></td>
           <!-- Name -->
-          <td class=""
-            style="min-width: 180px !important; max-width: 180px !important;"><a
+          <td style="font-size: 0.9rem !important; min-width: 180px !important; max-width: 180px !important;"><a
             th:target="_blank" th:href="${token.coin_gecko_link}"> <span
               th:text="${token.name}"></span></a>
             <p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
             <p style="font-size: 0.7rem !important;"
               th:text="${token.pumping_history}"></p></td>
           <!-- MC -->
-          <td style="text-align: right; max-width: 180px !important;"><span
+          <td style="font-size: 0.9rem !important; text-align: right; max-width: 180px !important;"><span
             th:classappend="${token.market_cap_css}"
             th:text="${#numbers.formatDecimal(token.market_cap, 0, 'COMMA', 0, 'POINT') + '$'}"></span>
             <p style="font-size: 0.7rem !important;"
               th:text="${#numbers.formatDecimal(token.total_supply, 0, 'COMMA', 0, 'POINT')}"></td>
           <!-- Volume -->
-          <td
-            style="text-align: right; min-width: 150px !important; max-width: 150px !important;">
-            <p
+          <td style="text-align: right; min-width: 150px !important; max-width: 150px !important;">
+            <p style="font-size: 0.9rem !important;"
               th:text="${#numbers.formatDecimal(token.gecko_total_volume, 0, 'COMMA', 0, 'POINT') + '$'}">
             <p style="font-size: 0.7rem !important;"
               th:text="${token.gecko_volumn_history}">
@@ -246,20 +244,14 @@ p {
             <!-- Star -->
           <td style="text-align: center; min-width: 160px !important;"
             th:classappend="${token.star_css}" th:text="${token.star}">
-            <!-- Volume/AvgPrice/Low-Hight today -->
+          <!-- Volume/AvgPrice/Low-Hight today -->
+          
+          <!-- Symbol -->
           <td class="" style="max-width: 80px !important;"><a
             th:target="_blank" th:href="${token.binance_trade}"><span
               th:text="${token.symbol}"></span></a>
-            <p style="font-size: 0.7rem !important;" th:text="${token.trend}"></td>
-
-            <!-- Name -->
-          <td class=""
-            style="min-width: 180px !important; max-width: 180px !important;"><a
-            th:target="_blank" th:href="${token.coin_gecko_link}"> <span
-              th:text="${token.name}"></span></a>
-            <p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
-            <p style="font-size: 0.7rem !important;"
-              th:text="${token.pumping_history}"></p></td>
+            <p style="font-size: 0.7rem !important;" th:text="${token.trend}">
+          </td>
 
           <td class="fix_width" style="text-align: right;">
             <div>

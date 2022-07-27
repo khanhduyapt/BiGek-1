@@ -408,11 +408,11 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   ROUND((cur.total_volume / COALESCE ((SELECT (case when pre.total_volume = 0.0 then 1000000000 else pre.total_volume end) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 1000000000) * 100 - 100), 0) pre_4h_total_volume_up, \n"
                     + "   coalesce((SELECT ROUND(pre.total_volume/1000000, 1) FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                  as vol_now,      \n"
                     + "                                                                                           \n"
-                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                     , 3) as price_now,    \n"
-                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0), 3) as price_pre_1h, \n"
-                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0), 3) as price_pre_2h, \n"
-                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0), 3) as price_pre_3h, \n"
-                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0), 3) as price_pre_4h, \n"
+                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW()), 'HH24')), 0)                     , 5) as price_now,    \n"
+                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '1 hours'), 'HH24')), 0), 5) as price_pre_1h, \n"
+                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '2 hours'), 'HH24')), 0), 5) as price_pre_2h, \n"
+                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '3 hours'), 'HH24')), 0), 5) as price_pre_3h, \n"
+                    + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0), 5) as price_pre_4h, \n"
                     + "                                                                                           \n"
                     + "   can.market_cap ,                                                                        \n"
                     + "   cur.price_at_binance            as current_price,                                       \n"
@@ -588,7 +588,7 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<CandidateTokenResponse> results = query.getResultList();
 
-            List<CandidateTokenCssResponse> result = new ArrayList<CandidateTokenCssResponse>();
+            //List<CandidateTokenCssResponse> result = new ArrayList<CandidateTokenCssResponse>();
             List<CandidateTokenCssResponse> priorityList = new ArrayList<CandidateTokenCssResponse>();
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
 
@@ -599,7 +599,6 @@ public class BinanceServiceImpl implements BinanceService {
             Boolean this_token_is_good_price = false;
             List<PriorityCoin> listPriorityCoin = priorityCoinRepository.findAll();
             String msg_short = "";
-            Boolean btc_danger = false;
 
             // monitorTokenSales(results);
             for (CandidateTokenResponse dto : results) {
@@ -658,8 +657,8 @@ public class BinanceServiceImpl implements BinanceService {
                         + Utils.removeLastZero(dto.getPrice_pre_2h()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_3h()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_4h());
-                if (pre_price_history.length() > 35) {
-                    pre_price_history = pre_price_history.substring(0, 35);
+                if (pre_price_history.length() > 32) {
+                    pre_price_history = pre_price_history.substring(0, 32) + "...";
                 }
                 css.setPre_price_history(pre_price_history);
 
@@ -983,11 +982,10 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar("m14d" + css.getStar());
                         css.setStar_css("text-white rounded-lg bg-info");
 
-                        String min14day = "min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "("
-                                + min_14d_per + "%)";
-
-                        String hold = "HOLD:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
-                                + "$), " + min14day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
+                        //String min14day = "min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "("
+                        //        + min_14d_per + "%)";
+                        //String hold = "HOLD:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
+                        //        + "$), " + min14day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
 
                         String key_hold = "HOLD"
                                 + Utils.convertDateToString("_yyyyMMdd_HH_", Calendar.getInstance().getTime())
@@ -1041,11 +1039,8 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((price_now.compareTo(dto.getMax28d()) < 0)
                             || (max28d_percent.compareTo(BigDecimal.valueOf(-0.5)) >= 0)) {
 
-                        String hold = "HOLD_28d:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
-                                + "$)";
-
-                        hold += ", " + avg_history + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
-
+                        //String hold = "HOLD_28d:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString()) + "$)";
+                        //hold += ", " + avg_history + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
                         String key_hold = "HOLD"
                                 + Utils.convertDateToString("_yyyyMMdd_HH_", Calendar.getInstance().getTime())
                                 + dto.getSymbol();
@@ -1160,8 +1155,6 @@ public class BinanceServiceImpl implements BinanceService {
                             if ((price_now.multiply(BigDecimal.valueOf(1.005)).compareTo(highest_price_today) > 0)) {
 
                                 css.setBtc_warning_css("bg-danger rounded-lg");
-
-                                btc_danger = true;
 
                                 if (!CollectionUtils.isEmpty(ordersRepository.findRealOrders())) {
                                     String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
@@ -1281,20 +1274,20 @@ public class BinanceServiceImpl implements BinanceService {
             query.executeUpdate();
             log.info("End getList <--");
 
-            if (list.size() > 0) {
-                result.add(list.get(0));
-                list.remove(0);
+            //if (list.size() > 0) {
+            //    result.add(list.get(0));
+            //    list.remove(0);
+            //
+            //    for (CandidateTokenCssResponse css : priorityList) {
+            //        result.add(css);
+            //    }
+            //
+            //    for (CandidateTokenCssResponse css : list) {
+            //        result.add(css);
+            //    }
+            //}
 
-                for (CandidateTokenCssResponse css : priorityList) {
-                    result.add(css);
-                }
-
-                for (CandidateTokenCssResponse css : list) {
-                    result.add(css);
-                }
-            }
-
-            return result;
+            return list;
 
         } catch (Exception e) {
             e.printStackTrace();
