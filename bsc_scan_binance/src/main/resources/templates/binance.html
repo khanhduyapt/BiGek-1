@@ -175,14 +175,13 @@ p {
             <div>
               <span th:text="${token.current_price} + '$'"></span>
             </div>
-            <div style="font-size: 0.9rem !important;">
-              <span
-                style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
+            <div style="font-size: 0.7rem !important;">
+              <span th:text="${token.avg_price + '$'}"></span>
+                (<span style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
                 th:classappend="${token.avg_price_css}"
-                th:text="${token.avg_percent}"></span>= <span
-                th:text="${token.avg_price + '$'}"></span>
+                th:text="${token.avg_percent}"></span>)
             </div>
-            <p style="font-size: 0.8rem !important;"
+            <p style="font-size: 0.7rem !important;"
                 th:text="${token.pre_price_history}" />
           </td>
           <!-- Avg -->
