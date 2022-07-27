@@ -53,7 +53,6 @@ public class CandidateTokenCssResponse {
     private String oco_stop_limit_low_css = "";
     private String oco_stop_price = "";
     private String oco_low_hight = "";
-    private String ema_history;
     private String avg_history;
     private String min28day;
     private String min28day_css;

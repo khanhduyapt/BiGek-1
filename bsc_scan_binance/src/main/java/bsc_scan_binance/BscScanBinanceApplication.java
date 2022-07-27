@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 public class BscScanBinanceApplication {
-    public static int app_flag = Utils.const_app_flag_webonly; //1: msg_on; 2: msg_off; 3: web only; 4: all coin
+    public static int app_flag = Utils.const_app_flag_msg_off; //1: msg_on; 2: msg_off; 3: web only; 4: all coin
     public static String callFormBinance = "";
 
     public static void main(String[] args) {
@@ -36,7 +36,7 @@ public class BscScanBinanceApplication {
                 }
             }
             if (app_flag == 0) {
-                app_flag = Utils.const_app_flag_webonly;
+                app_flag = Utils.const_app_flag_msg_off;
             }
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
