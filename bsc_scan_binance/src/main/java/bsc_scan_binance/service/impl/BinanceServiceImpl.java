@@ -656,7 +656,9 @@ public class BinanceServiceImpl implements BinanceService {
                         + Utils.removeLastZero(dto.getPrice_pre_3h()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_4h());
                 if (pre_price_history.length() > 28) {
-                    pre_price_history = pre_price_history.substring(0, 28) + "...";
+                    pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"
+                            + Utils.removeLastZero(dto.getPrice_pre_1h()) + "← "
+                            + Utils.removeLastZero(dto.getPrice_pre_2h());
                 }
                 css.setPre_price_history(pre_price_history);
 
@@ -674,9 +676,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                 String gecko_volumn_history = dto.getGec_vol_pre_1h() + "←" + dto.getGec_vol_pre_2h() + " ←"
                         + dto.getGec_vol_pre_3h() + "←" + dto.getGec_vol_pre_4h() + "M";
+
                 if (gecko_volumn_history.length() > 20) {
-                    gecko_volumn_history = gecko_volumn_history.substring(0, 20);
+                    gecko_volumn_history = dto.getGec_vol_pre_1h() + "←" + dto.getGec_vol_pre_2h() + "M";
                 }
+
                 css.setGecko_volumn_history(gecko_volumn_history);
 
                 List<String> volList = new ArrayList<String>();
