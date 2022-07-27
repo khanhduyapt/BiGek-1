@@ -1049,7 +1049,7 @@ public class BinanceServiceImpl implements BinanceService {
                     String min28day = Utils.removeLastZero(dto.getMin28d().toString()) + "(" + min28d_percent + "%)";
 
                     if ((price_now.compareTo(dto.getMax28d()) < 0)
-                            || (max28d_percent.compareTo(BigDecimal.valueOf(0)) >= 0)) {
+                            || (max28d_percent.compareTo(BigDecimal.valueOf(-0.5)) >= 0)) {
 
                         String hold = "HOLD_28d:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
                                 + "$)";
