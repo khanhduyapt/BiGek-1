@@ -168,11 +168,11 @@ p {
           <!-- Range -->
           <td style="text-align: right; min-width: 250px !important; max-width: 250px !important;">
             <p class="text-primary" th:text="${token.futures}">
-            <div>
-              <p style="color: black !important; font-size: 0.9rem !important;"
+            <div style="font-size: 0.8rem !important;">
+              <p style="color: black !important;"
                 th:text="${token.low_to_hight_price}">
             </div>
-            <div style="font-size: 0.7rem !important;">
+            <div style="font-size: 0.75rem !important;">
               <span th:classappend="${token.avg_boll_min_css}"
                 th:text="${token.avg_boll_min}"></span>
               <span th:classappend="${token.avg_boll_max_css}"
@@ -185,7 +185,7 @@ p {
             <div>
               <span th:text="${token.current_price} + '$'"></span>
             </div>
-            <div style="font-size: 0.7rem !important;" th:classappend="${token.avg_price_css}">
+            <div style="font-size: 0.8rem !important;" th:classappend="${token.avg_price_css}">
               Avg: <span th:text="${token.avg_price + '$'}"></span>
                 (<span style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
                 th:text="${token.avg_percent}"></span>)
@@ -196,7 +196,7 @@ p {
           </td>
           <!-- OCO -->
           <td class="oco_css" th:classappend="${token.oco_css}"
-            style="text-align: left; padding-left: 0.5rem !important; min-width: 500px !important; max-width: 500px !important;">
+            style="text-align: left; padding-left: 0.5rem !important; min-width: 510px !important; max-width: 510px !important;">
             <div th:classappend="${token.min_14d_css}">
               <span th:text="${token.oco_tp_price}"></span><span
                 th:classappend="${token.oco_tp_price_hight_css}"
