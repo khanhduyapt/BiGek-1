@@ -2,6 +2,7 @@ package bsc_scan_geckko;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,9 +18,21 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootApplication
 public class BscScanGeckkoApplication {
 
+    public static int app_flag = Utils.const_app_flag_msg_off; //1: msg_on; 2: msg_off; 3: web only; 4: all coin
+
     public static void main(String[] args) {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()) + " ---->");
+
+            if (!Objects.equals(null, args) && args.length > 0) {
+                if (Utils.isNotBlank(args[0])) {
+                    app_flag = Utils.getIntValue(args[0]);
+                }
+            }
+            if (app_flag == 0) {
+                app_flag = Utils.const_app_flag_msg_off;
+            }
+            log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
 
             ApplicationContext applicationContext = SpringApplication.run(BscScanGeckkoApplication.class, args);
             bsc_scan_geckko.service.CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);

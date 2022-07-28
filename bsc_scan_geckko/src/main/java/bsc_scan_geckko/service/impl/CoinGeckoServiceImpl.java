@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import bsc_scan_geckko.BscScanGeckkoApplication;
 import bsc_scan_geckko.entity.CandidateCoin;
 import bsc_scan_geckko.entity.GeckoVolumeMonth;
 import bsc_scan_geckko.entity.GeckoVolumeMonthKey;
@@ -49,7 +50,11 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
     @Override
     public List<CandidateCoin> getList() {
-        return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
+        if (BscScanGeckkoApplication.app_flag == Utils.const_app_flag_all_coin) {
+            return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
+        } else {
+            return candidateCoinRepository.findCandidateCoinInBinanceFutures();
+        }
     }
 
     public CandidateCoin loadData(String gecko_id) {

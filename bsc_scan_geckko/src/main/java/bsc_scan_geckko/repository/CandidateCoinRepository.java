@@ -12,5 +12,7 @@ import bsc_scan_geckko.entity.CandidateCoin;
 public interface CandidateCoinRepository extends JpaRepository<CandidateCoin, String> {
 
     @Query(value = "SELECT m.* FROM candidate_coin m WHERE m.gecko_id IN (select gecko_id from binance_futures)", nativeQuery = true)
+    public List<CandidateCoin> findCandidateCoinInBinanceFutures();
+
     public List<CandidateCoin> findAllByOrderByVolumnDivMarketcapDesc();
 }

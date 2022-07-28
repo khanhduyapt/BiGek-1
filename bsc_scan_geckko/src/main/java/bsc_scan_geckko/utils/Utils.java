@@ -21,6 +21,30 @@ import org.springframework.web.servlet.LocaleResolver;
 
 public class Utils {
 
+    public static final int const_app_flag_msg_on = 1; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin
+    public static final int const_app_flag_msg_off = 2;
+    public static final int const_app_flag_webonly = 3;
+    public static final int const_app_flag_all_coin = 4;
+
+    public static boolean isNotBlank(String value) {
+        if (Objects.equals(null, value) || Objects.equals("", value)) {
+            return false;
+        }
+        return true;
+    }
+
+    public static Integer getIntValue(Object value) {
+        try {
+            if (Objects.equals(null, value)) {
+                return 0;
+            }
+
+            return Integer.valueOf(value.toString().trim());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     public static BigDecimal getBigDecimal(Object value) {
         if (Objects.equals(null, value)) {
             return BigDecimal.ZERO;

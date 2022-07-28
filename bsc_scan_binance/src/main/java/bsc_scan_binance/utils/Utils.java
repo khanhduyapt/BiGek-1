@@ -350,6 +350,12 @@ public class Utils {
         if ((value == null) || (Objects.equals("", value))) {
             return "";
         }
+
+        BigDecimal val = getBigDecimalValue(value);
+        if (val.compareTo(BigDecimal.valueOf(1000)) > 0) {
+            return String.format("%.0f", val);
+        }
+
         if (Objects.equals("0", value.subSequence(value.length() - 1, value.length()))) {
             String str = value.substring(0, value.length() - 1);
             return removeLastZero(str);
