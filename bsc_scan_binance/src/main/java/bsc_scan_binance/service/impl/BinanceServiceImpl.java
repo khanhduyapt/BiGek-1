@@ -652,13 +652,13 @@ public class BinanceServiceImpl implements BinanceService {
 
                 // Price
                 String pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"
-                        + Utils.removeLastZero(dto.getPrice_pre_1h()) + "← "
+                        + Utils.removeLastZero(dto.getPrice_pre_1h()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_2h()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_3h()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_4h());
                 if (pre_price_history.length() > 28) {
                     pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"
-                            + Utils.removeLastZero(dto.getPrice_pre_1h()) + "← "
+                            + Utils.removeLastZero(dto.getPrice_pre_1h()) + "←"
                             + Utils.removeLastZero(dto.getPrice_pre_2h());
                 }
                 css.setPre_price_history(pre_price_history);
@@ -1197,6 +1197,12 @@ public class BinanceServiceImpl implements BinanceService {
                         sp500 = loadPremarketSp500();
 
                         pre_yyyyMMddHH = Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime());
+
+                        BigDecimal mid_price = dto.getPrice_can_buy().add(dto.getPrice_can_sell());
+                        mid_price = mid_price.divide(BigDecimal.valueOf(2));
+                        if (price_now.compareTo(mid_price) < 0) {
+                            Utils.sendToMyTelegram("Bitcoin hits the average price (" + mid_price + ") today.");
+                        }
                     }
 
                     css.setStar(sp500);
