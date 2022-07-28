@@ -60,7 +60,7 @@ p {
 }
 
 .display-tity{
-	font-size: 0.7rem !important;
+    font-size: 0.65rem !important;
 }
 
 .table td, .table th {
@@ -98,9 +98,9 @@ p {
 
           <th class="text-center text-primary" scope="col">Star</th>
           <th class="text-center" scope="col">Symbol</th>
-          <th class="text-center" scope="col">Name</th>
+
           <th class="text-center" scope="col"
-            th:text="${#dates.format(#dates.createNow(), 'dd/MM')}">
+            th:text="'Today ' + ${#dates.format(#dates.createNow(), 'dd/MM')}">
           <th class="text-center" scope="col"
             th:text="${#dates.format( #dates.create(#dates.year(#dates.createNow()), #dates.month(#dates.createNow()), #dates.day(#dates.createNow()) - 1), 'dd/MM')}">
           <th class="text-center" scope="col"
@@ -173,10 +173,12 @@ p {
           <td style="text-align: right; min-width: 250px !important; max-width: 250px !important;">
             <p class="text-primary" th:text="${token.futures}">
             <div style="font-size: 0.8rem !important;">
-              <p style="color: black !important;"
-                th:text="${token.low_to_hight_price}">
+              <span th:classappend="${token.low_price_css}"
+                th:text="${token.low_price}"></span>
+              <span th:classappend="${token.hight_price_css}"
+                th:text="${token.hight_price}"></span>
             </div>
-            <div style="font-size: 0.75rem !important;">
+            <div style="font-size: 0.75rem !important;" th:classappend="${token.avg_price_css}">
               <span th:classappend="${token.avg_boll_min_css}"
                 th:text="${token.avg_boll_min}"></span>
               <span th:classappend="${token.avg_boll_max_css}"
@@ -189,8 +191,8 @@ p {
             <div>
               <span th:text="${token.current_price} + '$'"></span>
             </div>
-            <div style="font-size: 0.8rem !important;" th:classappend="${token.avg_price_css}">
-              Avg: <span th:text="${token.avg_price + '$'}"></span>
+            <div style="font-size: 0.8rem !important;">
+              Avg14d: <span th:text="${token.avg_price + '$'}"></span>
                 (<span style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
                 th:text="${token.avg_percent}"></span>)
             </div>
@@ -261,7 +263,7 @@ p {
                 <span th:classappend="${token.today_vol_css}"
                   th:text="${token.today_vol}"></span>
             </div>
-            <p th:classappend="${token.today_price_css}"
+            <p style="font-size: 1rem !important;" th:classappend="${token.today_price_css}"
               th:text="${token.today_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.today_ema_css}"

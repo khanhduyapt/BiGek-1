@@ -89,7 +89,13 @@ public class CandidateTokenCssResponse {
     private String star = "";
     private String star_css = "";
 
+    private String low_price = "";
+    private String low_price_css = "";
+    private String hight_price = "";
+    private String hight_price_css = "";
     private String low_to_hight_price = "";
+    private String low_to_hight_price_css = "";
+
     private String today = "";
     private String day_0 = "";
     private String day_1 = "";

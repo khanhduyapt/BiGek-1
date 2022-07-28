@@ -612,6 +612,7 @@ public class BinanceServiceImpl implements BinanceService {
                 mapper.map(dto, css);
 
                 BigDecimal price_now = Utils.getBigDecimal(dto.getPrice_now());
+                BigDecimal mid_price = Utils.getMidPrice(dto.getPrice_can_buy(), dto.getPrice_can_sell());
                 BigDecimal market_cap = Utils.getBigDecimal(dto.getMarket_cap());
                 BigDecimal gecko_total_volume = Utils.getBigDecimal(dto.getGecko_total_volume());
 
@@ -691,7 +692,15 @@ public class BinanceServiceImpl implements BinanceService {
 
                 List<String> temp = splitVolAndPrice(css.getToday());
                 css.setToday_vol(temp.get(0));
-                css.setToday_price(temp.get(1));
+
+                css.setToday_price(Utils.removeLastZero(mid_price.toString()) + "$ ("
+                        + Utils.toPercent(mid_price, price_now) + "%)");
+                if (css.getToday_price().contains("-")) {
+                    css.setToday_price_css("text-danger");
+                } else {
+                    css.setToday_price_css("text-primary");
+                }
+
                 css.setToday_gecko_vol(
                         temp.get(6) + " (Vol4h: " + Utils.getBigDecimal(dto.getVol_up_rate()).toString() + ")");
                 String today_ema = "";
@@ -891,10 +900,6 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal max_subtract_5_percent = Utils.getBigDecimal(avgPriceList.get(idx_price_max));
                 max_subtract_5_percent.multiply(BigDecimal.valueOf(Double.valueOf(0.95)));
 
-                if ((idx_price_min == 0) || (idx_price_min == 1)) {
-                    setPriceDayCss(css, idx_price_min, "text-danger font-weight-bold", ""); // Min Price
-                }
-
                 // --------------AVG PRICE---------------
                 BigDecimal avg_price = BigDecimal.ZERO;
                 BigDecimal total_price = BigDecimal.ZERO;
@@ -908,16 +913,25 @@ public class BinanceServiceImpl implements BinanceService {
 
                 price_now = Utils.getBigDecimalValue(css.getCurrent_price());
 
-                BigDecimal taget_percent_lost_today = Utils
-                        .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now, 1));
-                BigDecimal taget_percent_profit_today = Utils
-                        .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
+                {
+                    BigDecimal taget_percent_lost_today = Utils
+                            .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now, 1));
+                    BigDecimal taget_percent_profit_today = Utils
+                            .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
 
-                css.setLow_to_hight_price("L:" + Utils.removeLastZero(lowest_price_today.toString()) + "("
-                        + taget_percent_lost_today + "%)_H:"
-                        + Utils.removeLastZero(highest_price_today.toString()) + "("
-                        + taget_percent_profit_today.toString().replace(".0", "") + "%)"
-                        + " " + Utils.whenGoodPrice(price_now, lowest_price_today, highest_price_today));
+                    String low_to_hight_price = "L:" + Utils.removeLastZero(lowest_price_today.toString()) + "("
+                            + taget_percent_lost_today + "%)_H:"
+                            + Utils.removeLastZero(highest_price_today.toString()) + "("
+                            + taget_percent_profit_today.toString().replace(".0", "") + "%)";
+
+                    css.setLow_to_hight_price(low_to_hight_price);
+
+                    css.setLow_price(low_to_hight_price.substring(0, low_to_hight_price.indexOf("_")));
+                    css.setHight_price(low_to_hight_price.substring(low_to_hight_price.indexOf("_") + 1));
+                    if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
+                        css.setLow_price_css("text-white bg-success rounded-lg px-1");
+                    }
+                }
 
                 this_token_is_good_price = Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today);
 
@@ -1082,8 +1096,12 @@ public class BinanceServiceImpl implements BinanceService {
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_buy()) != 0
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_sell()) != 0) {
 
-                    String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now, 1);
-                    String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now, 1);
+                    String avg_boll_min = Utils.toPercent(dto.getPrice_can_buy(), price_now);
+                    String avg_boll_max = Utils.toPercent(dto.getPrice_can_sell(), price_now);
+
+                    if (Utils.isGoodPrice(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())) {
+                        css.setAvg_boll_min_css("text-white bg-success rounded-lg px-1");
+                    }
 
                     priorityCoin.setTarget_percent(
                             Utils.getIntValue(Utils.getBigDecimalValue(avg_boll_max).toBigInteger()));
@@ -1113,15 +1131,13 @@ public class BinanceServiceImpl implements BinanceService {
                         predict = true;
                     }
 
-                    if (Utils.getBigDecimal(dto.getRsi()).compareTo(BigDecimal.valueOf(30)) < 0) {
-                        css.setRsi_css("text-white bg-success rounded-lg");
-                    }
-
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
                         if (Objects.equals(pre_btc_price, BigDecimal.ZERO)) {
                             pre_btc_price = price_now;
                         }
+
+                        css.setBinance_trade("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
 
                         BigDecimal btc_range = ((highest_price_today.subtract(lowest_price_today)).divide(price_now, 3,
                                 RoundingMode.CEILING));
@@ -1190,23 +1206,29 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setVolumn_binance_div_marketcap_css("font-weight-bold text-danger");
                 }
 
+                if (Utils.isDangerPrice(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())) {
+                    css.setAvg_boll_min_css("text-danger");
+                    css.setAvg_boll_max_css("text-danger");
+                }
+
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
 
-                        sp500 = loadPremarketSp500();
+                        sp500 = loadPremarketSp500().replace(" ", "").replace("Futures", "(Futures)")
+                                .replace(Utils.new_line_from_bot, " ");
 
                         pre_yyyyMMddHH = Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime());
 
-                        BigDecimal mid_price = dto.getPrice_can_buy().add(dto.getPrice_can_sell());
-                        mid_price = mid_price.divide(BigDecimal.valueOf(2));
-                        if (price_now.compareTo(mid_price) < 0) {
+                        if (Utils.isGoodPrice(price_now, mid_price, dto.getPrice_can_sell())) {
                             Utils.sendToMyTelegram("Bitcoin hits the average price (" + mid_price + ") today.");
+                            css.setAvg_boll_min_css("text-success font-weight-bold");
+                            css.setAvg_boll_max_css("text-success font-weight-bold");
                         }
                     }
 
                     css.setStar(sp500);
-                    css.setStar_css("display-tity");
+                    css.setStar_css("display-tity text-left");
                 }
                 //---------------------------------------------------
 
@@ -1489,8 +1511,6 @@ public class BinanceServiceImpl implements BinanceService {
     private void setPriceDayCss(CandidateTokenCssResponse css, int index, String css_class, String percent) {
         switch (index) {
         case 0:
-            css.setToday_price_css(css_class);
-            css.setToday_price(css.getToday_price() + percent);
             break;
         case 1:
             css.setDay_0_price_css(css_class);
@@ -1885,7 +1905,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             String sp500 = "";
             if (!Objects.equals(null, assets1) && assets1.size() > 0) {
-                sp500 = assets1.get(0).text();
+                sp500 = assets1.get(0).text() + "";
             }
             if (!Objects.equals(null, assets2) && assets2.size() > 0) {
                 sp500 += " " + assets2.get(0).text();

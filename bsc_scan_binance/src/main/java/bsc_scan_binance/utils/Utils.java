@@ -247,6 +247,24 @@ public class Utils {
         return true;
     }
 
+    public static BigDecimal getMidPrice(BigDecimal low_price, BigDecimal hight_price) {
+        BigDecimal mid_price = (getBigDecimal(hight_price).add(getBigDecimal(low_price)));
+        mid_price = mid_price.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
+
+        return mid_price;
+    }
+
+    public static Boolean isDangerPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+        BigDecimal mid_price = getMidPrice(low_price, hight_price);
+
+        BigDecimal danger_range = (hight_price.subtract(mid_price));
+        danger_range = danger_range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+
+        BigDecimal danger_price = mid_price.subtract(danger_range);
+
+        return (danger_price.compareTo(curr_price) > 0);
+    }
+
     public static Boolean isVectorUp(BigDecimal vector) {
         return (vector.compareTo(BigDecimal.ZERO) >= 0);
     }
@@ -352,7 +370,7 @@ public class Utils {
         }
 
         BigDecimal val = getBigDecimalValue(value);
-        if (val.compareTo(BigDecimal.valueOf(1000)) > 0) {
+        if (val.compareTo(BigDecimal.valueOf(500)) > 0) {
             return String.format("%.0f", val);
         }
 
