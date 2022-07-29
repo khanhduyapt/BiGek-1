@@ -692,10 +692,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                 List<String> temp = splitVolAndPrice(css.getToday());
                 css.setToday_vol(temp.get(0));
+                String mid_price_percent = Utils.toPercent(mid_price, price_now);
+                css.setToday_price(Utils.removeLastZero(mid_price.toString()) + "$ (" + mid_price_percent + "%)");
 
-                css.setToday_price(Utils.removeLastZero(mid_price.toString()) + "$ ("
-                        + Utils.toPercent(mid_price, price_now) + "%)");
-                if (css.getToday_price().contains("-")) {
+                if (mid_price_percent.contains("-")) {
                     css.setToday_price_css("text-danger");
                 } else {
                     css.setToday_price_css("text-primary");
