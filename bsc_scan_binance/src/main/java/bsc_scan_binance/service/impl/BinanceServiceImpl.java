@@ -944,13 +944,6 @@ public class BinanceServiceImpl implements BinanceService {
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
                     BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(avg_price, price_now, 1));
-
-                    if (percent.compareTo(BigDecimal.valueOf(-5)) < 0) {
-                        css.setAvg_price_css("text-danger");
-                    } else if (percent.compareTo(BigDecimal.valueOf(5)) > 0) {
-                        css.setAvg_price_css("text-primary");
-                    }
-
                     css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
                     css.setAvg_percent(percent.toString() + "%");
 
