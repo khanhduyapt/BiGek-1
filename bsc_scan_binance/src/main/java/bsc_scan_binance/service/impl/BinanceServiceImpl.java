@@ -1144,8 +1144,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         if (btc_range.compareTo(BigDecimal.valueOf(0.015)) >= 0) {
 
-                            if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)
-                                    && Utils.isGoodPrice(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())) {
+                            if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
 
                                 css.setBtc_warning_css("bg-success rounded-lg");
 
@@ -1206,11 +1205,6 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setVolumn_binance_div_marketcap_css("font-weight-bold text-danger");
                 }
 
-                if (Utils.isDangerPrice(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())) {
-                    css.setAvg_boll_min_css("text-danger");
-                    css.setAvg_boll_max_css("text-danger");
-                }
-
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
@@ -1221,7 +1215,7 @@ public class BinanceServiceImpl implements BinanceService {
                         pre_yyyyMMddHH = Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime());
 
                         if (Utils.isGoodPrice(price_now, mid_price, dto.getPrice_can_sell())) {
-                            Utils.sendToMyTelegram("Bitcoin hits the average price (" + mid_price + ") today.");
+                            //Utils.sendToMyTelegram("Bitcoin hits the average price (" + mid_price + ") today.");
                             css.setAvg_boll_min_css("text-success font-weight-bold");
                             css.setAvg_boll_max_css("text-success font-weight-bold");
                         }

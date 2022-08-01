@@ -229,8 +229,8 @@ public class Utils {
     }
 
     public static BigDecimal getGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
-
         BigDecimal good_price = (hight_price.subtract(low_price));
+
         good_price = good_price.divide(BigDecimal.valueOf(4), 5, RoundingMode.CEILING);
         good_price = low_price.add(good_price);
 
@@ -298,7 +298,7 @@ public class Utils {
         sendToChatId(Utils.chatId_duydk, text);
 
         int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        if ((hh >= 19) || (hh <= 7)) {
+        if ((hh >= 20) || (hh <= 6)) {
             return;
         }
         sendToChatId(Utils.chatId_linkdk, text);
