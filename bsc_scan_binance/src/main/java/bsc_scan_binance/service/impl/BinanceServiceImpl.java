@@ -1211,6 +1211,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setStar(sp500);
                     css.setStar_css("display-tity text-left");
+                    if(sp500.contains("-")) {
+                        css.setStar_css("bg-danger rounded-lg display-tity text-left text-white");
+                    }
                 }
                 // ---------------------------------------------------
 
