@@ -13,7 +13,7 @@ import bsc_scan_binance.entity.BinanceVolumnDayKey;
 @Repository
 public interface BinanceVolumnDayRepository extends JpaRepository<BinanceVolumnDay, BinanceVolumnDayKey> {
 
-    @Query("SELECT m FROM BinanceVolumnDay m WHERE m.id.hh = TO_CHAR(NOW(), 'HH24') and m.id.symbol = :symbol ")
+    @Query("SELECT m FROM BinanceVolumnDay m WHERE m.id.hh = TO_CHAR(NOW(), 'HH24') and (m.id.symbol = :symbol or m.id.geckoid = :symbol) ")
     List<BinanceVolumnDay> searchBySymbol(@Param("symbol") String symbol);
 
 }

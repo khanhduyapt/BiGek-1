@@ -43,8 +43,8 @@ public class BscScanBinanceApplication {
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
-
             // binance_service.loadDataBtcVolumeDay("bitcoin", "BTC");
+            // app_flag = Utils.const_app_flag_msg_on;
 
             if (app_flag == Utils.const_app_flag_msg_on) {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
@@ -56,19 +56,20 @@ public class BscScanBinanceApplication {
                     e.printStackTrace();
                 }
             }
-            // --------------------Start--------------------
+            // --------------------Debug--------------------
             // binance_service.loadDataVolumeHour("unlend-finance", "UFT");
             // binance_service.loadData("unlend-finance", "UFT");
             //binance_service.getList(false);
             //binance_service.monitorBollingerBandwidth(false);
-            //binance_service.monitorProfit();
-            //app_flag = Utils.const_app_flag_msg_on;
+            binance_service.monitorProfit();
+            // --------------------Debug--------------------
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
                 CandidateCoin btc = new CandidateCoin();
                 if (!CollectionUtils.isEmpty(list)) {
-                    btc = list.stream().filter(item -> Objects.equals("BTC", item.getSymbol())).findFirst().orElse(new CandidateCoin());
+                    btc = list.stream().filter(item -> Objects.equals("BTC", item.getSymbol())).findFirst()
+                            .orElse(new CandidateCoin());
                 }
 
                 int size = list.size();
@@ -81,14 +82,13 @@ public class BscScanBinanceApplication {
                             List<Orders> orders = binance_service.getOrderList();
                             if (!CollectionUtils.isEmpty(orders)) {
                                 for (Orders order : orders) {
-                                    gecko_service.loadData(order.getGeckoid());
-                                    log.info("Binance -> Gecko " + " id:" + order.getGeckoid() + "; Symbol:"
-                                            + order.getSymbol());
+                                    gecko_service.loadData(order.getId().getGeckoid());
+                                    log.info("Binance -> Gecko " + " id:" + order.getId().getGeckoid());
                                 }
                             }
                         }
 
-                        if(idx % 30 == 0) {
+                        if (idx % 30 == 0) {
                             binance_service.loadData(btc.getGeckoid(), btc.getSymbol());
                             binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
                             binance_service.getList(false); // ~3p 1 lan
@@ -100,7 +100,7 @@ public class BscScanBinanceApplication {
                         log.error("dkd error LoadData:" + e.getMessage());
                     }
 
-                    if(BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
+                    if (BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
                         wait(300);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
                     } else {
                         wait(200);

@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
@@ -35,8 +35,8 @@ import lombok.NoArgsConstructor;
 @SqlResultSetMapping(name = "OrdersProfitResponse", classes = {
         @ConstructorResult(targetClass = OrdersProfitResponse.class, columns = {
                 @ColumnResult(name = "gecko_id", type = String.class),
-                @ColumnResult(name = "symbol", type = String.class),
-                @ColumnResult(name = "name", type = String.class),
+                @ColumnResult(name = "chatId", type = String.class),
+                @ColumnResult(name = "userName", type = String.class),
 
                 @ColumnResult(name = "order_price", type = BigDecimal.class),
                 @ColumnResult(name = "qty", type = BigDecimal.class),
@@ -52,15 +52,8 @@ import lombok.NoArgsConstructor;
 })
 
 public class Orders {
-    @Id
-    @Column(name = "gecko_id")
-    private String geckoid;
-
-    @Column(name = "symbol")
-    private String symbol;
-
-    @Column(name = "name")
-    private String name;
+    @EmbeddedId
+    private OrderKey id;
 
     @Column(name = "order_price")
     private BigDecimal order_price = BigDecimal.ZERO;

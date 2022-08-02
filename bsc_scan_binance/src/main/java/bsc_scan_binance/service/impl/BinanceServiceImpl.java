@@ -88,7 +88,6 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private BinanceFuturesRepository binanceFuturesRepository;
 
-    private BigDecimal pre_btc_price = BigDecimal.ZERO;
     private String pre_percent_btc = "";
     private String pre_yyyyMMddHH = "";
     private String sp500 = "";
@@ -1126,9 +1125,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
-                        if (Objects.equals(pre_btc_price, BigDecimal.ZERO)) {
-                            pre_btc_price = price_now;
-                        }
 
                         css.setBinance_trade("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
 
@@ -1141,25 +1137,24 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 css.setBtc_warning_css("bg-success rounded-lg");
 
-                                String curr_percent_btc = Utils.convertDateToString("yyyy-MM-dd HH:mm",
+                                String curr_percent_btc = Utils.convertDateToString("yyyy-MM-dd_HHmm",
                                         Calendar.getInstance().getTime());
                                 curr_percent_btc = curr_percent_btc.substring(0, curr_percent_btc.length() - 1);
+
                                 if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
 
-                                    if (BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
+                                    if ((BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on)
+                                            && has15MinutesCandleUp()) {
 
-                                        if (price_now.compareTo(pre_btc_price) < 0) {
-                                            // (Good time to buy)
-                                            pre_percent_btc = curr_percent_btc;
-                                            Utils.sendToTelegram("Btc: " + Utils.removeLastZero(price_now.toString())
-                                                    + Utils.new_line_from_service + css.getLow_to_hight_price()
-                                                    + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
-                                                    + "Can" + css.getAvg_boll_max());
+                                        // (Good time to buy)
+                                        pre_percent_btc = curr_percent_btc;
 
-                                            monitorTokenSales(results);
+                                        Utils.sendToTelegram("Btc: " + Utils.removeLastZero(price_now.toString())
+                                                + Utils.new_line_from_service + css.getLow_to_hight_price()
+                                                + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
+                                                + "Can" + css.getAvg_boll_max());
 
-                                            pre_btc_price = price_now;
-                                        }
+                                        monitorTokenSales(results);
                                     }
                                 }
                             }
@@ -1168,7 +1163,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 css.setBtc_warning_css("bg-danger rounded-lg");
 
-                                if (!CollectionUtils.isEmpty(ordersRepository.findRealOrders())) {
+                                if (ordersRepository.count() > 0) {
                                     String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
                                     if (!Objects.equals(curr_percent_btc, pre_percent_btc)) {
 
@@ -1185,8 +1180,6 @@ public class BinanceServiceImpl implements BinanceService {
                                 }
 
                             }
-                        } else {
-                            pre_btc_price = BigDecimal.ZERO;
                         }
                     }
                 }
@@ -1593,6 +1586,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             }
         }
+
         String result = "";
         if (Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
             Utils.sendToTelegram("(CanBuy) " + buy_msg);
@@ -1613,7 +1607,7 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal percent_loss = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_buy(), price_now, 1));
         BigDecimal percent_profits = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
 
-        if (!ordersRepository.existsById(dto.getGecko_id())) {
+        if (!CollectionUtils.isEmpty(ordersRepository.findAllByIdGeckoid(dto.getGecko_id()))) {
 
             if ((percent_loss.compareTo(BigDecimal.valueOf(-0.85)) > 0)
                     && (dto.getRate1d0h().compareTo(BigDecimal.ZERO) > 0)) {
@@ -1650,10 +1644,10 @@ public class BinanceServiceImpl implements BinanceService {
             List<OrdersProfitResponse> results = query.getResultList();
 
             if (!CollectionUtils.isEmpty(results)) {
-                int index = 1;
-                String msg = "";
 
                 for (OrdersProfitResponse dto : results) {
+                    String msg = "";
+
                     BigDecimal tp_percent = Utils.getBigDecimalValue(String.valueOf(dto.getTp_percent()));
                     BigDecimal target_percent = Utils.getBigDecimalValue(String.valueOf(dto.getTarget_percent()))
                             .multiply(BigDecimal.valueOf(0.9));
@@ -1679,20 +1673,11 @@ public class BinanceServiceImpl implements BinanceService {
                                 + Utils.new_line_from_service + Utils.new_line_from_service;
                     }
 
-                    if (index == 5) {
-                        if (Utils.isNotBlank(msg)) {
-                            Utils.sendToTelegram(msg);
-                        }
-                        msg = "";
-                        index = 1;
+                    if (Utils.isNotBlank(msg)) {
+                        Utils.sendToChatId(dto.getChatId(), msg);
                     }
-                    index += 1;
                 }
 
-                if (Utils.isNotBlank(msg)) {
-                    Utils.sendToTelegram(msg);
-                    msg = "";
-                }
             }
 
             log.info("End monitorProfit <----");
@@ -1908,4 +1893,46 @@ public class BinanceServiceImpl implements BinanceService {
         }
         return "";
     }
+
+    public boolean has15MinutesCandleUp() {
+        try {
+            final Integer limit = 4;
+            String url_usdt = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=15m&limit="
+                    + String.valueOf(limit);
+
+            List<Object> result_usdt = getBinanceData(url_usdt, limit);
+            int count = 0;
+            for (int idx = limit - 1; idx >= 0; idx--) {
+                Object obj_usdt = result_usdt.get(idx);
+
+                @SuppressWarnings("unchecked")
+                List<Object> arr_usdt = (List<Object>) obj_usdt;
+
+                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
+                //BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
+                //BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
+                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
+                String open_time = arr_usdt.get(0).toString();
+
+                if (Objects.equals("0", open_time)) {
+                    return false;
+                }
+
+                if (price_open_candle.compareTo(price_close_candle) < 0) {
+                    count += 1;
+                } else if (idx == limit - 1) {
+                    //return false;
+                }
+            }
+
+            if (count > 2) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
 }

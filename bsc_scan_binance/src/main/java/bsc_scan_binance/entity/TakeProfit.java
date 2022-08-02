@@ -51,10 +51,10 @@ public class TakeProfit {
     private String geckoid;
 
     @Column(name = "symbol")
-    private String symbol;
+    private String chatId;
 
     @Column(name = "name")
-    private String name;
+    private String userName;
 
     @Column(name = "order_price")
     private BigDecimal order_price = BigDecimal.ZERO;

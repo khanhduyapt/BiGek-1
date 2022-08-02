@@ -60,8 +60,8 @@ public class Utils {
             + " SELECT * from (                                                                             \n"
             + "    SELECT                                                                                   \n"
             + "      od.gecko_id,                                                                           \n"
-            + "      od.symbol,                                                                             \n"
-            + "      od.name,                                                                               \n"
+            + "      od.symbol      as chatId,                                                              \n"
+            + "      od.name        as userName,                                                            \n"
             + "      od.order_price,                                                                        \n"
             + "      ROUND(od.qty, 1) qty,                                                                  \n"
             + "      od.amount,                                                                             \n"
@@ -78,7 +78,6 @@ public class Utils {
             + "    WHERE                                                                                    \n"
             + "            cur.hh      = TO_CHAR(NOW(), 'HH24')                                             \n"
             + "        and od.gecko_id = cur.gecko_id                                                       \n"
-            + "        and od.symbol   = cur.symbol                                                         \n"
             + " ) odr ORDER BY odr.tp_amount desc ";
 
     public static String sql_boll_2_body = "" + " (                                     \n"
@@ -123,7 +122,7 @@ public class Utils {
     }
 
     public static String createMsgBalance(OrdersProfitResponse dto, String newline) {
-        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id()) + newline + "Price: "
+        String result = String.format("[%s]", dto.getGecko_id()) + newline + "Price: "
                 + dto.getPrice_at_binance().toString() + "$, "
                 + (dto.getTp_amount().compareTo(BigDecimal.ZERO) > 0 ? "Profit: " : "Loss: ")
                 + Utils.removeLastZero(dto.getTp_amount().toString()) + "$ (" + dto.getTp_percent() + "%)" + newline
@@ -304,7 +303,14 @@ public class Utils {
         sendToChatId(Utils.chatId_linkdk, text);
     }
 
-    private static void sendToChatId(String chat_id, String text) {
+    public static String getChatId(String userName) {
+        if (Objects.equals(userName, chatUser_linkdk)) {
+            return chatId_linkdk;
+        }
+        return chatId_duydk;
+    }
+
+    public static void sendToChatId(String chat_id, String text) {
         try {
             String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
 

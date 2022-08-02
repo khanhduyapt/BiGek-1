@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class OrdersProfitResponse {
 
     private String gecko_id;
-    private String symbol;
-    private String name;
+    private String chatId;
+    private String userName;
 
     private BigDecimal order_price;
     private BigDecimal qty;
