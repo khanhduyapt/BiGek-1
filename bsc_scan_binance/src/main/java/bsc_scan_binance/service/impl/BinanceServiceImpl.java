@@ -1149,11 +1149,6 @@ public class BinanceServiceImpl implements BinanceService {
                                         // (Good time to buy)
                                         pre_percent_btc = curr_percent_btc;
 
-                                        Utils.sendToTelegram("Btc: " + Utils.removeLastZero(price_now.toString())
-                                                + Utils.new_line_from_service + css.getLow_to_hight_price()
-                                                + Utils.new_line_from_service + "Can" + css.getAvg_boll_min() + " "
-                                                + "Can" + css.getAvg_boll_max());
-
                                         monitorTokenSales(results);
                                     }
                                 }
@@ -1172,10 +1167,6 @@ public class BinanceServiceImpl implements BinanceService {
                                                         + Utils.new_line_from_service + css.getLow_to_hight_price()
                                                         + Utils.new_line_from_service + "Can" + css.getAvg_boll_min()
                                                         + " " + "Can" + css.getAvg_boll_max());
-
-                                        if (BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on) {
-                                            monitorTokenSales(results);
-                                        }
                                     }
                                 }
 
@@ -1623,10 +1614,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                     return "BUY:" + dto.getSymbol() + "(" + Utils.removeLastZero(price.toString()) + ")";
                 }
+            } else if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
+                return "SELL:" + dto.getSymbol();
             }
-
-        } else if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
-            return "SELL:" + dto.getSymbol();
         }
 
         return "";
