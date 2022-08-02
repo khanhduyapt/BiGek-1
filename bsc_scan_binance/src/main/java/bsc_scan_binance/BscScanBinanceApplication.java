@@ -61,7 +61,7 @@ public class BscScanBinanceApplication {
             // binance_service.loadData("unlend-finance", "UFT");
             //binance_service.getList(false);
             //binance_service.monitorBollingerBandwidth(false);
-            binance_service.monitorProfit();
+            //binance_service.monitorProfit();
             // --------------------Debug--------------------
 
             if (app_flag != Utils.const_app_flag_webonly) {
