@@ -30,6 +30,7 @@ public class BscScanBinanceApplication {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                     + " ---->");
+
             if (!Objects.equals(null, args) && args.length > 0) {
                 if (Utils.isNotBlank(args[0])) {
                     app_flag = Utils.getIntValue(args[0]);
@@ -38,6 +39,10 @@ public class BscScanBinanceApplication {
             if (app_flag == 0) {
                 app_flag = Utils.const_app_flag_msg_off;
             }
+
+            //Debug
+            app_flag = Utils.const_app_flag_msg_on;
+
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
@@ -62,7 +67,6 @@ public class BscScanBinanceApplication {
             //binance_service.getList(false);
             //binance_service.monitorBollingerBandwidth(false);
             //binance_service.monitorProfit();
-            // --------------------Debug--------------------
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
