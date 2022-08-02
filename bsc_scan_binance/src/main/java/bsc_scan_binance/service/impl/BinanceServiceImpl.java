@@ -927,7 +927,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setLow_price(low_to_hight_price.substring(0, low_to_hight_price.indexOf("_")));
                     css.setHight_price(low_to_hight_price.substring(low_to_hight_price.indexOf("_") + 1));
-                    if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
+
+                    if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)
+                            && taget_percent_lost_today.compareTo(BigDecimal.valueOf(-1)) > 0) {
                         css.setLow_price_css("text-white bg-success rounded-lg px-1");
                     }
                 }
