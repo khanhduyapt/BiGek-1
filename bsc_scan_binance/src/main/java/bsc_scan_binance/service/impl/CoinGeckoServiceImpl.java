@@ -94,6 +94,8 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 Arrays.asList("market_data", "price_change_percentage_14d"));
         Object priceChangePercentage30d = Utils.getLinkedHashMapValue(result,
                 Arrays.asList("market_data", "price_change_percentage_30d"));
+
+
         coin.setMarketCap(market_cap);
         coin.setTotalVolume(total_volume);
         coin.setCurrentPrice(Utils.getBigDecimal(current_price));

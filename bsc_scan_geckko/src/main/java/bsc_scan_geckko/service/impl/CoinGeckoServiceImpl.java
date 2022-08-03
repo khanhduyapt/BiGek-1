@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import bsc_scan_geckko.BscScanGeckkoApplication;
@@ -91,6 +92,10 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 Arrays.asList("market_data", "price_change_percentage_14d"));
         Object priceChangePercentage30d = Utils.getLinkedHashMapValue(result,
                 Arrays.asList("market_data", "price_change_percentage_30d"));
+
+        Object ath_date = Utils.getLinkedHashMapValue(result,
+                Arrays.asList("market_data", "ath_date"));
+
         coin.setMarketCap(market_cap);
         coin.setTotalVolume(total_volume);
         coin.setCurrentPrice(Utils.getBigDecimal(current_price));
@@ -98,6 +103,19 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         coin.setPriceChangePercentage7D(Utils.getBigDecimal(priceChangePercentage7d));
         coin.setPriceChangePercentage14D(Utils.getBigDecimal(priceChangePercentage14d));
         coin.setPriceChangePercentage30D(Utils.getBigDecimal(priceChangePercentage30d));
+
+        @SuppressWarnings("unchecked")
+        LinkedHashMap<String, Object> ath_date_map = (LinkedHashMap<String, Object>) ath_date;
+        int min_year = 2022;
+        if (!Objects.equals(null, ath_date_map) && !CollectionUtils.isEmpty(ath_date_map)) {
+            for (Object key : ath_date_map.keySet()) {
+                String value = String.valueOf(ath_date_map.get(key));
+                int year = Utils.getIntValue(value.substring(0, 4));
+                if (min_year > year && year > 0) {
+                    min_year = year;
+                }
+            }
+        }
 
         if (Objects.equals(BigDecimal.ZERO, market_cap)) {
             coin.setVolumnDivMarketcap(BigDecimal.valueOf(0));
@@ -212,7 +230,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             if (String.valueOf(str_categories).toLowerCase().indexOf("launchpool") > 0) {
                 backer = "Binance";
             }
-            coin.setTrend(trend);
+            coin.setTrend(trend + " (" + min_year + ")");
             coin.setUsdt(String.valueOf(symbol).toUpperCase() + "_USDT");
             coin.setBusd(String.valueOf(symbol).toUpperCase() + "_BUSD");
             coin.setTotalSupply(Utils.getBigDecimal(total_supply));
