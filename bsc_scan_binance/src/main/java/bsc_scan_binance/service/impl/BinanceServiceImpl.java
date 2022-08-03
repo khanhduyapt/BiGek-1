@@ -933,6 +933,12 @@ public class BinanceServiceImpl implements BinanceService {
 
                     if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)
                             && taget_percent_lost_today.compareTo(BigDecimal.valueOf(-1)) > 0) {
+
+                        css.setStop_loss("SL:("
+                                + (lowest_price_today.multiply(BigDecimal.valueOf(0.99)))
+                                        .setScale(Utils.getDecimalNumber(lowest_price_today), BigDecimal.ROUND_DOWN)
+                                + ")");
+                        css.setStop_loss_css("bg-warning rounded-lg px-1");
                         css.setLow_price_css("text-white bg-success rounded-lg px-1");
                     }
                 }

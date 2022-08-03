@@ -170,9 +170,10 @@ p {
             </div>
           </td>
           <!-- Range -->
-          <td style="text-align: right; min-width: 250px !important; max-width: 250px !important;">
+          <td style="text-align: right; min-width: 288px !important; max-width: 288px !important;">
             <p class="text-primary" th:text="${token.futures}">
             <div style="font-size: 0.8rem !important;">
+              <span th:classappend="${token.stop_loss_css}" th:text="${token.stop_loss}"></span>
               <span th:classappend="${token.low_price_css}"
                 th:text="${token.low_price}"></span>
               <span th:classappend="${token.hight_price_css}"

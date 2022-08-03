@@ -89,6 +89,8 @@ public class CandidateTokenCssResponse {
     private String star = "";
     private String star_css = "";
 
+    private String stop_loss = "";
+    private String stop_loss_css = "";
     private String low_price = "";
     private String low_price_css = "";
     private String hight_price = "";

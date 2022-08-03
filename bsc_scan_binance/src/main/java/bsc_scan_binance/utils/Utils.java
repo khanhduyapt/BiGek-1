@@ -468,6 +468,17 @@ public class Utils {
         return BigDecimal.valueOf(Double.valueOf(formatter.toString()));
     }
 
+    public static int getDecimalNumber(BigDecimal value) {
+
+        String val = removeLastZero(getStringValue(value));
+        if (!val.contains(".")) {
+            return 0;
+        }
+        int number = val.length() - val.indexOf(".") - 1;
+
+        return number;
+    }
+
     public static Date getDate(String unix_time) {
         String temp = unix_time.substring(0, unix_time.length() - 3);
 
