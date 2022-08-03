@@ -54,7 +54,7 @@ public class BscScanTokenApplication {
                         token_service.loadBscData(coin.getGeckoid(), page);
                     }
 
-                    Utils.wait(Utils.wait_12_sec);
+                    Utils.wait(Utils.wait_06_sec);
                 } catch (Exception e) {
                     log.error("dkd error LoadData:[" + coin.getGeckoid() + "]" + e.getMessage());
                 }

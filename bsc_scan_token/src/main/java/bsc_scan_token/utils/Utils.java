@@ -20,7 +20,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
 public class Utils {
-    public static final int wait_12_sec = 12000; // 12,000 ms = 0.2 min
+
+    // wait_12_sec: 19 token -> 17 phut -> 11943 token = 199h = 8 ngay)
+    // public static final int wait_12_sec = 12000; // 12,000 ms = 0.2 min
+
+    // wait_06_sec: 93 token 32 phut -> 11943 token = 68h = 2.8 ngay
+    public static final int wait_06_sec = 6000;
 
     public static void wait(int ms) {
         try {

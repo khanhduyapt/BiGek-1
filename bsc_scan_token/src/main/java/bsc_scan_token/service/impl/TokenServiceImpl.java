@@ -73,7 +73,7 @@ public class TokenServiceImpl implements TokenService {
                 return false;
             }
 
-            Utils.wait(Utils.wait_12_sec);
+            Utils.wait(Utils.wait_06_sec);
 
             Document doc = Jsoup.connect(url + contract_address + "&p=" + page.toString()).get();
 
