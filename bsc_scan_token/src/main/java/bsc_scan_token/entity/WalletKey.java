@@ -13,16 +13,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Embeddable
-public class GeckoVolumeMonthKey implements Serializable {
+public class WalletKey implements Serializable {
     private static final long serialVersionUID = 2487553551545049610L;
 
     @Column(name = "gecko_id")
     private String geckoid;
 
-    @Column(name = "symbol")
-    private String symbol;
+    @Column(name = "blockchain")
+    private String blockchain;
 
-    @Column(name = "yyyymmdd")
-    private String yyyymmdd;
+    @Column(name = "address")
+    private String address;
 
 }

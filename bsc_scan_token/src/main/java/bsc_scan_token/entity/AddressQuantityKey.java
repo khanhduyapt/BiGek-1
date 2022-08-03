@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Embeddable
-public class TokenAddressDayKey implements Serializable {
+public class AddressQuantityKey implements Serializable {
     private static final long serialVersionUID = 2487553551545049610L;
 
     @Column(name = "blockchain")
@@ -25,7 +25,7 @@ public class TokenAddressDayKey implements Serializable {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "dd")
-    private String dd;
+    @Column(name = "yyyymmdd")
+    private String yyyymmdd;
 
 }

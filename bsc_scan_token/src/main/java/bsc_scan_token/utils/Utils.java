@@ -20,6 +20,15 @@ import org.springframework.context.MessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 
 public class Utils {
+    public static final int wait_12_sec = 12000; // 12,000 ms = 0.2 min
+
+    public static void wait(int ms) {
+        try {
+            java.lang.Thread.sleep(ms);
+        } catch (InterruptedException ex) {
+            java.lang.Thread.currentThread().interrupt();
+        }
+    }
 
     public static BigDecimal getBigDecimal(Object value) {
         if (Objects.equals(null, value)) {

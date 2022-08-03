@@ -24,9 +24,13 @@ import org.springframework.web.client.RestTemplate;
 import bsc_scan_token.entity.CandidateCoin;
 import bsc_scan_token.entity.GeckoVolumeMonth;
 import bsc_scan_token.entity.GeckoVolumeMonthKey;
+import bsc_scan_token.entity.Wallet;
+import bsc_scan_token.entity.WalletKey;
 import bsc_scan_token.repository.CandidateCoinRepository;
 import bsc_scan_token.repository.GeckoVolumeMonthRepository;
+import bsc_scan_token.repository.WalletRepository;
 import bsc_scan_token.service.CoinGeckoService;
+import bsc_scan_token.utils.Constant;
 import bsc_scan_token.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +45,9 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
     @Autowired
     private CandidateCoinRepository candidateCoinRepository;
+
+    @Autowired
+    private WalletRepository walletRepository;
 
     @Autowired
     private GeckoVolumeMonthRepository geckoVolumeMonthRepository;
@@ -59,7 +66,8 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
         @SuppressWarnings("unchecked")
         LinkedHashMap<String, Object> result = restTemplate.getForObject(url, LinkedHashMap.class);
-
+        boolean hasBinanceOrEtherium = false;
+        List<Wallet> walletList = new ArrayList<Wallet>();
         CandidateCoin coin = new CandidateCoin();
 
         Object id = Utils.getLinkedHashMapValue(result, Arrays.asList("id"));
@@ -85,8 +93,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         Object priceChangePercentage30d = Utils.getLinkedHashMapValue(result,
                 Arrays.asList("market_data", "price_change_percentage_30d"));
 
-        Object ath_date = Utils.getLinkedHashMapValue(result,
-                Arrays.asList("market_data", "ath_date"));
+        Object ath_date = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "ath_date"));
 
         @SuppressWarnings("unchecked")
         LinkedHashMap<String, Object> ath_date_map = (LinkedHashMap<String, Object>) ath_date;
@@ -120,7 +127,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
         GeckoVolumeMonth month = new GeckoVolumeMonth();
         month.setId(new GeckoVolumeMonthKey(String.valueOf(id).toLowerCase(), String.valueOf(symbol).toUpperCase(),
-                Utils.convertDateToString("dd", Calendar.getInstance().getTime())));
+                Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime())));
         month.setTotalVolume(total_volume);
         month.setPrice(Utils.getBigDecimal(current_price));
 
@@ -185,6 +192,32 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 coin.setMarketsCount(marketList.size());
             }
 
+            {
+                Object platforms = Utils.getLinkedHashMapValue(result, Arrays.asList("platforms"));
+
+                @SuppressWarnings("unchecked")
+                LinkedHashMap<String, Object> platforms_map = (LinkedHashMap<String, Object>) platforms;
+                if (!Objects.equals(null, platforms_map) && !CollectionUtils.isEmpty(platforms_map)) {
+                    for (Object key : platforms_map.keySet()) {
+
+                        String blockchain = Utils.getStringValue(key);
+                        String wallet = String.valueOf(platforms_map.get(key));
+
+                        if (Objects.equals(blockchain, Constant.CONST_BLOCKCHAIN_BSC)) {
+                            hasBinanceOrEtherium = true;
+                        } else if (Objects.equals(blockchain, Constant.CONST_BLOCKCHAIN_ETH)) {
+                            hasBinanceOrEtherium = true;
+                        }
+
+                        if (Utils.isNotBlank(wallet)) {
+                            WalletKey wid = new WalletKey(gecko_id, blockchain, wallet);
+                            Wallet entity = new Wallet(wid);
+                            walletList.add(entity);
+                        }
+                    }
+                }
+
+            }
             coin.setCategory(str_categories);
 
             // DeFi
@@ -250,37 +283,44 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             coin.setBinanceTrade(str_trade_url);
             coin.setCoinGeckoLink("https://www.coingecko.com/en/coins/" + String.valueOf(id));
 
-            //https://www.coingecko.com/en/coins/8506/markets_tab
+            // https://www.coingecko.com/en/coins/8506/markets_tab
             coin.setBacker(backer);
         }
 
         boolean allowUpdate = true;
         if (Utils.isBlank(coin.getBinanceTrade())) {
-
             if (Utils.isNotBlank(min_year_month)) {
                 int min_year = Utils.getIntValue(min_year_month.substring(0, 4));
                 if (min_year < Calendar.getInstance().get(Calendar.YEAR) - 1) {
 
                     allowUpdate = false;
 
-                    delete(gecko_id, "loadData: " + min_year_month);
+                    hide(gecko_id, "loadData: " + min_year_month);
                 }
             }
 
             if (coin.getMarketsCount() < 3) {
                 allowUpdate = false;
 
-                delete(gecko_id, "loadData: MarketsCount");
-            } else if (Objects.equals(coin.getTotalSupply(), BigDecimal.ZERO)
+                hide(gecko_id, "loadData: MarketsCount");
+            }
+
+            if (Objects.equals(coin.getTotalSupply(), BigDecimal.ZERO)
                     && Objects.equals(coin.getMaxSupply(), BigDecimal.ZERO)
                     && Objects.equals(coin.getCirculatingSupply(), BigDecimal.ZERO)) {
                 allowUpdate = false;
 
-                delete(gecko_id, "loadData: Supply=0");
+                hide(gecko_id, "loadData: Supply=0");
+            }
+
+            if (!hasBinanceOrEtherium) {
+                allowUpdate = false;
+                hide(gecko_id, "loadData: BinanceOrEtherium=false");
             }
         }
 
         if (allowUpdate) {
+            walletRepository.saveAll(walletList);
             geckoVolumeMonthRepository.save(month);
             candidateCoinRepository.save(coin);
         } else {
@@ -292,7 +332,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
     @Override
     @Transactional
-    public void delete(String gecko_id, String note) {
+    public void hide(String gecko_id, String note) {
 
         try {
             if (!java.util.Objects.equals(null, gecko_id)) {

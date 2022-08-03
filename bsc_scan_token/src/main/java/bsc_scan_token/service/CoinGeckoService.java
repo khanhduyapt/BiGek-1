@@ -11,5 +11,5 @@ public interface CoinGeckoService {
 
     public CandidateCoin loadData(String gecko_id);
 
-    public void delete(String gecko_id, String note);
+    public void hide(String gecko_id, String note);
 }

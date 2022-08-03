@@ -1,6 +1,5 @@
 package bsc_scan_token.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -17,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import bsc_scan_token.entity.TokenAddressDay;
-import bsc_scan_token.entity.TokenAddressDayKey;
-import bsc_scan_token.repository.TokenAddressDayRepository;
+import bsc_scan_token.entity.AddressQuantity;
+import bsc_scan_token.entity.AddressQuantityKey;
+import bsc_scan_token.entity.Wallet;
+import bsc_scan_token.repository.AddressQuantityRepository;
+import bsc_scan_token.repository.WalletRepository;
 import bsc_scan_token.service.TokenService;
 import bsc_scan_token.utils.Constant;
 import bsc_scan_token.utils.Utils;
@@ -35,35 +36,29 @@ public class TokenServiceImpl implements TokenService {
     private EntityManager entityManager;
 
     @Autowired
-    private TokenAddressDayRepository tokenAddressDayRepository;
+    private WalletRepository walletRepository;
 
-    // @Override
-//	@Transactional
-//	public Response priority(CoinGeckoTokenRequest request) {
-//		try {
-//			log.info("Start priority  --->");
-//
-//			if (!Objects.equals("", Utils.getValue(request.getId()))) {
-//				String sql = " Update candidate_coin set priority=:priority WHERE gecko_id=:gecko_id ;";
-//				Query query = entityManager.createNativeQuery(sql);
-//				query.setParameter("priority", request.getPriority());
-//				query.setParameter("gecko_id", request.getId());
-//				query.executeUpdate();
-//
-//				log.info(request.getId() + "=" + request.getNote());
-//			}
-//			log.info("End priority success <---");
-//			return new Response("200", "Ok");
-//		} catch (Exception e) {
-//			log.info("Add note error --->");
-//			log.error(e.getMessage());
-//			return new Response("500", "Error", e.toString());
-//		}
-//	}
+    @Autowired
+    private AddressQuantityRepository addressQuantityRepository;
 
     @Override
     @Transactional
-    public void loadBscData(String blockchain, String contract_address, String gecko_id, Integer page) {
+    public boolean loadBscData(String gecko_id, Integer page) {
+        boolean val = false;
+        List<Wallet> wallets = walletRepository.findAllByIdGeckoid(gecko_id);
+        for (Wallet entity : wallets) {
+            String blokchain = entity.getId().getBlockchain().toLowerCase();
+            if (blokchain.contains("eth") || blokchain.contains("binance")) {
+                val = val || loadBscData(entity.getId().getBlockchain(), entity.getId().getAddress(), gecko_id, page);
+
+            }
+        }
+
+        return val;
+    }
+
+    @Transactional
+    private boolean loadBscData(String blockchain, String contract_address, String gecko_id, Integer page) {
         try {
             // https://openplanning.net/10399/jsoup-java-html-parser
             // 0x7837fd820ba38f95c54d6dac4ca3751b81511357
@@ -75,8 +70,10 @@ public class TokenServiceImpl implements TokenService {
             } else if (Objects.equals(blockchain, Constant.CONST_BLOCKCHAIN_ETH)) {
                 url = "https://etherscan.io/token/generic-tokenholders2?a=";
             } else {
-                return;
+                return false;
             }
+
+            Utils.wait(Utils.wait_12_sec);
 
             Document doc = Jsoup.connect(url + contract_address + "&p=" + page.toString()).get();
 
@@ -85,9 +82,9 @@ public class TokenServiceImpl implements TokenService {
                 Elements rows = tables.get(0).select("tr");
 
                 Calendar calendar = Calendar.getInstance();
-                String dd = bsc_scan_token.utils.Utils.convertDateToString("dd", calendar.getTime());
+                String yyyyMMdd = Utils.convertDateToString("yyyyMMdd", calendar.getTime());
 
-                List<TokenAddressDay> list_day = new ArrayList<TokenAddressDay>();
+                List<AddressQuantity> list_day = new ArrayList<AddressQuantity>();
 
                 for (int i = 1; i < rows.size(); i++) {
                     try {
@@ -103,11 +100,11 @@ public class TokenServiceImpl implements TokenService {
 
                         String quantity = Utils.replaceComma(values.get(2).text());
 
-                        TokenAddressDay day = new TokenAddressDay();
-                        day.setId(new TokenAddressDayKey(blockchain, gecko_id, address, dd));
+                        AddressQuantity day = new AddressQuantity();
+                        day.setId(new AddressQuantityKey(blockchain, gecko_id, address, yyyyMMdd));
                         day.setQuantity(Utils.convertBigDecimal(quantity));
                         if (!Objects.equals(alias, address)) {
-                            day.setAlias(alias);
+                            day.setWalletName(alias);
                         }
 
                         list_day.add(day);
@@ -116,14 +113,16 @@ public class TokenServiceImpl implements TokenService {
                     }
                 }
 
-                tokenAddressDayRepository.saveAll(list_day);
+                addressQuantityRepository.saveAll(list_day);
                 log.info("loadData->" + blockchain + ", " + gecko_id + ", page:" + page.toString());
             }
         } catch (Exception e) {
             log.info("TokenServiceImpl.loadData error --->");
             e.printStackTrace();
             log.error(e.getMessage());
+            return false;
         }
+        return true;
     }
 
 }
