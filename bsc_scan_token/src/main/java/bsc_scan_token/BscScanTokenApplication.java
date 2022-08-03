@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.CollectionUtils;
 
 import bsc_scan_token.entity.CandidateCoin;
@@ -63,11 +62,10 @@ public class BscScanTokenApplication {
                 if (Objects.equals(idx, size - 1)) {
                     log.info("reload: " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()));
 
-                    ((ConfigurableApplicationContext) applicationContext).close();
-                    //idx = 0;
-                    //list.clear();
-                    //list = gecko_service.getList();
-                    //size = list.size();
+                    idx = 0;
+                    list.clear();
+                    list = gecko_service.getList();
+                    size = list.size();
                 } else {
                     idx += 1;
                 }

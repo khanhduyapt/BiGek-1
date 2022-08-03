@@ -95,7 +95,6 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         Object priceChangePercentage30d = Utils.getLinkedHashMapValue(result,
                 Arrays.asList("market_data", "price_change_percentage_30d"));
 
-
         coin.setMarketCap(market_cap);
         coin.setTotalVolume(total_volume);
         coin.setCurrentPrice(Utils.getBigDecimal(current_price));
@@ -155,10 +154,38 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 @SuppressWarnings("unchecked")
                 List<Object> tk = (List<Object>) tickers;
                 for (Object obj : tk) {
-                    Object trade_url = Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url"));
-                    if (String.valueOf(trade_url).toLowerCase().contains("binance.com/en")) {
-                        str_trade_url = String.valueOf(trade_url);
+                    String trade_url = Utils
+                            .getStringValue(Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url"))).toLowerCase();
+
+                    if (trade_url.contains("binance.com/en") && trade_url.contains("usdt")) {
+                        str_trade_url = trade_url;
                         break;
+                    }
+                }
+
+                if (!Utils.isNotBlank(str_trade_url)) {
+                    for (Object obj : tk) {
+                        String trade_url = Utils
+                                .getStringValue(Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url")))
+                                .toLowerCase();
+
+                        if (trade_url.contains("binance.com/en") && trade_url.contains("busd")) {
+                            str_trade_url = trade_url;
+                            break;
+                        }
+                    }
+                }
+
+                if (!Utils.isNotBlank(str_trade_url)) {
+                    for (Object obj : tk) {
+                        String trade_url = Utils
+                                .getStringValue(Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url")))
+                                .toLowerCase();
+
+                        if (trade_url.contains("binance.com/en")) {
+                            str_trade_url = trade_url;
+                            break;
+                        }
                     }
                 }
             }
