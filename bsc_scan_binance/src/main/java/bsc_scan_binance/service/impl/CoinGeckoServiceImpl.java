@@ -156,7 +156,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 List<Object> tk = (List<Object>) tickers;
                 for (Object obj : tk) {
                     Object trade_url = Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url"));
-                    if (String.valueOf(trade_url).toLowerCase().contains("binance")) {
+                    if (String.valueOf(trade_url).toLowerCase().contains("binance.com/en")) {
                         str_trade_url = String.valueOf(trade_url);
                         break;
                     }

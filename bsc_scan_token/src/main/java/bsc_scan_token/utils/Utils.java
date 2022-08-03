@@ -48,6 +48,18 @@ public class Utils {
         return ret;
     }
 
+    public static Integer getIntValue(Object value) {
+        try {
+            if (Objects.equals(null, value)) {
+                return 0;
+            }
+
+            return Integer.valueOf(value.toString().trim());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     public static BigDecimal convertBigDecimal(String value) {
         try {
             return BigDecimal.valueOf(Long.valueOf(value));
@@ -114,6 +126,24 @@ public class Utils {
         }
 
         return null;
+    }
+
+    public static String getStringValue(Object value) {
+        if (Objects.equals(null, value)) {
+            return "";
+        }
+        if (Objects.equals("", value.toString())) {
+            return "";
+        }
+
+        return value.toString();
+    }
+
+    public static boolean isNotBlank(String value) {
+        if (Objects.equals(null, value) || Objects.equals("", value)) {
+            return false;
+        }
+        return true;
     }
 
     public static String getMessage(HttpServletRequest request, LocaleResolver localeResolver, MessageSource messages,
