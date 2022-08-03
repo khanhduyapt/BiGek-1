@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -229,9 +231,16 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             }
 
             String backer = "";
-            if (String.valueOf(str_categories).toLowerCase().indexOf("launchpool") > 0) {
-                backer = "Binance";
+            String backer_id = Utils
+                    .getStringValue(Utils.getLinkedHashMapValue(result, Arrays.asList("image", "thumb")));
+            if (Utils.isNotBlank(backer_id)) {
+                Pattern pattern = Pattern.compile("(.*images/)(\\d*)(/thumb.*)");
+                Matcher m = pattern.matcher(backer_id);
+                if (m.find()) {
+                    backer = m.replaceAll("$2");
+                }
             }
+
             coin.setTrend(trend + " (" + min_year_month + ")");
             coin.setUsdt(String.valueOf(symbol).toUpperCase() + "_USDT");
             coin.setBusd(String.valueOf(symbol).toUpperCase() + "_BUSD");
