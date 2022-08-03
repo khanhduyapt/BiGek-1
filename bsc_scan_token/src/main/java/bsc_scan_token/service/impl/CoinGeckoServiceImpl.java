@@ -254,6 +254,12 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 allowUpdate = false;
 
                 delete(gecko_id, "loadData: MarketsCount");
+            } else if (Objects.equals(coin.getTotalSupply(), BigDecimal.ZERO)
+                    && Objects.equals(coin.getMaxSupply(), BigDecimal.ZERO)
+                    && Objects.equals(coin.getCirculatingSupply(), BigDecimal.ZERO)) {
+                allowUpdate = false;
+
+                delete(gecko_id, "loadData: Supply=0");
             }
         }
 
