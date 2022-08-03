@@ -139,6 +139,10 @@ public class Utils {
         return value.toString();
     }
 
+    public static boolean isBlank(String value) {
+        return !isNotBlank(value);
+    }
+
     public static boolean isNotBlank(String value) {
         if (Objects.equals(null, value) || Objects.equals("", value)) {
             return false;

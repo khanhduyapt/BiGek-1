@@ -255,15 +255,19 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         }
 
         boolean allowUpdate = true;
-        if (Utils.isNotBlank(min_year_month)) {
-            int min_year = Utils.getIntValue(min_year_month.substring(0, 4));
-            if ((!Utils.isNotBlank(coin.getBinanceTrade()))
-                    && (min_year < Calendar.getInstance().get(Calendar.YEAR) - 1)) {
+        if (Utils.isBlank(coin.getBinanceTrade())) {
 
-                allowUpdate = false;
+            if (Utils.isNotBlank(min_year_month)) {
+                int min_year = Utils.getIntValue(min_year_month.substring(0, 4));
+                if (min_year < Calendar.getInstance().get(Calendar.YEAR) - 1) {
 
-                delete(gecko_id, "loadData: " + min_year_month);
-            } else if (coin.getMarketsCount() < 3) {
+                    allowUpdate = false;
+
+                    delete(gecko_id, "loadData: " + min_year_month);
+                }
+            }
+
+            if (coin.getMarketsCount() < 3) {
                 allowUpdate = false;
 
                 delete(gecko_id, "loadData: MarketsCount");
