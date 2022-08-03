@@ -37,6 +37,8 @@ public class BscScanTokenApplication {
         //((ConfigurableApplicationContext)applicationContext ).close();
 
         try {
+            //gecko_service.loadData("arpa-chain");
+
             List<CandidateCoin> list = gecko_service.getList();
 
             if (CollectionUtils.isEmpty(list)) {

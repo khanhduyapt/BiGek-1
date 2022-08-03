@@ -249,13 +249,17 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             coin.setCirculatingSupply(Utils.getBigDecimal(circulating_supply));
             coin.setBinanceTrade(str_trade_url);
             coin.setCoinGeckoLink("https://www.coingecko.com/en/coins/" + String.valueOf(id));
+
+            //https://www.coingecko.com/en/coins/8506/markets_tab
             coin.setBacker(backer);
         }
 
         boolean allowUpdate = true;
         if (Utils.isNotBlank(min_year_month)) {
             int min_year = Utils.getIntValue(min_year_month.substring(0, 4));
-            if (min_year < Calendar.getInstance().get(Calendar.YEAR) - 1) {
+            if ((!Utils.isNotBlank(coin.getBinanceTrade()))
+                    && (min_year < Calendar.getInstance().get(Calendar.YEAR) - 1)) {
+
                 allowUpdate = false;
 
                 delete(gecko_id, "loadData: " + min_year_month);
