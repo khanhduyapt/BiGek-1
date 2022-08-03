@@ -49,7 +49,6 @@ public class BscScanBinanceApplication {
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
             // binance_service.loadDataBtcVolumeDay("bitcoin", "BTC");
-            // app_flag = Utils.const_app_flag_msg_on;
 
             if (app_flag == Utils.const_app_flag_msg_on) {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
@@ -61,6 +60,7 @@ public class BscScanBinanceApplication {
                     e.printStackTrace();
                 }
             }
+
             // --------------------Debug--------------------
             // binance_service.loadDataVolumeHour("unlend-finance", "UFT");
             // binance_service.loadData("unlend-finance", "UFT");

@@ -27,6 +27,8 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "symbol", type = String.class),
                 @ColumnResult(name = "name", type = String.class),
 
+                @ColumnResult(name = "low_price_24h", type = BigDecimal.class),
+                @ColumnResult(name = "hight_price_24h", type = BigDecimal.class),
                 @ColumnResult(name = "price_can_buy", type = BigDecimal.class),
                 @ColumnResult(name = "price_can_sell", type = BigDecimal.class),
                 @ColumnResult(name = "is_bottom_area", type = Boolean.class),
