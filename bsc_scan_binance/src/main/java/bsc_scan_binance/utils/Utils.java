@@ -248,6 +248,31 @@ public class Utils {
         return true;
     }
 
+    public static String appendSpace(String value, int length) {
+        int len = value.length();
+        if (len > length) {
+            return value;
+        }
+
+        int target = length - len;
+        String val = value;
+        for (int i = 0; i < target; i++) {
+            val += "   ";
+        }
+
+        for (int i = 0; i < len - 2; i++) {
+            if (Objects.equals(value.substring(i, 1), "I")) {
+                val += "  ";
+            }
+
+            if (Objects.equals(value.substring(i, 1), "J")) {
+                val += "  ";
+            }
+        }
+
+        return val;
+    }
+
     public static BigDecimal getMidPrice(BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal mid_price = (getBigDecimal(hight_price).add(getBigDecimal(low_price)));
         mid_price = mid_price.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
@@ -297,12 +322,12 @@ public class Utils {
         }
 
         sendToChatId(Utils.chatId_duydk, text);
+        sendToChatId(Utils.chatId_linkdk, text);
 
         //int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         //if ((hh >= 20) || (hh <= 6)) {
         //    //return;
         //}
-        sendToChatId(Utils.chatId_linkdk, text);
     }
 
     public static String getChatId(String userName) {

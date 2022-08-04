@@ -27,6 +27,8 @@ public class Utils {
     // wait_06_sec: 93 token 32 phut -> 11943 token = 68h = 2.8 ngay = 10 request/minute
     public static final int wait_06_sec = 6000;
 
+    public static final int wait_02_sec = 2000;
+
     public static void wait(int ms) {
         try {
             java.lang.Thread.sleep(ms);

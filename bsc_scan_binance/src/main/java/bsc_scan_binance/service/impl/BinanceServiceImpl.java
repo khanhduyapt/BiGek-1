@@ -1148,8 +1148,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                     css.setBtc_warning_css("bg-success rounded-lg");
 
-                                    if ((BscScanBinanceApplication.app_flag == Utils.const_app_flag_msg_on)
-                                            && has15MinutesCandleUp()) {
+                                    if (has15MinutesCandleUp()) {
 
                                         // (Good time to buy)
                                         pre_time_of_btc = curr_time_of_btc;
@@ -1303,6 +1302,88 @@ public class BinanceServiceImpl implements BinanceService {
             log.error(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
+    }
+
+    public String monitorTokenSales(List<CandidateTokenCssResponse> results) {
+
+        String buy_msg = "";
+        int count = 1;
+        int idx = 1;
+        String strCanBuy = "(CanBuy) " + Utils.convertDateToString("MM-dd HH:mm", Calendar.getInstance().getTime());
+
+        for (CandidateTokenCssResponse dto : results) {
+            idx += 1;
+            if (idx > 100) {
+                break;
+            }
+
+            String msg = monitorToken(dto);
+
+            if (Utils.isNotBlank(msg)) {
+
+                if (msg.contains("BUY:")) {
+
+                    if (Utils.isNotBlank(buy_msg)) {
+                        buy_msg += Utils.new_line_from_service;
+                    }
+                    buy_msg += msg.replace("BUY:", "(" + Utils.getStringValue(count) + ")");
+
+                    count += 1;
+
+                    if (count % 10 == 0) {
+                        if (count < 11) {
+                            Utils.sendToTelegram(strCanBuy + Utils.new_line_from_service + buy_msg);
+                        } else {
+                            Utils.sendToTelegram(Utils.new_line_from_service + buy_msg);
+                        }
+
+                        buy_msg = "";
+                    }
+                }
+
+            }
+        }
+
+        String result = "";
+        if (Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
+
+            if (count < 11) {
+                Utils.sendToTelegram(strCanBuy + Utils.new_line_from_service + buy_msg);
+            } else {
+                Utils.sendToTelegram(Utils.new_line_from_service + buy_msg);
+            }
+
+            msg_vol_up_dict.put(buy_msg, buy_msg);
+            result = buy_msg;
+        }
+
+        return result;
+    }
+
+    public String monitorToken(CandidateTokenCssResponse css) {
+
+        if (Utils.isNotBlank(css.getAvg_boll_min_css())) {
+
+            if (CollectionUtils.isEmpty(ordersRepository.findAllByIdGeckoid(css.getGecko_id()))) {
+
+                if (binanceFuturesRepository.existsById(css.getGecko_id())) {
+
+                    String result = css.getAvg_boll_min().substring(0, css.getStop_loss().indexOf("(")).replace("Buy: ",
+                            "B:") + "$, "
+                            + "SL:"
+                            + String.valueOf(css.getStop_loss().subSequence(css.getStop_loss().indexOf("(") + 1,
+                                    css.getStop_loss().indexOf(")"))).replaceAll("%", "%,")
+                            + " " + css.getAvg_boll_max().replace(" ", "");
+
+                    result = "BUY:" + Utils.appendSpace(css.getSymbol(), 6) + " " + result;
+
+                    return result;
+
+                }
+            }
+        }
+
+        return "";
     }
 
     private void setEmaCss(CandidateTokenCssResponse css) {
@@ -1560,61 +1641,6 @@ public class BinanceServiceImpl implements BinanceService {
 
         return Arrays.asList(volumn, Utils.removeLastZero(avg_price), Utils.removeLastZero(min_price),
                 Utils.removeLastZero(max_price), arr[4], arr[5], arr[6]);
-    }
-
-    public String monitorTokenSales(List<CandidateTokenCssResponse> results) {
-
-        String buy_msg = "";
-        String sell_msg = "";
-        for (CandidateTokenCssResponse dto : results) {
-            String msg = monitorTokenSale1(dto);
-            if (Utils.isNotBlank(msg)) {
-
-                if (msg.contains("BUY:")) {
-                    if (Utils.isNotBlank(buy_msg)) {
-                        buy_msg += " ,";
-                    }
-                    buy_msg += msg.replace("BUY:", "");
-
-                } else if (msg.contains("SELL:")) {
-                    if (Utils.isNotBlank(sell_msg)) {
-                        sell_msg += " ,";
-                    }
-                    sell_msg += msg.replace("SELL:", "");
-                }
-
-            }
-        }
-
-        String result = "";
-        if (Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
-            Utils.sendToTelegram("(CanBuy) " + Utils.new_line_from_service + buy_msg);
-            msg_vol_up_dict.put(buy_msg, buy_msg);
-            result = buy_msg;
-        }
-
-        return result;
-    }
-
-    public String monitorTokenSale1(CandidateTokenCssResponse css) {
-        if (Utils.isNotBlank(css.getAvg_boll_min_css())) {
-            if (CollectionUtils.isEmpty(ordersRepository.findAllByIdGeckoid(css.getGecko_id()))) {
-
-                if (binanceFuturesRepository.existsById(css.getGecko_id())) {
-
-                    String result = css.getAvg_boll_min().replace("Buy: ", "P:")
-                            + "SL:" + css.getStop_loss().subSequence(css.getStop_loss().indexOf("("),
-                                    css.getStop_loss().indexOf(")"))
-                            + ")"
-                            + css.getAvg_boll_max();
-
-                    return "BUY:" + css.getSymbol() + "(" + result.replaceAll(" ", "") + ")";
-
-                }
-            }
-        }
-
-        return "";
     }
 
     @SuppressWarnings("unchecked")
