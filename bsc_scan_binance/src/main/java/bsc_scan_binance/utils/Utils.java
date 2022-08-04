@@ -107,7 +107,7 @@ public class Utils {
             + "             (SELECT COALESCE(low_price  , 0) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by low_price asc  limit 1))              low_price,     \n"
             + "             (SELECT COALESCE(hight_price, 0) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by low_price desc limit 1))              hight_price,   \n"
             + "             (SELECT ROUND(AVG(COALESCE(avg_price, 0)), 5) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by avg_price asc  limit 2)) price_can_buy, \n"
-            + "             (SELECT ROUND(AVG(COALESCE(avg_price, 0)), 5) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by avg_price desc limit 5)) price_can_sell \n"
+            + "             (SELECT ROUND(AVG(COALESCE(avg_price, 0)), 5) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by avg_price desc limit 1)) price_can_sell \n"
             + "         from                                                                                \n"
             + "             candidate_coin can,                                                             \n"
             + "             btc_volumn_day tok                                                              \n"
@@ -298,10 +298,10 @@ public class Utils {
 
         sendToChatId(Utils.chatId_duydk, text);
 
-        int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        if ((hh >= 20) || (hh <= 6)) {
-            return;
-        }
+        //int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        //if ((hh >= 20) || (hh <= 6)) {
+        //    //return;
+        //}
         sendToChatId(Utils.chatId_linkdk, text);
     }
 

@@ -1119,14 +1119,11 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStop_loss("SL: " + sl + "(" + stop_loss_precent + "%)");
 
                     if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
-                        if (take_profit_percent.compareTo(BigDecimal.valueOf(5)) > 0) {
+                        if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
                             css.setStop_loss_css("bg-warning rounded-lg px-1");
                             css.setAvg_boll_min_css("text-white bg-success rounded-lg");
                             css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
                         }
-                    } else if ((Utils.getBigDecimal(price_can_buy_24h_percent).compareTo(BigDecimal.valueOf(-2)) > 0)
-                            && (roe.compareTo(BigDecimal.valueOf(3)) > 0)) {
-                        css.setAvg_boll_min_css("text-success font-weight-bold");
                     }
 
                     // btc_warning_css
@@ -1199,10 +1196,6 @@ public class BinanceServiceImpl implements BinanceService {
                                 .replace(Utils.new_line_from_bot, " ");
 
                         pre_yyyyMMddHH = Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime());
-
-                        if (Utils.isGoodPrice(price_now, mid_price, dto.getPrice_can_sell())) {
-                            css.setAvg_boll_min_css("text-success font-weight-bold");
-                        }
                     }
 
                     css.setStar(sp500);
