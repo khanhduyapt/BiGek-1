@@ -88,6 +88,21 @@ public class CandidateCoin {
     @Column(name = "markets_count")
     private int marketsCount;
 
+    @Column(name = "market_cap_rank")
+    private BigDecimal marketCapRank;
+
+    @Column(name = "coingecko_rank")
+    private BigDecimal coingeckoRank;
+
+    @Column(name = "note")
+    private String note;
+
+    @Column(name = "visible")
+    private boolean visible;
+
+    @Column(name = "blockchains")
+    private String blockchains;
+
     public CandidateCoin(String geckoid, String symbol, String name) {
         this.geckoid = geckoid;
         this.symbol = symbol;

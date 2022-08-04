@@ -193,19 +193,34 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             }
 
             {
+                BigDecimal marketCapRank = Utils
+                        .getBigDecimal(Utils.getLinkedHashMapValue(result, Arrays.asList("market_cap_rank")));
+
+                BigDecimal coingeckoRank = Utils
+                        .getBigDecimal(Utils.getLinkedHashMapValue(result, Arrays.asList("coingecko_rank")));
+
+                coin.setMarketCapRank(marketCapRank);
+                coin.setCoingeckoRank(coingeckoRank);
+            }
+
+            {
                 Object platforms = Utils.getLinkedHashMapValue(result, Arrays.asList("platforms"));
 
                 @SuppressWarnings("unchecked")
                 LinkedHashMap<String, Object> platforms_map = (LinkedHashMap<String, Object>) platforms;
                 if (!Objects.equals(null, platforms_map) && !CollectionUtils.isEmpty(platforms_map)) {
+
+                    String blockchains = "";
+
                     for (Object key : platforms_map.keySet()) {
 
-                        String blockchain = Utils.getStringValue(key);
+                        String blockchain = Utils.getStringValue(key).toLowerCase();
                         String wallet = String.valueOf(platforms_map.get(key));
 
-                        if (Objects.equals(blockchain, Constant.CONST_BLOCKCHAIN_BSC)) {
-                            hasBinanceOrEtherium = true;
-                        } else if (Objects.equals(blockchain, Constant.CONST_BLOCKCHAIN_ETH)) {
+                        blockchains += blockchain + "; ";
+
+                        if (blockchain.contains(Constant.CONST_BLOCKCHAIN_ETH)
+                                || blockchain.contains(Constant.CONST_BLOCKCHAIN_ETH)) {
                             hasBinanceOrEtherium = true;
                         }
 
@@ -215,6 +230,8 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                             walletList.add(entity);
                         }
                     }
+
+                    coin.setBlockchains(blockchains);
                 }
 
             }
@@ -295,14 +312,14 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
                     allowUpdate = false;
 
-                    hide(gecko_id, "loadData: " + min_year_month);
+                    coin.setNote("loadData: " + min_year_month + " NG");
                 }
             }
 
             if (coin.getMarketsCount() < 3) {
                 allowUpdate = false;
 
-                hide(gecko_id, "loadData: MarketsCount");
+                coin.setNote("loadData: MarketsCount < 3");
             }
 
             if (Objects.equals(coin.getTotalSupply(), BigDecimal.ZERO)
@@ -310,22 +327,40 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                     && Objects.equals(coin.getCirculatingSupply(), BigDecimal.ZERO)) {
                 allowUpdate = false;
 
-                hide(gecko_id, "loadData: Supply=0");
+                coin.setNote("loadData: Supply=0");
             }
 
             if (!hasBinanceOrEtherium) {
                 allowUpdate = false;
-                hide(gecko_id, "loadData: BinanceOrEtherium=false");
+                coin.setNote("loadData: BinanceOrEtherium=false");
+            }
+
+            if (coin.getMarketCapRank().compareTo(BigDecimal.valueOf(3000)) > 0) {
+                allowUpdate = false;
+                coin.setNote("loadData: MarketCapRank > 3000");
+            }
+
+            if (coin.getCoingeckoRank().compareTo(BigDecimal.valueOf(3000)) > 0) {
+                allowUpdate = false;
+                coin.setNote("loadData: CoingeckoRank > 3000");
+            }
+
+            if (coin.getTotalVolume().compareTo(BigDecimal.valueOf(500000)) < 0) {
+                allowUpdate = false;
+                coin.setNote("loadData: TotalVolume Min 500k$");
             }
         }
 
         if (allowUpdate) {
+            coin.setVisible(true);
             walletRepository.saveAll(walletList);
             geckoVolumeMonthRepository.save(month);
-            candidateCoinRepository.save(coin);
         } else {
+            coin.setVisible(false);
             deleteTokenInMonth(gecko_id);
         }
+
+        candidateCoinRepository.save(coin);
 
         return coin;
     }

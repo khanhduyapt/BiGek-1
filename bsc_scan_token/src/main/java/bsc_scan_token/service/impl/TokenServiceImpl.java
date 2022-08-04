@@ -46,12 +46,11 @@ public class TokenServiceImpl implements TokenService {
     public boolean loadBscData(String gecko_id, Integer page) {
         boolean val = false;
         List<Wallet> wallets = walletRepository.findAllByIdGeckoid(gecko_id);
-        for (Wallet entity : wallets) {
-            String blokchain = entity.getId().getBlockchain().toLowerCase();
-            if (blokchain.contains("eth") || blokchain.contains("binance")) {
-                val = val || loadBscData(entity.getId().getBlockchain(), entity.getId().getAddress(), gecko_id, page);
 
-            }
+        for (Wallet entity : wallets) {
+            val = val || loadBscData(entity.getId().getBlockchain(), entity.getId().getAddress(), gecko_id, page);
+
+            Utils.wait(Utils.wait_06_sec);
         }
 
         return val;
@@ -72,8 +71,6 @@ public class TokenServiceImpl implements TokenService {
             } else {
                 return false;
             }
-
-            Utils.wait(Utils.wait_06_sec);
 
             Document doc = Jsoup.connect(url + contract_address + "&p=" + page.toString()).get();
 

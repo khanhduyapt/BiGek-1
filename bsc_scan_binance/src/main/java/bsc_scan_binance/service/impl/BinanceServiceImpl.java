@@ -929,7 +929,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     if (Utils.isGoodPrice(price_now, lowest_price_today, highest_price_today)) {
 
-                        css.setLow_price_css("text-primary font-weight-bold");
+                        css.setLow_price_css("text-primary");
                     }
                 }
 
@@ -1092,32 +1092,41 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal price_can_buy_24h = dto.getPrice_can_buy();
                     BigDecimal price_can_sell_24h = dto.getPrice_can_sell();
 
-                    String avg_boll_min = Utils.toPercent(price_can_buy_24h, price_now);
-                    String avg_boll_max = Utils.toPercent(price_can_sell_24h, price_now);
-
-                    if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
-                        // css.setAvg_boll_min_css("text-white bg-success rounded-lg px-1");
-                        css.setAvg_boll_min_css("text-success font-weight-bold");
-                    }
-
-                    priorityCoin.setTarget_percent(
-                            Utils.getIntValue(Utils.getBigDecimalValue(avg_boll_max).toBigInteger()));
-
-                    css.setAvg_boll_min("Buy: " + Utils.removeLastZero(price_can_buy_24h.toString()) + "("
-                            + avg_boll_min + "%)");
-
-                    css.setAvg_boll_max("TP: " + avg_boll_max + "%");
-
                     BigDecimal sl = (dto.getLow_price_24h().multiply(BigDecimal.valueOf(0.999)))
                             .setScale(Utils.getDecimalNumber(dto.getLow_price_24h()), BigDecimal.ROUND_DOWN);
 
-                    css.setStop_loss("SL: " + sl + "(" + Utils.toPercent(sl, price_can_buy_24h) + "%)");
+                    BigDecimal price_can_buy_24h_percent = Utils
+                            .getBigDecimalValue(Utils.toPercent(price_can_buy_24h, price_now));
+                    BigDecimal stop_loss_precent = Utils.getBigDecimalValue(Utils.toPercent(sl, price_can_buy_24h));
+                    BigDecimal take_profit_percent = Utils
+                            .getBigDecimalValue(Utils.toPercent(price_can_sell_24h, price_now));
+                    BigDecimal roe = take_profit_percent;
+                    if (take_profit_percent.compareTo(BigDecimal.ZERO) != 0) {
+                        if (stop_loss_precent.abs().compareTo(BigDecimal.valueOf(1)) > 0) {
+                            roe = take_profit_percent.divide(stop_loss_precent.abs(), 5, RoundingMode.CEILING);
+                        }
 
-                    if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)
-                            && Utils.getBigDecimalValue(avg_boll_max).compareTo(BigDecimal.valueOf(5)) > 0) {
-                        css.setStop_loss_css("bg-warning rounded-lg px-1");
-                        css.setAvg_boll_min_css("text-white bg-success rounded-lg");
-                        css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
+                    }
+
+                    priorityCoin.setTarget_percent(
+                            Utils.getIntValue(take_profit_percent.toBigInteger()));
+
+                    css.setAvg_boll_min("Buy: " + Utils.removeLastZero(price_can_buy_24h.toString()) + "("
+                            + price_can_buy_24h_percent + "%)");
+
+                    css.setAvg_boll_max("TP: " + take_profit_percent + "%");
+
+                    css.setStop_loss("SL: " + sl + "(" + stop_loss_precent + "%)");
+
+                    if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
+                        if (take_profit_percent.compareTo(BigDecimal.valueOf(5)) > 0) {
+                            css.setStop_loss_css("bg-warning rounded-lg px-1");
+                            css.setAvg_boll_min_css("text-white bg-success rounded-lg");
+                            css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
+                        }
+                    } else if ((Utils.getBigDecimal(price_can_buy_24h_percent).compareTo(BigDecimal.valueOf(-2)) > 0)
+                            && (roe.compareTo(BigDecimal.valueOf(3)) > 0)) {
+                        css.setAvg_boll_min_css("text-success font-weight-bold");
                     }
 
                     // btc_warning_css
@@ -1148,7 +1157,7 @@ public class BinanceServiceImpl implements BinanceService {
                                         // (Good time to buy)
                                         pre_time_of_btc = curr_time_of_btc;
 
-                                        monitorTokenSales(results);
+                                        btc_is_good_price = true;
                                     }
                                 }
                             }
@@ -1286,6 +1295,11 @@ public class BinanceServiceImpl implements BinanceService {
 
             query = entityManager.createNativeQuery(sql_update_ema);
             query.executeUpdate();
+
+            if (btc_is_good_price) {
+                monitorTokenSales(list);
+            }
+
             log.info("End getList <--");
 
             return list;
@@ -1555,11 +1569,11 @@ public class BinanceServiceImpl implements BinanceService {
                 Utils.removeLastZero(max_price), arr[4], arr[5], arr[6]);
     }
 
-    public String monitorTokenSales(List<CandidateTokenResponse> results) {
+    public String monitorTokenSales(List<CandidateTokenCssResponse> results) {
 
         String buy_msg = "";
         String sell_msg = "";
-        for (CandidateTokenResponse dto : results) {
+        for (CandidateTokenCssResponse dto : results) {
             String msg = monitorTokenSale1(dto);
             if (Utils.isNotBlank(msg)) {
 
@@ -1586,33 +1600,24 @@ public class BinanceServiceImpl implements BinanceService {
             result = buy_msg;
         }
 
-        // if (Utils.isNotBlank(sell_msg) && !msg_vol_up_dict.contains(sell_msg)) {
-        // Utils.sendToTelegram("(Sell) " + sell_msg);
-        // msg_vol_up_dict.put(sell_msg, sell_msg);
-        // result += sell_msg;
-        // }
         return result;
     }
 
-    public String monitorTokenSale1(CandidateTokenResponse dto) {
-        BigDecimal price_now = Utils.getBigDecimal(dto.getCurrent_price());
-        BigDecimal percent_profits = Utils.getBigDecimalValue(Utils.toPercent(dto.getPrice_can_sell(), price_now, 1));
+    public String monitorTokenSale1(CandidateTokenCssResponse css) {
+        if (Utils.isNotBlank(css.getAvg_boll_min_css())) {
+            if (CollectionUtils.isEmpty(ordersRepository.findAllByIdGeckoid(css.getGecko_id()))) {
 
-        if (CollectionUtils.isEmpty(ordersRepository.findAllByIdGeckoid(dto.getGecko_id()))) {
+                if (binanceFuturesRepository.existsById(css.getGecko_id())) {
 
-            if (Utils.isGoodPrice(price_now, dto.getPrice_can_buy(), dto.getPrice_can_sell())
-                    && (dto.getRate1d0h().compareTo(BigDecimal.ZERO) > 0)) {
+                    String result = css.getAvg_boll_min().replace("Buy: ", "P:")
+                            + "SL:" + css.getStop_loss().subSequence(css.getStop_loss().indexOf("("),
+                                    css.getStop_loss().indexOf(")"))
+                            + ")"
+                            + css.getAvg_boll_max();
 
-                if (binanceFuturesRepository.existsById(dto.getGecko_id())) {
-
-                    BigDecimal price = dto.getPrice_can_buy();
-
-                    return "BUY:" + dto.getSymbol() + "(" + Utils.removeLastZero(price.toString()) + ")";
+                    return "BUY:" + css.getSymbol() + "(" + result.replaceAll(" ", "") + ")";
 
                 }
-
-            } else if (percent_profits.compareTo(BigDecimal.valueOf(0.5)) < 0) {
-                return "SELL:" + dto.getSymbol();
             }
         }
 

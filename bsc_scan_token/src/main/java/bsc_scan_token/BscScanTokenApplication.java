@@ -12,6 +12,7 @@ import org.springframework.util.CollectionUtils;
 import bsc_scan_token.entity.CandidateCoin;
 import bsc_scan_token.service.CoinGeckoService;
 import bsc_scan_token.service.TokenService;
+import bsc_scan_token.utils.Constant;
 import bsc_scan_token.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,11 +29,11 @@ public class BscScanTokenApplication {
         // ((ConfigurableApplicationContext)applicationContext ).close();
 
         try {
-//            gecko_service.loadData("arpa-chain");
-//            for (int page = 1; page <= 3; page++) {
-//                token_service.loadBscData("arpa-chain", page);
-//                wait(10000);
-//            }
+            //            gecko_service.loadData("arpa-chain");
+            //            for (int page = 1; page <= 3; page++) {
+            //                token_service.loadBscData("arpa-chain", page);
+            //                wait(10000);
+            //            }
 
             List<CandidateCoin> list = gecko_service.getList();
 
@@ -49,9 +50,20 @@ public class BscScanTokenApplication {
                 log.info("Token:" + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
                 try {
-                    gecko_service.loadData(coin.getGeckoid());
-                    for (int page = 1; page <= 3; page++) {
-                        token_service.loadBscData(coin.getGeckoid(), page);
+                    CandidateCoin entity = gecko_service.loadData(coin.getGeckoid());
+
+                    if (entity.isVisible()) {
+                        String blockchains = entity.getBlockchains();
+
+                        if (blockchains.contains(Constant.CONST_BLOCKCHAIN_ETH)
+                                || blockchains.contains(Constant.CONST_BLOCKCHAIN_ETH)) {
+
+                            for (int page = 1; page <= 3; page++) {
+                                //token_service.loadBscData(coin.getGeckoid(), page);
+
+                                log.info("loadData-> page:" + String.valueOf(page));
+                            }
+                        }
                     }
 
                     Utils.wait(Utils.wait_06_sec);
@@ -59,9 +71,9 @@ public class BscScanTokenApplication {
                     log.error("dkd error LoadData:[" + coin.getGeckoid() + "]" + e.getMessage());
                 }
 
-                // if (idx > 10) {
-                // break;
-                // }
+                if (idx > 10) {
+                    //break;
+                }
 
                 if (Objects.equals(idx, size - 1)) {
                     log.info("reload: " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()));
