@@ -1089,15 +1089,17 @@ public class BinanceServiceImpl implements BinanceService {
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_buy()) != 0
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_sell()) != 0) {
 
-                    BigDecimal price_can_buy_24h = dto.getPrice_can_buy();
-                    BigDecimal price_can_sell_24h = dto.getPrice_can_sell();
-
-                    BigDecimal sl = (dto.getLow_price_24h().multiply(BigDecimal.valueOf(0.999)))
+                    BigDecimal stop_loss = (dto.getLow_price_24h().multiply(BigDecimal.valueOf(0.999)))
                             .setScale(Utils.getDecimalNumber(dto.getLow_price_24h()), BigDecimal.ROUND_DOWN);
+                    BigDecimal price_can_buy_24h = dto.getPrice_can_buy();
 
                     BigDecimal price_can_buy_24h_percent = Utils
                             .getBigDecimalValue(Utils.toPercent(price_can_buy_24h, price_now));
-                    BigDecimal stop_loss_precent = Utils.getBigDecimalValue(Utils.toPercent(sl, price_can_buy_24h));
+
+                    BigDecimal stop_loss_precent = Utils
+                            .getBigDecimalValue(Utils.toPercent(stop_loss, price_can_buy_24h));
+
+                    BigDecimal price_can_sell_24h = dto.getPrice_can_sell();
                     BigDecimal take_profit_percent = Utils
                             .getBigDecimalValue(Utils.toPercent(price_can_sell_24h, price_now));
                     BigDecimal roe = take_profit_percent;
@@ -1108,21 +1110,23 @@ public class BinanceServiceImpl implements BinanceService {
 
                     }
 
-                    priorityCoin.setTarget_percent(
-                            Utils.getIntValue(take_profit_percent.toBigInteger()));
+                    priorityCoin.setTarget_percent(Utils.getIntValue(take_profit_percent.toBigInteger()));
 
                     css.setAvg_boll_min("Buy: " + Utils.removeLastZero(price_can_buy_24h.toString()) + "("
                             + price_can_buy_24h_percent + "%)");
 
                     css.setAvg_boll_max("TP: " + take_profit_percent + "%");
 
-                    css.setStop_loss("SL: " + sl + "(" + stop_loss_precent + "%)");
+                    css.setStop_loss("SL: " + stop_loss + "(" + stop_loss_precent + "%)");
 
-                    if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
-                        if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
-                            css.setStop_loss_css("bg-warning rounded-lg px-1");
-                            css.setAvg_boll_min_css("text-white bg-success rounded-lg");
-                            css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
+                    String priceChange24h = dto.getPrice_change_percentage_24h().replace("%", "");
+                    if (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0) {
+                        if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
+                            if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
+                                css.setStop_loss_css("bg-warning rounded-lg px-1");
+                                css.setAvg_boll_min_css("text-white bg-success rounded-lg");
+                                css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
+                            }
                         }
                     }
 
@@ -1130,17 +1134,15 @@ public class BinanceServiceImpl implements BinanceService {
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
                         css.setBinance_trade("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
 
-                        String curr_time_of_btc = Utils.convertDateToString("yyyy-MM-dd_HH_",
+                        String curr_time_of_btc = Utils.convertDateToString("yyyy-MM-dd_HH_mm",
                                 Calendar.getInstance().getTime());
 
-                        int unroundedMinutes = Calendar.getInstance().get(Calendar.MINUTE) / 15;
-                        curr_time_of_btc += "Q" + unroundedMinutes;
+                        curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
                         if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
 
-                            BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h)).divide(
-                                    price_can_buy_24h, 3,
-                                    RoundingMode.CEILING));
+                            BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h))
+                                    .divide(price_can_buy_24h, 3, RoundingMode.CEILING));
 
                             if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0)) {
 
@@ -1150,10 +1152,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                                     if (has15MinutesCandleUp()) {
 
+                                        btc_is_good_price = true;
+
                                         // (Good time to buy)
                                         pre_time_of_btc = curr_time_of_btc;
-
-                                        btc_is_good_price = true;
                                     }
                                 }
                             }
@@ -1309,7 +1311,7 @@ public class BinanceServiceImpl implements BinanceService {
         String buy_msg = "";
         int count = 1;
         int idx = 1;
-        String strCanBuy = "(CanBuy) " + Utils.convertDateToString("MM-dd HH:mm", Calendar.getInstance().getTime());
+        String strCanBuy = "(" + Utils.convertDateToString("MM/dd HH:mm", Calendar.getInstance().getTime()) + ")";
 
         for (CandidateTokenCssResponse dto : results) {
             idx += 1;
@@ -1326,7 +1328,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (Utils.isNotBlank(buy_msg)) {
                         buy_msg += Utils.new_line_from_service;
                     }
-                    buy_msg += msg.replace("BUY:", "(" + Utils.getStringValue(count) + ")");
+                    buy_msg += msg.replace("BUY:", "(" + Utils.getStringValue(count) + ")..");
 
                     count += 1;
 
@@ -1361,26 +1363,44 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     public String monitorToken(CandidateTokenCssResponse css) {
+        boolean isCandidate = false;
+        if (css.getSymbol().equals("BTC")) {
+            isCandidate = true;
+        }
 
-        if (Utils.isNotBlank(css.getAvg_boll_min_css())) {
+        String priceChange24h = css.getPrice_change_percentage_24h().replace("%", "");
+
+        if (!isCandidate && Utils.isNotBlank(css.getAvg_boll_min_css())
+                && (css.getRate1d0h().compareTo(BigDecimal.valueOf(0)) > 0)
+                && (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0)) {
 
             if (CollectionUtils.isEmpty(ordersRepository.findAllByIdGeckoid(css.getGecko_id()))) {
-
                 if (binanceFuturesRepository.existsById(css.getGecko_id())) {
 
-                    String result = css.getAvg_boll_min().substring(0, css.getStop_loss().indexOf("(")).replace("Buy: ",
-                            "B:") + "$, "
-                            + "SL:"
-                            + String.valueOf(css.getStop_loss().subSequence(css.getStop_loss().indexOf("(") + 1,
-                                    css.getStop_loss().indexOf(")"))).replaceAll("%", "%,")
-                            + " " + css.getAvg_boll_max().replace(" ", "");
-
-                    result = "BUY:" + Utils.appendSpace(css.getSymbol(), 6) + " " + result;
-
-                    return result;
-
+                    isCandidate = true;
                 }
             }
+        }
+
+        if (isCandidate) {
+            String result = Utils.removeLastZero(
+                    css.getAvg_boll_min().substring(0, css.getAvg_boll_min().indexOf("(")).replace("Buy: ", ""))
+                    + "$, ";
+
+            result += css.getAvg_boll_max().replace(" ", ""); // TP:
+
+            String stop_loss = String.valueOf(css.getStop_loss().subSequence(css.getStop_loss().indexOf("(") + 1,
+                    css.getStop_loss().indexOf(")"))).replaceAll("%", "");
+
+            if (Utils.getBigDecimalValue(stop_loss).compareTo(BigDecimal.valueOf(-0.9)) < 0) {
+                result += ", SL:" + stop_loss + "%";
+            }
+
+            result = "BUY:" + Utils.appendSpace(css.getSymbol(), 4) + result;
+
+            result = result.replace(" ", ".").replace(",", "..");
+
+            return result;
         }
 
         return "";
@@ -1931,8 +1951,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (price_open_candle.compareTo(price_close_candle) < 0) {
                     count += 1;
-                } else if (idx == limit - 1) {
-                    // return false;
+                    if (idx == limit - 1) {
+                        count += 1;
+                    }
                 }
             }
 

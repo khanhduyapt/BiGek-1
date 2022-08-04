@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 public class BscScanBinanceApplication {
-    public static int app_flag = Utils.const_app_flag_msg_off; //1: msg_on; 2: msg_off; 3: web only; 4: all coin
+    public static int app_flag = Utils.const_app_flag_msg_off; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin
     public static String callFormBinance = "";
 
     public static void main(String[] args) {
@@ -40,8 +40,8 @@ public class BscScanBinanceApplication {
                 app_flag = Utils.const_app_flag_msg_off;
             }
 
-            //Debug
-            app_flag = Utils.const_app_flag_msg_on;
+            // Debug
+            // app_flag = Utils.const_app_flag_msg_on;
 
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -64,9 +64,9 @@ public class BscScanBinanceApplication {
             // --------------------Debug--------------------
             // binance_service.loadDataVolumeHour("unlend-finance", "UFT");
             // binance_service.loadData("unlend-finance", "UFT");
-            //binance_service.getList(false);
-            //binance_service.monitorBollingerBandwidth(false);
-            //binance_service.monitorProfit();
+            // binance_service.getList(false);
+            // binance_service.monitorBollingerBandwidth(false);
+            // binance_service.monitorProfit();
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
@@ -92,12 +92,6 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        if (idx % 30 == 0) {
-                            binance_service.loadData(btc.getGeckoid(), btc.getSymbol());
-                            binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
-                            binance_service.getList(false); // ~3p 1 lan
-                        }
-
                         binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
                     } catch (Exception e) {
@@ -114,12 +108,17 @@ public class BscScanBinanceApplication {
                             + coin.getSymbol());
 
                     if (Objects.equals(idx, size - 1)) {
+                        binance_service.loadData(btc.getGeckoid(), btc.getSymbol());
+                        binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
+
                         int minus = Utils
                                 .getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
                         if ((minus > 5) && (minus < 59)) {
                             binance_service.monitorProfit();
                             binance_service.monitorBollingerBandwidth(false);
                         }
+
+                        binance_service.getList(false); // ~3p 1 lan
 
                         log.info("reload: "
                                 + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));

@@ -255,18 +255,27 @@ public class Utils {
         }
 
         int target = length - len;
-        String val = value;
+        String val = value + "..";
         for (int i = 0; i < target; i++) {
-            val += "   ";
+            val += "..";
         }
 
-        for (int i = 0; i < len - 2; i++) {
-            if (Objects.equals(value.substring(i, 1), "I")) {
-                val += "  ";
+        for (int i = 0; i < len; i++) {
+            String alpha = value.substring(i, i + 1);
+            if (Objects.equals(alpha, "I")) {
+                val += "..";
             }
 
-            if (Objects.equals(value.substring(i, 1), "J")) {
-                val += "  ";
+            if (Objects.equals(alpha, "J")) {
+                val += "..";
+            }
+
+            if (Objects.equals(alpha, "M")) {
+                val = val.substring(0, val.length() - 1);
+            }
+
+            if (Objects.equals(alpha, "W")) {
+                val = val.substring(0, val.length() - 1);
             }
         }
 
@@ -324,10 +333,11 @@ public class Utils {
         sendToChatId(Utils.chatId_duydk, text);
         sendToChatId(Utils.chatId_linkdk, text);
 
-        //int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        //if ((hh >= 20) || (hh <= 6)) {
-        //    //return;
-        //}
+        // int hh = Utils.getIntValue(Utils.convertDateToString("HH",
+        // Calendar.getInstance().getTime()));
+        // if ((hh >= 20) || (hh <= 6)) {
+        // //return;
+        // }
     }
 
     public static String getChatId(String userName) {
