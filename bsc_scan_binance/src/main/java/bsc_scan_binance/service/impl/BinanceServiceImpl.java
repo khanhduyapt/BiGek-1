@@ -1190,6 +1190,9 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
+
+                    // debug: monitorToken(css);
+
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
 
@@ -1389,16 +1392,20 @@ public class BinanceServiceImpl implements BinanceService {
 
             result += css.getAvg_boll_max().replace(" ", ""); // TP:
 
-            String stop_loss = String.valueOf(css.getStop_loss().subSequence(css.getStop_loss().indexOf("(") + 1,
+            String stop_loss1 = String.valueOf(css.getStop_loss().subSequence(css.getStop_loss().indexOf("(") + 1,
                     css.getStop_loss().indexOf(")"))).replaceAll("%", "");
 
-            if (Utils.getBigDecimalValue(stop_loss).compareTo(BigDecimal.valueOf(-0.9)) < 0) {
-                result += ", SL:" + stop_loss + "%";
+            String stop_loss2 = css.getAvg_boll_min().substring(css.getAvg_boll_min().indexOf("(") + 1,
+                    css.getAvg_boll_min().indexOf("%"));
+
+            if (Utils.getBigDecimalValue(stop_loss1).compareTo(BigDecimal.valueOf(-0.9)) < 0) {
+                // result += ", SL1:" + stop_loss1 + "%";
             }
+            result += ", SL2:" + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
 
             result = "BUY:" + Utils.appendSpace(css.getSymbol(), 4) + result;
 
-            result = result.replace(" ", ".").replace(",", "..");
+            result = result.replace(" ", ".").replace(",", ".");
 
             return result;
         }

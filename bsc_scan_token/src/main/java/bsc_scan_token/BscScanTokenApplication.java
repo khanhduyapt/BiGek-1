@@ -29,11 +29,11 @@ public class BscScanTokenApplication {
         // ((ConfigurableApplicationContext)applicationContext ).close();
 
         try {
-            //            gecko_service.loadData("arpa-chain");
-            //            for (int page = 1; page <= 3; page++) {
-            //                token_service.loadBscData("arpa-chain", page);
-            //                wait(10000);
-            //            }
+            // gecko_service.loadData("arpa-chain");
+            // for (int page = 1; page <= 3; page++) {
+            // token_service.loadBscData("arpa-chain", page);
+            // wait(10000);
+            // }
 
             List<CandidateCoin> list = gecko_service.getList();
 
@@ -51,22 +51,27 @@ public class BscScanTokenApplication {
 
                 try {
                     CandidateCoin entity = gecko_service.loadData(coin.getGeckoid());
-
+                    boolean hasData = false;
                     if (entity.isVisible()) {
                         String blockchains = entity.getBlockchains();
 
                         if (blockchains.contains(Constant.CONST_BLOCKCHAIN_ETH)
                                 || blockchains.contains(Constant.CONST_BLOCKCHAIN_ETH)) {
-
+                            hasData = true;
                             for (int page = 1; page <= 3; page++) {
-                                //token_service.loadBscData(coin.getGeckoid(), page);
+                                token_service.loadBscData(coin.getGeckoid(), page);
 
-                                log.info("loadData-> page:" + String.valueOf(page));
+                                // log.info("loadData-> page:" + String.valueOf(page));
                             }
                         }
                     }
 
-                    Utils.wait(Utils.wait_02_sec);
+                    if (hasData) {
+                        Utils.wait(Utils.wait_02_sec);
+                    } else {
+                        Utils.wait(Utils.wait_06_sec);
+                    }
+
                 } catch (Exception e) {
                     log.error("dkd error LoadData:[" + coin.getGeckoid() + "]" + e.getMessage());
                 }
