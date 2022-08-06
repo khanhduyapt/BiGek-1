@@ -74,10 +74,13 @@ public class BscScanTokenApplication {
 
                 } catch (Exception e) {
                     log.error("dkd error LoadData:[" + coin.getGeckoid() + "]" + e.getMessage());
+                    if (e.getMessage().contains("Could not find coin with the given id")) {
+                        gecko_service.hide(coin.getGeckoid(), "Could not find coin with the given id");
+                    }
                 }
 
                 if (idx > 10) {
-                    //break;
+                    // break;
                 }
 
                 if (Objects.equals(idx, size - 1)) {
