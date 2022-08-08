@@ -26,9 +26,9 @@ public class BscScanTokenApplication {
         TokenService token_service = applicationContext.getBean(TokenService.class);
         CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
 
-        // ((ConfigurableApplicationContext)applicationContext ).close();
-
         try {
+            gecko_service.viewWalletInMonth();
+
             // gecko_service.loadData("arpa-chain");
             // for (int page = 1; page <= 3; page++) {
             // token_service.loadBscData("arpa-chain", page);
@@ -47,6 +47,10 @@ public class BscScanTokenApplication {
 
                 CandidateCoin coin = list.get(idx);
 
+                // Debug
+                // coin.setGeckoid("dose-token");
+                // coin.setSymbol("DOSE");
+
                 log.info("Token:" + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
                 try {
@@ -60,8 +64,6 @@ public class BscScanTokenApplication {
                             hasData = true;
                             for (int page = 1; page <= 3; page++) {
                                 token_service.loadBscData(coin.getGeckoid(), page);
-
-                                // log.info("loadData-> page:" + String.valueOf(page));
                             }
                         }
                     }
@@ -79,11 +81,14 @@ public class BscScanTokenApplication {
                     }
                 }
 
-                if (idx > 10) {
-                    // break;
+                if (idx > 0) {
+                    //break;
                 }
 
                 if (Objects.equals(idx, size - 1)) {
+
+                    gecko_service.viewWalletInMonth();
+
                     log.info("reload: " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", new Date()));
                     idx = 0;
                     list.clear();
@@ -99,6 +104,7 @@ public class BscScanTokenApplication {
 
         Exception e) {
             log.error(e.getMessage());
+            // ((ConfigurableApplicationContext)applicationContext ).close();
         }
 
     }

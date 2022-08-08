@@ -24,11 +24,15 @@ import org.springframework.web.client.RestTemplate;
 import bsc_scan_token.entity.CandidateCoin;
 import bsc_scan_token.entity.GeckoVolumeMonth;
 import bsc_scan_token.entity.GeckoVolumeMonthKey;
+import bsc_scan_token.entity.ViewWalletInMonth;
+import bsc_scan_token.entity.ViewWalletInMonthKey;
 import bsc_scan_token.entity.Wallet;
 import bsc_scan_token.entity.WalletKey;
 import bsc_scan_token.repository.CandidateCoinRepository;
 import bsc_scan_token.repository.GeckoVolumeMonthRepository;
+import bsc_scan_token.repository.ViewWalletInMonthRepository;
 import bsc_scan_token.repository.WalletRepository;
+import bsc_scan_token.response.ViewWalletInMonthResponse;
 import bsc_scan_token.service.CoinGeckoService;
 import bsc_scan_token.utils.Constant;
 import bsc_scan_token.utils.Utils;
@@ -51,6 +55,9 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
     @Autowired
     private GeckoVolumeMonthRepository geckoVolumeMonthRepository;
+
+    @Autowired
+    private ViewWalletInMonthRepository viewWalletInMonthRepository;
 
     @Override
     public List<CandidateCoin> getList() {
@@ -345,9 +352,9 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 coin.setNote("loadData: CoingeckoRank > 3000");
             }
 
-            if (coin.getTotalVolume().compareTo(BigDecimal.valueOf(500000)) < 0) {
+            if (coin.getTotalVolume().compareTo(BigDecimal.valueOf(100000)) < 0) {
                 allowUpdate = false;
-                coin.setNote("loadData: TotalVolume Min 500k$");
+                coin.setNote("loadData: TotalVolume Min 100k$");
             }
         }
 
@@ -439,6 +446,59 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         }
 
         return new ArrayList<CandidateCoin>();
+    }
+
+    @Override
+    public void viewWalletInMonth() {
+        try {
+            String sql = "SELECT                                                                    \n"
+                    + "   gecko_id,                                                                 \n"
+                    + "   blockchain,                                                               \n"
+                    + "   address,                                                                  \n"
+                    + "   yyyymmdd,                                                                 \n"
+                    + "   quantity_old,                                                             \n"
+                    + "   quantity_new,                                                             \n"
+                    + "   total_value,                                                              \n"
+                    + "   wallet_name,                                                              \n"
+                    + "   percent_up,                                                               \n"
+                    + "   ape_link                                                                  \n"
+                    + "FROM view_wallet_in_month ";
+
+            Query query = entityManager.createNativeQuery(sql, "ViewWalletInMonthResponse");
+
+            @SuppressWarnings("unchecked")
+            List<ViewWalletInMonthResponse> vol_list = query.getResultList();
+            if (!CollectionUtils.isEmpty(vol_list)) {
+                List<ViewWalletInMonth> saveList = new ArrayList<ViewWalletInMonth>();
+
+                for (ViewWalletInMonthResponse dto : vol_list) {
+                    ViewWalletInMonth entity = new ViewWalletInMonth();
+
+                    ViewWalletInMonthKey id = new ViewWalletInMonthKey();
+                    id.setGeckoid(dto.getGecko_id());
+                    id.setYyyymm(dto.getYyyymmdd().substring(0, 6));
+                    id.setBlockchain(dto.getBlockchain());
+                    id.setAddress(dto.getAddress());
+
+                    entity.setId(id);
+
+                    entity.setQuantity01(dto.getQuantity_old());
+                    entity.setQuantity31(dto.getQuantity_new());
+                    entity.setTotalValue(dto.getTotal_value());
+                    entity.setWalletName(dto.getWallet_name());
+                    entity.setPercentUp(dto.getPercent_up());
+                    entity.setApeLink(dto.getApe_link());
+
+                    saveList.add(entity);
+                }
+                viewWalletInMonthRepository.saveAll(saveList);
+            }
+
+            log.info("viewWalletInMonth success");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

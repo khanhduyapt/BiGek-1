@@ -48,7 +48,9 @@ public class TokenServiceImpl implements TokenService {
         List<Wallet> wallets = walletRepository.findAllByIdGeckoid(gecko_id);
 
         for (Wallet entity : wallets) {
-            val = val || loadBscData(entity.getId().getBlockchain(), entity.getId().getAddress(), gecko_id, page);
+            String blockchain = entity.getId().getBlockchain();
+
+            val = val || loadBscData(blockchain, entity.getId().getAddress(), gecko_id, page);
 
             Utils.wait(Utils.wait_06_sec);
         }
@@ -63,10 +65,11 @@ public class TokenServiceImpl implements TokenService {
             // 0x7837fd820ba38f95c54d6dac4ca3751b81511357
 
             String url = "";
-            if (Objects.equals(blockchain, Constant.CONST_BLOCKCHAIN_BSC)) {
+            if (blockchain.contains(Constant.CONST_BLOCKCHAIN_BSC)) {
                 url = "https://bscscan.com/token/generic-tokenholders2?a=";
 
-            } else if (Objects.equals(blockchain, Constant.CONST_BLOCKCHAIN_ETH)) {
+            } else if (blockchain.contains(Constant.CONST_BLOCKCHAIN_ETH)) {
+
                 url = "https://etherscan.io/token/generic-tokenholders2?a=";
             } else {
                 return false;
