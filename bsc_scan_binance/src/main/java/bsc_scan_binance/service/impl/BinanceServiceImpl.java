@@ -1120,6 +1120,11 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStop_loss("SL: " + stop_loss + "(" + stop_loss_precent + "%)");
 
                     String priceChange24h = dto.getPrice_change_percentage_24h().replace("%", "");
+
+                    if (price_can_buy_24h_percent.compareTo(BigDecimal.valueOf(-1.5)) > 0) {
+                        css.setAvg_boll_min_css("text-white bg-success rounded-lg");
+                    }
+
                     if (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0) {
                         if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
                             if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
