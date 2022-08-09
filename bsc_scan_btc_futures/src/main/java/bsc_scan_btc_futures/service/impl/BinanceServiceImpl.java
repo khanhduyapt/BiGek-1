@@ -140,7 +140,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     String time = "(" + Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime()) + ") ";
 
-                    String msg_long = "Long: " + dto.getLow_price() + "~" + dto.getMin_candle() + "$, TP: "
+                    String msg_long = "Long: " + dto.getLow_price() + "$, TP: "
                             + dto.getLong_tp() + "%";
 
                     String msg_short = "Short: " + dto.getHight_price() + "$, TP: " + dto.getShort_tp() + "%";
@@ -166,6 +166,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         }
+
     }
 
     private BigDecimal getBinancePrice(String url) {
@@ -222,13 +223,50 @@ public class BinanceServiceImpl implements BinanceService {
     public boolean hasResistance(List<BtcFutures> list_db) {
         try {
             int count = 0;
-            for (int index = 0; index < 5; index++) {
+            for (int index = 1; index < 5; index++) {
 
                 BtcFutures dto = list_db.get(index);
 
                 if (dto.isUptrend()) {
                     count += 1;
-                    if (index == 0) {
+                }
+            }
+
+            if (count >= 2) {
+                return has15MinutesCandleUp();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean has15MinutesCandleUp() {
+        try {
+            final Integer limit = 4;
+            String url_usdt = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=15m&limit="
+                    + String.valueOf(limit);
+
+            List<Object> result_usdt = getBinanceData(url_usdt, limit);
+            int count = 0;
+            for (int idx = limit - 1; idx >= 0; idx--) {
+                Object obj_usdt = result_usdt.get(idx);
+
+                @SuppressWarnings("unchecked")
+                List<Object> arr_usdt = (List<Object>) obj_usdt;
+
+                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
+                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
+                String open_time = arr_usdt.get(0).toString();
+
+                if (Objects.equals("0", open_time)) {
+                    return false;
+                }
+
+                if (price_open_candle.compareTo(price_close_candle) < 0) {
+                    count += 1;
+                    if (idx == limit - 1) {
                         count += 1;
                     }
                 }
