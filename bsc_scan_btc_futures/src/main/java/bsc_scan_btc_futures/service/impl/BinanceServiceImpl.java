@@ -45,14 +45,15 @@ public class BinanceServiceImpl implements BinanceService {
             String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
             BigDecimal price_at_binance = getBinancePrice(url_price);
 
-            // 1m: 30 candle = 30 minus
+            // 5m: 30 candle = 1.5h
             final Integer limit = 30;
-            String url_usdt = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit="
+            String url_usdt = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit="
                     + String.valueOf(limit);
             List<Object> result_usdt = getBinanceData(url_usdt, limit);
 
             List<BtcFutures> list_day = new ArrayList<BtcFutures>();
-            int mm_index = 0;
+            int id = 0;
+
             for (int idx = limit - 1; idx >= 0; idx--) {
                 Object obj_usdt = result_usdt.get(idx);
 
@@ -71,9 +72,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                 BtcFutures day = new BtcFutures();
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.MINUTE, -mm_index);
-                day.setId(Utils.convertDateToString("mm", calendar.getTime()));
+                String strid = String.valueOf(id);
+                if (strid.length() < 2) {
+                    strid = "0" + strid;
+                }
+                day.setId(strid);
 
                 if (idx == limit - 1) {
                     day.setCurrPrice(price_at_binance);
@@ -94,9 +97,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                 list_day.add(day);
 
-                mm_index += 1;
+                id += 1;
             }
             btcFuturesRepository.saveAll(list_day);
+            String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
+            log.info(time + " loadData");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,19 +130,18 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFuturesResponse> vol_list = query.getResultList();
         if (!CollectionUtils.isEmpty(vol_list)) {
 
-            String id = Utils.convertDateToString("mm", Calendar.getInstance().getTime());
-            BtcFutures entity = btcFuturesRepository.findById(id).orElse(null);
+            List<BtcFutures> list_db = btcFuturesRepository.findAllByOrderByIdAsc();
 
-            if (!Objects.equals(null, entity)) {
-
+            if (!CollectionUtils.isEmpty(list_db)) {
+                BtcFutures entity = list_db.get(0);
                 BtcFuturesResponse dto = vol_list.get(0);
 
-                if (Utils.isGoodProfit(dto.getLong_sl(), dto.getLong_tp())
-                        || Utils.isGoodProfit(dto.getShort_sl(), dto.getShort_tp())) {
+                if (Utils.isGoodProfit(dto.getLong_sl(), dto.getLong_tp()) && hasResistance(list_db)) {
 
                     String time = "(" + Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime()) + ") ";
 
-                    String msg_long = "Long: " + dto.getMin_candle() + "$, TP: " + dto.getLong_tp() + "%";
+                    String msg_long = "Long: " + dto.getLow_price() + "~" + dto.getMin_candle() + "$, TP: "
+                            + dto.getLong_tp() + "%";
 
                     String msg_short = "Short: " + dto.getHight_price() + "$, TP: " + dto.getShort_tp() + "%";
 
@@ -146,6 +150,7 @@ public class BinanceServiceImpl implements BinanceService {
                         if (!msg_dict.contains(msg_long)) {
                             log.info(time + msg_long);
                             msg_dict.put(msg_long, msg_long);
+                            Utils.sendToMyTelegram(msg_long);
                         }
 
                     } else if (Utils.isGoodPriceForShort(entity.getCurrPrice(), dto.getMin_candle(),
@@ -212,6 +217,31 @@ public class BinanceServiceImpl implements BinanceService {
             return list;
         }
 
+    }
+
+    public boolean hasResistance(List<BtcFutures> list_db) {
+        try {
+            int count = 0;
+            for (int index = 0; index < 5; index++) {
+
+                BtcFutures dto = list_db.get(index);
+
+                if (dto.isUptrend()) {
+                    count += 1;
+                    if (index == 0) {
+                        count += 1;
+                    }
+                }
+            }
+
+            if (count >= 2) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
 }

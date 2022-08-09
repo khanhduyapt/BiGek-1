@@ -1,8 +1,13 @@
 package bsc_scan_btc_futures.utils;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,67 +47,31 @@ public class Utils {
     public static final String PREPARE_ORDERS_DATA_TYPE_MIN14D = "4";
     public static final String PREPARE_ORDERS_DATA_TYPE_MAX14D = "5";
 
-    public static String sql_OrdersProfitResponse = ""
-            + " SELECT * from (                                                                             \n"
-            + "    SELECT                                                                                   \n"
-            + "      od.gecko_id,                                                                           \n"
-            + "      od.symbol      as chatId,                                                              \n"
-            + "      od.name        as userName,                                                            \n"
-            + "      od.order_price,                                                                        \n"
-            + "      ROUND(od.qty, 1) qty,                                                                  \n"
-            + "      od.amount,                                                                             \n"
-            + "      cur.price_at_binance,                                                                  \n"
-            + "      (select target_percent from priority_coin po where po.gecko_id = od.gecko_id) target_percent, \n"
-            + "      ROUND(((cur.price_at_binance - od.order_price)/od.order_price)*100, 1)  as tp_percent, \n"
-            + "      ROUND( (cur.price_at_binance - od.order_price)*od.qty, 1)               as tp_amount,  \n"
-            + "      od.low_price,                                                                          \n"
-            + "      od.height_price,                                                                       \n"
-            + "      (select note from priority_coin pc where pc.gecko_id = od.gecko_id) as target          \n"
-            + "    FROM                                                                                     \n"
-            + "        orders od,                                                                           \n"
-            + "        binance_volumn_day cur                                                               \n"
-            + "    WHERE                                                                                    \n"
-            + "            cur.hh      = TO_CHAR(NOW(), 'HH24')                                             \n"
-            + "        and od.gecko_id = cur.gecko_id                                                       \n"
-            + " ) odr ORDER BY odr.tp_amount desc ";
+    public static void sendToMyTelegram(String text) {
+        sendToChatId(Utils.chatId_duydk, text);
+    }
 
-    public static String sql_boll_2_body = ""
-            + " (                                                                                           \n"
-            + "     select                                                                                  \n"
-            + "         tmp.gecko_id,                                                                       \n"
-            + "         tmp.symbol,                                                                         \n"
-            + "         tmp.name,                                                                           \n"
-            + "         tmp.avg_price,                                                                      \n"
-            + "         tmp.price_open_candle,                                                              \n"
-            + "         tmp.price_close_candle,                                                             \n"
-            + "         tmp.low_price,                                                                      \n"
-            + "         tmp.hight_price,                                                                    \n"
-            + "         tmp.price_can_buy,                                                                  \n"
-            + "         tmp.price_can_sell,                                                                 \n"
-            + "         (case when (avg_price <= ROUND((price_can_buy  + (ABS(price_close_candle - price_open_candle)/2)), 5) ) then true else false end) is_bottom_area ,    \n"
-            + "         (case when (avg_price >= ROUND((price_can_sell - (ABS(price_close_candle - price_open_candle)/2)), 5) ) then true else false end) is_top_area         \n"
-            + "     from                                                                                    \n"
-            + "     (                                                                                       \n"
-            + "         select                                                                              \n"
-            + "             can.gecko_id,                                                                   \n"
-            + "             can.symbol,                                                                     \n"
-            + "             can.name,                                                                       \n"
-            + "             min(tok.avg_price) avg_price,                                                   \n"
-            + "             min(tok.price_open_candle) price_open_candle,                                   \n"
-            + "             min(tok.price_close_candle) price_close_candle,                                 \n"
-            + "             (SELECT COALESCE(low_price  , 0) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by low_price asc  limit 1))              low_price,     \n"
-            + "             (SELECT COALESCE(hight_price, 0) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by low_price desc limit 1))              hight_price,   \n"
-            + "             (SELECT ROUND(AVG(COALESCE(avg_price, 0)), 5) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by avg_price asc  limit 2)) price_can_buy, \n"
-            + "             (SELECT ROUND(AVG(COALESCE(avg_price, 0)), 5) FROM btc_volumn_day where gecko_id = can.gecko_id and hh in (select hh from btc_volumn_day where gecko_id = can.gecko_id order by avg_price desc limit 1)) price_can_sell \n"
-            + "         from                                                                                \n"
-            + "             candidate_coin can,                                                             \n"
-            + "             btc_volumn_day tok                                                              \n"
-            + "         where 1=1                                                                           \n"
-            + "         and can.gecko_id = tok.gecko_id                                                     \n"
-            + "         and tok.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
-            + "         group by can.gecko_id\n"
-            + "     ) tmp                                                                                   \n"
-            + " ) boll                                                                                      \n";
+    public static void sendToChatId(String chat_id, String text) {
+        try {
+            String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
+
+            // Telegram token
+            String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
+
+            urlString = String.format(urlString, apiToken, chat_id) + text;
+            try {
+                URL url = new URL(urlString);
+                URLConnection conn = url.openConnection();
+                @SuppressWarnings("unused")
+                InputStream is = new BufferedInputStream(conn.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static String createMsgSimple(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
         return Utils.removeLastZero(curr_price.toString()) + "$\n"
@@ -128,7 +97,7 @@ public class Utils {
         }
 
         BigDecimal profit_rank = tp.divide(sl.abs(), 0, RoundingMode.CEILING);
-        if (profit_rank.compareTo(BigDecimal.valueOf(10)) > 0) {
+        if (profit_rank.compareTo(BigDecimal.valueOf(3)) >= 0) {
             return true;
         }
 

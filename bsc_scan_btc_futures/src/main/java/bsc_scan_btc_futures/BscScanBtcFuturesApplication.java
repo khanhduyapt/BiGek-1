@@ -26,7 +26,7 @@ public class BscScanBtcFuturesApplication {
 
                 try {
                     binance_service.getList();
-                    wait(10000); // 1m=60000ms
+                    wait(60000); // 1m=60000ms
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                 }
