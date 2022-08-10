@@ -48,7 +48,7 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal price_at_binance = getBinancePrice(url_price);
 
             //30 candle
-            final Integer limit = 10;
+            final Integer limit = 16;
 
             // 5m: 30 candle = 1.5h
             //String url_5m = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=" + limit;
@@ -170,27 +170,29 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (!isCandidate) {
-            return;
+            //return;
         }
 
         String time = "(" + Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime()) + ") ";
 
-        BigDecimal entry_price = pre_00.getCurrPrice();
+        BigDecimal entry_price = dto.getLow_price();
 
-        BigDecimal take_profit_price = Utils.getGoodPriceForLongTP(entry_price, dto.getMax_candle());
+        BigDecimal take_profit_price = dto.getHight_price();
 
-        String TP = Utils.toPercent(take_profit_price, entry_price);
+        String TP = Utils.toPercent(take_profit_price, entry_price, 2);
 
-        BigDecimal SL = Utils.getBigDecimal(TP); // Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 1, RoundingMode.CEILING);
+        BigDecimal SL = Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 2, RoundingMode.CEILING);
 
         BigDecimal SL_price = entry_price.multiply(BigDecimal.valueOf(100).subtract(SL))
                 .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
 
-        String msg_long = "Long: " + entry_price + "$, TP: " + TP + "%("
-                + Utils.removeLastZero(take_profit_price.toString()) + ")" + ", SL: -" + SL + "% ("
-                + Utils.removeLastZero(SL_price.toString()) + ")";
+        String msg_long = "Long: " + Utils.removeLastZero(entry_price.toString()) + "$, ";
 
-        if (Utils.getBigDecimalValue(TP).compareTo(BigDecimal.valueOf(0.1)) > 0) {
+        msg_long += "TP: " + TP + "%(" + Utils.removeLastZero(take_profit_price.toString()) + ")" + ", ";
+
+        msg_long += "SL: -" + SL + "% (" + Utils.removeLastZero(SL_price.toString()) + ")";
+
+        if (Utils.getBigDecimalValue(TP).compareTo(BigDecimal.valueOf(0.2)) >= 0) {
             if (!msg_dict.contains(msg_long)) {
 
                 log.info(time + msg_long);
@@ -214,7 +216,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (!isCandidate) {
-            return;
+            //return;
         }
 
         String time = "(" + Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime()) + ") ";
@@ -223,7 +225,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         BigDecimal take_profit_price = Utils.getGoodPriceForShortTP(dto.getMin_candle(), entry_price);
 
-        String TP = Utils.toPercent(entry_price, take_profit_price);
+        String TP = Utils.toPercent(entry_price, take_profit_price, 2);
 
         BigDecimal SL = Utils.getBigDecimal(TP);//Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 1, RoundingMode.CEILING);
 
@@ -234,12 +236,12 @@ public class BinanceServiceImpl implements BinanceService {
                 + Utils.removeLastZero(take_profit_price.toString()) + ")" + ", SL: -" + SL + "% ("
                 + Utils.removeLastZero(SL_price.toString()) + ")";
 
-        if (Utils.getBigDecimalValue(TP).compareTo(BigDecimal.valueOf(0.3)) > 0) {
-            if (!msg_dict.contains(msg_short)) {
+        if (Utils.getBigDecimalValue(TP).compareTo(BigDecimal.valueOf(0.1)) > 0) {
+            if (!msg_dict.contains(time)) {
 
-                log.info(time + msg_short);
+                //log.info(time + msg_short);
 
-                msg_dict.put(msg_short, msg_short);
+                msg_dict.put(time, msg_short);
             }
         }
     }
