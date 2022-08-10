@@ -43,11 +43,12 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private void loadData() {
         try {
+
             String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
             BigDecimal price_at_binance = getBinancePrice(url_price);
 
             //30 candle
-            final Integer limit = 30;
+            final Integer limit = 10;
 
             // 5m: 30 candle = 1.5h
             //String url_5m = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=" + limit;
@@ -105,6 +106,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                 id += 1;
             }
+
+            btcFuturesRepository.deleteAll();
             btcFuturesRepository.saveAll(list_entity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -138,27 +141,11 @@ public class BinanceServiceImpl implements BinanceService {
                 List<BtcFutures> list_db = btcFuturesRepository.findAllByOrderByIdAsc();
 
                 if (!CollectionUtils.isEmpty(list_db)) {
-                    BtcFutures entity = list_db.get(0);
                     BtcFuturesResponse dto = vol_list.get(0);
 
-                    //Debug:
-                    // processLong(dto);
-                    // processShort(dto);
+                    processLong(list_db, dto);
+                    processShort(list_db, dto);
 
-                    if (Utils.isGoodProfit(dto.getLong_sl(), dto.getLong_tp())) {
-
-                        if (Utils.isGoodPriceForLong(entity.getCurrPrice(), dto.getMin_candle(), dto.getMax_candle())) {
-
-                            processLong(dto);
-
-                        } else if (Utils.isGoodPriceForShort(entity.getCurrPrice(), dto.getMin_candle(),
-                                dto.getMax_candle())) {
-
-                            processShort(dto);
-
-                        }
-
-                    }
                 }
             }
         } catch (Exception e) {
@@ -166,16 +153,35 @@ public class BinanceServiceImpl implements BinanceService {
 
     }
 
-    private void processLong(BtcFuturesResponse dto) {
+    private void processLong(List<BtcFutures> list_db, BtcFuturesResponse dto) {
+
+        BtcFutures pre_00 = list_db.get(0);
+        BtcFutures pre_01 = list_db.get(1);
+        BtcFutures pre_02 = list_db.get(2);
+
+        boolean isCandidate = pre_00.isUptrend() && !pre_01.isUptrend() && !pre_02.isUptrend();
+
+        if (!isCandidate) {
+            isCandidate = pre_00.isUptrend() && !pre_01.isUptrend() && !pre_02.isUptrend();
+        }
+
+        if (!isCandidate) {
+            isCandidate = pre_00.isUptrend() && pre_01.isUptrend() && !pre_02.isUptrend();
+        }
+
+        if (!isCandidate) {
+            return;
+        }
+
         String time = "(" + Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime()) + ") ";
 
-        BigDecimal entry_price = dto.getMin_candle();
+        BigDecimal entry_price = pre_00.getCurrPrice();
 
         BigDecimal take_profit_price = Utils.getGoodPriceForLongTP(entry_price, dto.getMax_candle());
 
         String TP = Utils.toPercent(take_profit_price, entry_price);
 
-        BigDecimal SL = Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 1, RoundingMode.CEILING);
+        BigDecimal SL = Utils.getBigDecimal(TP); // Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 1, RoundingMode.CEILING);
 
         BigDecimal SL_price = entry_price.multiply(BigDecimal.valueOf(100).subtract(SL))
                 .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
@@ -184,19 +190,32 @@ public class BinanceServiceImpl implements BinanceService {
                 + Utils.removeLastZero(take_profit_price.toString()) + ")" + ", SL: -" + SL + "% ("
                 + Utils.removeLastZero(SL_price.toString()) + ")";
 
-        if (Utils.getBigDecimal(TP).compareTo(BigDecimal.valueOf(0.2)) >= 0) {
+        if (Utils.getBigDecimalValue(TP).compareTo(BigDecimal.valueOf(0.1)) > 0) {
             if (!msg_dict.contains(msg_long)) {
 
                 log.info(time + msg_long);
-                Utils.sendToMyTelegram(time + msg_long);
 
                 msg_dict.put(msg_long, msg_long);
             }
         }
-
     }
 
-    private void processShort(BtcFuturesResponse dto) {
+    private void processShort(List<BtcFutures> list_db, BtcFuturesResponse dto) {
+
+        BtcFutures pre_00 = list_db.get(0);
+        BtcFutures pre_01 = list_db.get(1);
+        BtcFutures pre_02 = list_db.get(2);
+
+        boolean isCandidate = !pre_00.isUptrend() && !pre_01.isUptrend() && pre_02.isUptrend();
+
+        if (!isCandidate) {
+            isCandidate = !list_db.get(0).isUptrend() && list_db.get(1).isUptrend() && list_db.get(2).isUptrend()
+                    && list_db.get(3).isUptrend();
+        }
+
+        if (!isCandidate) {
+            return;
+        }
 
         String time = "(" + Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime()) + ") ";
 
@@ -206,7 +225,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String TP = Utils.toPercent(entry_price, take_profit_price);
 
-        BigDecimal SL = Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 1, RoundingMode.CEILING);
+        BigDecimal SL = Utils.getBigDecimal(TP);//Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 1, RoundingMode.CEILING);
 
         BigDecimal SL_price = entry_price.multiply(BigDecimal.valueOf(100).add(SL))
                 .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
@@ -215,14 +234,12 @@ public class BinanceServiceImpl implements BinanceService {
                 + Utils.removeLastZero(take_profit_price.toString()) + ")" + ", SL: -" + SL + "% ("
                 + Utils.removeLastZero(SL_price.toString()) + ")";
 
-        if (Utils.getBigDecimal(TP).compareTo(BigDecimal.valueOf(0.2)) >= 0) {
+        if (Utils.getBigDecimalValue(TP).compareTo(BigDecimal.valueOf(0.3)) > 0) {
             if (!msg_dict.contains(msg_short)) {
 
                 log.info(time + msg_short);
-                Utils.sendToMyTelegram(time + msg_short);
 
                 msg_dict.put(msg_short, msg_short);
-
             }
         }
     }

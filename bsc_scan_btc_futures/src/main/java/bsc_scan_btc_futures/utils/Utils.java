@@ -105,7 +105,7 @@ public class Utils {
 
     public static BigDecimal getGoodPriceForLongTP(BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
 
         BigDecimal price = hight_price.subtract(range);
 
@@ -114,7 +114,7 @@ public class Utils {
 
     public static Boolean isGoodPriceForLong(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
 
         BigDecimal mid_price = low_price.add(range);
 
@@ -126,7 +126,7 @@ public class Utils {
 
     public static BigDecimal getGoodPriceForShortTP(BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
 
         BigDecimal price = low_price.add(range);
 
@@ -135,7 +135,7 @@ public class Utils {
 
     public static Boolean isGoodPriceForShort(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
 
         BigDecimal mid_price = hight_price.subtract(range);
 
