@@ -144,8 +144,6 @@ public class BinanceServiceImpl implements BinanceService {
                     BtcFuturesResponse dto = vol_list.get(0);
 
                     processLong(list_db, dto);
-                    processShort(list_db, dto);
-
                 }
             }
         } catch (Exception e) {
@@ -155,93 +153,39 @@ public class BinanceServiceImpl implements BinanceService {
 
     private void processLong(List<BtcFutures> list_db, BtcFuturesResponse dto) {
 
-        BtcFutures pre_00 = list_db.get(0);
-        BtcFutures pre_01 = list_db.get(1);
-        BtcFutures pre_02 = list_db.get(2);
+        BigDecimal entry_price = list_db.get(0).getCurrPrice();
 
-        boolean isCandidate = pre_00.isUptrend() && !pre_01.isUptrend() && !pre_02.isUptrend();
+        BigDecimal TP1 = Utils.getBigDecimal(Utils.toPercent(dto.getHight_price(), entry_price, 2));
 
-        if (!isCandidate) {
-            isCandidate = pre_00.isUptrend() && !pre_01.isUptrend() && !pre_02.isUptrend();
+        BigDecimal TP2 = Utils.getBigDecimal(Utils.toPercent(entry_price, dto.getLow_price(), 2));
+
+        BigDecimal TP = TP1;
+        if (TP1.compareTo(TP2) < 0) {
+            TP = TP2;
         }
+        TP = TP.divide(BigDecimal.valueOf(2), 2, RoundingMode.CEILING);
 
-        if (!isCandidate) {
-            isCandidate = pre_00.isUptrend() && pre_01.isUptrend() && !pre_02.isUptrend();
-        }
-
-        if (!isCandidate) {
-            //return;
-        }
-
-        String time = "(" + Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime()) + ") ";
-
-        BigDecimal entry_price = dto.getLow_price();
-
-        BigDecimal take_profit_price = dto.getHight_price();
-
-        String TP = Utils.toPercent(take_profit_price, entry_price, 2);
-
-        BigDecimal SL = Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 2, RoundingMode.CEILING);
-
-        BigDecimal SL_price = entry_price.multiply(BigDecimal.valueOf(100).subtract(SL))
+        BigDecimal TP_long = entry_price.multiply(BigDecimal.valueOf(100).add(TP))
                 .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
 
-        String msg_long = "Long: " + Utils.removeLastZero(entry_price.toString()) + "$, ";
-
-        msg_long += "TP: " + TP + "%(" + Utils.removeLastZero(take_profit_price.toString()) + ")" + ", ";
-
-        msg_long += "SL: -" + SL + "% (" + Utils.removeLastZero(SL_price.toString()) + ")";
-
-        if (Utils.getBigDecimalValue(TP).compareTo(BigDecimal.valueOf(0.2)) >= 0) {
-            if (!msg_dict.contains(msg_long)) {
-
-                log.info(time + msg_long);
-
-                msg_dict.put(msg_long, msg_long);
-            }
-        }
-    }
-
-    private void processShort(List<BtcFutures> list_db, BtcFuturesResponse dto) {
-
-        BtcFutures pre_00 = list_db.get(0);
-        BtcFutures pre_01 = list_db.get(1);
-        BtcFutures pre_02 = list_db.get(2);
-
-        boolean isCandidate = !pre_00.isUptrend() && !pre_01.isUptrend() && pre_02.isUptrend();
-
-        if (!isCandidate) {
-            isCandidate = !list_db.get(0).isUptrend() && list_db.get(1).isUptrend() && list_db.get(2).isUptrend()
-                    && list_db.get(3).isUptrend();
-        }
-
-        if (!isCandidate) {
-            //return;
-        }
-
-        String time = "(" + Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime()) + ") ";
-
-        BigDecimal entry_price = dto.getMax_candle();
-
-        BigDecimal take_profit_price = Utils.getGoodPriceForShortTP(dto.getMin_candle(), entry_price);
-
-        String TP = Utils.toPercent(entry_price, take_profit_price, 2);
-
-        BigDecimal SL = Utils.getBigDecimal(TP);//Utils.getBigDecimal(TP).divide(BigDecimal.valueOf(2), 1, RoundingMode.CEILING);
-
-        BigDecimal SL_price = entry_price.multiply(BigDecimal.valueOf(100).add(SL))
+        BigDecimal TP_Short = entry_price.multiply(BigDecimal.valueOf(100).subtract(TP))
                 .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
 
-        String msg_short = "Short: " + entry_price + "$, TP: " + TP + "% ("
-                + Utils.removeLastZero(take_profit_price.toString()) + ")" + ", SL: -" + SL + "% ("
-                + Utils.removeLastZero(SL_price.toString()) + ")";
+        String msg_long = "Long..." + Utils.removeLastZero(entry_price.toString()) + "$, ";
+        msg_long += "TP: " + TP + "%(" + Utils.removeLastZero(TP_long.toString()) + ")";
 
-        if (Utils.getBigDecimalValue(TP).compareTo(BigDecimal.valueOf(0.1)) > 0) {
-            if (!msg_dict.contains(time)) {
+        String msg_short = "Short.." + Utils.removeLastZero(entry_price.toString()) + "$, ";
+        msg_short += "TP: " + TP + "%(" + Utils.removeLastZero(TP_Short.toString()) + ")";
 
-                //log.info(time + msg_short);
+        String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
 
-                msg_dict.put(time, msg_short);
+        if (!msg_dict.contains(time)) {
+            msg_dict.put(time, time);
+
+            if (Utils.isGoodPriceForShort(entry_price, dto.getLow_price(), dto.getHight_price())) {
+                log.info(time + "    " + msg_short);
+            } else {
+                log.info(time + "    " + msg_long);
             }
         }
     }

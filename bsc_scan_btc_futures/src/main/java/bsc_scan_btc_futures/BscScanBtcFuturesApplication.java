@@ -1,7 +1,6 @@
 package bsc_scan_btc_futures;
 
 import java.util.Calendar;
-import java.util.Objects;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootApplication
 public class BscScanBtcFuturesApplication {
     public static boolean pre_is_long = true;
+
     public static void main(String[] args) {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
@@ -23,15 +23,15 @@ public class BscScanBtcFuturesApplication {
             ApplicationContext applicationContext = SpringApplication.run(BscScanBtcFuturesApplication.class, args);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
 
-            String pre_time = "";
+            //String pre_time = "";
             while (true) {
 
                 try {
-                    String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
-                    if (!Objects.equals(pre_time, time)) {
-                        log.info(time);
-                        pre_time = time;
-                    }
+                    //String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
+                    //if (!Objects.equals(pre_time, time)) {
+                    //    log.info(time);
+                    //    pre_time = time;
+                    //}
                     binance_service.getList();
 
                     //wait(60000); // 1m = 60000ms
