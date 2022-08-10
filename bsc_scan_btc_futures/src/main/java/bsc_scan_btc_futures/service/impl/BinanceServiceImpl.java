@@ -1,5 +1,7 @@
 package bsc_scan_btc_futures.service.impl;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -8,6 +10,8 @@ import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -47,14 +51,16 @@ public class BinanceServiceImpl implements BinanceService {
             String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
             BigDecimal price_at_binance = getBinancePrice(url_price);
 
-            //30 candle
+            // 30 candle
             final Integer limit = 16;
 
             // 5m: 30 candle = 1.5h
-            //String url_5m = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=" + limit;
-            //List<Object> list = getBinanceData(url_5m, limit);
+            // String url_5m =
+            // "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=" +
+            // limit;
+            // List<Object> list = getBinanceData(url_5m, limit);
 
-            //30 minutes
+            // 30 minutes
             String url_1m = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=" + limit;
             List<Object> list = getBinanceData(url_1m, limit);
 
@@ -152,41 +158,102 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void processLong(List<BtcFutures> list_db, BtcFuturesResponse dto) {
-
-        BigDecimal entry_price = list_db.get(0).getCurrPrice();
-
-        BigDecimal TP1 = Utils.getBigDecimal(Utils.toPercent(dto.getHight_price(), entry_price, 2));
-
-        BigDecimal TP2 = Utils.getBigDecimal(Utils.toPercent(entry_price, dto.getLow_price(), 2));
-
-        BigDecimal TP = TP1;
-        if (TP1.compareTo(TP2) < 0) {
-            TP = TP2;
-        }
-        TP = TP.divide(BigDecimal.valueOf(2), 2, RoundingMode.CEILING);
-
-        BigDecimal TP_long = entry_price.multiply(BigDecimal.valueOf(100).add(TP))
-                .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
-
-        BigDecimal TP_Short = entry_price.multiply(BigDecimal.valueOf(100).subtract(TP))
-                .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
-
-        String msg_long = "Long..." + Utils.removeLastZero(entry_price.toString()) + "$, ";
-        msg_long += "TP: " + TP + "%(" + Utils.removeLastZero(TP_long.toString()) + ")";
-
-        String msg_short = "Short.." + Utils.removeLastZero(entry_price.toString()) + "$, ";
-        msg_short += "TP: " + TP + "%(" + Utils.removeLastZero(TP_Short.toString()) + ")";
-
         String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
 
-        if (!msg_dict.contains(time)) {
-            msg_dict.put(time, time);
+        BigDecimal candle_height = dto.getMax_candle().subtract(dto.getMin_candle());
 
-            if (Utils.isGoodPriceForShort(entry_price, dto.getLow_price(), dto.getHight_price())) {
-                log.info(time + "    " + msg_short);
-            } else {
-                log.info(time + "    " + msg_long);
+        String TP1_percent = Utils.toPercent(
+                dto.getMin_candle().add(candle_height.divide(BigDecimal.valueOf(2), 2, RoundingMode.CEILING)),
+                dto.getMin_candle(), 2);
+
+        List<String> long_list = new ArrayList<String>();
+
+        String TP2_percent = Utils.toPercent(dto.getMax_candle(), dto.getMin_candle(), 2);
+
+        BigDecimal entry_price = list_db.get(0).getCurrPrice().subtract(BigDecimal.valueOf(18));
+
+        BigDecimal TP1_price = entry_price.multiply(BigDecimal.valueOf(100).add(Utils.getBigDecimalValue(TP1_percent)))
+                .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
+
+        BigDecimal TP2_price = entry_price.multiply(BigDecimal.valueOf(100).add(Utils.getBigDecimalValue(TP2_percent)))
+                .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
+
+        String msg_long_min = Utils.removeLastZero(entry_price.toString()) + "$";
+        msg_long_min += "\t TP1: " + Utils.removeLastZero(TP1_price.toString()) + " (" + TP1_percent + "%)";
+        msg_long_min += "  TP2: " + Utils.removeLastZero(TP2_price.toString()) + " (" + TP2_percent + "%)";
+
+        BigDecimal SL_price = entry_price
+                .multiply(BigDecimal.valueOf(100).subtract(Utils.getBigDecimalValue(TP2_percent)))
+                .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
+        msg_long_min += "  SL: " + Utils.removeLastZero(SL_price.toString()) + " (-" + TP2_percent + "%)";
+
+        msg_long_min += " <- Current Price";
+        long_list.add(msg_long_min);
+
+        // --------------------------------------
+
+        for (int i = 0; i < 5; i++) {
+            BigDecimal range = candle_height.multiply(BigDecimal.valueOf(i)).divide(BigDecimal.valueOf(5), 0,
+                    RoundingMode.CEILING);
+
+            entry_price = dto.getMin_candle().add(range);
+
+            TP1_price = entry_price.multiply(BigDecimal.valueOf(100).add(Utils.getBigDecimalValue(TP1_percent)))
+                    .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
+
+            TP2_price = dto.getMax_candle().add(range);
+
+            msg_long_min = Utils.removeLastZero(entry_price.toString()) + "$";
+            msg_long_min += "\t TP1: " + Utils.removeLastZero(TP1_price.toString()) + " (" + TP1_percent + "%)";
+            msg_long_min += "  TP2: " + Utils.removeLastZero(TP2_price.toString()) + " (" + TP2_percent + "%)";
+
+            SL_price = entry_price.multiply(BigDecimal.valueOf(100).subtract(Utils.getBigDecimalValue(TP2_percent)))
+                    .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
+            msg_long_min += "  SL: " + Utils.removeLastZero(SL_price.toString()) + " (-" + TP2_percent + "%)";
+
+            long_list.add(msg_long_min);
+        }
+        long_list = long_list.stream().sorted().collect(Collectors.toList());
+
+        // --------------------------------------
+        String str_short = "Short:   ";
+        entry_price = list_db.get(0).getCurrPrice().subtract(BigDecimal.valueOf(18));
+
+        TP1_price = entry_price.multiply(BigDecimal.valueOf(100).subtract(Utils.getBigDecimalValue(TP1_percent)))
+                .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
+
+        TP2_price = entry_price.multiply(BigDecimal.valueOf(100).subtract(Utils.getBigDecimalValue(TP2_percent)))
+                .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
+
+        str_short += Utils.removeLastZero(entry_price.toString()) + "$";
+        str_short += "\t TP1: " + Utils.removeLastZero(TP1_price.toString()) + " (" + TP1_percent + "%)";
+        str_short += "  TP2: " + Utils.removeLastZero(TP2_price.toString()) + " (" + TP2_percent + "%)";
+
+        SL_price = entry_price.multiply(BigDecimal.valueOf(100).add(Utils.getBigDecimalValue(TP2_percent)))
+                .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
+        str_short += "  SL: " + Utils.removeLastZero(SL_price.toString()) + " (-" + TP2_percent + "%)";
+
+        // --------------------------------------
+        List<String> results = new ArrayList<String>();
+        results.add(time + " Long:");
+        for (int i = 0; i < long_list.size(); i++) {
+            results.add("Entry " + (i + 1) + ": " + long_list.get(i));
+        }
+        results.add("");
+        results.add(str_short);
+
+        writeToFile(results);
+    }
+
+    public void writeToFile(List<String> list) {
+        try {
+            FileWriter myWriter = new FileWriter("Btc_Long_Short.txt");
+            for (String text : list) {
+                myWriter.write(text + System.lineSeparator());
             }
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
