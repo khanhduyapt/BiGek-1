@@ -1,6 +1,7 @@
 package bsc_scan_btc_futures;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,11 +23,19 @@ public class BscScanBtcFuturesApplication {
             ApplicationContext applicationContext = SpringApplication.run(BscScanBtcFuturesApplication.class, args);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
 
+            String pre_time = "";
             while (true) {
 
                 try {
+                    String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
+                    if (!Objects.equals(pre_time, time)) {
+                        log.info(time);
+                        pre_time = time;
+                    }
                     binance_service.getList();
-                    wait(60000); // 1m=60000ms
+
+                    //wait(60000); // 1m = 60000ms
+                    wait(10000); // 1m = 60000ms = 6 request
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                 }

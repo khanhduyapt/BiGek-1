@@ -72,7 +72,6 @@ public class Utils {
         }
     }
 
-
     public static String createMsgSimple(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
         return Utils.removeLastZero(curr_price.toString()) + "$\n"
                 + createMsgLowHeight(curr_price, low_price, hight_price);
@@ -104,6 +103,15 @@ public class Utils {
         return false;
     }
 
+    public static BigDecimal getGoodPriceForLongTP(BigDecimal low_price, BigDecimal hight_price) {
+        BigDecimal range = (hight_price.subtract(low_price));
+        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+
+        BigDecimal price = hight_price.subtract(range);
+
+        return price;
+    }
+
     public static Boolean isGoodPriceForLong(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
@@ -114,6 +122,15 @@ public class Utils {
             return false;
         }
         return true;
+    }
+
+    public static BigDecimal getGoodPriceForShortTP(BigDecimal low_price, BigDecimal hight_price) {
+        BigDecimal range = (hight_price.subtract(low_price));
+        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+
+        BigDecimal price = low_price.add(range);
+
+        return price;
     }
 
     public static Boolean isGoodPriceForShort(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
