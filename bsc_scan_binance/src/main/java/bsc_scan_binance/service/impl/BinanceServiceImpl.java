@@ -1139,10 +1139,10 @@ public class BinanceServiceImpl implements BinanceService {
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
                         css.setBinance_trade("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
 
-                        String curr_time_of_btc = Utils.convertDateToString("yyyy-MM-dd_HH_mm",
-                                Calendar.getInstance().getTime());
+                        String curr_time_of_btc = Utils.convertDateToString("yyyy-MM-dd_HH",
+                                Calendar.getInstance().getTime()); //dd_HH_mm
 
-                        curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
+                        //curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
                         if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
 
