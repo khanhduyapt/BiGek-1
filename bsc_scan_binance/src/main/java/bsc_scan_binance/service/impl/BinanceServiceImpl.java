@@ -721,6 +721,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                 BigDecimal lowest_price_today = Utils.getBigDecimalValue(temp.get(2));
                 BigDecimal highest_price_today = Utils.getBigDecimalValue(temp.get(3));
+                BigDecimal taget_percent_lost_today = Utils
+                        .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now, 1));
+                BigDecimal taget_percent_profit_today = Utils
+                        .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
+
                 BigDecimal vol_today = Utils.getBigDecimal(temp.get(0).replace(",", ""));
 
                 temp = splitVolAndPrice(css.getDay_0());
@@ -913,11 +918,6 @@ public class BinanceServiceImpl implements BinanceService {
                 price_now = Utils.getBigDecimalValue(css.getCurrent_price());
 
                 {
-                    BigDecimal taget_percent_lost_today = Utils
-                            .getBigDecimalValue(Utils.toPercent(lowest_price_today, price_now, 1));
-                    BigDecimal taget_percent_profit_today = Utils
-                            .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
-
                     String low_to_hight_price = "L:" + Utils.removeLastZero(lowest_price_today.toString()) + "("
                             + taget_percent_lost_today + "%)_H:" + Utils.removeLastZero(highest_price_today.toString())
                             + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)";
@@ -1149,7 +1149,18 @@ public class BinanceServiceImpl implements BinanceService {
                             BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h))
                                     .divide(price_can_buy_24h, 3, RoundingMode.CEILING));
 
-                            if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0)) {
+                            int hh = Utils
+                                    .getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+                            boolean check_L_H = true;
+                            if (hh < 7 || hh > 12) {
+                                BigDecimal btc_range_L_H = taget_percent_profit_today
+                                        .subtract(taget_percent_lost_today);
+                                if (btc_range_L_H.compareTo(BigDecimal.valueOf(1.5)) < 0) {
+                                    check_L_H = false;
+                                }
+                            }
+
+                            if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0) && check_L_H) {
 
                                 if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
 
