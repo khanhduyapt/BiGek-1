@@ -21,7 +21,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 
 import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
@@ -101,13 +100,13 @@ public class BinanceServiceImpl implements BinanceService {
             String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT" + "&interval=1h&limit="
                     + String.valueOf(limit);
 
-            List<Object> result_usdt = getBinanceData(url_usdt, limit);
+            List<Object> result_usdt = Utils.getBinanceData(url_usdt, limit);
 
             if (!isHasData(result_usdt, limit - 1)) {
                 url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD" + "&interval=1h&limit="
                         + String.valueOf(limit);
 
-                result_usdt = getBinanceData(url_usdt, limit);
+                result_usdt = Utils.getBinanceData(url_usdt, limit);
             }
 
             List<BtcVolumeDay> list_day = new ArrayList<BtcVolumeDay>();
@@ -166,13 +165,13 @@ public class BinanceServiceImpl implements BinanceService {
                     + "&interval=1d&limit=" + String.valueOf(limit);
 
             String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
-            BigDecimal price_at_binance = getBinancePrice(url_price);
+            BigDecimal price_at_binance = Utils.getBinancePrice(url_price);
             if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
                 url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "BUSD";
-                price_at_binance = getBinancePrice(url_price);
+                price_at_binance = Utils.getBinancePrice(url_price);
             }
-            List<Object> result_usdt = getBinanceData(url_usdt, limit);
-            List<Object> result_busd = getBinanceData(url_busd, limit);
+            List<Object> result_usdt = Utils.getBinanceData(url_usdt, limit);
+            List<Object> result_busd = Utils.getBinanceData(url_busd, limit);
 
             List<BinanceVolumnWeek> list_week = new ArrayList<BinanceVolumnWeek>();
             List<BigDecimal> list_price_close_candle = new ArrayList<BigDecimal>();
@@ -315,57 +314,6 @@ public class BinanceServiceImpl implements BinanceService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private BigDecimal getBinancePrice(String url) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            Object result = restTemplate.getForObject(url, Object.class);
-
-            return Utils.getBigDecimal(Utils.getLinkedHashMapValue(result, Arrays.asList("price")));
-        } catch (Exception e) {
-            return BigDecimal.ZERO;
-        }
-
-    }
-
-    private List<Object> getBinanceData(String url, int limit) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            Object[] result = restTemplate.getForObject(url, Object[].class);
-
-            if (result.length < limit) {
-                List<Object> list = new ArrayList<Object>();
-                for (int idx = 0; idx < limit - result.length; idx++) {
-                    List<Object> data = new ArrayList<Object>();
-                    for (int i = 0; i < limit; i++) {
-                        data.add(0);
-                    }
-                    list.add(data);
-                }
-
-                for (Object obj : result) {
-                    list.add(obj);
-                }
-
-                return list;
-
-            } else {
-                return Arrays.asList(result);
-            }
-        } catch (Exception e) {
-            List<Object> list = new ArrayList<Object>();
-            for (int idx = 0; idx < limit; idx++) {
-                List<Object> data = new ArrayList<Object>();
-                for (int i = 0; i < limit; i++) {
-                    data.add(0);
-                }
-                list.add(data);
-            }
-
-            return list;
-        }
-
     }
 
     private Boolean isHasData(List<Object> result_usdt, int index) {
@@ -1156,7 +1104,7 @@ public class BinanceServiceImpl implements BinanceService {
                             if (hh < 7 || hh > 12) {
                                 BigDecimal btc_range_L_H = taget_percent_profit_today
                                         .subtract(taget_percent_lost_today);
-                                if (btc_range_L_H.compareTo(BigDecimal.valueOf(1.5)) < 0) {
+                                if (btc_range_L_H.compareTo(BigDecimal.valueOf(1)) < 0) {
                                     check_L_H = false;
                                 }
                             }
@@ -1167,7 +1115,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                     css.setBtc_warning_css("bg-success rounded-lg");
 
-                                    if (has15MinutesCandleUp()) {
+                                    if (isUptrend1h()) {
 
                                         btc_is_good_price = true;
 
@@ -1961,46 +1909,9 @@ public class BinanceServiceImpl implements BinanceService {
         return "";
     }
 
-    public boolean has15MinutesCandleUp() {
-        try {
-            final Integer limit = 4;
-            String url_usdt = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=15m&limit="
-                    + String.valueOf(limit);
-
-            List<Object> result_usdt = getBinanceData(url_usdt, limit);
-            int count = 0;
-            for (int idx = limit - 1; idx >= 0; idx--) {
-                Object obj_usdt = result_usdt.get(idx);
-
-                @SuppressWarnings("unchecked")
-                List<Object> arr_usdt = (List<Object>) obj_usdt;
-
-                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
-                // BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
-                // BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
-                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
-                String open_time = arr_usdt.get(0).toString();
-
-                if (Objects.equals("0", open_time)) {
-                    return false;
-                }
-
-                if (price_open_candle.compareTo(price_close_candle) < 0) {
-                    count += 1;
-                    if (idx == limit - 1) {
-                        count += 1;
-                    }
-                }
-            }
-
-            if (count >= 2) {
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
+    public boolean isUptrend1h() {
+        List<bsc_scan_binance.entity.BtcFutures> list = Utils.loadData(6, "30m");
+        return Utils.isUptrend(list);
     }
 
 }

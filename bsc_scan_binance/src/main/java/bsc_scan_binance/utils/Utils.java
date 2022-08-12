@@ -12,6 +12,8 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
@@ -25,12 +27,13 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.MessageSource;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
 import bsc_scan_binance.BscScanBinanceApplication;
+import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
-import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinResponse;
@@ -198,28 +201,150 @@ public class Utils {
         return result;
     }
 
-    public static String createMsgBollingerResponse(BollAreaResponse dto, String newline) {
-        String result = String.format("(Bollinger) [%s]_[%s]", dto.getSymbol(), dto.getGecko_id());
+    public static List<BtcFutures> loadData(int limit, String time) {
+        try {
+            String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
+            BigDecimal price_at_binance = getBinancePrice(url_price);
 
-        if (dto.getIs_bottom_area()) {
-            result += " (bottom price area)";
-        } else if (dto.getIs_top_area()) {
-            result += " (top price area)";
+            String url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=" + time + "&limit=" + limit;
+            List<Object> list = getBinanceData(url, limit);
+
+            List<BtcFutures> list_entity = new ArrayList<BtcFutures>();
+            int id = 0;
+
+            for (int idx = limit - 1; idx >= 0; idx--) {
+                Object obj_usdt = list.get(idx);
+
+                @SuppressWarnings("unchecked")
+                List<Object> arr_usdt = (List<Object>) obj_usdt;
+
+                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
+                BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
+                BigDecimal low_price = Utils.getBigDecimal(arr_usdt.get(3));
+                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
+                String open_time = arr_usdt.get(0).toString();
+
+                if (Objects.equals("0", open_time)) {
+                    break;
+                }
+
+                BtcFutures day = new BtcFutures();
+
+                String strid = String.valueOf(id);
+                if (strid.length() < 2) {
+                    strid = "0" + strid;
+                }
+                day.setId(strid);
+
+                if (idx == limit - 1) {
+                    day.setCurrPrice(price_at_binance);
+                } else {
+                    day.setCurrPrice(BigDecimal.ZERO);
+                }
+
+                day.setLow_price(low_price);
+                day.setHight_price(hight_price);
+                day.setPrice_open_candle(price_open_candle);
+                day.setPrice_close_candle(price_close_candle);
+
+                if (price_open_candle.compareTo(price_close_candle) < 0) {
+                    day.setUptrend(true);
+                } else {
+                    day.setUptrend(false);
+                }
+
+                list_entity.add(day);
+
+                id += 1;
+            }
+
+            return list_entity;
+        } catch (
+
+        Exception e) {
+            e.printStackTrace();
         }
-        if (dto.getVector_up()) {
-            result += " Uptrend";
+
+        return new ArrayList<BtcFutures>();
+    }
+
+    public static boolean isUptrend(List<BtcFutures> list) {
+        BtcFutures item00 = list.get(0);
+        BtcFutures item99 = list.get(list.size() - 1);
+
+        if (Utils.isAGreaterB(item00.getLow_price(), item99.getHight_price())) {
+            return true;
         }
-        result += newline + "Price: " + dto.getAvg_price() + "$" + newline;
 
-        result += "CanBuy: " + dto.getPrice_can_buy() + "(" + toPercent(dto.getPrice_can_buy(), dto.getAvg_price(), 1)
-                + "%)" + newline;
+        if (item00.isUptrend() && Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_close_candle()) &&
+                Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_open_candle())) {
+            return true;
+        }
 
-        result += "CanSell: " + dto.getPrice_can_sell() + "(" + toPercent(dto.getPrice_can_sell(), dto.getAvg_price())
-                + "%)" + newline;
+        if (item00.isUptrend() && (Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_close_candle()) ||
+                Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_open_candle()))) {
+            return true;
+        }
 
-        result += dto.getVector_desc();
+        return item00.isUptrend();
+    }
 
-        return result;
+    public static boolean isAGreaterB(BigDecimal a, BigDecimal b) {
+        if (getBigDecimal(a).compareTo(getBigDecimal(b)) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static List<Object> getBinanceData(String url, int limit) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            Object[] result = restTemplate.getForObject(url, Object[].class);
+
+            if (result.length < limit) {
+                List<Object> list = new ArrayList<Object>();
+                for (int idx = 0; idx < limit - result.length; idx++) {
+                    List<Object> data = new ArrayList<Object>();
+                    for (int i = 0; i < limit; i++) {
+                        data.add(0);
+                    }
+                    list.add(data);
+                }
+
+                for (Object obj : result) {
+                    list.add(obj);
+                }
+
+                return list;
+
+            } else {
+                return Arrays.asList(result);
+            }
+        } catch (Exception e) {
+            List<Object> list = new ArrayList<Object>();
+            for (int idx = 0; idx < limit; idx++) {
+                List<Object> data = new ArrayList<Object>();
+                for (int i = 0; i < limit; i++) {
+                    data.add(0);
+                }
+                list.add(data);
+            }
+
+            return list;
+        }
+
+    }
+
+    public static BigDecimal getBinancePrice(String url) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            Object result = restTemplate.getForObject(url, Object.class);
+
+            return Utils.getBigDecimal(Utils.getLinkedHashMapValue(result, Arrays.asList("price")));
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+
     }
 
     public static boolean isNotBlank(String value) {

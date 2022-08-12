@@ -305,11 +305,18 @@ public class Utils {
                 .multiply(BigDecimal.valueOf(100));
 
         String result = percent.toString();
-        if(result.contains(".")) {
+        if (result.contains(".")) {
             result = result.substring(0, result.indexOf(".") + scale + 1);
         }
 
         return percent.toString();
+    }
+
+    public static boolean isAGreaterB(BigDecimal a, BigDecimal b) {
+        if (getBigDecimal(a).compareTo(getBigDecimal(b)) > 0) {
+            return true;
+        }
+        return false;
     }
 
     public static BigDecimal getBigDecimalValue(String value) {

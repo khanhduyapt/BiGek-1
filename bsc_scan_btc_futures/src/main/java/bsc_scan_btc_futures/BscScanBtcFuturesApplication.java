@@ -38,7 +38,7 @@ public class BscScanBtcFuturesApplication {
                     }
 
                     //wait(60000); // 1m = 60000ms
-                    wait(60000); // 1m = 60000ms => 10000 = 6 request
+                    wait(30000); // 1m = 60000ms => 10000 = 6 request
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                 }

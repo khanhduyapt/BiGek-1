@@ -7,7 +7,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,27 +39,17 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private BtcFuturesRepository btcFuturesRepository;
 
-    private Hashtable<String, String> msg_dict = new Hashtable<String, String>();
+    private static final String TIME_1m = "1m";
+    private static final String TIME_5m = "5m";
 
     @Transactional
-    private void loadData() {
+    private List<BtcFutures> loadData(int limit, String time, boolean allowSaveData) {
         try {
 
             String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
             BigDecimal price_at_binance = getBinancePrice(url_price);
-
-            // 30 candle
-            final Integer limit = 16;
-
-            // 5m: 30 candle = 1.5h
-            // String url_5m =
-            // "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=" +
-            // limit;
-            // List<Object> list = getBinanceData(url_5m, limit);
-
-            // 30 minutes
-            String url_1m = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=" + limit;
-            List<Object> list = getBinanceData(url_1m, limit);
+            String url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=" + time + "&limit=" + limit;
+            List<Object> list = getBinanceData(url, limit);
 
             List<BtcFutures> list_entity = new ArrayList<BtcFutures>();
             int id = 0;
@@ -111,18 +100,26 @@ public class BinanceServiceImpl implements BinanceService {
                 id += 1;
             }
 
-            btcFuturesRepository.deleteAll();
-            btcFuturesRepository.saveAll(list_entity);
-        } catch (Exception e) {
+            if (allowSaveData) {
+                btcFuturesRepository.deleteAll();
+                btcFuturesRepository.saveAll(list_entity);
+            }
+
+            return list_entity;
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
         }
+
+        return new ArrayList<BtcFutures>();
     }
 
     @Override
     @Transactional
     public String getList() {
         try {
-            loadData();
+            loadData(30, TIME_1m, true);
 
             String sql = "SELECT                                                                                    \n"
                     + "    long_sl,                                                                                 \n"
@@ -160,25 +157,26 @@ public class BinanceServiceImpl implements BinanceService {
     private String processLong(List<BtcFutures> list_db, BtcFuturesResponse dto) {
         String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
 
-        BigDecimal candle_height = dto.getHight_price().subtract(dto.getLow_price());
-
-        List<String> long_list = new ArrayList<String>();
-
-        BigDecimal SL_percent = BigDecimal.valueOf(0.95);
-
+        BigDecimal SL_percent = BigDecimal.valueOf(0.9);
         // --------------------------------------
+        List<String> long_list = new ArrayList<String>();
+        for (int i = 0; i < 3; i++) {
 
-        for (int i = 0; i < 2; i++) {
-            BigDecimal range = candle_height.multiply(BigDecimal.valueOf(i)).divide(BigDecimal.valueOf(5), 0,
-                    RoundingMode.CEILING);
-
-            BigDecimal entry_price = list_db.get(0).getCurrPrice().subtract(range);
+            BigDecimal entry_price = dto.getLow_price();
+            String header = ".Low    :  ";
+            if (i == 0) {
+                header = ".Now    :  ";
+                entry_price = list_db.get(0).getCurrPrice();
+            } else if (i == 1) {
+                header = ".Candle :  ";
+                entry_price = dto.getMin_candle();
+            }
 
             String TP_percent = Utils.toPercent(dto.getMax_candle(), entry_price, 2);
-            BigDecimal TP_price = entry_price
-                    .multiply(dto.getMax_candle()).divide(list_db.get(0).getCurrPrice(), 2, RoundingMode.CEILING);
 
-            String msg_long = Utils.removeLastZero(entry_price.toString()) + "$\t";
+            BigDecimal TP_price = dto.getMax_candle();
+
+            String msg_long = Utils.removeLastZero(entry_price.toString()) + "$";
             msg_long += "  TP: " + Utils.removeLastZero(TP_price.toString()) + " (" + TP_percent + "%)";
 
             BigDecimal SL_price = entry_price
@@ -187,28 +185,29 @@ public class BinanceServiceImpl implements BinanceService {
 
             msg_long += "  SL: " + Utils.removeLastZero(SL_price.toString()) + " (-" + SL_percent + "%)";
 
-            if (i == 0) {
-                msg_long += " <- Current Price";
-            }
-            long_list.add(msg_long);
+            long_list.add((i + 1) + header + msg_long);
         }
 
         // --------------------------------------
         List<String> short_list = new ArrayList<String>();
+        for (int i = 0; i < 3; i++) {
 
-        for (int i = 0; i < 2; i++) {
-            BigDecimal range = candle_height.multiply(BigDecimal.valueOf(i)).divide(BigDecimal.valueOf(5), 0,
-                    RoundingMode.CEILING);
-
-            BigDecimal entry_price = list_db.get(0).getCurrPrice().add(range);
+            BigDecimal entry_price;
+            String header = ".Hight  :  ";
+            if (i == 0) {
+                header = ".Now    :  ";
+                entry_price = list_db.get(0).getCurrPrice();
+            } else if (i == 1) {
+                header = ".Candle :  ";
+                entry_price = dto.getMax_candle();
+            } else {
+                entry_price = dto.getHight_price();
+            }
 
             String TP_percent = Utils.toPercent(entry_price, dto.getMin_candle(), 2);
+            BigDecimal TP_price = dto.getMin_candle();
 
-            BigDecimal TP_price = entry_price
-                    .multiply(BigDecimal.valueOf(100).subtract(Utils.getBigDecimalValue(TP_percent)))
-                    .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
-
-            String str_short = Utils.removeLastZero(entry_price.toString()) + "$\t";
+            String str_short = Utils.removeLastZero(entry_price.toString()) + "$";
             str_short += "  TP: " + Utils.removeLastZero(TP_price.toString()) + " (" + TP_percent + "%)";
 
             BigDecimal SL_price = entry_price
@@ -216,30 +215,58 @@ public class BinanceServiceImpl implements BinanceService {
                     .divide(BigDecimal.valueOf(100), 1, RoundingMode.CEILING);
             str_short += "  SL: " + Utils.removeLastZero(SL_price.toString()) + " (-" + SL_percent + "%)";
 
-            if (i == 0) {
-                str_short += " <- Current Price";
-            }
-
-            short_list.add(str_short);
+            short_list.add((i + 1) + header + str_short);
         }
 
         // --------------------------------------
-        List<String> results = new ArrayList<String>();
-        String btc = " Btc: " + Utils.removeLastZero(list_db.get(0).getCurrPrice().toString());
-        results.add(time + " Btc: " + Utils.removeLastZero(list_db.get(0).getCurrPrice().toString()));
+        List<BtcFutures> list_candle_5m = loadData(6, TIME_5m, false);
 
-        for (int i = 0; i < long_list.size(); i++) {
-            results.add("Long " + (i + 1) + ":  " + long_list.get(i));
+        List<String> results = new ArrayList<String>();
+        String btc = " Btc:  " + Utils.removeLastZero(list_db.get(0).getCurrPrice().toString());
+        results.add("(" + time + ")" + btc + "   30m");
+
+        if (isUptrend(list_candle_5m)) {
+            results.add("Chart 5m: Uptrend");
+        } else {
+            results.add("");
         }
 
-        results.add("");
+        results.add("--------------------------------------------------------");
+        results.add("Long");
+        for (int i = 0; i < long_list.size(); i++) {
+            results.add(long_list.get(i));
+        }
+        results.add("--------------------------------------------------------");
+        results.add("Short");
         for (int i = 0; i < short_list.size(); i++) {
-            results.add("Short" + (i + 1) + ":  " + short_list.get(i));
+            results.add(short_list.get(i));
         }
 
         writeToFile(results);
 
         return btc;
+    }
+
+    private boolean isUptrend(List<BtcFutures> list) {
+        BtcFutures item00 = list.get(0);
+        //BtcFutures item01 = list.get(1);
+        BtcFutures item99 = list.get(list.size() - 1);
+
+        if (Utils.isAGreaterB(item00.getLow_price(), item99.getHight_price())) {
+            return true;
+        }
+
+        if (item00.isUptrend() && Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_close_candle()) &&
+                Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_open_candle())) {
+            return true;
+        }
+
+        if (item00.isUptrend() && (Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_close_candle()) ||
+                Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_open_candle()))) {
+            return true;
+        }
+
+        return item00.isUptrend();
     }
 
     public void writeToFile(List<String> list) {
