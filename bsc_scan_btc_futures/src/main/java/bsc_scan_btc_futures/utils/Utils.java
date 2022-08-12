@@ -301,7 +301,7 @@ public class Utils {
         if (compareToValue.compareTo(BigDecimal.ZERO) == 0) {
             return "[dvz]";
         }
-        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, scale, RoundingMode.CEILING)
+        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, scale + 5, RoundingMode.CEILING)
                 .multiply(BigDecimal.valueOf(100));
 
         String result = percent.toString();
@@ -309,7 +309,7 @@ public class Utils {
             result = result.substring(0, result.indexOf(".") + scale + 1);
         }
 
-        return percent.toString();
+        return result;
     }
 
     public static boolean isAGreaterB(BigDecimal a, BigDecimal b) {

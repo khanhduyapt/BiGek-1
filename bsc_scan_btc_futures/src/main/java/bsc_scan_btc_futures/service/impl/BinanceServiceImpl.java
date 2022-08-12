@@ -174,7 +174,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             String TP_percent = Utils.toPercent(dto.getMax_candle(), entry_price, 2);
 
-            BigDecimal TP_price = dto.getMax_candle();
+            BigDecimal TP_price = dto.getMax_candle().multiply(BigDecimal.valueOf(0.9995));
 
             String msg_long = Utils.removeLastZero(entry_price.toString()) + "$";
             msg_long += "  TP: " + Utils.removeLastZero(TP_price.toString()) + " (" + TP_percent + "%)";
@@ -199,12 +199,13 @@ public class BinanceServiceImpl implements BinanceService {
                 entry_price = list_db.get(0).getCurrPrice();
             } else if (i == 1) {
                 header = ".Candle :  ";
-                entry_price = dto.getMax_candle();
+                entry_price = dto.getMax_candle().multiply(BigDecimal.valueOf(1.0005));
             } else {
                 entry_price = dto.getHight_price();
             }
 
             String TP_percent = Utils.toPercent(entry_price, dto.getMin_candle(), 2);
+
             BigDecimal TP_price = dto.getMin_candle();
 
             String str_short = Utils.removeLastZero(entry_price.toString()) + "$";
