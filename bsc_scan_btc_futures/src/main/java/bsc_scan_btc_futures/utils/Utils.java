@@ -301,10 +301,15 @@ public class Utils {
         if (compareToValue.compareTo(BigDecimal.ZERO) == 0) {
             return "[dvz]";
         }
-        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, 2 + scale, RoundingMode.CEILING)
+        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, scale, RoundingMode.CEILING)
                 .multiply(BigDecimal.valueOf(100));
 
-        return removeLastZero(percent.toString());
+        String result = percent.toString();
+        if(result.contains(".")) {
+            result = result.substring(0, result.indexOf(".") + scale + 1);
+        }
+
+        return percent.toString();
     }
 
     public static BigDecimal getBigDecimalValue(String value) {
