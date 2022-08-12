@@ -322,6 +322,10 @@ public class Utils {
             return;
         }
 
+        if (!isBusinessTime()) {
+            return;
+        }
+
         sendToChatId(Utils.chatId_duydk, text);
     }
 
@@ -330,14 +334,21 @@ public class Utils {
             return;
         }
 
+        if (!isBusinessTime()) {
+            return;
+        }
+
         sendToChatId(Utils.chatId_duydk, text);
         sendToChatId(Utils.chatId_linkdk, text);
+    }
 
-        // int hh = Utils.getIntValue(Utils.convertDateToString("HH",
-        // Calendar.getInstance().getTime()));
-        // if ((hh >= 20) || (hh <= 6)) {
-        // //return;
-        // }
+    public static boolean isBusinessTime() {
+        int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        if ((23 <= hh && hh <= 7)) {
+            return false;
+        }
+
+        return true;
     }
 
     public static String getChatId(String userName) {
