@@ -1140,9 +1140,10 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setBinance_trade("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
 
                         String curr_time_of_btc = Utils.convertDateToString("yyyy-MM-dd_HH",
-                                Calendar.getInstance().getTime()); //dd_HH_mm
+                                Calendar.getInstance().getTime()); // dd_HH_mm
 
-                        //curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
+                        // curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() -
+                        // 1);
 
                         if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
 
@@ -1332,6 +1333,12 @@ public class BinanceServiceImpl implements BinanceService {
         int idx = 1;
         String strCanBuy = "(" + Utils.convertDateToString("MM/dd HH:mm", Calendar.getInstance().getTime()) + ")";
 
+        String sp500 = loadPremarketSp500();
+        boolean alert = true;
+        if (sp500.contains("S&P500-")) {
+            alert = false;
+        }
+
         for (CandidateTokenCssResponse dto : results) {
             idx += 1;
             if (idx > 100) {
@@ -1351,7 +1358,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     count += 1;
 
-                    if (count % 10 == 0) {
+                    if (alert && (count % 10 == 0)) {
                         if (count < 11) {
                             Utils.sendToTelegram(strCanBuy + Utils.new_line_from_service + buy_msg);
                         } else {
@@ -1366,7 +1373,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String result = "";
-        if (Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
+        if (alert && Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
 
             if (count < 11) {
                 Utils.sendToTelegram(strCanBuy + Utils.new_line_from_service + buy_msg);
@@ -1402,9 +1409,18 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (isCandidate) {
-            String result = Utils.removeLastZero(
+            String result = "";
+            String entry = Utils.removeLastZero(
                     css.getAvg_boll_min().substring(0, css.getAvg_boll_min().indexOf("(")).replace("Buy: ", ""))
                     + "$, ";
+
+            String entry2 = Utils.removeLastZero(css.getLow_price_24h().toString()) + "$, ";
+
+            if (!Utils.isBusinessTime()) {
+                result += entry2;
+            } else {
+                result += entry;
+            }
 
             result += css.getAvg_boll_max().replace(" ", ""); // TP:
 
@@ -1414,9 +1430,6 @@ public class BinanceServiceImpl implements BinanceService {
             String stop_loss2 = css.getAvg_boll_min().substring(css.getAvg_boll_min().indexOf("(") + 1,
                     css.getAvg_boll_min().indexOf("%"));
 
-            if (Utils.getBigDecimalValue(stop_loss1).compareTo(BigDecimal.valueOf(-0.9)) < 0) {
-                // result += ", SL1:" + stop_loss1 + "%";
-            }
             result += ", SL2:" + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
 
             result = "BUY:" + Utils.appendSpace(css.getSymbol(), 4) + result;

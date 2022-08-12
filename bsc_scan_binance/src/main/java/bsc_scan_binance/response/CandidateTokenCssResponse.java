@@ -13,6 +13,12 @@ public class CandidateTokenCssResponse {
     private String gecko_id = "";
     private String symbol = "";
     private String name = "";
+
+    private BigDecimal low_price_24h;
+    private BigDecimal hight_price_24h;
+    private BigDecimal price_can_buy;
+    private BigDecimal price_can_sell;
+
     private String pumping_history = "";
 
     private String volumn_div_marketcap = "";
