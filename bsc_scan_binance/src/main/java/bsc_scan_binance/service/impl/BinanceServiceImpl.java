@@ -599,6 +599,7 @@ public class BinanceServiceImpl implements BinanceService {
                 css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap_str);
                 css.setPumping_history(dto.getPumping_history().replace("Pump:h", "").replace("Dump:h", ""));
 
+                css.setBinance_trade("https://www.binance.com/en/futures/" + dto.getSymbol().toUpperCase() + "USDT");
                 // Price
                 String pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_1h()) + "←"
