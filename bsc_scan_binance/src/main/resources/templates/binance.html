@@ -84,8 +84,7 @@ p {
           <th class="text-center" scope="col">#</th>
           <th class="text-center" scope="col">Symbol</th>
           <th class="text-center" scope="col">Name</th>
-          <th class="text-center" scope="col">MC/Total supply</th>
-          <th class="text-center" scope="col">Volume</th>
+          <th class="text-center" scope="col">MC/Vol</th>
 
           <th class="text-center text-primary" scope="col">v/mc</th>
           <th class="text-center text-primary" scope="col">Range</th>
@@ -146,19 +145,15 @@ p {
             <p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
             <p style="font-size: 0.7rem !important;"
               th:text="${token.pumping_history}"></p></td>
-          <!-- MC -->
-          <td style="font-size: 0.9rem !important; text-align: right; max-width: 180px !important;"><span
+          <!-- MC/Vol -->
+          <td style="font-size: 0.9rem !important; text-align: right; max-width: 190px !important;"><span
             th:classappend="${token.market_cap_css}"
             th:text="${#numbers.formatDecimal(token.market_cap, 0, 'COMMA', 0, 'POINT') + '$'}"></span>
-            <p style="font-size: 0.7rem !important;"
-              th:text="${#numbers.formatDecimal(token.total_supply, 0, 'COMMA', 0, 'POINT')}"></td>
-          <!-- Volume -->
-          <td style="text-align: right; min-width: 130px !important; max-width: 130px !important;">
             <p style="font-size: 0.9rem !important;"
               th:text="${#numbers.formatDecimal(token.gecko_total_volume, 0, 'COMMA', 0, 'POINT') + '$'}">
             <p style="font-size: 0.7rem !important;"
               th:text="${token.gecko_volumn_history}">
-          </td>
+           </td>
           <!-- v/mc -->
           <td
             style="text-align: right; min-width: 80px !important; max-width: 80px !important;"
@@ -203,7 +198,7 @@ p {
           </td>
           <!-- OCO -->
           <td class="oco_css" th:classappend="${token.oco_css}"
-            style="text-align: left; padding-left: 0.5rem !important; min-width: 510px !important; max-width: 510px !important;">
+            style="text-align: left; padding-left: 0.5rem !important; min-width: 450px !important; max-width: 500px !important;">
             <div th:classappend="${token.min_14d_css}">
               <span th:text="${token.oco_tp_price}"></span><span
                 th:classappend="${token.oco_tp_price_hight_css}"

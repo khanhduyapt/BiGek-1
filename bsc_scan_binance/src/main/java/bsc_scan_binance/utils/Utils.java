@@ -276,13 +276,13 @@ public class Utils {
             return true;
         }
 
-        if (item00.isUptrend() && Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_close_candle()) &&
-                Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_open_candle())) {
+        if (item00.isUptrend() && Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_close_candle())
+                && Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_open_candle())) {
             return true;
         }
 
-        if (item00.isUptrend() && (Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_close_candle()) ||
-                Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_open_candle()))) {
+        if (item00.isUptrend() && (Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_close_candle())
+                || Utils.isAGreaterB(item00.getPrice_open_candle(), item99.getPrice_open_candle()))) {
             return true;
         }
 
@@ -376,7 +376,7 @@ public class Utils {
     public static String appendSpace(String value, int length) {
         int len = value.length();
         if (len > length) {
-            return value;
+            return value + "..";
         }
 
         int target = length - len;

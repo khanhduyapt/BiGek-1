@@ -1156,7 +1156,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                    // debug: monitorToken(css);
+                    //monitorToken(css); // debug
 
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
@@ -1261,6 +1261,7 @@ public class BinanceServiceImpl implements BinanceService {
             if (btc_is_good_price) {
                 monitorTokenSales(list);
             }
+            // monitorTokenSales(list); //debug
 
             log.info("End getList <--");
 
@@ -1283,7 +1284,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String sp500 = loadPremarketSp500();
         boolean alert = true;
-        if (sp500.contains("S&P500-")) {
+        if (sp500.contains("S&P500-") && !Utils.isBusinessTime()) {
             alert = false;
         }
 
@@ -1358,19 +1359,16 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (isCandidate) {
             String result = "";
-            String entry = Utils.removeLastZero(
-                    css.getAvg_boll_min().substring(0, css.getAvg_boll_min().indexOf("(")).replace("Buy: ", ""))
-                    + "$, ";
+            BigDecimal price_can_buy = css.getPrice_can_buy();
+            BigDecimal temp_prire_24h = css.getLow_price_24h().multiply(BigDecimal.valueOf(1.009));
 
-            String entry2 = Utils.removeLastZero(css.getLow_price_24h().toString()) + "$, ";
-
-            if (!Utils.isBusinessTime()) {
-                result += entry2;
-            } else {
-                result += entry;
+            if (price_can_buy.compareTo(temp_prire_24h) > 0) {
+                price_can_buy = temp_prire_24h;
             }
 
-            result += css.getAvg_boll_max().replace(" ", ""); // TP:
+            result += Utils.removeLastZero(price_can_buy.toString()) + "$, ";
+
+            // result += css.getAvg_boll_max().replace(" ", ""); // TP:
 
             String stop_loss1 = String.valueOf(css.getStop_loss().subSequence(css.getStop_loss().indexOf("(") + 1,
                     css.getStop_loss().indexOf(")"))).replaceAll("%", "");
@@ -1378,7 +1376,7 @@ public class BinanceServiceImpl implements BinanceService {
             String stop_loss2 = css.getAvg_boll_min().substring(css.getAvg_boll_min().indexOf("(") + 1,
                     css.getAvg_boll_min().indexOf("%"));
 
-            result += ", SL2:" + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
+            result += ", SL:" + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
 
             result = "BUY:" + Utils.appendSpace(css.getSymbol(), 4) + result;
 
