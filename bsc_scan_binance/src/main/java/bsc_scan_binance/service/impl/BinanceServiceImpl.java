@@ -30,6 +30,7 @@ import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.BollArea;
+import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
@@ -886,7 +887,7 @@ public class BinanceServiceImpl implements BinanceService {
                 priorityCoin.setCurrent_price(price_now);
 
                 if (dto.getName().contains("Futures")) {
-                    css.setFutures(dto.getSymbol() + " (Futures)");
+                    css.setFutures(dto.getSymbol() + "(Futures)");
                 }
 
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
@@ -1156,7 +1157,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                    //monitorToken(css); // debug
+                    // monitorToken(css); // debug
+                    // isUptrend1h();
 
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
@@ -1908,7 +1910,16 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     public boolean isUptrend1h() {
-        List<bsc_scan_binance.entity.BtcFutures> list = Utils.loadData(6, "30m");
+        List<bsc_scan_binance.entity.BtcFutures> list = Utils.loadData(5, "15m");
+        int count = 0;
+        for (BtcFutures dto : list) {
+            if (dto.isUptrend()) {
+                count += 1;
+            }
+        }
+        if (count < 2) {
+            return false;
+        }
         return Utils.isUptrend(list);
     }
 
