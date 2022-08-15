@@ -18,6 +18,9 @@ public class CandidateTokenCssResponse {
     private BigDecimal hight_price_24h;
     private BigDecimal price_can_buy;
     private BigDecimal price_can_sell;
+    private BigDecimal entry_price;
+    private String str_entry_price = "";
+    private String str_entry_price_css = "";
 
     private String pumping_history = "";
 

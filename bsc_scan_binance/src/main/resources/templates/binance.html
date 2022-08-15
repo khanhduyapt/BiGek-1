@@ -168,10 +168,9 @@ p {
           <td style="text-align: right; min-width: 288.8px !important; max-width: 288.8px !important;">
             <p class="text-primary" th:text="${token.futures}">
             <div style="font-size: 0.75rem !important;">
-              <span th:classappend="${token.low_price_css}"
-                th:text="${token.low_price}"></span>
-              <span th:classappend="${token.hight_price_css}"
-                th:text="${token.hight_price}"></span>
+              <span th:classappend="${token.str_entry_price_css}" th:text="${token.str_entry_price}"></span>
+              <span th:classappend="${token.low_price_css}"       th:text="${token.low_price}"></span>
+              <span th:classappend="${token.hight_price_css}"     th:text="${token.hight_price}"></span>
             </div>
             <div style="font-size: 0.75rem !important;">
               <span th:classappend="${token.stop_loss_css}" th:text="${token.stop_loss}"></span>
@@ -179,6 +178,10 @@ p {
                 th:text="${token.avg_boll_min}"></span>
               <span th:classappend="${token.avg_boll_max_css}"
                 th:text="${token.avg_boll_max}"></span>
+            </div>
+
+            <div style="font-size: 0.75rem !important;">
+
             </div>
           </td>
           <!-- Price -->

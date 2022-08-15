@@ -633,6 +633,10 @@ public class Utils {
         }
     }
 
+    public static BigDecimal formatPriceLike(BigDecimal value, BigDecimal des_value) {
+        return formatPrice(value, getDecimalNumber(des_value));
+    }
+
     public static BigDecimal formatPrice(BigDecimal value, int number) {
         @SuppressWarnings("resource")
         Formatter formatter = new Formatter();
