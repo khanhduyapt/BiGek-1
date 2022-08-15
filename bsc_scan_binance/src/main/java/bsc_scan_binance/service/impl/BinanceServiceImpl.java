@@ -874,32 +874,33 @@ public class BinanceServiceImpl implements BinanceService {
                         // curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() -
                         // 1);
 
-                        if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
+                        BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h))
+                                .divide(price_can_buy_24h, 3, RoundingMode.CEILING));
 
-                            BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h))
-                                    .divide(price_can_buy_24h, 3, RoundingMode.CEILING));
-
-                            int hh = Utils
-                                    .getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-                            boolean check_L_H = true;
-                            if (hh < 7 || hh > 12) {
-                                BigDecimal btc_range_L_H = taget_percent_profit_today
-                                        .subtract(taget_percent_lost_today);
-                                if (btc_range_L_H.compareTo(BigDecimal.valueOf(1)) < 0) {
-                                    check_L_H = false;
-                                }
+                        int hh = Utils
+                                .getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+                        boolean check_L_H = true;
+                        if (hh < 7 || hh > 12) {
+                            BigDecimal btc_range_L_H = taget_percent_profit_today
+                                    .subtract(taget_percent_lost_today);
+                            if (btc_range_L_H.compareTo(BigDecimal.valueOf(1)) < 0) {
+                                check_L_H = false;
                             }
+                        }
 
-                            if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0) && check_L_H) {
+                        if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0) && check_L_H) {
 
-                                if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
+                            if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
 
-                                    css.setBtc_warning_css("bg-success rounded-lg");
+                                css.setBtc_warning_css("bg-success rounded-lg");
 
-                                    btc_is_good_price = true;
+                                if (isUptrend1h()) {
+                                    if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
+                                        btc_is_good_price = true;
 
-                                    // (Good time to buy)
-                                    pre_time_of_btc = curr_time_of_btc;
+                                        // (Good time to buy)
+                                        pre_time_of_btc = curr_time_of_btc;
+                                    }
                                 }
                             }
 
@@ -1037,7 +1038,7 @@ public class BinanceServiceImpl implements BinanceService {
             query = entityManager.createNativeQuery(sql_update_ema);
             query.executeUpdate();
 
-            if (isUptrend1h() && btc_is_good_price) {
+            if (btc_is_good_price) {
                 monitorTokenSales(list);
             }
             // monitorTokenSales(list); //debug
