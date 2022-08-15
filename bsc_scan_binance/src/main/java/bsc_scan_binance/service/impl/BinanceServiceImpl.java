@@ -1138,7 +1138,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (isCandidate) {
-            String result = Utils.removeLastZero(css.getEntry_price().toString()) + "$, ";
+            String result = Utils.removeLastZero(css.getEntry_price().toString()) + ", ";
 
             // result += css.getAvg_boll_max().replace(" ", ""); // TP:
 
@@ -1148,7 +1148,7 @@ public class BinanceServiceImpl implements BinanceService {
             String stop_loss2 = css.getAvg_boll_min().substring(css.getAvg_boll_min().indexOf("(") + 1,
                     css.getAvg_boll_min().indexOf("%"));
 
-            result += ", SL:" + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
+            result += ", ..SL.." + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
 
             result = "BUY:" + Utils.appendSpace(css.getSymbol(), 4) + result;
 

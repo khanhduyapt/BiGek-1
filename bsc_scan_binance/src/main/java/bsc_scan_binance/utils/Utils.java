@@ -376,7 +376,7 @@ public class Utils {
     public static String appendSpace(String value, int length) {
         int len = value.length();
         if (len > length) {
-            return value + "..";
+            return value + "...";
         }
 
         int target = length - len;
@@ -404,7 +404,7 @@ public class Utils {
             }
         }
 
-        return val;
+        return val + ".";
     }
 
     public static BigDecimal getMidPrice(BigDecimal low_price, BigDecimal hight_price) {
