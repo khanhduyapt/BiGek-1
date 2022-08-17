@@ -1139,6 +1139,9 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (isCandidate) {
             String result = Utils.removeLastZero(css.getEntry_price().toString()) + ", ";
+            if (!Utils.isBusinessTime()) {
+                result = Utils.removeLastZero(css.getLow_price_24h().toString()) + ", ";
+            }
 
             // result += css.getAvg_boll_max().replace(" ", ""); // TP:
 
@@ -1684,9 +1687,14 @@ public class BinanceServiceImpl implements BinanceService {
         int count = 0;
         String kill_msg = "";
 
-        for (BtcFutures dto : list) {
+        for (int index = 0; index < list.size(); index++) {
+            BtcFutures dto = list.get(index);
+
             if (dto.isUptrend()) {
                 count += 1;
+                if (index == 0) {
+                    count += 1;
+                }
             }
 
             if (dto.isKillLong()) {
@@ -1700,7 +1708,6 @@ public class BinanceServiceImpl implements BinanceService {
                     msg_vol_up_dict.put(key, key);
                 }
             }
-
         }
 
         if (Utils.isNotBlank(kill_msg)) {

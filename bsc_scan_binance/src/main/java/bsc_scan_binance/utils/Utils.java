@@ -404,7 +404,7 @@ public class Utils {
             }
         }
 
-        return val + ".";
+        return val + "..";
     }
 
     public static BigDecimal getMidPrice(BigDecimal low_price, BigDecimal hight_price) {
