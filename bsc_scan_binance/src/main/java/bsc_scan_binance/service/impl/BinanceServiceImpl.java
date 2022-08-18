@@ -705,21 +705,8 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar("m14d" + css.getStar());
                         css.setStar_css("text-white rounded-lg bg-info");
 
-                        String min14day = "min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "("
-                                + min_14d_per + "%)";
-                        String hold = "HOLD:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
-                                + "$), " + min14day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
-
-                        String key_hold = "HOLD"
-                                + Utils.convertDateToString("_yyyyMMdd_", Calendar.getInstance().getTime())
-                                + dto.getSymbol();
-
                         css.setMin_14d_css("text-primary");
 
-                        if (!msg_vol_up_dict.contains(key_hold)) {
-                            Utils.sendToMyTelegram(hold);
-                            msg_vol_up_dict.put(key_hold, key_hold);
-                        }
                     } else if (min_14d_per.compareTo(BigDecimal.valueOf(-3)) > 0) {
                         css.setMin_14d_css("text-primary");
                     }
@@ -870,9 +857,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         String curr_time_of_btc = Utils.convertDateToString("yyyy-MM-dd_HH",
                                 Calendar.getInstance().getTime()); // dd_HH_mm
-
-                        // curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() -
-                        // 1);
+                        curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
                         BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h))
                                 .divide(price_can_buy_24h, 3, RoundingMode.CEILING));
@@ -888,6 +873,7 @@ public class BinanceServiceImpl implements BinanceService {
                             }
                         }
 
+                        //take_profit_percent > 3% ?
                         if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0) && check_L_H) {
 
                             if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
@@ -1714,7 +1700,7 @@ public class BinanceServiceImpl implements BinanceService {
             Utils.sendToMyTelegram(kill_msg);
         }
 
-        if (count < 2) {
+        if (count < 3) {
             return false;
         }
         return Utils.isUptrend(list);
