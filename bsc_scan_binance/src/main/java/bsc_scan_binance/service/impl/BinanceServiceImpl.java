@@ -842,8 +842,8 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal temp_prire_24h_percent = Utils
                             .getBigDecimalValue(Utils.toPercent(temp_prire_24h, price_now));
                     css.setEntry_price(temp_prire_24h);
-                    css.setStr_entry_price("E:" + Utils.removeLastZero(temp_prire_24h.toString())
-                            + "(" + Utils.removeLastZero(temp_prire_24h_percent.toString()) + "%)");
+                    css.setStr_entry_price("E:" + Utils.removeLastZero(temp_prire_24h.toString()) + "("
+                            + Utils.removeLastZero(temp_prire_24h_percent.toString()) + "%)");
 
                     if (temp_prire_24h_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
                         css.setStr_entry_price_css("text-primary font-weight-bold");
@@ -862,31 +862,33 @@ public class BinanceServiceImpl implements BinanceService {
                         BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h))
                                 .divide(price_can_buy_24h, 3, RoundingMode.CEILING));
 
-                        int hh = Utils
-                                .getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+                        int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
                         boolean check_L_H = true;
                         if (hh < 7 || hh > 12) {
-                            BigDecimal btc_range_L_H = taget_percent_profit_today
-                                    .subtract(taget_percent_lost_today);
+                            BigDecimal btc_range_L_H = taget_percent_profit_today.subtract(taget_percent_lost_today);
                             if (btc_range_L_H.compareTo(BigDecimal.valueOf(1)) < 0) {
                                 check_L_H = false;
                             }
                         }
 
-                        //take_profit_percent > 3% ?
+                        // take_profit_percent > 3% ?
                         if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0) && check_L_H) {
 
                             if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
 
                                 css.setBtc_warning_css("bg-success rounded-lg");
+                                if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
 
-                                if (isUptrend1h()) {
-                                    if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
+                                    if (isUptrend1h()) {
+
                                         btc_is_good_price = true;
 
+                                    } else {
                                         // (Good time to buy)
-                                        pre_time_of_btc = curr_time_of_btc;
+                                        Utils.sendToMyTelegram("BTC enters the lowest price zone in 24 hours");
                                     }
+
+                                    pre_time_of_btc = curr_time_of_btc;
                                 }
                             }
 
@@ -1706,7 +1708,7 @@ public class BinanceServiceImpl implements BinanceService {
         return Utils.isUptrend(list);
     }
 
-    //------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------
 
     @Override
     @Transactional
