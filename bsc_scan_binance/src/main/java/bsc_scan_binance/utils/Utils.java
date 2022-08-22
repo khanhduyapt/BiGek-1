@@ -447,10 +447,6 @@ public class Utils {
             return;
         }
 
-        if (!isBusinessTime()) {
-            return;
-        }
-
         sendToChatId(Utils.chatId_duydk, text);
     }
 

@@ -1084,6 +1084,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                         buy_msg = "";
                     }
+
+                    if (count > 20) {
+                        return "";
+                    }
                 }
 
             }
