@@ -1706,7 +1706,7 @@ public class BinanceServiceImpl implements BinanceService {
             Utils.sendToMyTelegram(kill_msg);
         }
 
-        if (count < 3) {
+        if (count < 2) {
             return false;
         }
         return Utils.isUptrend(list);
