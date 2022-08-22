@@ -755,7 +755,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
-                            //Utils.sendToMyTelegram(hold);
+                            // Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
 
@@ -878,15 +878,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 css.setBtc_warning_css("bg-success rounded-lg");
                                 if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
-
-                                    if (isUptrend1h()) {
-
-                                        btc_is_good_price = true;
-
-                                    } else {
-                                        // (Good time to buy)
-                                        Utils.sendToMyTelegram("BTC enters the lowest price zone in 24 hours");
-                                    }
+                                    btc_is_good_price = true;
+                                    // (Good time to buy)
 
                                     pre_time_of_btc = curr_time_of_btc;
                                 }
@@ -923,8 +916,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                    // monitorToken(css); // debug
-                    // isUptrend1h();
+                    //monitorToken(css); // debug
 
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
@@ -1045,6 +1037,8 @@ public class BinanceServiceImpl implements BinanceService {
 
     public String monitorTokenSales(List<CandidateTokenCssResponse> results) {
 
+        boolean isUptrend = isUptrend1h();
+
         String buy_msg = "";
         int count = 1;
         int idx = 1;
@@ -1060,6 +1054,9 @@ public class BinanceServiceImpl implements BinanceService {
             idx += 1;
             if (idx > 100) {
                 break;
+            }
+            if (!isUptrend) {
+                idx = 101;
             }
 
             String msg = monitorToken(dto);
@@ -1083,10 +1080,9 @@ public class BinanceServiceImpl implements BinanceService {
                         }
 
                         buy_msg = "";
-                    }
-
-                    if (count > 20) {
-                        return "";
+                        if (count > 20) {
+                            return "";
+                        }
                     }
                 }
 
@@ -1130,12 +1126,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (isCandidate) {
-            String result = Utils.removeLastZero(css.getEntry_price().toString()) + ", ";
-            if (!Utils.isBusinessTime()) {
-                result = Utils.removeLastZero(css.getLow_price_24h().toString()) + ", ";
-            }
-
-            // result += css.getAvg_boll_max().replace(" ", ""); // TP:
+            String result = Utils.removeLastZero(css.getLow_price_24h().toString());
+            result += "~" + Utils.removeLastZero(css.getEntry_price().toString()) + ", ";
 
             String stop_loss1 = String.valueOf(css.getStop_loss().subSequence(css.getStop_loss().indexOf("(") + 1,
                     css.getStop_loss().indexOf(")"))).replaceAll("%", "");
@@ -1143,7 +1135,7 @@ public class BinanceServiceImpl implements BinanceService {
             String stop_loss2 = css.getAvg_boll_min().substring(css.getAvg_boll_min().indexOf("(") + 1,
                     css.getAvg_boll_min().indexOf("%"));
 
-            result += ", ..SL.." + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
+            result += "SL" + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
 
             result = "BUY:" + Utils.appendSpace(css.getSymbol(), 4) + result;
 
