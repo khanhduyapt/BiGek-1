@@ -91,6 +91,7 @@ public class CandidateTokenCssResponse {
     private String max_supply = "";
     private String circulating_supply = "";
     private String binance_trade = "";
+    private String trading_view = "";
     private String coin_gecko_link = "";
     private String backer = "";
     private String note = "";
