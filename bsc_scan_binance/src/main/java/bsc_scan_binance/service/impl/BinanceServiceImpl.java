@@ -856,9 +856,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
-                        css.setBinance_trade("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
-                        css.setCoin_gecko_link("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D");
-                        css.setTrading_view("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3ATOTAL");
+                        css.setBinance_trade("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D");
+                        css.setCoin_gecko_link("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3ATOTAL");
 
                         String curr_time_of_btc = Utils.convertDateToString("yyyy-MM-dd_HH",
                                 Calendar.getInstance().getTime()); // dd_HH_mm

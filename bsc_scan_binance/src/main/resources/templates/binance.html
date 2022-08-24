@@ -143,19 +143,19 @@ p {
             th:target="_blank" th:href="${token.binance_trade}"><span
               th:text="${token.symbol}"></span>
             </a><br>
-            <a th:target="_blank" th:href="${token.trading_view}">
+            <a th:target="_blank" th:href="${token.coin_gecko_link}">
               <span style="font-size: 0.7rem !important;" th:text="${token.trend}"></span>
             </a>
             </td>
           <!-- Name -->
-          <td style="font-size: 0.9rem !important; min-width: 180px !important; max-width: 180px !important;"><a
-            th:target="_blank" th:href="${token.coin_gecko_link}"> <span
-              th:text="${token.name}"></span></a>
+          <td style="font-size: 0.9rem !important; min-width: 180px !important; max-width: 180px !important;">
+            <a th:target="_blank" th:href="${token.trading_view}">
+              <span th:text="${token.name}"></span>
+            </a>
 
-              <p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
-
-            <p style="font-size: 0.7rem !important;"
-              th:text="${token.pumping_history}"></p></td>
+            <p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
+            <p style="font-size: 0.7rem !important;" th:text="${token.pumping_history}"></p>
+          </td>
           <!-- MC/Vol -->
           <td style="font-size: 0.9rem !important; text-align: right; max-width: 220px !important;"><span
             th:classappend="${token.market_cap_css}"
