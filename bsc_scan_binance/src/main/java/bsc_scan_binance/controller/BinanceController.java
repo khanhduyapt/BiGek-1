@@ -29,7 +29,7 @@ public class BinanceController {
     public String list(Model model) {
         BscScanBinanceApplication.callFormBinance = "";
 
-        model.addAttribute("data_list", service.getList(false));
+        model.addAttribute("data_list", service.getList(true));
         return "binance";
     }
 

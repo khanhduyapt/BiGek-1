@@ -5,6 +5,8 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +23,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
@@ -649,7 +652,16 @@ public class BinanceServiceImpl implements BinanceService {
                 priorityCoin.setCurrent_price(price_now);
 
                 if (dto.getName().contains("Futures")) {
-                    css.setFutures(dto.getSymbol() + "(Futures)");
+                    String futu = dto.getSymbol() + " ";
+
+                    if (isOrderByBynaceVolume) {
+                        List<String> coinglass = getCoinGlassData(dto.getSymbol());
+
+                        futu += coinglass.get(0);
+                        css.setFutures_css(coinglass.get(1));
+                    }
+
+                    css.setFutures(futu);
                 }
 
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
@@ -920,7 +932,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                    //monitorToken(css); // debug
+                    // monitorToken(css); // debug
 
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
@@ -1026,9 +1038,6 @@ public class BinanceServiceImpl implements BinanceService {
                 monitorTokenSales(list);
             }
             // monitorTokenSales(list); //debug
-
-            log.info("End getList <--");
-
             return list;
 
         } catch (Exception e) {
@@ -1947,6 +1956,79 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> getCoinGlassData(String symbol) {
+        String url = "https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=" + symbol.toUpperCase()
+                + "&exName=Binance&type=1&timeType=3";
+
+        /*
+         * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=Binance&type=1&timeType=3
+         * https://fapi.coinglass.com/api/tradingData/positionLSRatio?symbol=BTC&exName=Binance&type=1&timeType=3
+         */
+        List<String> list = new ArrayList<String>();
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            Object result = restTemplate.getForObject(url, Object.class);
+
+            Object longRatioList = Utils.getLinkedHashMapValue(result, Arrays.asList("data", "longRatioList"));
+            Object shortRatioList = Utils.getLinkedHashMapValue(result, Arrays.asList("data", "shortRatioList"));
+            Object longShortRatioList = Utils.getLinkedHashMapValue(result,
+                    Arrays.asList("data", "longShortRatioList"));
+            // Object dateList = Utils.getLinkedHashMapValue(result, Arrays.asList("data",
+            // "dateList"));
+
+            if (longRatioList instanceof Collection) {
+                List<Double> longRatioList2 = new ArrayList<>((Collection<Double>) longRatioList);
+                List<Double> shortRatioList2 = new ArrayList<>((Collection<Double>) shortRatioList);
+                List<Double> longShortRatioList2 = new ArrayList<>((Collection<Double>) longShortRatioList);
+
+                int index = longRatioList2.size() - 1;
+
+                // List<String> dateList2 = new ArrayList<>((Collection<String>) dateList);
+                // String abc = String.valueOf(dateList2.get(index));
+                // Date date = Utils.getDate(abc);
+                // String str_date = Utils.convertDateToString("HH:mm", date);
+
+                double longShortRatio = longShortRatioList2.get(index);
+
+                String msg = "";
+                if (longShortRatio > 1) {
+                    msg += "Long:" + String.valueOf(longRatioList2.get(index)) + "%";
+                } else {
+                    msg += "Short:" + String.valueOf(shortRatioList2.get(index)) + "%";
+                }
+
+                // log.info("End getCoinGlassData <--");
+                msg = "(" + msg + ")";
+                list.add(msg);
+
+                String css = "";
+
+                if (msg.contains("Short:")) {
+                    css = "text-danger";
+                } else {
+                    css = "text-primary";
+                    if (longRatioList2.get(index) < 60) {
+                        css = "";
+                    }
+                }
+
+                if (longRatioList2.get(index) > 71) {
+                    css += " font-weight-bold";
+                }
+                list.add(css);
+
+                return list;
+            }
+
+        } catch (Exception e) {
+        }
+
+        list.add("(Futures)");
+        list.add("");
+        return list;
     }
 
 }

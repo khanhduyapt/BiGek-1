@@ -37,6 +37,7 @@ public class CandidateTokenCssResponse {
     private String btc_warning_css = "";
 
     private String futures = "";
+    private String futures_css = "";
     private String avg_percent = "";
     private String avg_price = "";
     private String avg_boll_min = "";

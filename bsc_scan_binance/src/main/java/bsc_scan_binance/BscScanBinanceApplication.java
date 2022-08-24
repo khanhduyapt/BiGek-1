@@ -104,8 +104,7 @@ public class BscScanBinanceApplication {
                         wait(300);
                     }
 
-                    log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:"
-                            + coin.getSymbol());
+                    //log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
 
                     if (Objects.equals(idx, size - 1)) {
                         binance_service.loadData(btc.getGeckoid(), btc.getSymbol());
