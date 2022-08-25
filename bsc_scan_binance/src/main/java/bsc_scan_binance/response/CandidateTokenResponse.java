@@ -100,4 +100,7 @@ public class CandidateTokenResponse {
     private BigDecimal rate1d4h;
     private BigDecimal rsi;
 
+    private String futures;
+    private String futures_css;
+
 }

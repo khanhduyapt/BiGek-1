@@ -112,6 +112,10 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "rate1d0h", type = BigDecimal.class),
                 @ColumnResult(name = "rate1d4h", type = BigDecimal.class),
                 @ColumnResult(name = "rsi", type = BigDecimal.class),
+
+                @ColumnResult(name = "futures", type = String.class),
+                @ColumnResult(name = "futures_css", type = String.class),
+
         })
 })
 

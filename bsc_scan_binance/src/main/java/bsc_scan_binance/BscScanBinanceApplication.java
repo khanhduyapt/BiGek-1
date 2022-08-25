@@ -92,22 +92,24 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        binance_service.loadData(coin.getGeckoid(), coin.getSymbol());
+                        String loadBinanceData = binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol());
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
+
+                        log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
+                                + loadBinanceData);
+
                     } catch (Exception e) {
                         log.error("dkd error LoadData:" + e.getMessage());
                     }
 
                     if (BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
-                        wait(400);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                        wait(1000);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
                     } else {
-                        wait(300);
+                        wait(1200);
                     }
 
-                    log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol:" + coin.getSymbol());
-
                     if (Objects.equals(idx, size - 1)) {
-                        binance_service.loadData(btc.getGeckoid(), btc.getSymbol());
+                        binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol());
                         binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
 
                         int minus = Utils

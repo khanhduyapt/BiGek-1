@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import bsc_scan_binance.BscScanBinanceApplication;
+import bsc_scan_binance.entity.BinanceFutures;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
 import bsc_scan_binance.entity.BinanceVolumeDateTimeKey;
 import bsc_scan_binance.entity.BinanceVolumnDay;
@@ -194,6 +194,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , rate1d0h                                                                              \n"
                     + "   , rate1d4h                                                                              \n"
                     + "   , cur.rsi                                                                               \n"
+                    + "   , (select futures_msg from binance_futures where gecko_id = can.gecko_id)    as futures      \n"
+                    + "   , (select futures_css from binance_futures where gecko_id = can.gecko_id)    as futures_css  \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
@@ -651,18 +653,18 @@ public class BinanceServiceImpl implements BinanceService {
 
                 priorityCoin.setCurrent_price(price_now);
 
-                if (dto.getName().contains("Futures")) {
-                    String futu = dto.getSymbol() + " ";
-
-                    if (isOrderByBynaceVolume) {
-                        List<String> coinglass = getCoinGlassData(dto.getSymbol());
-
-                        futu += coinglass.get(0);
-                        css.setFutures_css(coinglass.get(1));
-                    }
-
-                    css.setFutures(futu);
-                }
+                //if (dto.getName().contains("Futures")) {
+                //    String futu = dto.getSymbol() + " ";
+                //
+                //    if (isOrderByBynaceVolume) {
+                //        List<String> coinglass = getCoinGlassData(dto.getGecko_id(), dto.getSymbol());
+                //
+                //        futu += coinglass.get(0);
+                //        css.setFutures_css(coinglass.get(1));
+                //    }
+                //
+                //    css.setFutures(futu);
+                //}
 
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
@@ -831,16 +833,18 @@ public class BinanceServiceImpl implements BinanceService {
 
                     String priceChange24h = dto.getPrice_change_percentage_24h().replace("%", "");
 
-                    if (price_can_buy_24h_percent.compareTo(BigDecimal.valueOf(-1.5)) > 0) {
-                        css.setAvg_boll_min_css("text-white bg-success rounded-lg");
-                    }
+                    if (!dto.getFutures().contains("Short:")) {
+                        if (price_can_buy_24h_percent.compareTo(BigDecimal.valueOf(-1.5)) > 0) {
+                            css.setAvg_boll_min_css("text-white bg-success rounded-lg");
+                        }
 
-                    if (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0) {
-                        if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
-                            if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
-                                css.setStop_loss_css("bg-warning rounded-lg px-1");
-                                css.setAvg_boll_min_css("text-white bg-success rounded-lg");
-                                css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
+                        if (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0) {
+                            if (Utils.isGoodPrice(price_now, price_can_buy_24h, price_can_sell_24h)) {
+                                if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
+                                    css.setStop_loss_css("bg-warning rounded-lg px-1");
+                                    css.setAvg_boll_min_css("text-white bg-success rounded-lg");
+                                    css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
+                                }
                             }
                         }
                     }
@@ -857,12 +861,13 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setStr_entry_price("E:" + Utils.removeLastZero(temp_prire_24h.toString()) + "("
                             + Utils.removeLastZero(temp_prire_24h_percent.toString()) + "%)");
 
-                    if (temp_prire_24h_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
-                        css.setStr_entry_price_css("text-primary font-weight-bold");
-                    } else if (temp_prire_24h_percent.compareTo(BigDecimal.valueOf(-0.3)) > 0) {
-                        css.setStr_entry_price_css("text-white bg-success rounded-lg");
+                    if (!dto.getFutures().contains("Short:")) {
+                        if (temp_prire_24h_percent.compareTo(BigDecimal.valueOf(-1)) > 0) {
+                            css.setStr_entry_price_css("text-primary font-weight-bold");
+                        } else if (temp_prire_24h_percent.compareTo(BigDecimal.valueOf(-0.3)) > 0) {
+                            css.setStr_entry_price_css("text-white bg-success rounded-lg");
+                        }
                     }
-
                     css.setTrading_view("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
                             + dto.getSymbol().toUpperCase() + "USDT");
 
@@ -1011,24 +1016,26 @@ public class BinanceServiceImpl implements BinanceService {
                         " where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getGecko_id(), dto.getSymbol());
 
-                if (isOrderByBynaceVolume) {
-                    if (Objects.equals("BTC", css.getSymbol())) {
-                        list.add(css);
-                    } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.ZERO) > 0)
-                            || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.ZERO) > 0)) {
+                //if (isOrderByBynaceVolume) {
+                //    if (Objects.equals("BTC", css.getSymbol())) {
+                //        list.add(css);
+                //    } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.ZERO) > 0)
+                //            || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.ZERO) > 0)) {
+                //
+                //        list.add(css);
+                //
+                //    } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
+                //            .compareTo(BigDecimal.valueOf(5)) > 0)
+                //            && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
+                //
+                //        // list.add(css);
+                //    }
+                //
+                //} else {
+                //    list.add(css);
+                //}
 
-                        list.add(css);
-
-                    } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
-                            .compareTo(BigDecimal.valueOf(5)) > 0)
-                            && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
-
-                        // list.add(css);
-                    }
-
-                } else {
-                    list.add(css);
-                }
+                list.add(css);
             }
 
             query = entityManager.createNativeQuery(sql_update_ema);
@@ -1782,7 +1789,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public void loadData(String gecko_id, String symbol) {
+    public String loadBinanceData(String gecko_id, String symbol) {
         try {
             final Integer limit = 14;
             final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
@@ -1938,9 +1945,12 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
+            return setCoinGlassData(gecko_id, symbol);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return "";
     }
 
     private Boolean isHasData(List<Object> result_usdt, int index) {
@@ -1958,15 +1968,25 @@ public class BinanceServiceImpl implements BinanceService {
         return true;
     }
 
+    /**
+     * https://fapi.coinglass.com/api/futures/longShortRate?symbol=BTC&timeType=3
+     *
+     * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=Okex&type=-1&timeType=3
+     * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=Huobi&type=1&timeType=3
+     *
+     */
     @SuppressWarnings("unchecked")
-    private List<String> getCoinGlassData(String symbol) {
+    private String setCoinGlassData(String gecko_id, String symbol) {
         String url = "https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=" + symbol.toUpperCase()
                 + "&exName=Binance&type=1&timeType=3";
 
         /*
+         *
          * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=Binance&type=1&timeType=3
          * https://fapi.coinglass.com/api/tradingData/positionLSRatio?symbol=BTC&exName=Binance&type=1&timeType=3
          */
+        BigDecimal topTraderBinanceLongRate = BigDecimal.ZERO;
+
         List<String> list = new ArrayList<String>();
         try {
             RestTemplate restTemplate = new RestTemplate();
@@ -1984,51 +2004,70 @@ public class BinanceServiceImpl implements BinanceService {
                 List<Double> shortRatioList2 = new ArrayList<>((Collection<Double>) shortRatioList);
                 List<Double> longShortRatioList2 = new ArrayList<>((Collection<Double>) longShortRatioList);
 
-                int index = longRatioList2.size() - 1;
+                if (longRatioList2.size() > 0) {
+                    int index = longRatioList2.size() - 1;
 
-                // List<String> dateList2 = new ArrayList<>((Collection<String>) dateList);
-                // String abc = String.valueOf(dateList2.get(index));
-                // Date date = Utils.getDate(abc);
-                // String str_date = Utils.convertDateToString("HH:mm", date);
+                    // List<String> dateList2 = new ArrayList<>((Collection<String>) dateList);
+                    // String abc = String.valueOf(dateList2.get(index));
+                    // Date date = Utils.getDate(abc);
+                    // String str_date = Utils.convertDateToString("HH:mm", date);
 
-                double longShortRatio = longShortRatioList2.get(index);
+                    double longShortRatio = longShortRatioList2.get(index);
+                    topTraderBinanceLongRate = Utils.getBigDecimal(longRatioList2.get(index));
 
-                String msg = "";
-                if (longShortRatio > 1) {
-                    msg += "Long:" + String.valueOf(longRatioList2.get(index)) + "%";
-                } else {
-                    msg += "Short:" + String.valueOf(shortRatioList2.get(index)) + "%";
-                }
-
-                // log.info("End getCoinGlassData <--");
-                msg = "(" + msg + ")";
-                list.add(msg);
-
-                String css = "";
-
-                if (msg.contains("Short:")) {
-                    css = "text-danger";
-                } else {
-                    css = "text-primary";
-                    if (longRatioList2.get(index) < 60) {
-                        css = "";
+                    String msg = "";
+                    if (longShortRatio > 1) {
+                        msg += "Long:" + String.valueOf(longRatioList2.get(index)) + "%";
+                    } else {
+                        msg += "Short:" + String.valueOf(shortRatioList2.get(index)) + "%";
                     }
-                }
 
-                if (longRatioList2.get(index) > 71) {
-                    css += " font-weight-bold";
-                }
-                list.add(css);
+                    // log.info("End getCoinGlassData <--");
+                    msg = "(" + msg + ")";
+                    list.add(msg);
 
-                return list;
+                    String css = "";
+
+                    if (msg.contains("Short:")) {
+                        css = "text-danger";
+                    } else {
+                        css = "text-primary";
+                        if (longRatioList2.get(index) < 60) {
+                            css = "";
+                        }
+                    }
+
+                    if (longRatioList2.get(index) > 71) {
+                        css += " font-weight-bold";
+                    }
+                    list.add(css);
+                }
             }
 
+            if (CollectionUtils.isEmpty(list)) {
+                list.add("(Futures)");
+                list.add("");
+            }
+
+            String futuresMsg = symbol + " " + list.get(0);
+            String futuresCss = list.get(1);
+
+            BinanceFutures entity = binanceFuturesRepository.findById(gecko_id).orElse(null);
+            if (!Objects.equals(null, entity)) {
+                entity.setFuturesMsg(futuresMsg);
+                entity.setFuturesCss(futuresCss);
+                entity.setTopTraderBinanceLongRate(topTraderBinanceLongRate);
+
+                binanceFuturesRepository.save(entity);
+            }
+
+            return futuresMsg;
+
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        list.add("(Futures)");
-        list.add("");
-        return list;
+        return "";
     }
 
 }
