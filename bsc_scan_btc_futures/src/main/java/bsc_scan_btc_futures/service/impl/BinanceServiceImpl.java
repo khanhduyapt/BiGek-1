@@ -7,6 +7,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,12 +22,18 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import bsc_scan_btc_futures.entity.BtcFutures;
+import bsc_scan_btc_futures.entity.DepthAsks;
+import bsc_scan_btc_futures.entity.DepthBids;
+import bsc_scan_btc_futures.entity.DepthKey;
 import bsc_scan_btc_futures.repository.BtcFuturesRepository;
+import bsc_scan_btc_futures.repository.DepthAsksRepository;
+import bsc_scan_btc_futures.repository.DepthBidsRepository;
 import bsc_scan_btc_futures.service.BinanceService;
 import bsc_scan_btc_futures.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import response.BtcFuturesResponse;
+import response.DepthResponse;
 
 @Service
 @Slf4j
@@ -39,12 +46,20 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private BtcFuturesRepository btcFuturesRepository;
 
+    @Autowired
+    private DepthBidsRepository depthBidsRepository;
+
+    @Autowired
+    private DepthAsksRepository depthAsksRepository;
+
     private static final String TIME_1m = "1m";
     private static final String TIME_5m = "5m";
 
     @Transactional
     private List<BtcFutures> loadData(int limit, String time, boolean allowSaveData) {
         try {
+
+            saveDepthData();
 
             String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
             BigDecimal price_at_binance = getBinancePrice(url_price);
@@ -276,6 +291,22 @@ public class BinanceServiceImpl implements BinanceService {
             for (String text : list) {
                 myWriter.write(text + System.lineSeparator());
             }
+
+            myWriter.write(System.lineSeparator());
+            myWriter.write(System.lineSeparator());
+            myWriter.write(System.lineSeparator());
+            List<DepthResponse> depth_list = getDepthData();
+            int size = depth_list.size();
+            for (int index = 0; index < size; index++) {
+                DepthResponse dto = depth_list.get(index);
+
+                if (index == size / 2) {
+                    myWriter.write(System.lineSeparator());
+                }
+
+                myWriter.write(dto.toString(7) + System.lineSeparator());
+
+            }
             myWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -292,6 +323,93 @@ public class BinanceServiceImpl implements BinanceService {
             return BigDecimal.ZERO;
         }
 
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    private void saveDepthData() {
+        try {
+            String url = "https://api.binance.com/api/v3/depth?limit=5000&symbol=BTCUSDT";
+
+            RestTemplate restTemplate = new RestTemplate();
+            Object result = restTemplate.getForObject(url, Object.class);
+
+            Object obj_bids = Utils.getLinkedHashMapValue(result, Arrays.asList("bids"));
+            Object obj_asks = Utils.getLinkedHashMapValue(result, Arrays.asList("asks"));
+
+            if (obj_bids instanceof Collection) {
+                List<Object> obj_bids2 = new ArrayList<>((Collection<Object>) obj_bids);
+
+                List<DepthBids> bids_save_list = new ArrayList<DepthBids>();
+                for (Object obj : obj_bids2) {
+                    List<Double> bids = new ArrayList<>((Collection<Double>) obj);
+                    BigDecimal price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
+                    BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(bids.get(1)));
+
+                    DepthBids entity = new DepthBids();
+                    DepthKey key = new DepthKey();
+                    key.setGeckoId("bitcoin");
+                    key.setSymbol("BTC");
+                    key.setPrice(price);
+                    entity.setId(key);
+                    entity.setQty(qty);
+
+                    bids_save_list.add(entity);
+                }
+                depthBidsRepository.deleteAll();
+                depthBidsRepository.saveAll(bids_save_list);
+            }
+
+            if (obj_asks instanceof Collection) {
+                List<Object> obj_asks2 = new ArrayList<>((Collection<Object>) obj_asks);
+
+                List<DepthAsks> asks_save_list = new ArrayList<DepthAsks>();
+                for (Object obj : obj_asks2) {
+                    List<Double> asks = new ArrayList<>((Collection<Double>) obj);
+                    BigDecimal price = Utils.getBigDecimalValue(String.valueOf(asks.get(0)));
+                    BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(asks.get(1)));
+
+                    DepthAsks entity = new DepthAsks();
+                    DepthKey key = new DepthKey();
+                    key.setGeckoId("bitcoin");
+                    key.setSymbol("BTC");
+                    key.setPrice(price);
+                    entity.setId(key);
+                    entity.setQty(qty);
+
+                    asks_save_list.add(entity);
+                }
+                depthAsksRepository.deleteAll();
+                depthAsksRepository.saveAll(asks_save_list);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<DepthResponse> getDepthData() {
+        try {
+            String sql = "SELECT                                                                                    \n"
+                    + "    gecko_id,                                                                                \n"
+                    + "    symbol,                                                                                  \n"
+                    + "    price,                                                                                   \n"
+                    + "    qty,                                                                                     \n"
+                    + "    val_million_dolas                                                                        \n"
+                    + "FROM                                                                                         \n"
+                    + "    view_btc_depth_resistant ";
+
+            Query query = entityManager.createNativeQuery(sql, "DepthResponse");
+
+            @SuppressWarnings("unchecked")
+            List<DepthResponse> list = query.getResultList();
+            if (!CollectionUtils.isEmpty(list)) {
+                return list;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<DepthResponse>();
     }
 
     private List<Object> getBinanceData(String url, int limit) {
