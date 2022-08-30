@@ -1,5 +1,6 @@
 package bsc_scan_binance.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import bsc_scan_binance.entity.Orders;
@@ -20,4 +21,6 @@ public interface BinanceService {
     List<Orders> getOrderList();
 
     public String loadPremarket();
+
+    public String getTextDepthData(BigDecimal price_now);
 }

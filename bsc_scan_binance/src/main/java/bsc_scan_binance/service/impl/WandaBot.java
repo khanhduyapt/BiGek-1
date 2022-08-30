@@ -91,9 +91,12 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
+                String btcDepth = binance_service.getTextDepthData(list.get(0).getCurrent_price());
+
                 message.setText(
                         Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot)
-                                + Utils.new_line_from_bot + Utils.new_line_from_bot + premarket);
+                                + Utils.new_line_from_bot + Utils.new_line_from_bot + premarket
+                                + Utils.new_line_from_bot + btcDepth);
                 execute(message);
 
             } else if (command.contains("/buy")) {

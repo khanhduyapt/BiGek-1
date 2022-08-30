@@ -888,7 +888,10 @@ public class BinanceServiceImpl implements BinanceService {
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
+                        saveDepthData(dto.getGecko_id(), dto.getSymbol());
                         writeDepthData(price_now);
+                        String textDepth = getTextDepthData(price_now);
+                        css.setOco_depth(textDepth);
 
                         css.setBinance_trade("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D");
                         css.setCoin_gecko_link("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3ATOTAL");
@@ -954,7 +957,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                    // monitorToken(css); // debug
+                    //monitorToken(css); // debug
 
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
@@ -1177,6 +1180,10 @@ public class BinanceServiceImpl implements BinanceService {
             result = "BUY:" + Utils.appendSpace(css.getSymbol(), 4) + result;
 
             result = result.replace(" ", ".").replace(",", ".");
+
+            if (css.getSymbol().equals("BTC")) {
+                result += Utils.new_line_from_service + css.getOco_depth();
+            }
 
             return result;
         }
@@ -2157,8 +2164,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private void writeDepthData(BigDecimal price_now) {
-
+    private List<DepthResponse> getDepthData() {
         try {
             String sql = "SELECT                                                                                  \n"
                     + "    gecko_id,                                                                              \n"
@@ -2173,6 +2179,46 @@ public class BinanceServiceImpl implements BinanceService {
 
             @SuppressWarnings("unchecked")
             List<DepthResponse> list = query.getResultList();
+
+            return list;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<DepthResponse>();
+    }
+
+    @Override
+    public String getTextDepthData(BigDecimal price_now) {
+        String result = "";
+
+        List<DepthResponse> list = getDepthData();
+
+        if (!CollectionUtils.isEmpty(list)) {
+            Boolean isAddPriceNow = false;
+
+            for (DepthResponse dto : list) {
+
+                if (!isAddPriceNow) {
+                    if (dto.getPrice().compareTo(price_now) > 0) {
+                        result += "< NOW >";
+                        isAddPriceNow = true;
+                    }
+                }
+
+                result += dto.toStringMillion(price_now);
+            }
+        }
+
+        return result;
+    }
+
+    private void writeDepthData(BigDecimal price_now) {
+
+        try {
+            List<DepthResponse> list = getDepthData();
+
             if (!CollectionUtils.isEmpty(list)) {
 
                 FileWriter myWriter = new FileWriter("BtcResistanceZone.txt");

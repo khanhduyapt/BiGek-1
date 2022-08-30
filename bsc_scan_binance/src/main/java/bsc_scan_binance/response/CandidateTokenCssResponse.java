@@ -63,6 +63,7 @@ public class CandidateTokenCssResponse {
     private String oco_stop_limit_low_css = "";
     private String oco_stop_price = "";
     private String oco_low_hight = "";
+    private String oco_depth;
     private String min_14d_css = "";
 
     private String avg_history;
@@ -257,4 +258,6 @@ public class CandidateTokenCssResponse {
     private String rate1d0h_css;
     private String rate1d4h_css;
     private String rsi_css;
+
+
 }
