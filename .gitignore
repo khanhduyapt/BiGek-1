@@ -2,3 +2,4 @@
 *.log
 *.gz
 bsc_scan_btc_futures/Btc_Long_Short.txt
+*.txt

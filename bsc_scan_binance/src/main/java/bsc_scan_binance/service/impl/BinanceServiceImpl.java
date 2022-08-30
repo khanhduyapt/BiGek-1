@@ -888,8 +888,6 @@ public class BinanceServiceImpl implements BinanceService {
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                        saveDepthData(dto.getGecko_id(), dto.getSymbol());
-                        writeDepthData(price_now);
                         String textDepth = getTextDepthData(price_now);
                         css.setOco_depth(textDepth);
 
@@ -2099,6 +2097,7 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @SuppressWarnings({ "unchecked" })
+    @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
         try {
 
@@ -2190,7 +2189,11 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @Override
+    @Transactional
     public String getTextDepthData(BigDecimal price_now) {
+        saveDepthData("bitcoin", "BTC");
+        writeDepthData(price_now);
+
         String result = "";
 
         List<DepthResponse> list = getDepthData();
