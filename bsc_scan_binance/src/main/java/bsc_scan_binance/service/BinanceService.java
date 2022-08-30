@@ -5,6 +5,7 @@ import java.util.List;
 
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
+import bsc_scan_binance.response.DepthResponse;
 
 public interface BinanceService {
 
@@ -23,4 +24,6 @@ public interface BinanceService {
     public String loadPremarket();
 
     public String getTextDepthData(BigDecimal price_now);
+
+    public List<DepthResponse> getListDepthData(String symbol);
 }

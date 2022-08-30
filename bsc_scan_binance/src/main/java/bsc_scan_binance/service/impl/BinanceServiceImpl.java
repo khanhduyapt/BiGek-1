@@ -2190,6 +2190,15 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
+    public List<DepthResponse> getListDepthData(String symbol) {
+        saveDepthData("bitcoin", "BTC");
+        List<DepthResponse> list = getDepthData();
+
+        return list;
+    }
+
+    @Override
+    @Transactional
     public String getTextDepthData(BigDecimal price_now) {
         saveDepthData("bitcoin", "BTC");
         writeDepthData(price_now);
