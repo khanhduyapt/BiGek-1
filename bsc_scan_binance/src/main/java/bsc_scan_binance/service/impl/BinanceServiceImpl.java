@@ -1,5 +1,6 @@
 package bsc_scan_binance.service.impl;
 
+import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -35,6 +36,9 @@ import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
+import bsc_scan_binance.entity.DepthAsks;
+import bsc_scan_binance.entity.DepthBids;
+import bsc_scan_binance.entity.DepthKey;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
@@ -44,12 +48,15 @@ import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
+import bsc_scan_binance.repository.DepthAsksRepository;
+import bsc_scan_binance.repository.DepthBidsRepository;
 import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
+import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.GeckoVolumeUpPre4hResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
@@ -90,6 +97,12 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private BinanceFuturesRepository binanceFuturesRepository;
+
+    @Autowired
+    private DepthBidsRepository depthBidsRepository;
+
+    @Autowired
+    private DepthAsksRepository depthAsksRepository;
 
     private String pre_time_of_btc = "";
     private String pre_yyyyMMddHH = "";
@@ -761,9 +774,9 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((price_now.compareTo(dto.getMax28d()) < 0)
                             || (max28d_percent.compareTo(BigDecimal.valueOf(-0.5)) >= 0)) {
 
-                        String hold = "HOLD_28d:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString())
-                                + "$)";
-                        hold += ", " + avg_history + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
+                        //String hold = "HOLD_28d:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString()) + "$)";
+                        //hold += ", " + avg_history + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
+
                         String key_hold = "HOLD"
                                 + Utils.convertDateToString("_yyyyMMdd_", Calendar.getInstance().getTime())
                                 + dto.getSymbol();
@@ -776,6 +789,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setMin28day_css("text-primary font-weight-bold");
                         css.setStar("m28d " + css.getStar());
                         css.setStar_css("text-white rounded-lg bg-info");
+
                     } else if (min28d_percent.compareTo(BigDecimal.valueOf(-10)) < 0) {
 
                         // css.setMin28day_css("text-danger");
@@ -873,6 +887,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
+
+                        writeDepthData(price_now);
+
                         css.setBinance_trade("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D");
                         css.setCoin_gecko_link("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3ATOTAL");
 
@@ -1945,6 +1962,10 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
+            if ("BTC".contains(symbol.toUpperCase())) {
+                saveDepthData(gecko_id, symbol);
+            }
+
             return setCoinGlassData(gecko_id, symbol);
 
         } catch (Exception e) {
@@ -2068,6 +2089,120 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         return "";
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    private void saveDepthData(String gecko_id, String symbol) {
+        try {
+
+            String sql = " DELETE FROM public.depth_asks WHERE gecko_id = '" + gecko_id + "';" +
+                    " DELETE FROM public.depth_bids WHERE gecko_id = '" + gecko_id + "';";
+            Query query = entityManager.createNativeQuery(sql);
+            query.executeUpdate();
+
+            String url = "https://api.binance.com/api/v3/depth?limit=5000&symbol=" + symbol.toUpperCase() + "USDT";
+
+            RestTemplate restTemplate = new RestTemplate();
+            Object result = restTemplate.getForObject(url, Object.class);
+
+            Object obj_bids = Utils.getLinkedHashMapValue(result, Arrays.asList("bids"));
+            Object obj_asks = Utils.getLinkedHashMapValue(result, Arrays.asList("asks"));
+
+            if (obj_bids instanceof Collection) {
+                List<Object> obj_bids2 = new ArrayList<>((Collection<Object>) obj_bids);
+
+                List<DepthBids> bids_save_list = new ArrayList<DepthBids>();
+                for (Object obj : obj_bids2) {
+                    List<Double> bids = new ArrayList<>((Collection<Double>) obj);
+                    BigDecimal price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
+                    BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(bids.get(1)));
+
+                    DepthBids entity = new DepthBids();
+                    DepthKey key = new DepthKey();
+                    key.setGeckoId(gecko_id);
+                    key.setSymbol(symbol);
+                    key.setPrice(price);
+                    entity.setId(key);
+                    entity.setQty(qty);
+
+                    bids_save_list.add(entity);
+                }
+                depthBidsRepository.saveAll(bids_save_list);
+            }
+
+            if (obj_asks instanceof Collection) {
+                List<Object> obj_asks2 = new ArrayList<>((Collection<Object>) obj_asks);
+
+                List<DepthAsks> asks_save_list = new ArrayList<DepthAsks>();
+                for (Object obj : obj_asks2) {
+                    List<Double> asks = new ArrayList<>((Collection<Double>) obj);
+                    BigDecimal price = Utils.getBigDecimalValue(String.valueOf(asks.get(0)));
+                    BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(asks.get(1)));
+
+                    DepthAsks entity = new DepthAsks();
+                    DepthKey key = new DepthKey();
+                    key.setGeckoId(gecko_id);
+                    key.setSymbol(symbol);
+                    key.setPrice(price);
+                    entity.setId(key);
+                    entity.setQty(qty);
+
+                    asks_save_list.add(entity);
+                }
+                depthAsksRepository.saveAll(asks_save_list);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeDepthData(BigDecimal price_now) {
+
+        try {
+            String sql = "SELECT                                                                                  \n"
+                    + "    gecko_id,                                                                              \n"
+                    + "    symbol,                                                                                \n"
+                    + "    price,                                                                                 \n"
+                    + "    qty,                                                                                   \n"
+                    + "    val_million_dolas                                                                      \n"
+                    + "FROM                                                                                       \n"
+                    + "    view_btc_depth                                                                         \n";
+
+            Query query = entityManager.createNativeQuery(sql, "DepthResponse");
+
+            @SuppressWarnings("unchecked")
+            List<DepthResponse> list = query.getResultList();
+            if (!CollectionUtils.isEmpty(list)) {
+
+                FileWriter myWriter = new FileWriter("BtcResistanceZone.txt");
+                String time = Utils.convertDateToString("MM/dd HH:mm", Calendar.getInstance().getTime());
+                myWriter.write(System.lineSeparator());
+                myWriter.write(time);
+                myWriter.write(System.lineSeparator());
+                myWriter.write(System.lineSeparator());
+
+                int size = list.size();
+                for (int index = 0; index < size; index++) {
+                    DepthResponse dto = list.get(index);
+
+                    if (index == size / 2) {
+                        myWriter.write(System.lineSeparator());
+                        myWriter.write("BTC:" + Utils.removeLastZero(String.valueOf(price_now)));
+                        myWriter.write(System.lineSeparator());
+                        myWriter.write(System.lineSeparator());
+                    }
+
+                    myWriter.write(dto.toString(7) + System.lineSeparator());
+
+                }
+                myWriter.write(System.lineSeparator());
+                myWriter.close();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-package response;
+package bsc_scan_binance.response;
 
 import java.math.BigDecimal;
 
@@ -28,7 +28,6 @@ public class DepthResponse {
             value += " <-----";
         }
         return value;
-
     }
 
 }
