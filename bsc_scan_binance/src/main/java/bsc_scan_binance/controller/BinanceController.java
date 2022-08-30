@@ -1,5 +1,6 @@
 package bsc_scan_binance.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,11 +40,22 @@ public class BinanceController {
     }
 
     @GetMapping("/{symbol}")
-    public String listOrderByBinaceVolume(@PathVariable("symbol") String symbol, Model model) {
-        List<DepthResponse> list = service.getListDepthData(symbol);
+    public String getListDepthData(@PathVariable("symbol") String symbol, Model model) {
+        List<DepthResponse> list = new ArrayList<DepthResponse>();
 
-        List<DepthResponse> list1 = list.subList(0, list.size() / 2);
-        List<DepthResponse> list2 = list.subList((list.size() / 2) + 1, list.size());
+        //list = service.getListDepthData(symbol);
+        if (symbol.toUpperCase().equals("BTC")) {
+            list = service.getListDepthData(symbol);
+        }
+
+        List<DepthResponse> list1 = new ArrayList<DepthResponse>();
+        List<DepthResponse> list2 = new ArrayList<DepthResponse>();
+
+        if (!CollectionUtils.isEmpty(list)) {
+            list1 = list.subList(0, list.size() / 2);
+            list2 = list.subList((list.size() / 2) + 1, list.size());
+        }
+
         model.addAttribute("data_list_1", list1);
         model.addAttribute("data_list_2", list2);
         model.addAttribute("symbol", symbol);

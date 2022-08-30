@@ -100,7 +100,7 @@ p {
           <th class="text-center" scope="col">%30d</th>
 
           <th class="text-center text-primary" scope="col">Star</th>
-          <th class="text-center" scope="col">Symbol</th>
+          <th class="text-center" scope="col">Details</th>
 
           <th class="text-center" scope="col"
             th:text="'Today ' + ${#dates.format(#dates.createNow(), 'dd/MM')}">
@@ -260,10 +260,14 @@ p {
             th:classappend="${token.star_css}" th:text="${token.star}">
           <!-- Volume/AvgPrice/Low-Hight today -->
 
-          <!-- Symbol -->
-          <td class="" style="max-width: 80px !important;"><a
-            th:target="_blank" th:href="${'/' + token.symbol}"><span
-              th:text="${token.symbol}"></span></a>
+          <!-- Details -->
+          <td class="" style="max-width: 80px !important;" th:switch="${token.symbol}">
+            <a th:case="'BTC'" th:target="_blank" th:href="${'/' + token.symbol}">
+              <span th:text="${token.symbol}"></span>
+            </a>
+            <a th:case="*" th:target="_blank" th:href="${token.trading_view}">
+              <span th:text="${token.symbol}"></span>
+            </a>
           </td>
 
           <td class="fix_width2" style="text-align: right;">

@@ -76,15 +76,15 @@ p {
             </tr>
           </thead>
           <tbody>
-            <tr class="table_row" th:each="token,iter: ${data_list_1}">
+            <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.val_million_dolas >= 2 ? 'bg-warning' : ''}">
               <!-- # -->
               <td class="" style="text-align: center;" th:text="${iter.index + 1}">
               <!-- Symbol -->
               <td th:text="${token.symbol}"></td>
               <!-- Name -->
-              <td th:text="${token.price}" th:classappend="${token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
+              <td th:text="${token.price}" th:classappend="${token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
               <!-- MC/Vol -->
-              <td th:text="${token.val_million_dolas} + 'm$'" th:classappend="${token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
+              <td th:text="${token.val_million_dolas} + 'm$'" th:classappend="${token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
             </tr>
           </tbody>
         </table>
@@ -99,15 +99,15 @@ p {
             </tr>
           </thead>
           <tbody>
-            <tr class="table_row" th:each="token,iter: ${data_list_2}">
+            <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.val_million_dolas >= 2 ? 'bg-warning' : ''}">
               <!-- # -->
               <td class="" style="text-align: center;" th:text="${iter.index + 1}">
               <!-- Symbol -->
               <td th:text="${token.symbol}"></td>
               <!-- Name -->
-              <td th:text="${token.price}" th:classappend="${token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
+              <td th:text="${token.price}" th:classappend="${token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
               <!-- MC/Vol -->
-              <td th:text="${token.val_million_dolas} + 'm$'" th:classappend="${token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
+              <td th:text="${token.val_million_dolas} + 'm$'" th:classappend="${token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
             </tr>
           </tbody>
         </table>

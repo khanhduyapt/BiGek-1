@@ -2123,6 +2123,11 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
                     BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(bids.get(1)));
 
+                    BigDecimal volume = price.multiply(qty);
+                    if(volume.compareTo(BigDecimal.valueOf(10000)) < 0) {
+                        continue;
+                    }
+
                     DepthBids entity = new DepthBids();
                     DepthKey key = new DepthKey();
                     key.setGeckoId(gecko_id);
@@ -2145,6 +2150,11 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal price = Utils.getBigDecimalValue(String.valueOf(asks.get(0)));
                     BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(asks.get(1)));
 
+                    BigDecimal volume = price.multiply(qty);
+                    if(volume.compareTo(BigDecimal.valueOf(10000)) < 0) {
+                        continue;
+                    }
+
                     DepthAsks entity = new DepthAsks();
                     DepthKey key = new DepthKey();
                     key.setGeckoId(gecko_id);
@@ -2163,7 +2173,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private List<DepthResponse> getDepthData() {
+    private List<DepthResponse> getDepthDataBtc() {
         try {
             String sql = "SELECT                                                                                  \n"
                     + "    gecko_id,                                                                              \n"
@@ -2172,7 +2182,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    qty,                                                                                   \n"
                     + "    val_million_dolas                                                                      \n"
                     + "FROM                                                                                       \n"
-                    + "    view_btc_depth                                                                         \n";
+                    + "    view_btc_depth  WHERE val_million_dolas > 0                                            \n";
 
             Query query = entityManager.createNativeQuery(sql, "DepthResponse");
 
@@ -2191,10 +2201,66 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     @Transactional
     public List<DepthResponse> getListDepthData(String symbol) {
-        saveDepthData("bitcoin", "BTC");
-        List<DepthResponse> list = getDepthData();
 
-        return list;
+        //BTC
+        if (symbol.toUpperCase().equals("BTC")) {
+            saveDepthData("bitcoin", "BTC");
+            List<DepthResponse> list = getDepthDataBtc();
+            return list;
+        }
+
+        //Others
+        try {
+            List<BinanceVolumnDay> temp = binanceVolumnDayRepository.searchBySymbol(symbol);
+            if (CollectionUtils.isEmpty(temp)) {
+                return new ArrayList<DepthResponse>();
+            }
+            String geckoId = temp.get(0).getId().getGeckoid();
+            saveDepthData(geckoId, symbol.toUpperCase());
+
+            String sql = "                                                                                          \n"
+                    + " select * from (                                                                             \n"
+
+                    + "SELECT                                                                                       \n"
+                    + "    gecko_id,                                                                                \n"
+                    + "    symbol,                                                                                  \n"
+                    + "    price,                                                                                   \n"
+                    + "    qty,                                                                                     \n"
+                    + "    round(price * qty / 1000000, 1) as val_million_dolas                                     \n"
+                    + "FROM                                                                                         \n"
+                    + "    depth_bids                                                                               \n"
+                    + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
+
+                    + "UNION ALL                                                                                    \n"
+
+                    + "SELECT                                                                                       \n"
+                    + "    gecko_id,                                                                                \n"
+                    + "    symbol,                                                                                  \n"
+                    + "    price,                                                                                   \n"
+                    + "    qty,                                                                                     \n"
+                    + "    round(price * qty / 1000000, 1) as val_million_dolas                                     \n"
+                    + "FROM                                                                                         \n"
+                    + "    depth_asks                                                                               \n"
+                    + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
+
+                    + " ) depth where depth.val_million_dolas > 0   ORDER BY price                                  \n";
+
+            Query query = entityManager.createNativeQuery(sql, "DepthResponse");
+
+            @SuppressWarnings("unchecked")
+            List<DepthResponse> list = query.getResultList();
+
+            List<DepthResponse> result = new ArrayList<DepthResponse>();
+            for (DepthResponse dto : list) {
+                dto.setPrice(Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice()))));
+                result.add(dto);
+            }
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<DepthResponse>();
     }
 
     @Override
@@ -2205,7 +2271,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String result = "";
 
-        List<DepthResponse> list = getDepthData();
+        List<DepthResponse> list = getDepthDataBtc();
 
         if (!CollectionUtils.isEmpty(list)) {
             Boolean isAddPriceNow = false;
@@ -2229,7 +2295,7 @@ public class BinanceServiceImpl implements BinanceService {
     private void writeDepthData(BigDecimal price_now) {
 
         try {
-            List<DepthResponse> list = getDepthData();
+            List<DepthResponse> list = getDepthDataBtc();
 
             if (!CollectionUtils.isEmpty(list)) {
 
