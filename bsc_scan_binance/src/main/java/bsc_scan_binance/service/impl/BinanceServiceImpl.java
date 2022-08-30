@@ -2101,10 +2101,12 @@ public class BinanceServiceImpl implements BinanceService {
     private void saveDepthData(String gecko_id, String symbol) {
         try {
 
-            String sql = " DELETE FROM public.depth_asks WHERE gecko_id = '" + gecko_id + "';" +
-                    " DELETE FROM public.depth_bids WHERE gecko_id = '" + gecko_id + "';";
-            Query query = entityManager.createNativeQuery(sql);
-            query.executeUpdate();
+            //String sql = " DELETE FROM public.depth_asks WHERE gecko_id = '" + gecko_id + "';" +
+            //        " DELETE FROM public.depth_bids WHERE gecko_id = '" + gecko_id + "';";
+            //Query query = entityManager.createNativeQuery(sql);
+            //query.executeUpdate();
+            depthBidsRepository.deleteAll();
+            depthAsksRepository.deleteAll();
 
             String url = "https://api.binance.com/api/v3/depth?limit=5000&symbol=" + symbol.toUpperCase() + "USDT";
 
