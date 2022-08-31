@@ -2108,6 +2108,11 @@ public class BinanceServiceImpl implements BinanceService {
             depthBidsRepository.deleteAll();
             depthAsksRepository.deleteAll();
 
+            BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
+            if ("BTC".equals(symbol.toUpperCase())) {
+                MIL_VOL = BigDecimal.valueOf(10000);
+            }
+
             String url = "https://api.binance.com/api/v3/depth?limit=5000&symbol=" + symbol.toUpperCase() + "USDT";
 
             RestTemplate restTemplate = new RestTemplate();
@@ -2126,7 +2131,7 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(bids.get(1)));
 
                     BigDecimal volume = price.multiply(qty);
-                    if(volume.compareTo(BigDecimal.valueOf(10000)) < 0) {
+                    if (volume.compareTo(MIL_VOL) < 0) {
                         continue;
                     }
 
@@ -2153,7 +2158,7 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(asks.get(1)));
 
                     BigDecimal volume = price.multiply(qty);
-                    if(volume.compareTo(BigDecimal.valueOf(10000)) < 0) {
+                    if (volume.compareTo(MIL_VOL) < 0) {
                         continue;
                     }
 
@@ -2177,6 +2182,10 @@ public class BinanceServiceImpl implements BinanceService {
 
     private List<DepthResponse> getDepthDataBtc() {
         try {
+            if (depthBidsRepository.count() < 1) {
+                return new ArrayList<DepthResponse>();
+            }
+
             String sql = "SELECT                                                                                  \n"
                     + "    gecko_id,                                                                              \n"
                     + "    symbol,                                                                                \n"
@@ -2228,7 +2237,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    symbol,                                                                                  \n"
                     + "    price,                                                                                   \n"
                     + "    qty,                                                                                     \n"
-                    + "    round(price * qty / 1000000, 1) as val_million_dolas                                     \n"
+                    + "    round(price * qty / 1000, 1) as val_million_dolas                                        \n"
                     + "FROM                                                                                         \n"
                     + "    depth_bids                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
@@ -2240,12 +2249,12 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    symbol,                                                                                  \n"
                     + "    price,                                                                                   \n"
                     + "    qty,                                                                                     \n"
-                    + "    round(price * qty / 1000000, 1) as val_million_dolas                                     \n"
+                    + "    round(price * qty / 1000, 1) as val_million_dolas                                        \n"
                     + "FROM                                                                                         \n"
                     + "    depth_asks                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
 
-                    + " ) depth where depth.val_million_dolas > 0   ORDER BY price                                  \n";
+                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price                                 \n";
 
             Query query = entityManager.createNativeQuery(sql, "DepthResponse");
 

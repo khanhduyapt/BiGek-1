@@ -43,9 +43,9 @@ public class BinanceController {
     public String getListDepthData(@PathVariable("symbol") String symbol, Model model) {
         List<DepthResponse> list = new ArrayList<DepthResponse>();
 
-        //list = service.getListDepthData(symbol);
+        list = service.getListDepthData(symbol);
         if (symbol.toUpperCase().equals("BTC")) {
-            list = service.getListDepthData(symbol);
+            //list = service.getListDepthData(symbol);
         }
 
         List<DepthResponse> list1 = new ArrayList<DepthResponse>();
@@ -54,6 +54,12 @@ public class BinanceController {
         if (!CollectionUtils.isEmpty(list)) {
             list1 = list.subList(0, list.size() / 2);
             list2 = list.subList((list.size() / 2) + 1, list.size());
+
+            if (list1.size() > list2.size()) {
+                list1 = list.subList(0, (list.size() / 2) - 1);
+            } else if (list1.size() < list2.size()) {
+                list2 = list.subList((list.size() / 2) + 1, list.size() - 1);
+            }
         }
 
         model.addAttribute("data_list_1", list1);
