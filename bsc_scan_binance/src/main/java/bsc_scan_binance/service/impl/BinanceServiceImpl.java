@@ -666,18 +666,19 @@ public class BinanceServiceImpl implements BinanceService {
 
                 priorityCoin.setCurrent_price(price_now);
 
-                //if (dto.getName().contains("Futures")) {
-                //    String futu = dto.getSymbol() + " ";
+                // if (dto.getName().contains("Futures")) {
+                // String futu = dto.getSymbol() + " ";
                 //
-                //    if (isOrderByBynaceVolume) {
-                //        List<String> coinglass = getCoinGlassData(dto.getGecko_id(), dto.getSymbol());
+                // if (isOrderByBynaceVolume) {
+                // List<String> coinglass = getCoinGlassData(dto.getGecko_id(),
+                // dto.getSymbol());
                 //
-                //        futu += coinglass.get(0);
-                //        css.setFutures_css(coinglass.get(1));
-                //    }
+                // futu += coinglass.get(0);
+                // css.setFutures_css(coinglass.get(1));
+                // }
                 //
-                //    css.setFutures(futu);
-                //}
+                // css.setFutures(futu);
+                // }
 
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
@@ -774,8 +775,10 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((price_now.compareTo(dto.getMax28d()) < 0)
                             || (max28d_percent.compareTo(BigDecimal.valueOf(-0.5)) >= 0)) {
 
-                        //String hold = "HOLD_28d:" + dto.getSymbol() + " (" + Utils.removeLastZero(price_now.toString()) + "$)";
-                        //hold += ", " + avg_history + min28day + ", Mc:" + Utils.toMillions(dto.getMarket_cap());
+                        // String hold = "HOLD_28d:" + dto.getSymbol() + " (" +
+                        // Utils.removeLastZero(price_now.toString()) + "$)";
+                        // hold += ", " + avg_history + min28day + ", Mc:" +
+                        // Utils.toMillions(dto.getMarket_cap());
 
                         String key_hold = "HOLD"
                                 + Utils.convertDateToString("_yyyyMMdd_", Calendar.getInstance().getTime())
@@ -955,7 +958,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                    //monitorToken(css); // debug
+                    // monitorToken(css); // debug
 
                     if (!Objects.equals(pre_yyyyMMddHH,
                             Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
@@ -1034,24 +1037,25 @@ public class BinanceServiceImpl implements BinanceService {
                         " where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getGecko_id(), dto.getSymbol());
 
-                //if (isOrderByBynaceVolume) {
-                //    if (Objects.equals("BTC", css.getSymbol())) {
-                //        list.add(css);
-                //    } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.ZERO) > 0)
-                //            || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.ZERO) > 0)) {
+                // if (isOrderByBynaceVolume) {
+                // if (Objects.equals("BTC", css.getSymbol())) {
+                // list.add(css);
+                // } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.ZERO)
+                // > 0)
+                // || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.ZERO) > 0)) {
                 //
-                //        list.add(css);
+                // list.add(css);
                 //
-                //    } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
-                //            .compareTo(BigDecimal.valueOf(5)) > 0)
-                //            && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
+                // } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
+                // .compareTo(BigDecimal.valueOf(5)) > 0)
+                // && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
                 //
-                //        // list.add(css);
-                //    }
+                // // list.add(css);
+                // }
                 //
-                //} else {
-                //    list.add(css);
-                //}
+                // } else {
+                // list.add(css);
+                // }
 
                 list.add(css);
             }
@@ -2008,8 +2012,10 @@ public class BinanceServiceImpl implements BinanceService {
 
         /*
          *
-         * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=Binance&type=1&timeType=3
-         * https://fapi.coinglass.com/api/tradingData/positionLSRatio?symbol=BTC&exName=Binance&type=1&timeType=3
+         * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=
+         * Binance&type=1&timeType=3
+         * https://fapi.coinglass.com/api/tradingData/positionLSRatio?symbol=BTC&exName=
+         * Binance&type=1&timeType=3
          */
         BigDecimal topTraderBinanceLongRate = BigDecimal.ZERO;
 
@@ -2197,10 +2203,19 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private List<DepthResponse> getDepthDataBtc() {
+    // 1: all, 2: bids, 3: asks
+    private List<DepthResponse> getDepthDataBtc(int type) {
         try {
             if (depthBidsRepository.count() < 1) {
                 return new ArrayList<DepthResponse>();
+            }
+
+            String view = "view_btc_depth";
+            if (type == 2) {
+                view = "view_btc_depth_bids";
+            }
+            if (type == 3) {
+                view = "view_btc_depth_asks";
             }
 
             String sql = "SELECT                                                                                  \n"
@@ -2209,8 +2224,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    price,                                                                                 \n"
                     + "    qty,                                                                                   \n"
                     + "    val_million_dolas                                                                      \n"
-                    + "FROM                                                                                       \n"
-                    + "    view_btc_depth  WHERE val_million_dolas > 0                                            \n";
+                    + "FROM " + view + "                                                                          \n"
+                    + "WHERE val_million_dolas > 0                                            \n";
 
             Query query = entityManager.createNativeQuery(sql, "DepthResponse");
 
@@ -2228,25 +2243,30 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public List<DepthResponse> getListDepthData(String symbol) {
+    public List<List<DepthResponse>> getListDepthData(String symbol) {
+        List<List<DepthResponse>> result = new ArrayList<List<DepthResponse>>();
 
-        //BTC
+        // BTC
         if (symbol.toUpperCase().equals("BTC")) {
             saveDepthData("bitcoin", "BTC");
-            List<DepthResponse> list = getDepthDataBtc();
-            return list;
+            List<DepthResponse> list_bids = getDepthDataBtc(2);
+            List<DepthResponse> list_asks = getDepthDataBtc(3);
+            result.add(list_bids);
+            result.add(list_asks);
+            return result;
         }
 
-        //Others
+        // Others
         try {
             List<BinanceVolumnDay> temp = binanceVolumnDayRepository.searchBySymbol(symbol);
             if (CollectionUtils.isEmpty(temp)) {
-                return new ArrayList<DepthResponse>();
+                return new ArrayList<List<DepthResponse>>();
             }
+
             String geckoId = temp.get(0).getId().getGeckoid();
             saveDepthData(geckoId, symbol.toUpperCase());
 
-            String sql = "                                                                                          \n"
+            String sql_bids = "                                                                                          \n"
                     + " select * from (                                                                             \n"
 
                     + "SELECT                                                                                       \n"
@@ -2258,8 +2278,10 @@ public class BinanceServiceImpl implements BinanceService {
                     + "FROM                                                                                         \n"
                     + "    depth_bids                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
+                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price                                 \n";
 
-                    + "UNION ALL                                                                                    \n"
+            String sql_asks = "                                                                                          \n"
+                    + " select * from (                                                                             \n"
 
                     + "SELECT                                                                                       \n"
                     + "    gecko_id,                                                                                \n"
@@ -2273,33 +2295,44 @@ public class BinanceServiceImpl implements BinanceService {
 
                     + " ) depth where depth.val_million_dolas > 10   ORDER BY price                                 \n";
 
-            Query query = entityManager.createNativeQuery(sql, "DepthResponse");
-
+            Query query = entityManager.createNativeQuery(sql_bids, "DepthResponse");
             @SuppressWarnings("unchecked")
-            List<DepthResponse> list = query.getResultList();
+            List<DepthResponse> list_bids = query.getResultList();
 
-            List<DepthResponse> result = new ArrayList<DepthResponse>();
-            for (DepthResponse dto : list) {
+            query = entityManager.createNativeQuery(sql_asks, "DepthResponse");
+            @SuppressWarnings("unchecked")
+            List<DepthResponse> list_asks = query.getResultList();
+
+            List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
+            for (DepthResponse dto : list_bids) {
                 dto.setPrice(Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice()))));
-                result.add(dto);
+                list_bids_ok.add(dto);
             }
+
+            List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
+            for (DepthResponse dto : list_asks) {
+                dto.setPrice(Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice()))));
+                list_asks_ok.add(dto);
+            }
+
+            result.add(list_bids_ok);
+            result.add(list_asks_ok);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return new ArrayList<DepthResponse>();
+        return result;
     }
 
     @Override
     @Transactional
     public String getTextDepthData(BigDecimal price_now) {
         saveDepthData("bitcoin", "BTC");
-        writeDepthData(price_now);
 
         String result = "";
 
-        List<DepthResponse> list = getDepthDataBtc();
+        List<DepthResponse> list = getDepthDataBtc(1);
 
         if (!CollectionUtils.isEmpty(list)) {
             Boolean isAddPriceNow = false;
@@ -2320,41 +2353,5 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
-    private void writeDepthData(BigDecimal price_now) {
-
-        try {
-            List<DepthResponse> list = getDepthDataBtc();
-
-            if (!CollectionUtils.isEmpty(list)) {
-
-                FileWriter myWriter = new FileWriter("BtcResistanceZone.txt");
-                String time = Utils.convertDateToString("MM/dd HH:mm", Calendar.getInstance().getTime());
-                myWriter.write(System.lineSeparator());
-                myWriter.write(time);
-                myWriter.write(System.lineSeparator());
-                myWriter.write(System.lineSeparator());
-
-                int size = list.size();
-                for (int index = 0; index < size; index++) {
-                    DepthResponse dto = list.get(index);
-
-                    if (index == size / 2) {
-                        myWriter.write(System.lineSeparator());
-                        myWriter.write("BTC:" + Utils.removeLastZero(String.valueOf(price_now)));
-                        myWriter.write(System.lineSeparator());
-                        myWriter.write(System.lineSeparator());
-                    }
-
-                    myWriter.write(dto.toString(7) + System.lineSeparator());
-
-                }
-                myWriter.write(System.lineSeparator());
-                myWriter.close();
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }

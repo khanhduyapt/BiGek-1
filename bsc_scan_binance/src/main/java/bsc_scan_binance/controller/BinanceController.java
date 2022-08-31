@@ -41,29 +41,23 @@ public class BinanceController {
 
     @GetMapping("/{symbol}")
     public String getListDepthData(@PathVariable("symbol") String symbol, Model model) {
-        List<DepthResponse> list = new ArrayList<DepthResponse>();
+        List<List<DepthResponse>> list = new ArrayList<List<DepthResponse>>();
 
         list = service.getListDepthData(symbol);
         if (symbol.toUpperCase().equals("BTC")) {
-            //list = service.getListDepthData(symbol);
+            // list = service.getListDepthData(symbol);
         }
 
-        List<DepthResponse> list1 = new ArrayList<DepthResponse>();
-        List<DepthResponse> list2 = new ArrayList<DepthResponse>();
+        List<DepthResponse> list_bids = new ArrayList<DepthResponse>();
+        List<DepthResponse> list_asks = new ArrayList<DepthResponse>();
 
         if (!CollectionUtils.isEmpty(list)) {
-            list1 = list.subList(0, list.size() / 2);
-            list2 = list.subList((list.size() / 2) + 1, list.size());
-
-            if (list1.size() > list2.size()) {
-                list1 = list.subList(0, (list.size() / 2) - 1);
-            } else if (list1.size() < list2.size()) {
-                list2 = list.subList((list.size() / 2) + 1, list.size() - 1);
-            }
+            list_bids = list.get(0);
+            list_asks = list.get(1);
         }
 
-        model.addAttribute("data_list_1", list1);
-        model.addAttribute("data_list_2", list2);
+        model.addAttribute("data_list_1", list_bids);
+        model.addAttribute("data_list_2", list_asks);
         model.addAttribute("symbol", symbol);
 
         return "detail";
