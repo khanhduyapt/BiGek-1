@@ -2100,6 +2100,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
         try {
+            List<String> keyList = new ArrayList<String>();
 
             if (depthBidsRepository.count() > 1) {
                 depthBidsRepository.deleteAll();
@@ -2144,9 +2145,17 @@ public class BinanceServiceImpl implements BinanceService {
                     entity.setId(key);
                     entity.setQty(qty);
 
-                    bids_save_list.add(entity);
+                    String str_key = gecko_id + "_" + symbol + "_" + String.valueOf(price);
+                    if (!keyList.contains(str_key)) {
+                        bids_save_list.add(entity);
+                        keyList.add(str_key);
+                    }
+
                 }
-                depthBidsRepository.saveAll(bids_save_list);
+
+                if (!CollectionUtils.isEmpty(bids_save_list)) {
+                    depthBidsRepository.saveAll(bids_save_list);
+                }
             }
 
             if (obj_asks instanceof Collection) {
@@ -2171,9 +2180,16 @@ public class BinanceServiceImpl implements BinanceService {
                     entity.setId(key);
                     entity.setQty(qty);
 
-                    asks_save_list.add(entity);
+                    String str_key = gecko_id + "_" + symbol + "_" + String.valueOf(price);
+                    if (!keyList.contains(str_key)) {
+                        asks_save_list.add(entity);
+                        keyList.add(str_key);
+                    }
                 }
-                depthAsksRepository.saveAll(asks_save_list);
+
+                if (!CollectionUtils.isEmpty(asks_save_list)) {
+                    depthAsksRepository.saveAll(asks_save_list);
+                }
             }
 
         } catch (Exception e) {
