@@ -123,10 +123,10 @@ public class Utils {
 
         BigDecimal mid_price = low_price.add(range);
 
-        if (curr_price.compareTo(mid_price) > 0) {
-            return false;
+        if (mid_price.compareTo(curr_price) < 0) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     public static Boolean isGoodPriceForShort(BigDecimal cur_price, BigDecimal lo_price, BigDecimal hi_price) {

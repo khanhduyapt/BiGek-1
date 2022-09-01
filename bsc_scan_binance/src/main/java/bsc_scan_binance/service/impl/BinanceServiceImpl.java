@@ -2107,12 +2107,14 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             List<String> keyList = new ArrayList<String>();
 
-            if (depthBidsRepository.count() > 1) {
-                depthBidsRepository.deleteAll();
+            List<DepthBids> depthBids = depthBidsRepository.findAll();
+            if (!CollectionUtils.isEmpty(depthBids)) {
+                depthBidsRepository.deleteAll(depthBids);
             }
 
-            if (depthAsksRepository.count() > 1) {
-                depthAsksRepository.deleteAll();
+            List<DepthAsks> depthAsks = depthAsksRepository.findAll();
+            if (!CollectionUtils.isEmpty(depthAsks)) {
+                depthAsksRepository.deleteAll(depthAsks);
             }
 
             BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
@@ -2255,9 +2257,6 @@ public class BinanceServiceImpl implements BinanceService {
             List<DepthResponse> list_bids = getDepthDataBtc(2);
             List<DepthResponse> list_asks = getDepthDataBtc(3);
 
-
-
-
             result.add(list_bids);
             result.add(list_asks);
             return result;
@@ -2359,6 +2358,5 @@ public class BinanceServiceImpl implements BinanceService {
 
         return result.trim();
     }
-
 
 }

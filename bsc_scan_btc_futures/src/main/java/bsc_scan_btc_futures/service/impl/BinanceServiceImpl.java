@@ -162,12 +162,14 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             List<String> keyList = new ArrayList<String>();
 
-            if (depthBidsRepository.count() > 1) {
-                depthBidsRepository.deleteAll();
+            List<DepthBids> depthBids = depthBidsRepository.findAll();
+            if (!CollectionUtils.isEmpty(depthBids)) {
+                depthBidsRepository.deleteAll(depthBids);
             }
 
-            if (depthAsksRepository.count() > 1) {
-                depthAsksRepository.deleteAll();
+            List<DepthAsks> depthAsks = depthAsksRepository.findAll();
+            if (!CollectionUtils.isEmpty(depthAsks)) {
+                depthAsksRepository.deleteAll(depthAsks);
             }
 
             BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
@@ -475,7 +477,10 @@ public class BinanceServiceImpl implements BinanceService {
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
                 // (Good time to buy)
                 if (Utils.isGoodPriceForLong(price_at_binance, dto.getLow_price(), dto.getHight_price())) {
-                    Utils.sendToMyTelegram(msg);
+                    Utils.sendToMyTelegram("(LONG)..." + msg);
+                    pre_time_of_btc = curr_time_of_btc;
+                } else if (Utils.isGoodPriceForShort(price_at_binance, dto.getLow_price(), dto.getHight_price())) {
+                    Utils.sendToMyTelegram("(SHORT)..." + msg);
                     pre_time_of_btc = curr_time_of_btc;
                 }
             }
