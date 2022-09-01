@@ -2211,11 +2211,14 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             String view = "view_btc_depth";
+            String orderby = "price ASC ";
             if (type == 2) {
                 view = "view_btc_depth_bids";
+                orderby = "price DESC ";
             }
             if (type == 3) {
                 view = "view_btc_depth_asks";
+                orderby = "price ASC ";
             }
 
             String sql = "SELECT                                                                                  \n"
@@ -2225,7 +2228,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    qty,                                                                                   \n"
                     + "    val_million_dolas                                                                      \n"
                     + "FROM " + view + "                                                                          \n"
-                    + "WHERE val_million_dolas > 0                                            \n";
+                    + "WHERE val_million_dolas > 0                                                                \n"
+                    + "ORDER BY " + orderby;
 
             Query query = entityManager.createNativeQuery(sql, "DepthResponse");
 
@@ -2251,6 +2255,10 @@ public class BinanceServiceImpl implements BinanceService {
             saveDepthData("bitcoin", "BTC");
             List<DepthResponse> list_bids = getDepthDataBtc(2);
             List<DepthResponse> list_asks = getDepthDataBtc(3);
+
+
+
+
             result.add(list_bids);
             result.add(list_asks);
             return result;
@@ -2278,9 +2286,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + "FROM                                                                                         \n"
                     + "    depth_bids                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
-                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price                                 \n";
+                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price ASC                             \n";
 
-            String sql_asks = "                                                                                          \n"
+            String sql_asks = "                                                                                     \n"
                     + " select * from (                                                                             \n"
 
                     + "SELECT                                                                                       \n"
@@ -2293,7 +2301,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    depth_asks                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
 
-                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price                                 \n";
+                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price DESC                            \n";
 
             Query query = entityManager.createNativeQuery(sql_bids, "DepthResponse");
             @SuppressWarnings("unchecked")
