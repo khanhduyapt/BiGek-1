@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 public class BscScanBtcFuturesApplication {
-    public static boolean pre_is_long = true;
-
     public static void main(String[] args) {
         try {
             log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
@@ -29,17 +27,17 @@ public class BscScanBtcFuturesApplication {
 
                 try {
 
-                    String btc = binance_service.getList();
+                    String btc = binance_service.doProcess();
 
                     String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
                     if (!Objects.equals(pre_time, time)) {
-                        log.info(time + btc);
+                        log.info("BTC: " + btc);
                         pre_time = time;
                     }
 
-                    //wait(60000); // 1m = 60000ms
-                    //wait(30000); // 1m = 60000ms => 10000 = 6 request
-                    wait(120000);
+                    // wait(60000); // 1m = 60000ms
+                    // wait(30000); // 1m = 60000ms => 10000 = 6 request
+                    wait(60000);
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                 }

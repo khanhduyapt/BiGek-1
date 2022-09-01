@@ -1,6 +1,5 @@
 package bsc_scan_binance.service.impl;
 
-import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -2358,7 +2357,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        return result;
+        return result.trim();
     }
 
 

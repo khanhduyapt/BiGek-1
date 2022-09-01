@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" http-equiv="refresh" content="60">
+<title>Wanda-details</title>
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+</head>
+<style>
+.tableFixHead {
+  height: 100px;
+  margin-left: 0.5rem;
+}
+
+/* Just common table stuff. Really. */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 8px 16px;
+}
+
+th {
+  background: #eee;
+}
+
+p {
+  margin-bottom: 0px !important;
+}
+
+.highlight {
+  background-color: #CFF5FF !important;
+}
+
+.oco_css:focus {
+  color: red !important;
+}
+
+.fix_width {
+    min-width: 138px !important;
+    max-width: 138px !important;
+    font-size: 0.8rem !important;
+}
+
+.fix_width2 {
+    min-width: 300px !important;
+    max-width: 300px !important;
+    font-size: 0.8rem !important;
+}
+
+.display-tity{
+    font-size: 0.65rem !important;
+}
+
+.table td, .table th {
+  padding: 0.25rem !important;
+  vertical-align: middle !important;
+}
+</style>
+<body>
+    <div style="display: flex; margin-top: 1rem;">
+        <table class="table table-bordered tableFixHead" style="min-width: 125px !important; max-width: 125px !important;">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">#</th>
+              <th class="text-center" scope="col">Buy</th>
+              <th class="text-center" scope="col">Volume</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'bg-warning text-primary font-weight-bold' : ''}">
+              <!-- # -->
+              <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) - iter.index}">
+              <!-- Buy -->
+              <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
+              <!-- Volume -->
+              <td th:text="${token.val_million_dolas + (symbol == 'BTC' ? 'm$' : 'k$')}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="table table-bordered tableFixHead" style="min-width: 155px !important; max-width: 155px !important;">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">#</th>
+              <th class="text-center" scope="col">Sell</th>
+              <th class="text-center" scope="col">Volume</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'bg-warning text-primary font-weight-bold' : ''}">
+              <!-- # -->
+              <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) + iter.index + 1}">
+              <!-- Sell -->
+              <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
+              <!-- Volume -->
+              <td th:text="${token.val_million_dolas + (symbol == 'BTC' ? 'm$' : 'k$')}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="table table-bordered tableFixHead" style="min-width: 68px !important; max-width: 68px !important;">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">S</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="table_row" th:each="token,iter: ${data_list_2}">
+              <!-- Symbol -->
+              <td style="text-align: center; max-width: 68px !important;" th:text="${token.symbol}"></td>
+            </tr>
+          </tbody>
+        </table>
+
+    </div>
+
+    <a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
+      <span style="padding-left: 1rem;padding-bottom: 3rem;">Trading View</span>
+    </a>
+</body>
+</html>

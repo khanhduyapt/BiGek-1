@@ -31,4 +31,18 @@ public class DepthResponse {
 
     }
 
+    public String toStringMillion(BigDecimal price_now) {
+
+        if (val_million_dolas.compareTo(BigDecimal.valueOf(1)) >= 0) {
+
+            if (price.compareTo(price_now) > 0) {
+                return "> " + price + "(" + val_million_dolas + "m)";
+            } else {
+                return " " + price + "(" + val_million_dolas + "m) <";
+            }
+
+        }
+
+        return "";
+    }
 }

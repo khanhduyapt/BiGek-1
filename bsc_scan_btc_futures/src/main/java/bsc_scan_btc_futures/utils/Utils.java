@@ -112,7 +112,12 @@ public class Utils {
         return price;
     }
 
-    public static Boolean isGoodPriceForLong(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+    public static Boolean isGoodPriceForLong(BigDecimal cur_price, BigDecimal lo_price, BigDecimal hi_price) {
+
+        BigDecimal curr_price = Utils.getBigDecimal(cur_price);
+        BigDecimal low_price = Utils.getBigDecimal(lo_price);
+        BigDecimal hight_price = Utils.getBigDecimal(hi_price);
+
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
 
@@ -124,16 +129,11 @@ public class Utils {
         return true;
     }
 
-    public static BigDecimal getGoodPriceForShortTP(BigDecimal low_price, BigDecimal hight_price) {
-        BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+    public static Boolean isGoodPriceForShort(BigDecimal cur_price, BigDecimal lo_price, BigDecimal hi_price) {
+        BigDecimal curr_price = Utils.getBigDecimal(cur_price);
+        BigDecimal low_price = Utils.getBigDecimal(lo_price);
+        BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
-        BigDecimal price = low_price.add(range);
-
-        return price;
-    }
-
-    public static Boolean isGoodPriceForShort(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
 
