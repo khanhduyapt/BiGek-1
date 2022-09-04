@@ -2105,8 +2105,6 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
         try {
-            List<String> keyList = new ArrayList<String>();
-
             List<DepthBids> depthBids = depthBidsRepository.findAll();
             if (!CollectionUtils.isEmpty(depthBids)) {
                 depthBidsRepository.deleteAll(depthBids);
@@ -2133,7 +2131,6 @@ public class BinanceServiceImpl implements BinanceService {
             if (obj_bids instanceof Collection) {
                 List<Object> obj_bids2 = new ArrayList<>((Collection<Object>) obj_bids);
 
-                List<DepthBids> bids_save_list = new ArrayList<DepthBids>();
                 for (Object obj : obj_bids2) {
                     List<Double> bids = new ArrayList<>((Collection<Double>) obj);
                     BigDecimal price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
@@ -2149,26 +2146,24 @@ public class BinanceServiceImpl implements BinanceService {
                     key.setGeckoId(gecko_id);
                     key.setSymbol(symbol);
                     key.setPrice(price);
-                    entity.setId(key);
-                    entity.setQty(qty);
 
-                    String str_key = gecko_id + "_" + symbol + "_" + String.valueOf(price);
-                    if (!keyList.contains(str_key)) {
-                        bids_save_list.add(entity);
-                        keyList.add(str_key);
+                    DepthBids old_entity = depthBidsRepository.findById(key).orElse(null);
+                    if (Objects.equals(null, old_entity)) {
+                        entity.setId(key);
+                        entity.setQty(qty);
+                        depthBidsRepository.save(entity);
+                    } else {
+                        old_entity.setQty(Utils.getBigDecimal(old_entity.getQty()).add(qty));
+                        depthBidsRepository.save(old_entity);
                     }
 
                 }
 
-                if (!CollectionUtils.isEmpty(bids_save_list)) {
-                    depthBidsRepository.saveAll(bids_save_list);
-                }
             }
 
             if (obj_asks instanceof Collection) {
                 List<Object> obj_asks2 = new ArrayList<>((Collection<Object>) obj_asks);
 
-                List<DepthAsks> asks_save_list = new ArrayList<DepthAsks>();
                 for (Object obj : obj_asks2) {
                     List<Double> asks = new ArrayList<>((Collection<Double>) obj);
                     BigDecimal price = Utils.getBigDecimalValue(String.valueOf(asks.get(0)));
@@ -2187,15 +2182,15 @@ public class BinanceServiceImpl implements BinanceService {
                     entity.setId(key);
                     entity.setQty(qty);
 
-                    String str_key = gecko_id + "_" + symbol + "_" + String.valueOf(price);
-                    if (!keyList.contains(str_key)) {
-                        asks_save_list.add(entity);
-                        keyList.add(str_key);
+                    DepthAsks old_entity = depthAsksRepository.findById(key).orElse(null);
+                    if (Objects.equals(null, old_entity)) {
+                        entity.setId(key);
+                        entity.setQty(qty);
+                        depthAsksRepository.save(entity);
+                    } else {
+                        old_entity.setQty(Utils.getBigDecimal(old_entity.getQty()).add(qty));
+                        depthAsksRepository.save(old_entity);
                     }
-                }
-
-                if (!CollectionUtils.isEmpty(asks_save_list)) {
-                    depthAsksRepository.saveAll(asks_save_list);
                 }
             }
 

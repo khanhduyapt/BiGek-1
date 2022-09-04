@@ -24,9 +24,7 @@ public class BscScanBtcFuturesApplication {
 
             String pre_time = "";
             while (true) {
-
                 try {
-
                     String btc = binance_service.doProcess();
 
                     String time = Utils.convertDateToString("HH:mm", Calendar.getInstance().getTime());
@@ -37,7 +35,7 @@ public class BscScanBtcFuturesApplication {
 
                     // wait(60000); // 1m = 60000ms
                     // wait(30000); // 1m = 60000ms => 10000 = 6 request
-                    wait(60000);
+                    wait(180000);
                 } catch (Exception e) {
                     log.error("dkd error LoadData:" + e.getMessage());
                 }
