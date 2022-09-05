@@ -81,22 +81,14 @@ public class WandaBot extends TelegramLongPollingBot {
             String command = update.getMessage().getText();
 
             if (command.contains("/btc")) {
-                // binance_service.getList(false);
-                String premarket = binance_service.loadPremarket();
-
-                List<PriorityCoin> list = priorityCoinRepository.searchBySymbol("BTC");
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
 
                 String btcrange = binance_service.monitorBtcPrice().replace(Utils.new_line_from_service,
                         Utils.new_line_from_bot);
 
-                message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot)
-                        + Utils.new_line_from_bot + Utils.new_line_from_bot + premarket + Utils.new_line_from_bot
-                        + Utils.new_line_from_bot + btcrange);
+                String premarket = binance_service.loadPremarket();
+
+                message.setText(btcrange + Utils.new_line_from_bot + Utils.new_line_from_bot + premarket);
+
                 execute(message);
 
             } else if (command.contains("/buy")) {
