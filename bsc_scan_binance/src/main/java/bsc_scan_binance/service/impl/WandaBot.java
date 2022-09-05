@@ -91,9 +91,7 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                BigDecimal price_at_binance = list.get(0).getCurrent_price();
-
-                String btcrange = binance_service.monitorBtcPrice(price_at_binance).replace(Utils.new_line_from_service,
+                String btcrange = binance_service.monitorBtcPrice().replace(Utils.new_line_from_service,
                         Utils.new_line_from_bot);
 
                 message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot)

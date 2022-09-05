@@ -981,7 +981,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar_css("bg-danger rounded-lg display-tity text-left text-white");
                     }
 
-                    monitorBtcPrice(price_now);
+                    monitorBtcPrice();
                 }
                 // ---------------------------------------------------
 
@@ -2426,9 +2426,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public String monitorBtcPrice(BigDecimal price_at_binance) {
+    public String monitorBtcPrice() {
         try {
-            loadData15m();
+            BigDecimal price_at_binance = loadData15m();
 
             String sql = "SELECT                                                                                    \n"
                     + "    long_sl,                                                                                 \n"

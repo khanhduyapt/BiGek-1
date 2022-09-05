@@ -92,9 +92,10 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        if (idx % 20 == 0) {
+                        if (idx % 30 == 0) {
                             binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol());
                             binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
+                            binance_service.monitorBtcPrice();
                         }
 
                         String loadBinanceData = binance_service.loadBinanceData(coin.getGeckoid(),
