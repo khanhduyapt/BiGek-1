@@ -2104,7 +2104,7 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @SuppressWarnings({ "unchecked" })
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
         try {
             BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
@@ -2144,12 +2144,7 @@ public class BinanceServiceImpl implements BinanceService {
                     saveList.add(entity);
 
                 }
-
-                List<DepthBids> del_list = depthBidsRepository.findAll();
-                if (!CollectionUtils.isEmpty(del_list)) {
-                    depthBidsRepository.deleteAll(del_list);
-                }
-
+                depthBidsRepository.deleteAll();
                 depthBidsRepository.saveAll(saveList);
             }
 
@@ -2176,11 +2171,7 @@ public class BinanceServiceImpl implements BinanceService {
                     entity.setQty(qty);
                     saveList.add(entity);
                 }
-
-                List<DepthAsks> del_list = depthAsksRepository.findAll();
-                if (!CollectionUtils.isEmpty(del_list)) {
-                    depthAsksRepository.deleteAll(del_list);
-                }
+                depthAsksRepository.deleteAll();
                 depthAsksRepository.saveAll(saveList);
             }
 
