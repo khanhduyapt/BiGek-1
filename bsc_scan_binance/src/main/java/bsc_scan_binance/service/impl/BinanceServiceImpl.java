@@ -1505,11 +1505,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
             }
-
-            log.info("End monitorProfit <----");
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("monitorProfit error ------->");
             log.error(e.getMessage());
@@ -1630,11 +1626,7 @@ public class BinanceServiceImpl implements BinanceService {
                     geckoVolumeUpPre4hRepository.saveAll(saveList);
                 }
             }
-
-            log.info("End monitorToken <----");
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("monitorToken error ------->");
             log.error(e.getMessage());
@@ -2428,6 +2420,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public String monitorBtcPrice() {
         try {
+            log.info("Start monitorBtcPrice ---->");
             BigDecimal price_at_binance = loadData15m();
 
             String sql = "SELECT                                                                                    \n"
