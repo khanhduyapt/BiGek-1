@@ -1,6 +1,7 @@
 package bsc_scan_binance.service.impl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,6 @@ import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
 import bsc_scan_binance.entity.DepthAsks;
 import bsc_scan_binance.entity.DepthBids;
-import bsc_scan_binance.entity.DepthKey;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
@@ -2114,16 +2114,6 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
         try {
-            List<DepthBids> depthBids = depthBidsRepository.findAll();
-            if (!CollectionUtils.isEmpty(depthBids)) {
-                depthBidsRepository.deleteAll(depthBids);
-            }
-
-            List<DepthAsks> depthAsks = depthAsksRepository.findAll();
-            if (!CollectionUtils.isEmpty(depthAsks)) {
-                depthAsksRepository.deleteAll(depthAsks);
-            }
-
             BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
             if ("BTC".equals(symbol.toUpperCase())) {
                 MIL_VOL = BigDecimal.valueOf(10000);
@@ -2139,7 +2129,8 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (obj_bids instanceof Collection) {
                 List<Object> obj_bids2 = new ArrayList<>((Collection<Object>) obj_bids);
-
+                List<DepthBids> saveList = new ArrayList<DepthBids>();
+                BigInteger rowidx = BigInteger.ZERO;
                 for (Object obj : obj_bids2) {
                     List<Double> bids = new ArrayList<>((Collection<Double>) obj);
                     BigDecimal price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
@@ -2151,28 +2142,28 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     DepthBids entity = new DepthBids();
-                    DepthKey key = new DepthKey();
-                    key.setGeckoId(gecko_id);
-                    key.setSymbol(symbol);
-                    key.setPrice(price);
-
-                    DepthBids old_entity = depthBidsRepository.findById(key).orElse(null);
-                    if (Objects.equals(null, old_entity)) {
-                        entity.setId(key);
-                        entity.setQty(qty);
-                        depthBidsRepository.save(entity);
-                    } else {
-                        old_entity.setQty(Utils.getBigDecimal(old_entity.getQty()).add(qty));
-                        depthBidsRepository.save(old_entity);
-                    }
+                    rowidx = rowidx.add(BigInteger.valueOf(1));
+                    entity.setGeckoId(gecko_id);
+                    entity.setSymbol(symbol);
+                    entity.setPrice(price);
+                    entity.setRowidx(rowidx);
+                    entity.setQty(qty);
+                    saveList.add(entity);
 
                 }
 
+                List<DepthBids> del_list = depthBidsRepository.findAll();
+                if (!CollectionUtils.isEmpty(del_list)) {
+                    depthBidsRepository.deleteAll(del_list);
+                }
+
+                depthBidsRepository.saveAll(saveList);
             }
 
             if (obj_asks instanceof Collection) {
                 List<Object> obj_asks2 = new ArrayList<>((Collection<Object>) obj_asks);
-
+                List<DepthAsks> saveList = new ArrayList<DepthAsks>();
+                BigInteger rowidx = BigInteger.ZERO;
                 for (Object obj : obj_asks2) {
                     List<Double> asks = new ArrayList<>((Collection<Double>) obj);
                     BigDecimal price = Utils.getBigDecimalValue(String.valueOf(asks.get(0)));
@@ -2184,23 +2175,20 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     DepthAsks entity = new DepthAsks();
-                    DepthKey key = new DepthKey();
-                    key.setGeckoId(gecko_id);
-                    key.setSymbol(symbol);
-                    key.setPrice(price);
-                    entity.setId(key);
+                    rowidx = rowidx.add(BigInteger.valueOf(1));
+                    entity.setGeckoId(gecko_id);
+                    entity.setSymbol(symbol);
+                    entity.setPrice(price);
+                    entity.setRowidx(rowidx);
                     entity.setQty(qty);
-
-                    DepthAsks old_entity = depthAsksRepository.findById(key).orElse(null);
-                    if (Objects.equals(null, old_entity)) {
-                        entity.setId(key);
-                        entity.setQty(qty);
-                        depthAsksRepository.save(entity);
-                    } else {
-                        old_entity.setQty(Utils.getBigDecimal(old_entity.getQty()).add(qty));
-                        depthAsksRepository.save(old_entity);
-                    }
+                    saveList.add(entity);
                 }
+
+                List<DepthAsks> del_list = depthAsksRepository.findAll();
+                if (!CollectionUtils.isEmpty(del_list)) {
+                    depthAsksRepository.deleteAll(del_list);
+                }
+                depthAsksRepository.saveAll(saveList);
             }
 
         } catch (Exception e) {
@@ -2476,13 +2464,15 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
                 //// (Good time to buy)
-                //if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price(), dto.getHight_price())) {
-                //    Utils.sendToMyTelegram("(LONG)..." + msg);
-                //    pre_time_of_btc = curr_time_of_btc;
-                //} else if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price(), dto.getHight_price())) {
-                //    Utils.sendToMyTelegram("(SHORT)..." + msg);
-                //    pre_time_of_btc = curr_time_of_btc;
-                //}
+                // if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price(),
+                //// dto.getHight_price())) {
+                // Utils.sendToMyTelegram("(LONG)..." + msg);
+                // pre_time_of_btc = curr_time_of_btc;
+                // } else if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price(),
+                //// dto.getHight_price())) {
+                // Utils.sendToMyTelegram("(SHORT)..." + msg);
+                // pre_time_of_btc = curr_time_of_btc;
+                // }
 
                 if (price_at_binance.compareTo(dto.getMin_candle()) <= 0) {
                     Utils.sendToMyTelegram("(LONG)..." + msg);

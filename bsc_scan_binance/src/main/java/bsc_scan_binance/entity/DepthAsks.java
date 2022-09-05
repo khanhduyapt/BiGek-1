@@ -1,12 +1,13 @@
 package bsc_scan_binance.entity;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
@@ -32,8 +33,18 @@ import lombok.NoArgsConstructor;
 })
 
 public class DepthAsks {
-    @EmbeddedId
-    private DepthKey id;
+    @Id
+    @Column(name = "rowidx")
+    private BigInteger rowidx;
+
+    @Column(name = "gecko_id")
+    private String geckoId;
+
+    @Column(name = "symbol")
+    private String symbol;
+
+    @Column(name = "price")
+    private BigDecimal price;
 
     @Column(name = "qty")
     private BigDecimal qty;
