@@ -2111,7 +2111,7 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @SuppressWarnings({ "unchecked" })
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     private void saveDepthData(String gecko_id, String symbol) {
         try {
             BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
@@ -2424,8 +2424,9 @@ public class BinanceServiceImpl implements BinanceService {
         return BigDecimal.ZERO;
     }
 
+    @Override
     @Transactional
-    private void monitorBtcPrice(BigDecimal price_at_binance) {
+    public String monitorBtcPrice(BigDecimal price_at_binance) {
         try {
             loadData15m();
 
@@ -2446,7 +2447,7 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<BtcFuturesResponse> vol_list = query.getResultList();
             if (CollectionUtils.isEmpty(vol_list)) {
-                return;
+                return "";
             }
 
             BtcFuturesResponse dto = vol_list.get(0);
@@ -2485,8 +2486,11 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
+            return msg;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return "";
     }
 }

@@ -91,12 +91,14 @@ public class WandaBot extends TelegramLongPollingBot {
                     return;
                 }
 
-                String btcDepth = binance_service.getTextDepthData(list.get(0).getCurrent_price()).trim();
+                BigDecimal price_at_binance = list.get(0).getCurrent_price();
 
-                message.setText(
-                        Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot)
-                                + Utils.new_line_from_bot + Utils.new_line_from_bot + premarket
-                                + Utils.new_line_from_bot + Utils.new_line_from_bot + btcDepth);
+                String btcrange = binance_service.monitorBtcPrice(price_at_binance).replace(Utils.new_line_from_service,
+                        Utils.new_line_from_bot);
+
+                message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot)
+                        + Utils.new_line_from_bot + Utils.new_line_from_bot + premarket + Utils.new_line_from_bot
+                        + Utils.new_line_from_bot + btcrange);
                 execute(message);
 
             } else if (command.contains("/buy")) {
@@ -230,12 +232,10 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 ordersRepository.save(entity);
 
-                message.setText(
-                        String.format(
-                                "Added:[%s] [User:%s]" + Utils.new_line_from_bot + "[Qty:%s(+%s)]_[P:%s$] [T:%s$].",
-                                entity.getId().getGeckoid(), userName, entity.getQty(), qty2, entity.getOrder_price(),
-                                entity.getAmount()) + Utils.new_line_from_bot
-                                + note.replace("~", Utils.new_line_from_bot));
+                message.setText(String.format(
+                        "Added:[%s] [User:%s]" + Utils.new_line_from_bot + "[Qty:%s(+%s)]_[P:%s$] [T:%s$].",
+                        entity.getId().getGeckoid(), userName, entity.getQty(), qty2, entity.getOrder_price(),
+                        entity.getAmount()) + Utils.new_line_from_bot + note.replace("~", Utils.new_line_from_bot));
                 execute(message);
 
             } else if (command.contains("/sellall")) {
@@ -267,9 +267,8 @@ public class WandaBot extends TelegramLongPollingBot {
 
                     takeProfitRepository.save(profit);
 
-                    message.setText(
-                            String.format("Sell:[%s] [Qty:-%s]_[P:%s$]_[T:%s$] [PT:%s$].", profit.getGeckoid(),
-                                    profit.getQty(), price_now, amount2, profit.getProfit()));
+                    message.setText(String.format("Sell:[%s] [Qty:-%s]_[P:%s$]_[T:%s$] [PT:%s$].", profit.getGeckoid(),
+                            profit.getQty(), price_now, amount2, profit.getProfit()));
                     execute(message);
                 }
 
@@ -347,10 +346,8 @@ public class WandaBot extends TelegramLongPollingBot {
                         order.setAmount(amount_remain);
                         ordersRepository.save(order);
 
-                        message.setText(
-                                String.format("Remain:[%s] [User:%s] [Qty:%s]_[P:%s$] [T:%s$].",
-                                        order.getId().getGeckoid(),
-                                        userName, order.getQty(), order_price1, order.getAmount()));
+                        message.setText(String.format("Remain:[%s] [User:%s] [Qty:%s]_[P:%s$] [T:%s$].",
+                                order.getId().getGeckoid(), userName, order.getQty(), order_price1, order.getAmount()));
                         execute(message);
                         // ------------------------
                         profit.setQty(qty2);
@@ -360,9 +357,8 @@ public class WandaBot extends TelegramLongPollingBot {
                     }
 
                     takeProfitRepository.save(profit);
-                    message.setText(
-                            String.format("Sell:[%s] [Qty:-%s]_[P:%s$]_[T:%s$] [PT:%s$].", profit.getGeckoid(),
-                                    profit.getQty(), order_price2, amount2, profit.getProfit()));
+                    message.setText(String.format("Sell:[%s] [Qty:-%s]_[P:%s$]_[T:%s$] [PT:%s$].", profit.getGeckoid(),
+                            profit.getQty(), order_price2, amount2, profit.getProfit()));
                     execute(message);
 
                 }
