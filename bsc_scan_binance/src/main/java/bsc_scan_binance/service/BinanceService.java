@@ -28,4 +28,6 @@ public interface BinanceService {
     public List<List<DepthResponse>> getListDepthData(String symbol);
 
     public String monitorBtcPrice();
+
+    public String loadPremarketSp500();
 }

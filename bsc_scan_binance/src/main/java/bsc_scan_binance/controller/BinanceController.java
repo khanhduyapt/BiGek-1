@@ -20,6 +20,7 @@ import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.service.CoinGeckoService;
 import bsc_scan_binance.utils.Response;
+import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class BinanceController {
         model.addAttribute("data_list_1", list_bids);
         model.addAttribute("data_list_2", list_asks);
         model.addAttribute("symbol", symbol);
-
+        model.addAttribute("sp500", service.loadPremarketSp500().replaceAll(Utils.new_line_from_bot, "; "));
         return "detail";
     }
 

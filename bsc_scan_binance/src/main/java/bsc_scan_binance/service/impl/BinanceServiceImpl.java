@@ -1662,6 +1662,7 @@ public class BinanceServiceImpl implements BinanceService {
         return value;
     }
 
+    @Override
     public String loadPremarketSp500() {
         String value = "";
 
