@@ -123,7 +123,7 @@ public class Utils {
 
         BigDecimal mid_price = low_price.add(range);
 
-        if (mid_price.compareTo(curr_price) < 0) {
+        if (curr_price.compareTo(mid_price) < 0) {
             return true;
         }
         return false;

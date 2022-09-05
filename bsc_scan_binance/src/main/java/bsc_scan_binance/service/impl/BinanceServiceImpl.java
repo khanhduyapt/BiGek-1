@@ -46,6 +46,7 @@ import bsc_scan_binance.repository.BinanceVolumeDateTimeRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
+import bsc_scan_binance.repository.BtcFuturesRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
 import bsc_scan_binance.repository.DepthAsksRepository;
 import bsc_scan_binance.repository.DepthBidsRepository;
@@ -53,6 +54,7 @@ import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.response.BollAreaResponse;
+import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
 import bsc_scan_binance.response.DepthResponse;
@@ -102,6 +104,11 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private DepthAsksRepository depthAsksRepository;
+
+    @Autowired
+    private BtcFuturesRepository btcFuturesRepository;
+    private static final String TIME_15m = "15m";
+    private static final int LIMIT_DATA = 30;
 
     private String pre_time_of_btc = "";
     private String pre_yyyyMMddHH = "";
@@ -973,6 +980,8 @@ public class BinanceServiceImpl implements BinanceService {
                     if (sp500.contains("-")) {
                         css.setStar_css("bg-danger rounded-lg display-tity text-left text-white");
                     }
+
+                    monitorBtcPrice(price_now);
                 }
                 // ---------------------------------------------------
 
@@ -2354,4 +2363,140 @@ public class BinanceServiceImpl implements BinanceService {
         return result.trim();
     }
 
+    @Transactional
+    private BigDecimal loadData15m() {
+        try {
+            String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
+            BigDecimal price_at_binance = Utils.getBinancePrice(url_price);
+
+            String url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=" + TIME_15m + "&limit="
+                    + LIMIT_DATA;
+
+            List<Object> list = Utils.getBinanceData(url, LIMIT_DATA);
+
+            List<BtcFutures> list_entity = new ArrayList<BtcFutures>();
+            int id = 0;
+
+            for (int idx = LIMIT_DATA - 1; idx >= 0; idx--) {
+                Object obj_usdt = list.get(idx);
+
+                @SuppressWarnings("unchecked")
+                List<Object> arr_usdt = (List<Object>) obj_usdt;
+
+                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
+                BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
+                BigDecimal low_price = Utils.getBigDecimal(arr_usdt.get(3));
+                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
+                String open_time = arr_usdt.get(0).toString();
+
+                if (Objects.equals("0", open_time)) {
+                    break;
+                }
+
+                BtcFutures day = new BtcFutures();
+
+                String strid = String.valueOf(id);
+                if (strid.length() < 2) {
+                    strid = "0" + strid;
+                }
+                day.setId(strid);
+
+                if (idx == LIMIT_DATA - 1) {
+                    day.setCurrPrice(price_at_binance);
+                } else {
+                    day.setCurrPrice(BigDecimal.ZERO);
+                }
+
+                day.setLow_price(low_price);
+                day.setHight_price(hight_price);
+                day.setPrice_open_candle(price_open_candle);
+                day.setPrice_close_candle(price_close_candle);
+
+                if (price_open_candle.compareTo(price_close_candle) < 0) {
+                    day.setUptrend(true);
+                } else {
+                    day.setUptrend(false);
+                }
+
+                list_entity.add(day);
+
+                id += 1;
+            }
+
+            btcFuturesRepository.deleteAll();
+            btcFuturesRepository.saveAll(list_entity);
+
+            return price_at_binance;
+        } catch (
+
+        Exception e) {
+            e.printStackTrace();
+        }
+
+        return BigDecimal.ZERO;
+    }
+
+    @Transactional
+    private void monitorBtcPrice(BigDecimal price_at_binance) {
+        try {
+            loadData15m();
+
+            String sql = "SELECT                                                                                    \n"
+                    + "    long_sl,                                                                                 \n"
+                    + "    long_tp,                                                                                 \n"
+                    + "    low_price,                                                                               \n"
+                    + "    min_candle,                                                                              \n"
+                    + "    max_candle,                                                                              \n"
+                    + "    hight_price,                                                                             \n"
+                    + "    short_sl,                                                                                \n"
+                    + "    short_tp                                                                                 \n"
+                    + "FROM                                                                                         \n"
+                    + "    view_btc_futures_result";
+
+            Query query = entityManager.createNativeQuery(sql, "BtcFuturesResponse");
+
+            @SuppressWarnings("unchecked")
+            List<BtcFuturesResponse> vol_list = query.getResultList();
+            if (CollectionUtils.isEmpty(vol_list)) {
+                return;
+            }
+
+            BtcFuturesResponse dto = vol_list.get(0);
+            String msg = "BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + Utils.new_line_from_service;
+            msg += "Buy:" + Utils.removeLastZero(String.valueOf(dto.getLow_price()));
+            msg += "~" + Utils.removeLastZero(String.valueOf(dto.getMin_candle()));
+            msg += " Sell:" + Utils.removeLastZero(String.valueOf(dto.getMax_candle()));
+            msg += "~" + Utils.removeLastZero(String.valueOf(dto.getHight_price()));
+
+            msg += Utils.new_line_from_service + Utils.new_line_from_service;
+            msg += getTextDepthData(price_at_binance).replace(" ", "");
+
+            String curr_time_of_btc = Utils.convertDateToString("MMdd_HH", Calendar.getInstance().getTime());
+            curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
+
+            if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
+                //// (Good time to buy)
+                //if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price(), dto.getHight_price())) {
+                //    Utils.sendToMyTelegram("(LONG)..." + msg);
+                //    pre_time_of_btc = curr_time_of_btc;
+                //} else if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price(), dto.getHight_price())) {
+                //    Utils.sendToMyTelegram("(SHORT)..." + msg);
+                //    pre_time_of_btc = curr_time_of_btc;
+                //}
+
+                if (price_at_binance.compareTo(dto.getMin_candle()) <= 0) {
+                    Utils.sendToMyTelegram("(LONG)..." + msg);
+                    pre_time_of_btc = curr_time_of_btc;
+                }
+
+                if (price_at_binance.compareTo(dto.getMax_candle()) >= 0) {
+                    Utils.sendToMyTelegram("(SHORT)..." + msg);
+                    pre_time_of_btc = curr_time_of_btc;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

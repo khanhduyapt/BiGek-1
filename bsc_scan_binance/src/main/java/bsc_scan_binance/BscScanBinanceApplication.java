@@ -92,7 +92,13 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        String loadBinanceData = binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol());
+                        if (idx % 20 == 0) {
+                            binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol());
+                            binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
+                        }
+
+                        String loadBinanceData = binance_service.loadBinanceData(coin.getGeckoid(),
+                                coin.getSymbol());
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
 
                         log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
@@ -109,8 +115,6 @@ public class BscScanBinanceApplication {
                     }
 
                     if (Objects.equals(idx, size - 1)) {
-                        binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol());
-                        binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
 
                         int minus = Utils
                                 .getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
