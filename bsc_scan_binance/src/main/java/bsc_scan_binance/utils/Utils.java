@@ -814,12 +814,12 @@ public class Utils {
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
-        if(hi_price.subtract(lo_price).compareTo(BigDecimal.valueOf(250)) < 0) {
+        if(hi_price.subtract(lo_price).compareTo(BigDecimal.valueOf(300)) < 0) {
             return false;
         }
 
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(10), 5, RoundingMode.CEILING);
 
         BigDecimal mid_price = low_price.add(range);
 

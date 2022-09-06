@@ -2448,16 +2448,17 @@ public class BinanceServiceImpl implements BinanceService {
             String curr_time_of_btc = Utils.convertDateToString("MMdd_HH", Calendar.getInstance().getTime());
             curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
+            String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
                 // (Good time to buy)
                 if ((price_at_binance.compareTo(dto.getMin_candle()) <= 0)
                         || (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price(), dto.getHight_price()))) {
-                    Utils.sendToMyTelegram("(LONG)..." + msg);
+                    Utils.sendToMyTelegram(time + " LONG..." + msg);
                     pre_time_of_btc = curr_time_of_btc;
                 }
 
                 if (price_at_binance.compareTo(dto.getMax_candle()) >= 0) {
-                    Utils.sendToMyTelegram("(SHORT)..." + msg);
+                    Utils.sendToMyTelegram(time + " SHORT..." + msg);
                     pre_time_of_btc = curr_time_of_btc;
                 }
             }
