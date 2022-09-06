@@ -1,6 +1,7 @@
 package bsc_scan_binance.service.impl;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,6 @@ import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
 import bsc_scan_binance.entity.DepthAsks;
 import bsc_scan_binance.entity.DepthBids;
-import bsc_scan_binance.entity.DepthKey;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
@@ -981,7 +981,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setStar_css("bg-danger rounded-lg display-tity text-left text-white");
                     }
 
-                    monitorBtcPrice(price_now);
+                    monitorBtcPrice();
                 }
                 // ---------------------------------------------------
 
@@ -1505,11 +1505,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
             }
-
-            log.info("End monitorProfit <----");
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("monitorProfit error ------->");
             log.error(e.getMessage());
@@ -1630,11 +1626,7 @@ public class BinanceServiceImpl implements BinanceService {
                     geckoVolumeUpPre4hRepository.saveAll(saveList);
                 }
             }
-
-            log.info("End monitorToken <----");
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.info("monitorToken error ------->");
             log.error(e.getMessage());
@@ -1670,6 +1662,7 @@ public class BinanceServiceImpl implements BinanceService {
         return value;
     }
 
+    @Override
     public String loadPremarketSp500() {
         String value = "";
 
@@ -2114,16 +2107,6 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
         try {
-            List<DepthBids> depthBids = depthBidsRepository.findAll();
-            if (!CollectionUtils.isEmpty(depthBids)) {
-                depthBidsRepository.deleteAll(depthBids);
-            }
-
-            List<DepthAsks> depthAsks = depthAsksRepository.findAll();
-            if (!CollectionUtils.isEmpty(depthAsks)) {
-                depthAsksRepository.deleteAll(depthAsks);
-            }
-
             BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
             if ("BTC".equals(symbol.toUpperCase())) {
                 MIL_VOL = BigDecimal.valueOf(10000);
@@ -2139,7 +2122,8 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (obj_bids instanceof Collection) {
                 List<Object> obj_bids2 = new ArrayList<>((Collection<Object>) obj_bids);
-
+                List<DepthBids> saveList = new ArrayList<DepthBids>();
+                BigInteger rowidx = BigInteger.ZERO;
                 for (Object obj : obj_bids2) {
                     List<Double> bids = new ArrayList<>((Collection<Double>) obj);
                     BigDecimal price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
@@ -2151,28 +2135,23 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     DepthBids entity = new DepthBids();
-                    DepthKey key = new DepthKey();
-                    key.setGeckoId(gecko_id);
-                    key.setSymbol(symbol);
-                    key.setPrice(price);
-
-                    DepthBids old_entity = depthBidsRepository.findById(key).orElse(null);
-                    if (Objects.equals(null, old_entity)) {
-                        entity.setId(key);
-                        entity.setQty(qty);
-                        depthBidsRepository.save(entity);
-                    } else {
-                        old_entity.setQty(Utils.getBigDecimal(old_entity.getQty()).add(qty));
-                        depthBidsRepository.save(old_entity);
-                    }
+                    rowidx = rowidx.add(BigInteger.valueOf(1));
+                    entity.setGeckoId(gecko_id);
+                    entity.setSymbol(symbol);
+                    entity.setPrice(price);
+                    entity.setRowidx(rowidx);
+                    entity.setQty(qty);
+                    saveList.add(entity);
 
                 }
-
+                depthBidsRepository.deleteAll();
+                depthBidsRepository.saveAll(saveList);
             }
 
             if (obj_asks instanceof Collection) {
                 List<Object> obj_asks2 = new ArrayList<>((Collection<Object>) obj_asks);
-
+                List<DepthAsks> saveList = new ArrayList<DepthAsks>();
+                BigInteger rowidx = BigInteger.ZERO;
                 for (Object obj : obj_asks2) {
                     List<Double> asks = new ArrayList<>((Collection<Double>) obj);
                     BigDecimal price = Utils.getBigDecimalValue(String.valueOf(asks.get(0)));
@@ -2184,23 +2163,16 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     DepthAsks entity = new DepthAsks();
-                    DepthKey key = new DepthKey();
-                    key.setGeckoId(gecko_id);
-                    key.setSymbol(symbol);
-                    key.setPrice(price);
-                    entity.setId(key);
+                    rowidx = rowidx.add(BigInteger.valueOf(1));
+                    entity.setGeckoId(gecko_id);
+                    entity.setSymbol(symbol);
+                    entity.setPrice(price);
+                    entity.setRowidx(rowidx);
                     entity.setQty(qty);
-
-                    DepthAsks old_entity = depthAsksRepository.findById(key).orElse(null);
-                    if (Objects.equals(null, old_entity)) {
-                        entity.setId(key);
-                        entity.setQty(qty);
-                        depthAsksRepository.save(entity);
-                    } else {
-                        old_entity.setQty(Utils.getBigDecimal(old_entity.getQty()).add(qty));
-                        depthAsksRepository.save(old_entity);
-                    }
+                    saveList.add(entity);
                 }
+                depthAsksRepository.deleteAll();
+                depthAsksRepository.saveAll(saveList);
             }
 
         } catch (Exception e) {
@@ -2436,10 +2408,12 @@ public class BinanceServiceImpl implements BinanceService {
         return BigDecimal.ZERO;
     }
 
+    @Override
     @Transactional
-    private void monitorBtcPrice(BigDecimal price_at_binance) {
+    public String monitorBtcPrice() {
         try {
-            loadData15m();
+            log.info("Start monitorBtcPrice ---->");
+            BigDecimal price_at_binance = loadData15m();
 
             String sql = "SELECT                                                                                    \n"
                     + "    long_sl,                                                                                 \n"
@@ -2458,7 +2432,7 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<BtcFuturesResponse> vol_list = query.getResultList();
             if (CollectionUtils.isEmpty(vol_list)) {
-                return;
+                return "";
             }
 
             BtcFuturesResponse dto = vol_list.get(0);
@@ -2488,8 +2462,11 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
+            return msg;
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return "";
     }
 }

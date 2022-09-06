@@ -26,4 +26,8 @@ public interface BinanceService {
     public String getTextDepthData(BigDecimal price_now);
 
     public List<List<DepthResponse>> getListDepthData(String symbol);
+
+    public String monitorBtcPrice();
+
+    public String loadPremarketSp500();
 }
