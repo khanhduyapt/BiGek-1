@@ -2475,16 +2475,9 @@ public class BinanceServiceImpl implements BinanceService {
             curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
-                //// (Good time to buy)
-                //if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price(), dto.getHight_price())) {
-                //    Utils.sendToMyTelegram("(LONG)..." + msg);
-                //    pre_time_of_btc = curr_time_of_btc;
-                //} else if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price(), dto.getHight_price())) {
-                //    Utils.sendToMyTelegram("(SHORT)..." + msg);
-                //    pre_time_of_btc = curr_time_of_btc;
-                //}
-
-                if (price_at_binance.compareTo(dto.getMin_candle()) <= 0) {
+                // (Good time to buy)
+                if ((price_at_binance.compareTo(dto.getMin_candle()) <= 0)
+                        || (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price(), dto.getHight_price()))) {
                     Utils.sendToMyTelegram("(LONG)..." + msg);
                     pre_time_of_btc = curr_time_of_btc;
                 }

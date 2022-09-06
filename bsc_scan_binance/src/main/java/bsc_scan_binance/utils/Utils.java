@@ -810,10 +810,13 @@ public class Utils {
 
 
     public static Boolean isGoodPriceLong(BigDecimal cur_price, BigDecimal lo_price, BigDecimal hi_price) {
-
         BigDecimal curr_price = Utils.getBigDecimal(cur_price);
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
+
+        if(hi_price.subtract(lo_price).compareTo(BigDecimal.valueOf(250)) < 0) {
+            return false;
+        }
 
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
