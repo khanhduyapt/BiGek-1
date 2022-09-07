@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import bsc_scan_binance.response.DepthResponse;
 import lombok.AllArgsConstructor;
@@ -50,7 +49,4 @@ public class DepthAsks {
     @Column(name = "qty")
     private BigDecimal qty;
 
-    @Version
-    @Column(name = "version")
-    private Long version;
 }

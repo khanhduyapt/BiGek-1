@@ -2106,6 +2106,19 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
         try {
+
+            List<DepthBids> depthBidsList = depthBidsRepository.findAll();
+            for (DepthBids entity : depthBidsList) {
+                entity.setQty(BigDecimal.ZERO);
+            }
+            depthBidsRepository.saveAll(depthBidsList);
+
+            List<DepthAsks> depthAsksList = depthAsksRepository.findAll();
+            for (DepthAsks entity : depthAsksList) {
+                entity.setQty(BigDecimal.ZERO);
+            }
+            depthAsksRepository.saveAll(depthAsksList);
+
             BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
             if ("BTC".equals(symbol.toUpperCase())) {
                 MIL_VOL = BigDecimal.valueOf(10000);
@@ -2143,7 +2156,6 @@ public class BinanceServiceImpl implements BinanceService {
                     saveList.add(entity);
 
                 }
-                depthBidsRepository.deleteAll();
                 depthBidsRepository.saveAll(saveList);
             }
 
@@ -2170,7 +2182,6 @@ public class BinanceServiceImpl implements BinanceService {
                     entity.setQty(qty);
                     saveList.add(entity);
                 }
-                depthAsksRepository.deleteAll();
                 depthAsksRepository.saveAll(saveList);
             }
 

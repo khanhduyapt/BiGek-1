@@ -7,7 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +36,4 @@ public class DepthBids {
     @Column(name = "qty")
     private BigDecimal qty;
 
-    @Version
-    @Column(name = "version")
-    private Long version;
 }
