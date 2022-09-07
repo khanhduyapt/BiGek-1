@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,6 +34,8 @@ import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
+import bsc_scan_binance.entity.BitcoinBalancesOnExchanges;
+import bsc_scan_binance.entity.BitcoinBalancesOnExchangesKey;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
@@ -45,6 +48,7 @@ import bsc_scan_binance.repository.BinanceFuturesRepository;
 import bsc_scan_binance.repository.BinanceVolumeDateTimeRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
+import bsc_scan_binance.repository.BitcoinBalancesOnExchangesRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcFuturesRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
@@ -53,6 +57,7 @@ import bsc_scan_binance.repository.DepthBidsRepository;
 import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
+import bsc_scan_binance.response.BitcoinBalancesOnExchangesResponse;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
@@ -107,10 +112,15 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private BtcFuturesRepository btcFuturesRepository;
+
+    @Autowired
+    private BitcoinBalancesOnExchangesRepository bitcoinBalancesOnExchangesRepository;
+
     private static final String TIME_15m = "15m";
     private static final int LIMIT_DATA = 30;
 
     private String pre_time_of_btc = "";
+    private String pre_time_of_btc_for_long_short = "";
     private String pre_yyyyMMddHH = "";
     private String sp500 = "";
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
@@ -973,7 +983,13 @@ public class BinanceServiceImpl implements BinanceService {
                                 .replace(Utils.new_line_from_bot, " ");
 
                         pre_yyyyMMddHH = Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime());
+
+                        monitorBitcoinBalancesOnExchanges();
                     }
+
+                    css.setNote("");
+                    String btcOnEx = getBtcBalancesOnExchanges().replaceAll(Utils.new_line_from_service, " ");
+                    css.setPumping_history(btcOnEx);
 
                     css.setStar(sp500);
                     css.setStar_css("display-tity text-left");
@@ -1044,26 +1060,6 @@ public class BinanceServiceImpl implements BinanceService {
                 sql_update_ema += String.format(
                         " where gecko_id='%s' and symbol='%s' and yyyymmdd=TO_CHAR(NOW(), 'yyyyMMdd'); \n",
                         dto.getGecko_id(), dto.getSymbol());
-
-                // if (isOrderByBynaceVolume) {
-                // if (Objects.equals("BTC", css.getSymbol())) {
-                // list.add(css);
-                // } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.ZERO)
-                // > 0)
-                // || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.ZERO) > 0)) {
-                //
-                // list.add(css);
-                //
-                // } else if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap())
-                // .compareTo(BigDecimal.valueOf(5)) > 0)
-                // && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(0.5)) > 0)) {
-                //
-                // // list.add(css);
-                // }
-                //
-                // } else {
-                // list.add(css);
-                // }
 
                 list.add(css);
             }
@@ -1817,6 +1813,9 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     @Transactional
     public String loadBinanceData(String gecko_id, String symbol) {
+        // debug
+        //monitorBitcoinBalancesOnExchanges();
+
         try {
             final Integer limit = 14;
             final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
@@ -2449,19 +2448,127 @@ public class BinanceServiceImpl implements BinanceService {
             curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
             String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
-            if (!Objects.equals(curr_time_of_btc, pre_time_of_btc)) {
+            if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short)) {
                 // (Good time to buy)
                 if ((price_at_binance.compareTo(dto.getMin_candle()) <= 0)
                         || (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price(), dto.getHight_price()))) {
                     Utils.sendToMyTelegram(time + " LONG..." + msg);
-                    pre_time_of_btc = curr_time_of_btc;
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
 
                 if (price_at_binance.compareTo(dto.getMax_candle()) >= 0) {
                     Utils.sendToMyTelegram(time + " SHORT..." + msg);
-                    pre_time_of_btc = curr_time_of_btc;
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
             }
+
+            return msg;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Transactional
+    private void monitorBitcoinBalancesOnExchanges() {
+        log.info("Start monitorBitcoinBalancesOnExchanges ---->");
+
+        String url = "https://fapi.coinglass.com/api/exchange/chain/balance/list";
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            Object result = restTemplate.getForObject(url, Object.class);
+            Object dataList = Utils.getLinkedHashMapValue(result, Arrays.asList("data"));
+
+            if (dataList instanceof Collection) {
+                List<LinkedHashMap> exchangeList = new ArrayList<>((Collection<LinkedHashMap>) dataList);
+
+                if (exchangeList.size() > 0) {
+
+                    String yyyyMMdd = Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime());
+                    List<BitcoinBalancesOnExchanges> entities = new ArrayList<BitcoinBalancesOnExchanges>();
+
+                    for (LinkedHashMap exchange : exchangeList) {
+
+                        Object exchangeName = Utils.getLinkedHashMapValue(exchange, Arrays.asList("exchangeName"));
+                        Object symbol = Utils.getLinkedHashMapValue(exchange, Arrays.asList("symbol"));
+                        Object balance = Utils.getLinkedHashMapValue(exchange, Arrays.asList("balance"));
+
+                        Object balanceChange = Utils.getLinkedHashMapValue(exchange, Arrays.asList("balanceChange"));
+                        Object balanceChangePercent = Utils.getLinkedHashMapValue(exchange,
+                                Arrays.asList("balanceChangePercent"));
+
+                        Object d7BalanceChange = Utils.getLinkedHashMapValue(exchange,
+                                Arrays.asList("d7BalanceChange"));
+                        Object d7BalanceChangePercent = Utils.getLinkedHashMapValue(exchange,
+                                Arrays.asList("d7BalanceChangePercent"));
+
+                        Object d30BalanceChange = Utils.getLinkedHashMapValue(exchange,
+                                Arrays.asList("d30BalanceChange"));
+                        Object d30BalanceChangePercent = Utils.getLinkedHashMapValue(exchange,
+                                Arrays.asList("d30BalanceChangePercent"));
+                        Object exLogo = Utils.getLinkedHashMapValue(exchange, Arrays.asList("exLogo"));
+
+                        BitcoinBalancesOnExchanges entity = new BitcoinBalancesOnExchanges();
+                        BitcoinBalancesOnExchangesKey id = new BitcoinBalancesOnExchangesKey();
+                        id.setYyyymmdd(yyyyMMdd);
+                        id.setExchangeName(Utils.getStringValue(exchangeName));
+                        id.setSymbol(Utils.getStringValue(symbol));
+
+                        entity.setId(id);
+                        entity.setBalance(Utils.getBigDecimal(balance));
+                        entity.setBalanceChange(Utils.getBigDecimal(balanceChange));
+                        entity.setBalanceChangePercent(Utils.getBigDecimal(balanceChangePercent));
+                        entity.setD7BalanceChange(Utils.getBigDecimal(d7BalanceChange));
+                        entity.setD7BalanceChangePercent(Utils.getBigDecimal(d7BalanceChangePercent));
+                        entity.setD30BalanceChange(Utils.getBigDecimal(d30BalanceChange));
+                        entity.setD30BalanceChangePercent(Utils.getBigDecimal(d30BalanceChangePercent));
+                        entity.setExLogo(Utils.getStringValue(exLogo));
+
+                        entities.add(entity);
+                    }
+
+                    bitcoinBalancesOnExchangesRepository.saveAll(entities);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String getBtcBalancesOnExchanges() {
+
+        try {
+            log.info("Start getBtcBalancesOnExchanges ---->");
+
+            String sql = " SELECT                                                                                   \n"
+                    + "  fun_btc_price_now()                                              as price_now              \n"
+                    + ", sum(balance_change)                                              as change_24h             \n"
+                    + ", round(sum(balance_change) * fun_btc_price_now() / 1000000, 0)    as change_24h_val_million \n"
+                    + ", sum(d7_balance_change)                                           as change_7d              \n"
+                    + ", round(sum(d7_balance_change) * fun_btc_price_now() / 1000000, 0) as change_7d_val_million  \n"
+                    + "FROM bitcoin_balances_on_exchanges ";
+
+            Query query = entityManager.createNativeQuery(sql, "BitcoinBalancesOnExchangesResponse");
+
+            @SuppressWarnings("unchecked")
+            List<BitcoinBalancesOnExchangesResponse> vol_list = query.getResultList();
+            if (CollectionUtils.isEmpty(vol_list)) {
+                return "";
+            }
+
+            BitcoinBalancesOnExchangesResponse dto = vol_list.get(0);
+
+            String msg = "BTC:" + dto.getPrice_now() + "$" + Utils.new_line_from_service;
+            msg += "24h:" + dto.getChange_24h() + "btc(" + dto.getChange_24h_val_million() + "m$)"
+                    + Utils.new_line_from_service;
+
+            msg += "07d:" + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)"
+                    + Utils.new_line_from_service;
 
             return msg;
         } catch (Exception e) {

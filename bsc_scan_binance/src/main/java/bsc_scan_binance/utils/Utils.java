@@ -444,7 +444,7 @@ public class Utils {
 
     public static void sendToMyTelegram(String text) {
         if (BscScanBinanceApplication.app_flag != const_app_flag_msg_on) {
-            //return;
+            return;
         }
 
         sendToChatId(Utils.chatId_duydk, text);

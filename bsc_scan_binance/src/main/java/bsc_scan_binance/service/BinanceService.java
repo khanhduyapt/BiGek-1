@@ -30,4 +30,6 @@ public interface BinanceService {
     public String monitorBtcPrice();
 
     public String loadPremarketSp500();
+
+    public String getBtcBalancesOnExchanges();
 }

@@ -61,6 +61,9 @@ public class BinanceController {
         model.addAttribute("data_list_2", list_asks);
         model.addAttribute("symbol", symbol);
         model.addAttribute("sp500", service.loadPremarketSp500().replaceAll(Utils.new_line_from_bot, "; "));
+        model.addAttribute("exchanges",
+                service.getBtcBalancesOnExchanges().replaceAll(Utils.new_line_from_service, " "));
+
         return "detail";
     }
 

@@ -66,6 +66,12 @@ p {
 </style>
 <body>
     <p style="margin-top: 1rem; margin-left: 0.5rem;" th:text="${sp500}"></p>
+
+	<div style="margin-top: 1rem; margin-left: 0.5rem;">
+		<span>Bitcoin Balances on Exchanges:</span>
+		<p th:text="${exchanges}"></p>
+	</div>
+
     <div style="display: flex; margin-top: 1rem;">
       <table class="table table-bordered tableFixHead" style="min-width: 125px !important; max-width: 125px !important;">
         <thead>
@@ -121,8 +127,6 @@ p {
         </tbody>
       </table>
   </div>
-
-  <p style="margin-left: 0.5rem;" th:text="${sp500}"></p>
 
   <a style="padding-top: 3rem;padding-left: 0.5rem;padding-bottom: 3rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
     <span>Trading View</span>
