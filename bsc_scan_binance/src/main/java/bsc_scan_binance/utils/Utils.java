@@ -818,7 +818,7 @@ public class Utils {
         }
 
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(8), 5, RoundingMode.CEILING);
 
         BigDecimal mid_price = low_price.add(range);
 
@@ -838,7 +838,7 @@ public class Utils {
         }
 
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(8), 5, RoundingMode.CEILING);
 
         BigDecimal mid_price = hight_price.subtract(range);
 

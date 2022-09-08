@@ -2530,21 +2530,34 @@ public class BinanceServiceImpl implements BinanceService {
 
             // (Good time to buy)
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short)) {
-                if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
+                if (isUptrend
+                        && (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m()))) {
+                    Utils.sendToTelegram(msg);
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+
+                } else if (isDowntrend
+                        && (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m()))) {
+
+                    Utils.sendToTelegram(msg);
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+
+                } else if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_15m(), dto.getHight_price_15m())) {
+                    msg = "(Long*)" + Utils.new_line_from_service + getMsgLong(dto.getLow_price_1m(), dto);
                     msg += Utils.new_line_from_service + Utils.new_line_from_service;
-                    msg += getTextDepthData().replace(" ", "");
+                    msg += "(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto);
+
+                    Utils.sendToTelegram(msg);
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+
+                } else if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price_15m(), dto.getHight_price_15m())) {
+                    msg = "(Short*)" + Utils.new_line_from_service + getMsgShort(dto.getHight_price_1m(), dto);
+                    msg += Utils.new_line_from_service + Utils.new_line_from_service;
+                    msg += "(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto);
 
                     Utils.sendToTelegram(msg);
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
 
-                if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
-                    msg += Utils.new_line_from_service + Utils.new_line_from_service;
-                    msg += getTextDepthData().replace(" ", "");
-
-                    Utils.sendToTelegram(msg);
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-                }
             }
 
             return results;
