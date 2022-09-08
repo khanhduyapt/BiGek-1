@@ -1818,7 +1818,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public String loadBinanceData(String gecko_id, String symbol) {
         // debug
-        //monitorBitcoinBalancesOnExchanges();
+        // monitorBitcoinBalancesOnExchanges();
 
         try {
             final Integer limit = 14;
@@ -2424,7 +2424,7 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             log.info("Start monitorBtcPrice ---->");
 
-            //1) Xem chart 1H xac dinh long/short (2 cay 1h truoc do)
+            // 1) Xem chart 1H xac dinh long/short (2 cay 1h truoc do)
             List<BtcFutures> btc1hs = loadData(TIME_1h, LIMIT_DATA_1h);
             boolean isUptrend = false;
             boolean isDowntrend = false;
@@ -2453,8 +2453,8 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> btc15m = loadData(TIME_15m, LIMIT_DATA_15m);
             btcFuturesRepository.saveAll(btc15m);
 
-            //2) Entry: chart 1m
-            //3) SL chart 15m, TP: 1 ho tro Chart 15m, tp2 khang cu 15m
+            // 2) Entry: chart 1m
+            // 3) SL chart 15m, TP: 1 ho tro Chart 15m, tp2 khang cu 15m
             String sql = " SELECT                                                                                                   \n"
                     + "     (SELECT min(btc_futures.low_price) FROM btc_futures where id like '1m_%')       AS low_price_1m,        \n"
                     + "     (SELECT min(CASE WHEN btc_futures.price_open_candle > btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '1m_%')     AS min_candle_1m,   \n"
@@ -2492,9 +2492,12 @@ public class BinanceServiceImpl implements BinanceService {
                 results.add(Utils.getStringValue(msg));
 
                 String tmp = getMsgLong(dto.getLow_price_1m(), dto);
-                results.add(tmp);
-                results.add(getMsgLong(price_at_binance, dto));
+                results.add("(Long*)" + Utils.new_line_from_service + tmp);
+                results.add("(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
                 msg += tmp;
+
+                results.add("(Short*)" + Utils.new_line_from_service + getMsgShort(dto.getHight_price_1m(), dto));
+                results.add("(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
             }
 
             if (isDowntrend) {
@@ -2508,15 +2511,21 @@ public class BinanceServiceImpl implements BinanceService {
 
                 results.add(Utils.getStringValue(msg));
                 String tmp = getMsgShort(dto.getHight_price_1m(), dto);
-                results.add(tmp);
-                results.add(getMsgShort(price_at_binance, dto));
+                results.add("(Short*)" + Utils.new_line_from_service + tmp);
+                results.add("(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
                 msg += tmp;
+
+                results.add("(Long*)" + Utils.new_line_from_service + getMsgLong(dto.getLow_price_1m(), dto));
+                results.add("(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
             }
 
             if (isSideway) {
                 results.add("Btc sideway không rõ xu hướng.");
-                results.add("(Long)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
-                results.add("(Short)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
+                results.add("(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
+                results.add("(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
+
+                results.add("(Long*)" + Utils.new_line_from_service + getMsgLong(dto.getLow_price_1m(), dto));
+                results.add("(Short*)" + Utils.new_line_from_service + getMsgShort(dto.getHight_price_1m(), dto));
             }
 
             // (Good time to buy)
@@ -2557,12 +2566,12 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal take_porfit_2 = dto.getHight_price_15m().subtract(BigDecimal.valueOf(10));
 
         BigDecimal fee = BigDecimal.valueOf(2);
-        BigDecimal loss = BigDecimal.valueOf(1000).multiply(stop_loss.subtract(entry)).divide(entry, 0,
-                RoundingMode.CEILING).subtract(fee);
-        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(take_porfit_1.subtract(entry)).divide(entry, 0,
-                RoundingMode.CEILING).subtract(fee);
-        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(take_porfit_2.subtract(entry)).divide(entry, 0,
-                RoundingMode.CEILING).subtract(fee);
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(stop_loss.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(take_porfit_1.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(take_porfit_2.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
 
         msg += "E  :" + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
 
@@ -2584,7 +2593,6 @@ public class BinanceServiceImpl implements BinanceService {
             msg += Utils.new_line_from_service + "(Bad)";
         }
 
-
         return msg;
     }
 
@@ -2597,12 +2605,12 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal take_porfit_2 = dto.getMin_candle_15m().add(BigDecimal.valueOf(10));
 
         BigDecimal fee = BigDecimal.valueOf(2);
-        BigDecimal loss = BigDecimal.valueOf(1000).multiply(entry.subtract(stop_loss)).divide(entry, 0,
-                RoundingMode.CEILING).subtract(fee);
-        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_1)).divide(entry, 0,
-                RoundingMode.CEILING).subtract(fee);
-        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_2)).divide(entry, 0,
-                RoundingMode.CEILING).subtract(fee);
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(entry.subtract(stop_loss))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_1))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_2))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
 
         msg += "E  :" + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
 
