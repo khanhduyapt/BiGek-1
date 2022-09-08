@@ -2580,7 +2580,10 @@ public class BinanceServiceImpl implements BinanceService {
             msg += Utils.new_line_from_service + "(Good x2)";
         } else if (loss.add(tp2).compareTo(BigDecimal.ZERO) > 0) {
             msg += Utils.new_line_from_service + "(Good)";
+        } else {
+            msg += Utils.new_line_from_service + "(Bad)";
         }
+
 
         return msg;
     }
@@ -2617,6 +2620,8 @@ public class BinanceServiceImpl implements BinanceService {
             msg += Utils.new_line_from_service + "(Good x2)";
         } else if (loss.add(tp2).compareTo(BigDecimal.ZERO) > 0) {
             msg += Utils.new_line_from_service + "(Good)";
+        } else {
+            msg += Utils.new_line_from_service + "(Bad)";
         }
 
         return msg;
