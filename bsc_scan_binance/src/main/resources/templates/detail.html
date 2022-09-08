@@ -73,23 +73,22 @@ p {
 		<p th:text="${exchanges}"></p>
 	</div>
 
-    <p style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;" th:text="${long_short_header}" 
-        th:classappend="${#strings.contains(long_short_header, 'SHORT') ? 'text-danger' : #strings.contains(long_short_header, 'LONG') ? 'text-primary' : ''}"></p>
+    <p style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;" th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'SHORT') ? 'text-danger' : #strings.contains(long_short_header, 'LONG') ? 'text-primary' : ''}"></p>
 
     <div style="display: flex; margin-top: 0rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
         <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important;">
             <tbody>
               <tr th:each="msg,iter: ${long_short_list_perfect}">
-              	<td th:if="${iter.index == 0}" style="background: #eee; padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
-                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
+              	<td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" class="text-primary"></td>
+                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
               </tr>
             </tbody>
         </table>
         <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important; margin-left: 0.5rem; ">
             <tbody>
               <tr th:each="msg,iter: ${long_short_list_curr_price}">
-                <td th:if="${iter.index == 0}" style="background: #eee; padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
-                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
+                <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" class="text-primary"></td>
+                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
               </tr>
             </tbody>
         </table>
@@ -99,16 +98,16 @@ p {
         <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important;">
             <tbody>
               <tr th:each="msg,iter: ${long_list_perfect2}">
-                <td th:if="${iter.index == 0}" style="background: #eee; padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
-                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
+                <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}"></td>
+                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
               </tr>
             </tbody>
         </table>
         <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important; margin-left: 0.5rem; ">
             <tbody>
               <tr th:each="msg,iter: ${short_list_perfect2}">
-                <td th:if="${iter.index == 0}" style="background: #eee; padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
-                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
+                <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}"></td>
+                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
               </tr>
             </tbody>
         </table>
