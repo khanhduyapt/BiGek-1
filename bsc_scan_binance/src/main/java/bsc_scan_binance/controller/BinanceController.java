@@ -67,7 +67,7 @@ public class BinanceController {
 
         List<String> long_short = service.monitorBtcPrice();
         if (CollectionUtils.isEmpty(long_short)) {
-            model.addAttribute("long_short_header", "");
+            model.addAttribute("long_short_header", "Btc sideway không rõ xu hướng.");
             model.addAttribute("long_short_list_perfect", new ArrayList<String>());
             model.addAttribute("long_short_list_curr_price", new ArrayList<String>());
         } else {

@@ -2407,9 +2407,6 @@ public class BinanceServiceImpl implements BinanceService {
                 id += 1;
             }
 
-            // btcFuturesRepository.deleteAll();
-            // btcFuturesRepository.saveAll(list_entity);
-
             return list_entity;
         } catch (
 
@@ -2431,20 +2428,30 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> btc1hs = loadData(TIME_1h, LIMIT_DATA_1h);
             boolean isUptrend = false;
             boolean isDowntrend = false;
+            boolean isSideway = false;
 
             isUptrend = btc1hs.get(1).isUptrend() && btc1hs.get(2).isUptrend();
+            if (!isUptrend) {
+                isUptrend = btc1hs.get(0).isUptrend() && btc1hs.get(1).isUptrend() && !btc1hs.get(2).isUptrend();
+            }
+
             isDowntrend = !btc1hs.get(1).isUptrend() && !btc1hs.get(2).isUptrend();
+            if (!isDowntrend) {
+                isDowntrend = !btc1hs.get(0).isUptrend() && !btc1hs.get(1).isUptrend() && btc1hs.get(2).isUptrend();
+            }
 
             if (isUptrend || isDowntrend) {
-                List<BtcFutures> btc1m = loadData(TIME_1m, LIMIT_DATA_1m);
-                btcFuturesRepository.saveAll(btc1m);
-
-                List<BtcFutures> btc15m = loadData(TIME_15m, LIMIT_DATA_15m);
-                btcFuturesRepository.saveAll(btc15m);
+                isSideway = false;
             } else {
-                //return "";
+                isSideway = true;
             }
+
             BigDecimal price_at_binance = Utils.getBinancePrice();
+            List<BtcFutures> btc1m = loadData(TIME_1m, LIMIT_DATA_1m);
+            btcFuturesRepository.saveAll(btc1m);
+
+            List<BtcFutures> btc15m = loadData(TIME_15m, LIMIT_DATA_15m);
+            btcFuturesRepository.saveAll(btc15m);
 
             //2) Entry: chart 1m
             //3) SL chart 15m, TP: 1 ho tro Chart 15m, tp2 khang cu 15m
@@ -2506,6 +2513,12 @@ public class BinanceServiceImpl implements BinanceService {
                 msg += tmp;
             }
 
+            if (isSideway) {
+                results.add("Btc sideway không rõ xu hướng.");
+                results.add("(Long)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
+                results.add("(Short)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
+            }
+
             // (Good time to buy)
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short)) {
                 if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
@@ -2537,7 +2550,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String getMsgLong(BigDecimal entry, BtcFuturesResponse dto) {
         String msg = "";
 
-        BigDecimal stop_loss = dto.getLow_price_15m().add(BigDecimal.valueOf(10));
+        BigDecimal stop_loss = dto.getLow_price_15m().subtract(BigDecimal.valueOf(10));
         BigDecimal candle_height = dto.getMax_candle_15m().subtract(dto.getMin_candle_15m());
         BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
         BigDecimal take_porfit_1 = dto.getMin_candle_15m().add(mid_candle);
@@ -2563,6 +2576,10 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (loss.add(tp2).compareTo(BigDecimal.ZERO) < 0) {
             msg += Utils.new_line_from_service + "(Bad)";
+        } else if (loss.add(tp1).compareTo(BigDecimal.ZERO) > 0) {
+            msg += Utils.new_line_from_service + "(Good x2)";
+        } else if (loss.add(tp2).compareTo(BigDecimal.ZERO) > 0) {
+            msg += Utils.new_line_from_service + "(Good)";
         }
 
         return msg;
@@ -2596,6 +2613,10 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (loss.add(tp2).compareTo(BigDecimal.ZERO) < 0) {
             msg += Utils.new_line_from_service + "(Bad)";
+        } else if (loss.add(tp1).compareTo(BigDecimal.ZERO) > 0) {
+            msg += Utils.new_line_from_service + "(Good x2)";
+        } else if (loss.add(tp2).compareTo(BigDecimal.ZERO) > 0) {
+            msg += Utils.new_line_from_service + "(Good)";
         }
 
         return msg;

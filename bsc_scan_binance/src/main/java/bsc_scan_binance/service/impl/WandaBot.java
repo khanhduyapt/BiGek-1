@@ -98,6 +98,11 @@ public class WandaBot extends TelegramLongPollingBot {
                             Utils.new_line_from_bot);
 
                     btcrange += Utils.new_line_from_bot + Utils.new_line_from_bot;
+                } else {
+                    btcrange = "BTC:" + Utils.removeLastZero(Utils.getStringValue(Utils.getBinancePrice()))
+                            + Utils.new_line_from_bot;
+
+                    btcrange += "Btc sideway không rõ xu hướng." + Utils.new_line_from_bot + Utils.new_line_from_bot;
                 }
 
                 String depth = binance_service.getTextDepthData();
