@@ -82,12 +82,28 @@ public class WandaBot extends TelegramLongPollingBot {
 
             if (command.contains("/btc")) {
 
-                String btcrange = binance_service.monitorBtcPrice().replace(Utils.new_line_from_service,
-                        Utils.new_line_from_bot);
+                List<String> long_short = binance_service.monitorBtcPrice();
+
+                String btcrange = "";
+                if (!CollectionUtils.isEmpty(long_short)) {
+
+                    btcrange += long_short.get(0);
+                    btcrange += long_short.get(1).replace(Utils.new_line_from_service,
+                            Utils.new_line_from_bot);
+
+                    btcrange += Utils.new_line_from_bot;
+                    btcrange += long_short.get(2).replace(Utils.new_line_from_service,
+                            Utils.new_line_from_bot);
+
+                    btcrange += Utils.new_line_from_bot + Utils.new_line_from_bot;
+                }
+
+                String depth = binance_service.getTextDepthData();
+                depth += Utils.new_line_from_bot + Utils.new_line_from_bot;
 
                 String premarket = binance_service.loadPremarket();
 
-                message.setText(btcrange + Utils.new_line_from_bot + Utils.new_line_from_bot + premarket);
+                message.setText(btcrange + depth + premarket);
 
                 execute(message);
 

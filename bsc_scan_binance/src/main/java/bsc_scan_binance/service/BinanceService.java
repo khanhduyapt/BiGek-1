@@ -1,6 +1,5 @@
 package bsc_scan_binance.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import bsc_scan_binance.entity.Orders;
@@ -23,11 +22,11 @@ public interface BinanceService {
 
     public String loadPremarket();
 
-    public String getTextDepthData(BigDecimal price_now);
+    public String getTextDepthData();
 
     public List<List<DepthResponse>> getListDepthData(String symbol);
 
-    public String monitorBtcPrice();
+    public List<String> monitorBtcPrice();
 
     public String loadPremarketSp500();
 

@@ -116,8 +116,12 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private BitcoinBalancesOnExchangesRepository bitcoinBalancesOnExchangesRepository;
 
+    private static final String TIME_1m = "1m";
     private static final String TIME_15m = "15m";
-    private static final int LIMIT_DATA = 30;
+    private static final String TIME_1h = "1h";
+    private static final int LIMIT_DATA_1m = 60;
+    private static final int LIMIT_DATA_15m = 50;
+    private static final int LIMIT_DATA_1h = 3;
 
     private String pre_time_of_btc = "";
     private String pre_time_of_btc_for_long_short = "";
@@ -907,7 +911,7 @@ public class BinanceServiceImpl implements BinanceService {
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
-                        String textDepth = getTextDepthData(price_now);
+                        String textDepth = getTextDepthData();
                         css.setOco_depth(textDepth);
 
                         css.setBinance_trade("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D");
@@ -1824,11 +1828,9 @@ public class BinanceServiceImpl implements BinanceService {
             final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD"
                     + "&interval=1d&limit=" + String.valueOf(limit);
 
-            String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
-            BigDecimal price_at_binance = Utils.getBinancePrice(url_price);
+            BigDecimal price_at_binance = Utils.getBinancePrice();
             if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
-                url_price = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "BUSD";
-                price_at_binance = Utils.getBinancePrice(url_price);
+                return "";
             }
             List<Object> result_usdt = Utils.getBinanceData(url_usdt, limit);
             List<Object> result_busd = Utils.getBinanceData(url_busd, limit);
@@ -2319,7 +2321,8 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public String getTextDepthData(BigDecimal price_now) {
+    public String getTextDepthData() {
+        BigDecimal price_now = Utils.getBinancePrice();
         saveDepthData("bitcoin", "BTC");
 
         String result = "";
@@ -2346,12 +2349,11 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @Transactional
-    private BigDecimal loadData15m() {
+    private List<BtcFutures> loadData(String TIME, int LIMIT_DATA) {
         try {
-            String url_price = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
-            BigDecimal price_at_binance = Utils.getBinancePrice(url_price);
+            BigDecimal price_at_binance = Utils.getBinancePrice();
 
-            String url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=" + TIME_15m + "&limit="
+            String url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=" + TIME + "&limit="
                     + LIMIT_DATA;
 
             List<Object> list = Utils.getBinanceData(url, LIMIT_DATA);
@@ -2381,7 +2383,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (strid.length() < 2) {
                     strid = "0" + strid;
                 }
-                day.setId(strid);
+                day.setId(TIME + "_" + strid);
 
                 if (idx == LIMIT_DATA - 1) {
                     day.setCurrPrice(price_at_binance);
@@ -2405,80 +2407,198 @@ public class BinanceServiceImpl implements BinanceService {
                 id += 1;
             }
 
-            btcFuturesRepository.deleteAll();
-            btcFuturesRepository.saveAll(list_entity);
+            // btcFuturesRepository.deleteAll();
+            // btcFuturesRepository.saveAll(list_entity);
 
-            return price_at_binance;
+            return list_entity;
         } catch (
 
         Exception e) {
             e.printStackTrace();
         }
 
-        return BigDecimal.ZERO;
+        return new ArrayList<BtcFutures>();
     }
 
     @Override
     @Transactional
-    public String monitorBtcPrice() {
+    public List<String> monitorBtcPrice() {
+        List<String> results = new ArrayList<String>();
         try {
             log.info("Start monitorBtcPrice ---->");
-            BigDecimal price_at_binance = loadData15m();
 
-            String sql = "SELECT                                                                                    \n"
-                    + "    long_sl,                                                                                 \n"
-                    + "    long_tp,                                                                                 \n"
-                    + "    low_price,                                                                               \n"
-                    + "    min_candle,                                                                              \n"
-                    + "    max_candle,                                                                              \n"
-                    + "    hight_price,                                                                             \n"
-                    + "    short_sl,                                                                                \n"
-                    + "    short_tp                                                                                 \n"
-                    + "FROM                                                                                         \n"
-                    + "    view_btc_futures_result";
+            //1) Xem chart 1H xac dinh long/short (2 cay 1h truoc do)
+            List<BtcFutures> btc1hs = loadData(TIME_1h, LIMIT_DATA_1h);
+            boolean isUptrend = false;
+            boolean isDowntrend = false;
+
+            isUptrend = btc1hs.get(1).isUptrend() && btc1hs.get(2).isUptrend();
+            isDowntrend = !btc1hs.get(1).isUptrend() && !btc1hs.get(2).isUptrend();
+
+            if (isUptrend || isDowntrend) {
+                List<BtcFutures> btc1m = loadData(TIME_1m, LIMIT_DATA_1m);
+                btcFuturesRepository.saveAll(btc1m);
+
+                List<BtcFutures> btc15m = loadData(TIME_15m, LIMIT_DATA_15m);
+                btcFuturesRepository.saveAll(btc15m);
+            } else {
+                //return "";
+            }
+            BigDecimal price_at_binance = Utils.getBinancePrice();
+
+            //2) Entry: chart 1m
+            //3) SL chart 15m, TP: 1 ho tro Chart 15m, tp2 khang cu 15m
+            String sql = " SELECT                                                                                                   \n"
+                    + "     (SELECT min(btc_futures.low_price) FROM btc_futures where id like '1m_%')       AS low_price_1m,        \n"
+                    + "     (SELECT min(CASE WHEN btc_futures.price_open_candle > btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '1m_%')     AS min_candle_1m,   \n"
+                    + "     (SELECT max(CASE WHEN btc_futures.price_open_candle < btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '1m_%')     AS max_candle_1m,   \n"
+                    + "     (SELECT max(btc_futures.hight_price) FROM btc_futures where id like '1m_%')     AS hight_price_1m,      \n"
+                    + "     (SELECT min(btc_futures.low_price) FROM btc_futures where id like '15m_%')      AS low_price_15m,       \n"
+                    + "     (SELECT min(CASE WHEN btc_futures.price_open_candle > btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '15m_%')    AS min_candle_15m,  \n"
+                    + "     (SELECT max(CASE WHEN btc_futures.price_open_candle < btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '15m_%')    AS max_candle_15m,  \n"
+                    + "     (SELECT max(btc_futures.hight_price) FROM btc_futures where id like '15m_%')    AS hight_price_15m      \n";
 
             Query query = entityManager.createNativeQuery(sql, "BtcFuturesResponse");
 
             @SuppressWarnings("unchecked")
             List<BtcFuturesResponse> vol_list = query.getResultList();
             if (CollectionUtils.isEmpty(vol_list)) {
-                return "";
+                return results;
             }
 
-            BtcFuturesResponse dto = vol_list.get(0);
-            String msg = "BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + Utils.new_line_from_service;
-            msg += "Buy:" + Utils.removeLastZero(String.valueOf(dto.getLow_price()));
-            msg += "~" + Utils.removeLastZero(String.valueOf(dto.getMin_candle()));
-            msg += " Sell:" + Utils.removeLastZero(String.valueOf(dto.getMax_candle()));
-            msg += "~" + Utils.removeLastZero(String.valueOf(dto.getHight_price()));
-
-            msg += Utils.new_line_from_service + Utils.new_line_from_service;
-            msg += getTextDepthData(price_at_binance).replace(" ", "");
-
+            String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
             String curr_time_of_btc = Utils.convertDateToString("MMdd_HH", Calendar.getInstance().getTime());
             curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
-            String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
+            BtcFuturesResponse dto = vol_list.get(0);
+
+            String msg = time;
+            if (isUptrend) {
+                msg += " LONG..." + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
+                if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
+                    msg += " (Good)";
+                } else {
+                    msg += " (Bad)";
+                }
+                msg += Utils.new_line_from_service;
+
+                results.add(Utils.getStringValue(msg));
+
+                String tmp = getMsgLong(dto.getLow_price_1m(), dto);
+                results.add(tmp);
+                results.add(getMsgLong(price_at_binance, dto));
+                msg += tmp;
+            }
+
+            if (isDowntrend) {
+                msg += " SHORT..." + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
+                if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
+                    msg += " (Good)";
+                } else {
+                    msg += " (Bad)";
+                }
+                msg += Utils.new_line_from_service;
+
+                results.add(Utils.getStringValue(msg));
+                String tmp = getMsgShort(dto.getHight_price_1m(), dto);
+                results.add(tmp);
+                results.add(getMsgShort(price_at_binance, dto));
+                msg += tmp;
+            }
+
+            // (Good time to buy)
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short)) {
-                // (Good time to buy)
-                if ((price_at_binance.compareTo(dto.getMin_candle()) <= 0)
-                        || (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price(), dto.getHight_price()))) {
-                    Utils.sendToMyTelegram(time + " LONG..." + msg);
+                if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
+                    msg += Utils.new_line_from_service + Utils.new_line_from_service;
+                    msg += getTextDepthData().replace(" ", "");
+
+                    Utils.sendToMyTelegram(msg);
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
 
-                if (price_at_binance.compareTo(dto.getMax_candle()) >= 0) {
-                    Utils.sendToMyTelegram(time + " SHORT..." + msg);
+                if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
+                    msg += Utils.new_line_from_service + Utils.new_line_from_service;
+                    msg += getTextDepthData().replace(" ", "");
+
+                    Utils.sendToMyTelegram(msg);
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
             }
 
-            return msg;
+            return results;
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return "";
+        return results;
+    }
+
+    private String getMsgLong(BigDecimal entry, BtcFuturesResponse dto) {
+        String msg = "";
+
+        BigDecimal stop_loss = dto.getLow_price_15m().add(BigDecimal.valueOf(10));
+        BigDecimal candle_height = dto.getMax_candle_15m().subtract(dto.getMin_candle_15m());
+        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+        BigDecimal take_porfit_1 = dto.getMin_candle_15m().add(mid_candle);
+        BigDecimal take_porfit_2 = dto.getHight_price_15m().subtract(BigDecimal.valueOf(10));
+
+        BigDecimal fee = BigDecimal.valueOf(2);
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(stop_loss.subtract(entry)).divide(entry, 0,
+                RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(take_porfit_1.subtract(entry)).divide(entry, 0,
+                RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(take_porfit_2.subtract(entry)).divide(entry, 0,
+                RoundingMode.CEILING).subtract(fee);
+
+        msg += "E  :" + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
+
+        msg += "SL :" + stop_loss + "(" + Utils.toPercent(stop_loss, entry) + "%):1000/" + loss + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP1:" + take_porfit_1 + "(" + Utils.toPercent(take_porfit_1, entry) + "%):1000/" + tp1 + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP2:" + take_porfit_2 + "(" + Utils.toPercent(take_porfit_2, entry) + "%):1000/" + tp2 + "$";
+
+        if (loss.add(tp2).compareTo(BigDecimal.ZERO) < 0) {
+            msg += Utils.new_line_from_service + "(Bad)";
+        }
+
+        return msg;
+    }
+
+    private String getMsgShort(BigDecimal entry, BtcFuturesResponse dto) {
+        String msg = "";
+        BigDecimal stop_loss = dto.getHight_price_15m().add(BigDecimal.valueOf(10));
+        BigDecimal candle_height = dto.getMax_candle_15m().subtract(dto.getMin_candle_15m());
+        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+        BigDecimal take_porfit_1 = dto.getMin_candle_15m().add(mid_candle);
+        BigDecimal take_porfit_2 = dto.getMin_candle_15m().add(BigDecimal.valueOf(10));
+
+        BigDecimal fee = BigDecimal.valueOf(2);
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(entry.subtract(stop_loss)).divide(entry, 0,
+                RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_1)).divide(entry, 0,
+                RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_2)).divide(entry, 0,
+                RoundingMode.CEILING).subtract(fee);
+
+        msg += "E  :" + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
+
+        msg += "SL :" + stop_loss + "(" + Utils.toPercent(entry, stop_loss) + "%):1000/" + loss + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP1:" + take_porfit_1 + "(" + Utils.toPercent(entry, take_porfit_1) + "%):1000/" + tp1 + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP2:" + take_porfit_2 + "(" + Utils.toPercent(entry, take_porfit_2) + "%):1000/" + tp2 + "$";
+
+        if (loss.add(tp2).compareTo(BigDecimal.ZERO) < 0) {
+            msg += Utils.new_line_from_service + "(Bad)";
+        }
+
+        return msg;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -2562,7 +2682,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + ", round(sum(balance_change) * fun_btc_price_now() / 1000000, 0)    as change_24h_val_million \n"
                     + ", sum(d7_balance_change)                                           as change_7d              \n"
                     + ", round(sum(d7_balance_change) * fun_btc_price_now() / 1000000, 0) as change_7d_val_million  \n"
-                    + "FROM bitcoin_balances_on_exchanges ";
+                    + " FROM bitcoin_balances_on_exchanges                                                          \n"
+                    + " WHERE                                                                                       \n"
+                    + " yyyymmdd='" + Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime()) + "'";
 
             Query query = entityManager.createNativeQuery(sql, "BitcoinBalancesOnExchangesResponse");
 
@@ -2574,11 +2696,10 @@ public class BinanceServiceImpl implements BinanceService {
 
             BitcoinBalancesOnExchangesResponse dto = vol_list.get(0);
 
-            String msg = "BTC:" + dto.getPrice_now() + "$" + Utils.new_line_from_service;
-            msg += "24h:" + dto.getChange_24h() + "btc(" + dto.getChange_24h_val_million() + "m$)"
+            String msg = "BTC 24h: " + dto.getChange_24h() + "btc(" + dto.getChange_24h_val_million() + "m$)"
                     + Utils.new_line_from_service;
 
-            msg += "07d:" + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)"
+            msg += " 07d: " + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)"
                     + Utils.new_line_from_service;
 
             return msg;

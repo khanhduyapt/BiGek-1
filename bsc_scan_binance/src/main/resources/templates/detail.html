@@ -65,13 +65,34 @@ p {
 }
 </style>
 <body>
-    <p style="margin-top: 1rem; margin-left: 0.5rem;" th:text="${sp500}"></p>
+    <p style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;" th:text="${sp500}" th:classappend="${#strings.contains(sp500, '-') ? 'text-danger' : 'text-primary'}"></p>
 
-	<div style="margin-top: 1rem; margin-left: 0.5rem;">
-		<span>Bitcoin Balances on Exchanges:</span>
+	<div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
+		<span>Bitcoin Balances on </span>
+		<a th:target="_blank" th:href="${'https://www.coinglass.com/Balance'}">Exchanges:</a>
 		<p th:text="${exchanges}"></p>
 	</div>
 
+    <p style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;" th:text="${long_short_header}" 
+        th:classappend="${#strings.contains(long_short_header, 'SHORT') ? 'text-danger' : #strings.contains(long_short_header, 'LONG') ? 'text-primary' : ''}"></p>
+
+    <div style="display: flex; margin-top: 0rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
+        <table class="table-bordered" style="min-width: 180px !important; max-width: 180px !important;">
+            <tbody>
+              <tr th:each="msg,iter: ${long_short_list_perfect}">
+                <td style="padding: 0 !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
+              </tr>
+            </tbody>
+        </table>
+        <table class="table-bordered" style="min-width: 180px !important; max-width: 180px !important;">
+            <tbody>
+              <tr th:each="msg,iter: ${long_short_list_curr_price}">
+                <td style="padding: 0 !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
+              </tr>
+            </tbody>
+        </table>
+    </div>
+    
     <div style="display: flex; margin-top: 1rem;">
       <table class="table table-bordered tableFixHead" style="min-width: 125px !important; max-width: 125px !important;">
         <thead>

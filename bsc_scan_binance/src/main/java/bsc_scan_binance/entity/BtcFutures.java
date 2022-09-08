@@ -24,14 +24,15 @@ import lombok.NoArgsConstructor;
 
 @SqlResultSetMapping(name = "BtcFuturesResponse", classes = {
         @ConstructorResult(targetClass = BtcFuturesResponse.class, columns = {
-                @ColumnResult(name = "long_sl", type = BigDecimal.class),
-                @ColumnResult(name = "long_tp", type = BigDecimal.class),
-                @ColumnResult(name = "low_price", type = BigDecimal.class),
-                @ColumnResult(name = "min_candle", type = BigDecimal.class),
-                @ColumnResult(name = "max_candle", type = BigDecimal.class),
-                @ColumnResult(name = "hight_price", type = BigDecimal.class),
-                @ColumnResult(name = "short_sl", type = BigDecimal.class),
-                @ColumnResult(name = "short_tp", type = BigDecimal.class),
+                @ColumnResult(name = "low_price_1m", type = BigDecimal.class),
+                @ColumnResult(name = "min_candle_1m", type = BigDecimal.class),
+                @ColumnResult(name = "max_candle_1m", type = BigDecimal.class),
+                @ColumnResult(name = "hight_price_1m", type = BigDecimal.class),
+
+                @ColumnResult(name = "low_price_15m", type = BigDecimal.class),
+                @ColumnResult(name = "min_candle_15m", type = BigDecimal.class),
+                @ColumnResult(name = "max_candle_15m", type = BigDecimal.class),
+                @ColumnResult(name = "hight_price_15m", type = BigDecimal.class),
         })
 })
 

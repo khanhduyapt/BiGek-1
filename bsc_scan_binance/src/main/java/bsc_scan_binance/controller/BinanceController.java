@@ -1,6 +1,7 @@
 package bsc_scan_binance.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +61,25 @@ public class BinanceController {
         model.addAttribute("data_list_1", list_bids);
         model.addAttribute("data_list_2", list_asks);
         model.addAttribute("symbol", symbol);
-        model.addAttribute("sp500", service.loadPremarketSp500().replaceAll(Utils.new_line_from_bot, "; "));
+        model.addAttribute("sp500", service.loadPremarketSp500().replaceAll(Utils.new_line_from_bot, ", "));
         model.addAttribute("exchanges",
-                service.getBtcBalancesOnExchanges().replaceAll(Utils.new_line_from_service, " "));
+                service.getBtcBalancesOnExchanges().replaceAll(Utils.new_line_from_service, ", "));
+
+        List<String> long_short = service.monitorBtcPrice();
+        if (CollectionUtils.isEmpty(long_short)) {
+            model.addAttribute("long_short_header", "");
+            model.addAttribute("long_short_list_perfect", new ArrayList<String>());
+            model.addAttribute("long_short_list_curr_price", new ArrayList<String>());
+        } else {
+
+            model.addAttribute("long_short_header", long_short.get(0).replace(Utils.new_line_from_service, ""));
+
+            model.addAttribute("long_short_list_perfect",
+                    new ArrayList<String>(Arrays.asList(long_short.get(1).split(Utils.new_line_from_service))));
+
+            model.addAttribute("long_short_list_curr_price",
+                    new ArrayList<String>(Arrays.asList(long_short.get(2).split(Utils.new_line_from_service))));
+        }
 
         return "detail";
     }

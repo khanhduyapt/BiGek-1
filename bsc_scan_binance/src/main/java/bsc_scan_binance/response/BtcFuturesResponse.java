@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BtcFuturesResponse {
-    private BigDecimal long_sl;
-    private BigDecimal long_tp;
-    private BigDecimal low_price;
-    private BigDecimal min_candle;
-    private BigDecimal max_candle;
-    private BigDecimal hight_price;
-    private BigDecimal short_sl;
-    private BigDecimal short_tp;
+    private BigDecimal low_price_1m;
+    private BigDecimal min_candle_1m;
+    private BigDecimal max_candle_1m;
+    private BigDecimal hight_price_1m;
+    private BigDecimal low_price_15m;
+    private BigDecimal min_candle_15m;
+    private BigDecimal max_candle_15m;
+    private BigDecimal hight_price_15m;
 }
