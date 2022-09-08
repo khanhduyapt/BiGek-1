@@ -2512,7 +2512,7 @@ public class BinanceServiceImpl implements BinanceService {
                     msg += Utils.new_line_from_service + Utils.new_line_from_service;
                     msg += getTextDepthData().replace(" ", "");
 
-                    Utils.sendToMyTelegram(msg);
+                    Utils.sendToTelegram(msg);
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
 
@@ -2520,7 +2520,7 @@ public class BinanceServiceImpl implements BinanceService {
                     msg += Utils.new_line_from_service + Utils.new_line_from_service;
                     msg += getTextDepthData().replace(" ", "");
 
-                    Utils.sendToMyTelegram(msg);
+                    Utils.sendToTelegram(msg);
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
             }
@@ -2553,13 +2553,13 @@ public class BinanceServiceImpl implements BinanceService {
 
         msg += "E  :" + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
 
-        msg += "SL :" + stop_loss + "(" + Utils.toPercent(stop_loss, entry) + "%):1000/" + loss + "$";
+        msg += "SL :" + stop_loss + "(" + Utils.toPercent(stop_loss, entry) + "%): 1000$/" + loss + "$";
         msg += Utils.new_line_from_service;
 
-        msg += "TP1:" + take_porfit_1 + "(" + Utils.toPercent(take_porfit_1, entry) + "%):1000/" + tp1 + "$";
+        msg += "TP1:" + take_porfit_1 + "(" + Utils.toPercent(take_porfit_1, entry) + "%): 1000$/" + tp1 + "$";
         msg += Utils.new_line_from_service;
 
-        msg += "TP2:" + take_porfit_2 + "(" + Utils.toPercent(take_porfit_2, entry) + "%):1000/" + tp2 + "$";
+        msg += "TP2:" + take_porfit_2 + "(" + Utils.toPercent(take_porfit_2, entry) + "%): 1000$/" + tp2 + "$";
 
         if (loss.add(tp2).compareTo(BigDecimal.ZERO) < 0) {
             msg += Utils.new_line_from_service + "(Bad)";
@@ -2586,13 +2586,13 @@ public class BinanceServiceImpl implements BinanceService {
 
         msg += "E  :" + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
 
-        msg += "SL :" + stop_loss + "(" + Utils.toPercent(entry, stop_loss) + "%):1000/" + loss + "$";
+        msg += "SL :" + stop_loss + "(" + Utils.toPercent(entry, stop_loss) + "%): 1000$/" + loss + "$";
         msg += Utils.new_line_from_service;
 
-        msg += "TP1:" + take_porfit_1 + "(" + Utils.toPercent(entry, take_porfit_1) + "%):1000/" + tp1 + "$";
+        msg += "TP1:" + take_porfit_1 + "(" + Utils.toPercent(entry, take_porfit_1) + "%): 1000$/" + tp1 + "$";
         msg += Utils.new_line_from_service;
 
-        msg += "TP2:" + take_porfit_2 + "(" + Utils.toPercent(entry, take_porfit_2) + "%):1000/" + tp2 + "$";
+        msg += "TP2:" + take_porfit_2 + "(" + Utils.toPercent(entry, take_porfit_2) + "%): 1000$/" + tp2 + "$";
 
         if (loss.add(tp2).compareTo(BigDecimal.ZERO) < 0) {
             msg += Utils.new_line_from_service + "(Bad)";

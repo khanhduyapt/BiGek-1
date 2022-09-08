@@ -80,14 +80,14 @@ p {
         <table class="table-bordered" style="min-width: 180px !important; max-width: 180px !important;">
             <tbody>
               <tr th:each="msg,iter: ${long_short_list_perfect}">
-                <td style="padding: 0 !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
+                <td style="padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
               </tr>
             </tbody>
         </table>
-        <table class="table-bordered" style="min-width: 180px !important; max-width: 180px !important;">
+        <table class="table-bordered" style="min-width: 180px !important; max-width: 180px !important; margin-left: 0.5rem; ">
             <tbody>
               <tr th:each="msg,iter: ${long_short_list_curr_price}">
-                <td style="padding: 0 !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
+                <td style="padding: 0; padding-left: 0.5rem !important;"  th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : ''}"></td>
               </tr>
             </tbody>
         </table>
