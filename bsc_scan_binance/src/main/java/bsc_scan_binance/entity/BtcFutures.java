@@ -33,6 +33,9 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "min_candle_15m", type = BigDecimal.class),
                 @ColumnResult(name = "max_candle_15m", type = BigDecimal.class),
                 @ColumnResult(name = "hight_price_15m", type = BigDecimal.class),
+
+                @ColumnResult(name = "low_price_24h", type = BigDecimal.class),
+                @ColumnResult(name = "hight_price_24h", type = BigDecimal.class),
         })
 })
 

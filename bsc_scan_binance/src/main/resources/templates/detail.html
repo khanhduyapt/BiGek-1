@@ -99,7 +99,7 @@ p {
             <tbody>
               <tr th:each="msg,iter: ${long_list_perfect2}">
                 <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}"></td>
-                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : #strings.contains(msg, 'Good') ? 'text-primary' : ''}"></td>
+                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;" th:text="${msg}"></td>
               </tr>
             </tbody>
         </table>
@@ -107,7 +107,7 @@ p {
             <tbody>
               <tr th:each="msg,iter: ${short_list_perfect2}">
                 <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}"></td>
-                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, 'Bad') ? 'text-danger font-weight-bold' : #strings.contains(msg, 'Good') ? 'text-primary' : ''}"></td>
+                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.5rem !important;" th:text="${msg}"></td>
               </tr>
             </tbody>
         </table>

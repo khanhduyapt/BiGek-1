@@ -121,7 +121,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String TIME_1h = "1h";
     private static final int LIMIT_DATA_1m = 60;
     private static final int LIMIT_DATA_15m = 50;
-    private static final int LIMIT_DATA_1h = 3;
+    private static final int LIMIT_DATA_1h = 24;
 
     private String pre_time_of_btc = "";
     private String pre_time_of_btc_for_long_short = "";
@@ -2426,6 +2426,8 @@ public class BinanceServiceImpl implements BinanceService {
 
             // 1) Xem chart 1H xac dinh long/short (2 cay 1h truoc do)
             List<BtcFutures> btc1hs = loadData(TIME_1h, LIMIT_DATA_1h);
+            btcFuturesRepository.saveAll(btc1hs);
+
             boolean isUptrend = false;
             boolean isDowntrend = false;
             boolean isSideway = false;
@@ -2455,15 +2457,17 @@ public class BinanceServiceImpl implements BinanceService {
 
             // 2) Entry: chart 1m
             // 3) SL chart 15m, TP: 1 ho tro Chart 15m, tp2 khang cu 15m
-            String sql = " SELECT                                                                                                   \n"
-                    + "     (SELECT min(btc_futures.low_price) FROM btc_futures where id like '1m_%')       AS low_price_1m,        \n"
+            String sql = " SELECT                                                                                              \n"
+                    + "     (SELECT min(btc_futures.low_price) FROM btc_futures where id like '1m_%')      AS low_price_1m,     \n"
                     + "     (SELECT min(CASE WHEN btc_futures.price_open_candle > btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '1m_%')     AS min_candle_1m,   \n"
                     + "     (SELECT max(CASE WHEN btc_futures.price_open_candle < btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '1m_%')     AS max_candle_1m,   \n"
-                    + "     (SELECT max(btc_futures.hight_price) FROM btc_futures where id like '1m_%')     AS hight_price_1m,      \n"
-                    + "     (SELECT min(btc_futures.low_price) FROM btc_futures where id like '15m_%')      AS low_price_15m,       \n"
+                    + "     (SELECT max(btc_futures.hight_price) FROM btc_futures where id like '1m_%')    AS hight_price_1m,   \n"
+                    + "     (SELECT min(btc_futures.low_price) FROM btc_futures where id like '15m_%')     AS low_price_15m,    \n"
                     + "     (SELECT min(CASE WHEN btc_futures.price_open_candle > btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '15m_%')    AS min_candle_15m,  \n"
                     + "     (SELECT max(CASE WHEN btc_futures.price_open_candle < btc_futures.price_close_candle THEN btc_futures.price_close_candle ELSE btc_futures.price_open_candle END) FROM btc_futures where id like '15m_%')    AS max_candle_15m,  \n"
-                    + "     (SELECT max(btc_futures.hight_price) FROM btc_futures where id like '15m_%')    AS hight_price_15m      \n";
+                    + "     (SELECT max(btc_futures.hight_price) FROM btc_futures where id like '15m_%')   AS hight_price_15m,  \n"
+                    + "     (SELECT min(btc_futures.low_price)   FROM btc_futures where id like '1h_%' and id <> '1h_00')  AS low_price_24h,    \n"
+                    + "     (SELECT max(btc_futures.hight_price) FROM btc_futures where id like '1h_%' and id <> '1h_00')  AS hight_price_24h   \n";
 
             Query query = entityManager.createNativeQuery(sql, "BtcFuturesResponse");
 
@@ -2474,19 +2478,24 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
-            String curr_time_of_btc = Utils.convertDateToString("MMdd_HH", Calendar.getInstance().getTime());
+            String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
             curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
             BtcFuturesResponse dto = vol_list.get(0);
 
             String msg = time;
+
+            String low_height = ", 24h: " + dto.getLow_price_24h() + "$("
+                    + Utils.toPercent(dto.getLow_price_24h(), price_at_binance) + "%) ~ " + dto.getHight_price_24h()
+                    + "$(" + Utils.toPercent(dto.getHight_price_24h(), price_at_binance) + "%)"
+                    + Utils.new_line_from_service;
+
             if (isUptrend) {
                 msg += " LONG..." + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
                 if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
                     msg += " (Good)";
-                } else {
-                    msg += " (Bad)";
                 }
+                msg += low_height;
                 msg += Utils.new_line_from_service;
 
                 results.add(Utils.getStringValue(msg));
@@ -2504,9 +2513,8 @@ public class BinanceServiceImpl implements BinanceService {
                 msg += " SHORT..." + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
                 if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price_1m(), dto.getHight_price_1m())) {
                     msg += " (Good)";
-                } else {
-                    msg += " (Bad)";
                 }
+                msg += low_height;
                 msg += Utils.new_line_from_service;
 
                 results.add(Utils.getStringValue(msg));
@@ -2520,7 +2528,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (isSideway) {
-                results.add(time + " Btc sideway.");
+                results.add(time + " Btc sideway" + low_height);
                 results.add("(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
                 results.add("(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
 
@@ -2541,18 +2549,21 @@ public class BinanceServiceImpl implements BinanceService {
                     Utils.sendToTelegram(msg);
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
 
-                } else if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_15m(), dto.getHight_price_15m())) {
+                } else if (price_at_binance.compareTo(dto.getLow_price_24h()) <= 0) {
+
+                    Utils.sendToTelegram("CZ kill LONG !!!");
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+
+                } else if (price_at_binance.compareTo(dto.getHight_price_24h()) >= 0) {
+
+                    // kill short: loss 30$ 2022/09/09
+                    Utils.sendToTelegram("CZ kill SHORT !!!");
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+
+                } else if (Utils.isGoodPriceLong(price_at_binance, dto.getLow_price_24h(), dto.getHight_price_24h())) {
                     msg = "(Long*)" + Utils.new_line_from_service + getMsgLong(dto.getLow_price_1m(), dto);
                     msg += Utils.new_line_from_service + Utils.new_line_from_service;
                     msg += "(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto);
-
-                    Utils.sendToTelegram(msg);
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-
-                } else if (Utils.isGoodPriceShort(price_at_binance, dto.getLow_price_15m(), dto.getHight_price_15m())) {
-                    msg = "(Short*)" + Utils.new_line_from_service + getMsgShort(dto.getHight_price_1m(), dto);
-                    msg += Utils.new_line_from_service + Utils.new_line_from_service;
-                    msg += "(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto);
 
                     Utils.sendToTelegram(msg);
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
@@ -2750,8 +2761,7 @@ public class BinanceServiceImpl implements BinanceService {
             String msg = "BTC 24h: " + dto.getChange_24h() + "btc(" + dto.getChange_24h_val_million() + "m$)"
                     + Utils.new_line_from_service;
 
-            msg += " 07d: " + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)"
-                    + Utils.new_line_from_service;
+            msg += " 07d: " + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)";
 
             return msg;
         } catch (Exception e) {
