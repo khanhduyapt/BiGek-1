@@ -2596,15 +2596,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         msg += "TP2:" + take_porfit_2 + "(" + Utils.toPercent(take_porfit_2, entry) + "%): 1000$/" + tp2 + "$";
 
-        if (loss.add(tp2).compareTo(BigDecimal.ZERO) < 0) {
-            msg += Utils.new_line_from_service + "(Bad)";
-        } else if (loss.add(tp1).compareTo(BigDecimal.ZERO) > 0) {
-            msg += Utils.new_line_from_service + "(Good x2)";
-        } else if (loss.add(tp2).compareTo(BigDecimal.ZERO) > 0) {
-            msg += Utils.new_line_from_service + "(Good)";
-        } else {
-            msg += Utils.new_line_from_service + "(Bad)";
-        }
+        msg += checkRR(loss, tp1);
 
         return msg;
     }
@@ -2635,14 +2627,26 @@ public class BinanceServiceImpl implements BinanceService {
 
         msg += "TP2:" + take_porfit_2 + "(" + Utils.toPercent(entry, take_porfit_2) + "%): 1000$/" + tp2 + "$";
 
-        if (loss.add(tp2).compareTo(BigDecimal.ZERO) < 0) {
-            msg += Utils.new_line_from_service + "(Bad)";
-        } else if (loss.add(tp1).compareTo(BigDecimal.ZERO) > 0) {
-            msg += Utils.new_line_from_service + "(Good x2)";
-        } else if (loss.add(tp2).compareTo(BigDecimal.ZERO) > 0) {
-            msg += Utils.new_line_from_service + "(Good)";
-        } else {
-            msg += Utils.new_line_from_service + "(Bad)";
+        msg += checkRR(loss, tp1);
+
+        return msg;
+    }
+
+    private String checkRR(BigDecimal loss, BigDecimal tp1) {
+        String msg = Utils.new_line_from_service + "(Bad)";
+
+        if (loss.add(tp1.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING))
+                .compareTo(BigDecimal.ZERO) > 0) {
+            msg = Utils.new_line_from_service + "(Good x2)";
+
+        } else if (loss.add(tp1).compareTo(BigDecimal.ZERO) >= 0) {
+
+            msg = Utils.new_line_from_service + "(Good)";
+
+        } else if ((loss.add(tp1.add(BigDecimal.valueOf(2)))).compareTo(BigDecimal.ZERO) >= 0) {
+
+            msg = Utils.new_line_from_service + "...";
+
         }
 
         return msg;
