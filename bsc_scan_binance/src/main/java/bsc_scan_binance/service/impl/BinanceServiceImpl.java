@@ -2520,7 +2520,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (isSideway) {
-                results.add("Btc sideway không rõ xu hướng.");
+                results.add(time + " Btc sideway.");
                 results.add("(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
                 results.add("(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
 
