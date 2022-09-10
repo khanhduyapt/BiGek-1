@@ -161,7 +161,7 @@ p {
         </tbody>
       </table>
 
-      <table class="table table-bordered tableFixHead" style="min-width: 68px !important; max-width: 68px !important;">
+      <table class="table table-bordered tableFixHead" style="min-width: 70px !important; max-width: 70px !important;">
         <thead>
           <tr>
             <th class="text-center" scope="col">48h</th>
@@ -169,7 +169,7 @@ p {
         </thead>
         <tbody>
           <tr class="table_row" th:each="msg,iter: ${btc_48h}">
-            <td style="text-align: center; max-width: 68px !important; font-size: 0.7rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, '10d') ? 'font-weight-bold custom_header' : #strings.contains(msg, 'now') ? 'text-primary' : ''}"></td>
+            <td style="text-align: center; max-width: 70px !important; font-size: 0.7rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, '10d') ? 'font-weight-bold custom_header' : #strings.contains(msg, 'now') ? 'text-primary' : ''}"></td>
           </tr>
         </tbody>
       </table>
