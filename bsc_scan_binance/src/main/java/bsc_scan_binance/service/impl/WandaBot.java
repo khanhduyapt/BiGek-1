@@ -88,12 +88,15 @@ public class WandaBot extends TelegramLongPollingBot {
                 if (!CollectionUtils.isEmpty(long_short)) {
 
                     btcrange += long_short.get(0).replace(Utils.new_line_from_service,
-                            Utils.new_line_from_bot + Utils.new_line_from_bot);
+                            Utils.new_line_from_bot);
+
+                    btcrange += Utils.new_line_from_bot + Utils.new_line_from_bot;
 
                     btcrange += long_short.get(1).replace(Utils.new_line_from_service,
                             Utils.new_line_from_bot);
 
                     btcrange += Utils.new_line_from_bot + Utils.new_line_from_bot;
+
                     btcrange += long_short.get(2).replace(Utils.new_line_from_service,
                             Utils.new_line_from_bot);
 

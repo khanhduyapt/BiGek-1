@@ -118,13 +118,23 @@ public class BinanceServiceImpl implements BinanceService {
 
     // private static final String TIME_1m = "1m";
     // private static final String TIME_15m = "15m";
-    private static final String TIME_1h = "1h";
     // private static final int LIMIT_DATA_1m = 60;
     // private static final int LIMIT_DATA_15m = 50;
+
+    private static final String TIME_1h = "1h";
+    private static final String TIME_4h = "4h";
+
+    private static final String ID_1H_LIKE = "'1h_%'";
+    private static final String ID_4H_LIKE = "'4h_%'";
+
     private static final int LIMIT_DATA_1h = 48;
+    private static final int LIMIT_DATA_4h = 60;
+    private boolean isSaved_LIMIT_DATA_4h = false;
 
     private String pre_time_of_btc = "";
     private String pre_time_of_btc_for_long_short = "";
+    private String pre_time_of_btc_kill_long_short = "";
+
     private String pre_yyyyMMddHH = "";
     private String sp500 = "";
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
@@ -686,20 +696,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                 priorityCoin.setCurrent_price(price_now);
 
-                // if (dto.getName().contains("Futures")) {
-                // String futu = dto.getSymbol() + " ";
-                //
-                // if (isOrderByBynaceVolume) {
-                // List<String> coinglass = getCoinGlassData(dto.getGecko_id(),
-                // dto.getSymbol());
-                //
-                // futu += coinglass.get(0);
-                // css.setFutures_css(coinglass.get(1));
-                // }
-                //
-                // css.setFutures(futu);
-                // }
-
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
                     BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(avg_price, price_now, 1));
@@ -1072,7 +1068,7 @@ public class BinanceServiceImpl implements BinanceService {
             query.executeUpdate();
 
             if (btc_is_good_price) {
-                monitorTokenSales(list);
+                // monitorTokenSales(list);
             }
             // monitorTokenSales(list); //debug
             return list;
@@ -2417,6 +2413,70 @@ public class BinanceServiceImpl implements BinanceService {
         return new ArrayList<BtcFutures>();
     }
 
+    public BtcFuturesResponse getBtcFuturesResponse(String ID_LIKE) {
+        // ID_1H_LIKE = "'1h_%'";
+        String header = ID_LIKE.replaceAll("'", "").replaceAll("%", ""); // 1h_
+
+        String sql = "SELECT                                                                                            \n"
+                + "    (SELECT min(low_price) FROM btc_futures WHERE id like " + ID_LIKE + ") AS low_price_h, \n"
+                + "    (SELECT                                                                                          \n"
+                + "        ROUND(AVG(COALESCE(open_price, 0)), 0) open_candle                                           \n"
+                + "    FROM(                                                                                            \n"
+                + "        SELECT open_price                                                                            \n"
+                + "        FROM                                                                                         \n"
+                + "        (                                                                                            \n"
+                + "            SELECT case when uptrend then price_open_candle else price_close_candle end as open_price FROM btc_futures WHERE id like "
+                + ID_LIKE + "  \n"
+                + "        ) low_candle1                                                                                \n"
+                + "        ORDER BY open_price asc limit 5                                                              \n"
+                + "    ) low_candle) open_candle_h                                                                      \n"
+                + "    ,                                                                                                \n"
+                + "    (SELECT ROUND(AVG(COALESCE(close_price, 0)), 0) open_candle                                      \n"
+                + "     FROM(                                                                                           \n"
+                + "        SELECT close_price                                                                           \n"
+                + "        FROM                                                                                         \n"
+                + "        (                                                                                            \n"
+                + "            SELECT case when uptrend then price_close_candle else price_open_candle end as close_price FROM btc_futures WHERE id like "
+                + ID_LIKE + " \n"
+                + "        ) close_candle1                                                                              \n"
+                + "        ORDER BY close_price desc limit 5                                                            \n"
+                + "    ) close_candle) close_candle_h,                                                                  \n"
+                + "    (SELECT max(hight_price) FROM btc_futures WHERE id like " + ID_LIKE
+                + ")   AS hight_price_h,              \n"
+                + "                                                                                                     \n"
+                + "    (                                                                                                \n"
+                + "        SELECT REPLACE (id, '" + header + "', '') as id_half1 FROM btc_futures WHERE id like "
+                + ID_LIKE + " and id < '" + header + "24'    \n"
+                + "        ORDER BY (case when uptrend then price_open_candle else price_close_candle end) asc limit 1  \n"
+                + "    )  as id_half1,                                                                                  \n"
+                + "    (                                                                                                \n"
+                + "        SELECT case when uptrend then price_open_candle else price_close_candle end as open_price_half1 FROM btc_futures WHERE id like "
+                + ID_LIKE + " and id < '" + header + "24'   \n"
+                + "        ORDER BY open_price_half1 asc limit 1                                                        \n"
+                + "    )  as open_price_half1,                                                                          \n"
+                + "    (                                                                                                \n"
+                + "        SELECT REPLACE (id, '" + header + "', '') as id_half2 FROM btc_futures WHERE id like "
+                + ID_LIKE + " and id >= '" + header + "24'   \n"
+                + "        ORDER BY (case when uptrend then price_open_candle else price_close_candle end) asc limit 1  \n"
+                + "    )  as id_half2,                                                                                  \n"
+                + "    (                                                                                                \n"
+                + "        SELECT case when uptrend then price_open_candle else price_close_candle end as open_price_half2 FROM btc_futures WHERE id like "
+                + ID_LIKE + " and id >= '" + header + "24'  \n"
+                + "        ORDER BY open_price_half2 asc limit 1                                                        \n"
+                + "    )  as open_price_half2                                                                           \n";
+
+        Query query = entityManager.createNativeQuery(sql, "BtcFuturesResponse");
+
+        @SuppressWarnings("unchecked")
+        List<BtcFuturesResponse> vol_list = query.getResultList();
+        if (CollectionUtils.isEmpty(vol_list)) {
+            return null;
+        }
+
+        BtcFuturesResponse dto = vol_list.get(0);
+        return dto;
+    }
+
     @Override
     @Transactional
     public List<String> monitorBtcPrice() {
@@ -2424,13 +2484,22 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             log.info("Start monitorBtcPrice ---->");
 
-            //btcFuturesRepository.deleteAll();
+            // btcFuturesRepository.deleteAll();
 
             // 1) Xem chart 1H xac dinh long/short (2 cay 1h truoc do)
             BigDecimal price_at_binance = Utils.getBinancePrice();
 
             List<BtcFutures> btc1hs = loadData(TIME_1h, LIMIT_DATA_1h);
             btcFuturesRepository.saveAll(btc1hs);
+
+            int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+            if ((hh % 4 == 0) && !isSaved_LIMIT_DATA_4h) {
+                List<BtcFutures> btc4hs = loadData(TIME_4h, LIMIT_DATA_4h);
+                btcFuturesRepository.saveAll(btc4hs);
+                isSaved_LIMIT_DATA_4h = true;
+            } else if (hh % 4 != 0) {
+                isSaved_LIMIT_DATA_4h = false;
+            }
 
             boolean isUptrend = false;
             boolean isDowntrend = false;
@@ -2452,43 +2521,12 @@ public class BinanceServiceImpl implements BinanceService {
                 isSideway = true;
             }
 
-            String sql = "SELECT                                                                                            \n"
-                    + "    (SELECT min(low_price) FROM btc_futures WHERE id like '1h_%')     AS low_price_h,                \n"
-                    + "    (SELECT                                                                                          \n"
-                    + "        ROUND(AVG(COALESCE(open_price, 0)), 0) open_candle                                           \n"
-                    + "    FROM(                                                                                            \n"
-                    + "        SELECT open_price                                                                            \n"
-                    + "        FROM                                                                                         \n"
-                    + "        (                                                                                            \n"
-                    + "            SELECT case when uptrend then price_open_candle else price_close_candle end as open_price FROM btc_futures WHERE id like '1h_%'  \n"
-                    + "        ) low_candle1                                                                                \n"
-                    + "        ORDER BY open_price asc limit 5                                                              \n"
-                    + "    ) low_candle) open_candle_h                                                                      \n"
-                    + "    ,                                                                                                \n"
-                    + "    (SELECT ROUND(AVG(COALESCE(close_price, 0)), 0) open_candle                                      \n"
-                    + "     FROM(                                                                                           \n"
-                    + "        SELECT close_price                                                                           \n"
-                    + "        FROM                                                                                         \n"
-                    + "        (                                                                                            \n"
-                    + "            SELECT case when uptrend then price_close_candle else price_open_candle end as close_price FROM btc_futures WHERE id like '1h_%' \n"
-                    + "        ) close_candle1                                                                              \n"
-                    + "        ORDER BY close_price desc limit 5                                                            \n"
-                    + "    ) close_candle) close_candle_h,                                                                  \n"
-                    + "    (SELECT max(hight_price) FROM btc_futures WHERE id like '1h_%')   AS hight_price_h               \n";
-
-            Query query = entityManager.createNativeQuery(sql, "BtcFuturesResponse");
-
-            @SuppressWarnings("unchecked")
-            List<BtcFuturesResponse> vol_list = query.getResultList();
-            if (CollectionUtils.isEmpty(vol_list)) {
-                return results;
-            }
-
             String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
             String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
             curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
-            BtcFuturesResponse dto = vol_list.get(0);
+            BtcFuturesResponse dto = getBtcFuturesResponse(ID_1H_LIKE);
+            BtcFuturesResponse dto_10d = getBtcFuturesResponse(ID_4H_LIKE);
 
             BigDecimal good_price_for_long = Utils.getGoodPriceLongByPercent(price_at_binance, dto.getLow_price_h(),
                     dto.getOpen_candle_h(), BigDecimal.valueOf(1));
@@ -2496,41 +2534,20 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal good_price_for_short = Utils.getGoodPriceShortByPercent(price_at_binance, dto.getHight_price_h(),
                     dto.getClose_candle_h(), BigDecimal.valueOf(1));
 
+            BigDecimal entry0 = dto.getOpen_price_half1().subtract(dto.getOpen_price_half2());
+            boolean entry0_is_candidate = false;
+            if (entry0.abs().compareTo(BigDecimal.valueOf(350)) < 0) {
+                entry0_is_candidate = true;
+            }
+            entry0 = entry0.multiply(Utils.getBigDecimal(dto.getId_half1()));
+            entry0 = entry0.divide(BigDecimal.valueOf(dto.getId_half2() - dto.getId_half1()), 0, RoundingMode.CEILING);
+            entry0 = dto.getOpen_price_half1().add(entry0);
+
             String msg = time;
 
-            String low_height = "";
-            {
-                String btc_now = Utils.removeLastZero(String.valueOf(price_at_binance)) + "$ (now)"
-                        + Utils.new_line_from_service;
-
-                low_height += "H: " + dto.getHight_price_h() + "$ ("
-                        + Utils.toPercent(dto.getHight_price_h(), price_at_binance) + "%)"
-                        + Utils.new_line_from_service;
-
-                if (price_at_binance.compareTo(dto.getClose_candle_h()) > 0) {
-                    low_height += btc_now;
-                }
-
-                low_height += "C: " + dto.getClose_candle_h() + "$ ("
-                        + Utils.toPercent(dto.getClose_candle_h(), price_at_binance) + "%)"
-                        + Utils.new_line_from_service;
-
-                if (price_at_binance.compareTo(dto.getClose_candle_h()) < 0
-                        && price_at_binance.compareTo(dto.getOpen_candle_h()) > 0) {
-                    low_height += btc_now;
-                }
-
-                low_height += "O: " + dto.getOpen_candle_h() + "$ ("
-                        + Utils.toPercent(dto.getOpen_candle_h(), price_at_binance) + "%)"
-                        + Utils.new_line_from_service;
-
-                if (price_at_binance.compareTo(dto.getOpen_candle_h()) < 0) {
-                    low_height += btc_now;
-                }
-
-                low_height += "L: " + dto.getLow_price_h() + "$ ("
-                        + Utils.toPercent(dto.getLow_price_h(), price_at_binance) + "%)";
-            }
+            String low_height = getMsgLowHeight(price_at_binance, dto_10d);
+            low_height += " " + Utils.new_line_from_service;
+            low_height += "10d" + Utils.new_line_from_service + getMsgLowHeight(price_at_binance, dto_10d);
 
             if (isUptrend) {
                 msg += " LONG..." + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
@@ -2539,15 +2556,16 @@ public class BinanceServiceImpl implements BinanceService {
                 }
                 msg += Utils.new_line_from_service;
                 msg += low_height;
-
                 results.add(Utils.getStringValue(msg));
 
-                String tmp = getMsgLong(good_price_for_long, dto);
-                results.add("(Long*)" + Utils.new_line_from_service + tmp);
+                results.add("(Long*)" + Utils.new_line_from_service + getMsgLong(good_price_for_long, dto));
                 results.add("(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
-                msg += tmp;
 
-                results.add("(Short*)" + Utils.new_line_from_service + getMsgShort(good_price_for_short, dto));
+                if (entry0_is_candidate) {
+                    results.add("(Long**)" + Utils.new_line_from_service + getMsgShort(entry0, dto));
+                } else {
+                    results.add("(Short*)" + Utils.new_line_from_service + getMsgShort(good_price_for_short, dto));
+                }
                 results.add("(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
             }
 
@@ -2558,19 +2576,19 @@ public class BinanceServiceImpl implements BinanceService {
                 }
                 msg += Utils.new_line_from_service;
                 msg += low_height;
-
                 results.add(Utils.getStringValue(msg));
-                String tmp = getMsgShort(good_price_for_short, dto);
-                results.add("(Short*)" + Utils.new_line_from_service + tmp);
+
+                results.add("(Short*)" + Utils.new_line_from_service + getMsgShort(good_price_for_short, dto));
                 results.add("(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
-                msg += tmp;
 
                 results.add("(Long*)" + Utils.new_line_from_service + getMsgLong(good_price_for_long, dto));
                 results.add("(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
             }
 
             if (isSideway) {
-                results.add(time + " Btc sideway" + low_height);
+                msg = time + " Btc sideway" + Utils.new_line_from_service + low_height;
+                results.add(Utils.getStringValue(msg));
+
                 results.add("(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
                 results.add("(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
 
@@ -2580,28 +2598,64 @@ public class BinanceServiceImpl implements BinanceService {
 
             // (Good time to buy)
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short)) {
-                if (isUptrend && (price_at_binance.compareTo(good_price_for_long) <= 0)) {
 
-                    Utils.sendToTelegram(msg);
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+                if (price_at_binance.compareTo(dto_10d.getOpen_candle_h()) <= 0) {
+                    Utils.sendToTelegram("(Bitcoin bottomed in 10d)" + Utils.new_line_from_service
+                            + getMsgLong(price_at_binance, dto));
 
-                } else if (isDowntrend && (price_at_binance.compareTo(good_price_for_short) > 0)) {
-
-                    Utils.sendToTelegram(msg);
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-
-                } else if (price_at_binance.compareTo(dto.getLow_price_h()) <= 0) {
-
-                    Utils.sendToTelegram("CZ kill LONG !!!");
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-
-                } else if (price_at_binance.compareTo(dto.getHight_price_h()) >= 0) {
-
-                    // kill short: loss 30$ 2022/09/09
-                    Utils.sendToTelegram("CZ kill SHORT !!!");
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
 
+                if (price_at_binance.compareTo(dto.getOpen_candle_h()) <= 0) {
+                    Utils.sendToTelegram("(Bitcoin bottomed in 48h)" + Utils.new_line_from_service
+                            + getMsgLong(price_at_binance, dto));
+
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+                }
+
+                if (price_at_binance.compareTo(good_price_for_long) <= 0) {
+
+                    Utils.sendToTelegram(
+                            "(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
+
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+                }
+
+                if (price_at_binance.compareTo(dto_10d.getClose_candle_h()) >= 0) {
+
+                    Utils.sendToTelegram("(Bitcoin hits 10d peak)" + Utils.new_line_from_service
+                            + getMsgShort(price_at_binance, dto));
+
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+                }
+
+                if (price_at_binance.compareTo(dto.getClose_candle_h()) >= 0) {
+
+                    Utils.sendToTelegram("(Bitcoin hits 48h peak)" + Utils.new_line_from_service
+                            + getMsgShort(price_at_binance, dto));
+
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+                }
+
+                if (price_at_binance.compareTo(good_price_for_short) > 0) {
+
+                    Utils.sendToTelegram(
+                            "(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
+                    pre_time_of_btc_for_long_short = curr_time_of_btc;
+                }
+            }
+
+            if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_kill_long_short)) {
+                if (price_at_binance.compareTo(dto.getLow_price_h()) <= 0) {
+                    Utils.sendToTelegram("CZ kill LONG !!!");
+                    pre_time_of_btc_kill_long_short = curr_time_of_btc;
+                }
+
+                if (price_at_binance.compareTo(dto.getHight_price_h()) >= 0) {
+                    // kill short: loss 30$ 2022/09/09
+                    Utils.sendToTelegram("CZ kill SHORT !!!");
+                    pre_time_of_btc_kill_long_short = curr_time_of_btc;
+                }
             }
 
             return results;
@@ -2636,6 +2690,9 @@ public class BinanceServiceImpl implements BinanceService {
         msg += "SL :" + stop_loss + "(" + Utils.toPercent(stop_loss, entry) + "%): 1000$/" + loss + "$";
         msg += Utils.new_line_from_service;
 
+        msg += "Lo: " + dto.getLow_price_h() + "(" + Utils.toPercent(dto.getLow_price_h(), entry) + "%)";
+        msg += Utils.new_line_from_service;
+
         msg += "TP1:" + take_porfit_1 + "(" + Utils.toPercent(take_porfit_1, entry) + "%): 1000$/" + tp1 + "$";
         msg += Utils.new_line_from_service;
 
@@ -2644,6 +2701,40 @@ public class BinanceServiceImpl implements BinanceService {
         msg += checkRR(loss, tp1);
 
         return msg;
+    }
+
+    private String getMsgLowHeight(BigDecimal price_at_binance, BtcFuturesResponse dto) {
+        String low_height = "";
+
+        String btc_now = Utils.removeLastZero(String.valueOf(price_at_binance)) + "$ (now)"
+                + Utils.new_line_from_service;
+
+        low_height += "H: " + dto.getHight_price_h() + "$ (" + Utils.toPercent(dto.getHight_price_h(), price_at_binance)
+                + "%)" + Utils.new_line_from_service;
+
+        if (price_at_binance.compareTo(dto.getClose_candle_h()) > 0) {
+            low_height += btc_now;
+        }
+
+        low_height += "C: " + dto.getClose_candle_h() + "$ ("
+                + Utils.toPercent(dto.getClose_candle_h(), price_at_binance) + "%)" + Utils.new_line_from_service;
+
+        if (price_at_binance.compareTo(dto.getClose_candle_h()) < 0
+                && price_at_binance.compareTo(dto.getOpen_candle_h()) > 0) {
+            low_height += btc_now;
+        }
+
+        low_height += "O: " + dto.getOpen_candle_h() + "$ (" + Utils.toPercent(dto.getOpen_candle_h(), price_at_binance)
+                + "%)" + Utils.new_line_from_service;
+
+        if (price_at_binance.compareTo(dto.getOpen_candle_h()) < 0) {
+            low_height += btc_now;
+        }
+
+        low_height += "L: " + dto.getLow_price_h() + "$ (" + Utils.toPercent(dto.getLow_price_h(), price_at_binance)
+                + "%)";
+
+        return low_height;
     }
 
     private String getMsgShort(BigDecimal entry, BtcFuturesResponse dto) {
@@ -2666,6 +2757,9 @@ public class BinanceServiceImpl implements BinanceService {
         msg += "E  :" + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
 
         msg += "SL :" + stop_loss + "(" + Utils.toPercent(entry, stop_loss) + "%): 1000$/" + loss + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "Hi:  " + dto.getHight_price_h() + "(" + Utils.toPercent(entry, dto.getHight_price_h()) + "%)";
         msg += Utils.new_line_from_service;
 
         msg += "TP1:" + take_porfit_1 + "(" + Utils.toPercent(entry, take_porfit_1) + "%): 1000$/" + tp1 + "$";

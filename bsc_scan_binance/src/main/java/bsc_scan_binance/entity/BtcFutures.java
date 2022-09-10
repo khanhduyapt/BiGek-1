@@ -28,6 +28,11 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "open_candle_h", type = BigDecimal.class),
                 @ColumnResult(name = "close_candle_h", type = BigDecimal.class),
                 @ColumnResult(name = "hight_price_h", type = BigDecimal.class),
+
+                @ColumnResult(name = "id_half1", type = Integer.class),
+                @ColumnResult(name = "open_price_half1", type = BigDecimal.class),
+                @ColumnResult(name = "id_half2", type = Integer.class),
+                @ColumnResult(name = "open_price_half2", type = BigDecimal.class),
         })
 })
 
