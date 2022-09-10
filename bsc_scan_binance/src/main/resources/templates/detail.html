@@ -157,13 +157,12 @@ p {
       <table class="table table-bordered tableFixHead" style="min-width: 68px !important; max-width: 68px !important;">
         <thead>
           <tr>
-            <th class="text-center" scope="col">S</th>
+            <th class="text-center" scope="col">48h</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="table_row" th:each="token,iter: ${data_list_2}">
-            <!-- Symbol -->
-            <td style="text-align: center; max-width: 68px !important;" th:text="${token.symbol}"></td>
+          <tr class="table_row" th:each="msg,iter: ${btc_48h}">
+            <td style="text-align: center; max-width: 68px !important; font-size: 0.7rem !important;" th:text="${msg}"></td>
           </tr>
         </tbody>
       </table>

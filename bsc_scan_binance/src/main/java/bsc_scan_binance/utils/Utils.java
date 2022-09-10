@@ -354,25 +354,6 @@ public class Utils {
         return true;
     }
 
-    public static BigDecimal getGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
-        BigDecimal good_price = (hight_price.subtract(low_price));
-
-        good_price = good_price.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
-        good_price = low_price.add(good_price);
-
-        return good_price;
-    }
-
-    public static Boolean isGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
-
-        BigDecimal good_price = getGoodPrice(curr_price, low_price, hight_price);
-
-        if (curr_price.compareTo(good_price) > 0) {
-            return false;
-        }
-        return true;
-    }
-
     public static String appendSpace(String value, int length) {
         int len = value.length();
         if (len > length) {
@@ -430,7 +411,7 @@ public class Utils {
     }
 
     public static String whenGoodPrice(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
-        return (isGoodPrice(curr_price, low_price, hight_price) ? "*5*" : "");
+        return (isGoodPriceLong(curr_price, low_price, hight_price) ? "*5*" : "");
     }
 
     public static boolean isCandidate(CandidateTokenCssResponse css) {
@@ -600,6 +581,13 @@ public class Utils {
                 .multiply(BigDecimal.valueOf(100));
 
         return removeLastZero(percent.toString());
+    }
+
+    public static BigDecimal getPercent(BigDecimal value, BigDecimal compareToValue) {
+        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, 4, RoundingMode.CEILING)
+                .multiply(BigDecimal.valueOf(100));
+
+        return percent;
     }
 
     public static BigDecimal getBigDecimalValue(String value) {
@@ -808,6 +796,65 @@ public class Utils {
         return result.toString();
     }
 
+    public static BigDecimal getGoodPriceLong(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+        BigDecimal good_price = (hight_price.subtract(low_price));
+
+        good_price = good_price.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        good_price = low_price.add(good_price);
+
+        return good_price;
+    }
+
+    public static BigDecimal getStopLossForLong(BigDecimal low_price, BigDecimal open_candle) {
+        BigDecimal candle_beard_length = open_candle.subtract(low_price);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+
+        BigDecimal stop_loss = low_price.subtract(candle_beard_length);
+        return stop_loss;
+    }
+
+    public static BigDecimal getStopLossForShort(BigDecimal hight_price, BigDecimal close_candle) {
+        BigDecimal candle_beard_length = hight_price.subtract(close_candle);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+
+        BigDecimal stop_loss = hight_price.add(candle_beard_length);
+        return stop_loss;
+    }
+
+    public static BigDecimal getGoodPriceLongByPercent(BigDecimal cur_price, BigDecimal low_price,
+            BigDecimal open_candle, BigDecimal stop_loss_percent) {
+        BigDecimal stop_loss = getStopLossForLong(low_price, open_candle);
+
+        BigDecimal good_price = cur_price;
+        while (true) {
+            BigDecimal stop_loss_percent_curr = getPercent(good_price, stop_loss);
+            if (stop_loss_percent_curr.compareTo(stop_loss_percent) < 0) {
+                break;
+            } else {
+                good_price = good_price.subtract(BigDecimal.valueOf(10));
+            }
+        }
+
+        return good_price;
+    }
+
+    public static BigDecimal getGoodPriceShortByPercent(BigDecimal cur_price, BigDecimal hight_price,
+            BigDecimal close_candle, BigDecimal stop_loss_percent) {
+        BigDecimal stop_loss = getStopLossForShort(hight_price, close_candle);
+
+        BigDecimal good_price = cur_price;
+        while (true) {
+            BigDecimal stop_loss_percent_curr = getPercent(stop_loss, good_price);
+            if (stop_loss_percent_curr.compareTo(stop_loss_percent) < 0) {
+                break;
+            } else {
+                good_price = good_price.add(BigDecimal.valueOf(10));
+            }
+        }
+
+        return good_price;
+    }
+
     public static Boolean isGoodPriceLong(BigDecimal cur_price, BigDecimal lo_price, BigDecimal hi_price) {
         BigDecimal curr_price = Utils.getBigDecimal(cur_price);
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
@@ -817,12 +864,9 @@ public class Utils {
             return false;
         }
 
-        BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(8), 5, RoundingMode.CEILING);
+        BigDecimal good_price = getGoodPriceLong(curr_price, low_price, hight_price);
 
-        BigDecimal mid_price = low_price.add(range);
-
-        if (curr_price.compareTo(mid_price) < 0) {
+        if (curr_price.compareTo(good_price) < 0) {
             return true;
         }
         return false;

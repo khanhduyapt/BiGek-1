@@ -75,14 +75,20 @@ public class BinanceController {
             model.addAttribute("short_list_perfect2", new ArrayList<String>());
 
         } else {
+            List<String> headers = new ArrayList<String>(
+                    Arrays.asList(long_short.get(0).split(Utils.new_line_from_service)));
 
-            model.addAttribute("long_short_header", long_short.get(0).replace(Utils.new_line_from_service, ""));
+            model.addAttribute("long_short_header", headers.get(0));
+            model.addAttribute("btc_48h", headers.subList(1, headers.size()));
 
             model.addAttribute("long_short_list_perfect",
                     new ArrayList<String>(Arrays.asList(long_short.get(1).split(Utils.new_line_from_service))));
 
             model.addAttribute("long_short_list_curr_price",
                     new ArrayList<String>(Arrays.asList(long_short.get(2).split(Utils.new_line_from_service))));
+
+            // model.addAttribute("long_list_perfect2", new ArrayList<String>());
+            // model.addAttribute("short_list_perfect2", new ArrayList<String>());
 
             model.addAttribute("long_list_perfect2",
                     new ArrayList<String>(Arrays.asList(long_short.get(3).split(Utils.new_line_from_service))));

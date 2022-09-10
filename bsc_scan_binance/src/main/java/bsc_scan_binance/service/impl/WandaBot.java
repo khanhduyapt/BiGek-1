@@ -134,8 +134,8 @@ public class WandaBot extends TelegramLongPollingBot {
                 execute(message);
 
                 Boolean allowNext = true;
-                if (!Utils.isGoodPrice(btc_now.getPriceAtBinance(), btc.getMin_price(), btc.getMax_price())) {
-                    BigDecimal good_price = Utils.getGoodPrice(btc_now.getPriceAtBinance(), btc.getMin_price(),
+                if (!Utils.isGoodPriceLong(btc_now.getPriceAtBinance(), btc.getMin_price(), btc.getMax_price())) {
+                    BigDecimal good_price = Utils.getGoodPriceLong(btc_now.getPriceAtBinance(), btc.getMin_price(),
                             btc.getMax_price());
 
                     message.setText("The current price is unfavorable.\nWaiting for BTC correct to "
@@ -170,8 +170,8 @@ public class WandaBot extends TelegramLongPollingBot {
                         + Utils.createMsgSimple(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price()));
                 execute(message);
 
-                if (!Utils.isGoodPrice(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price())) {
-                    BigDecimal good_price = Utils.getGoodPrice(dto.getPriceAtBinance(), temp.getMin_price(),
+                if (!Utils.isGoodPriceLong(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price())) {
+                    BigDecimal good_price = Utils.getGoodPriceLong(dto.getPriceAtBinance(), temp.getMin_price(),
                             temp.getMax_price());
 
                     message.setText("Waiting for " + dto.getId().getSymbol() + " correct to "
