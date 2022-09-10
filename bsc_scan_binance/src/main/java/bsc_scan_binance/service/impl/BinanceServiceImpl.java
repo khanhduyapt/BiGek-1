@@ -132,6 +132,7 @@ public class BinanceServiceImpl implements BinanceService {
     private boolean isSaved_LIMIT_DATA_4h = false;
 
     private String pre_time_of_btc = "";
+    private String pre_time_of_btc_msg_1h = "";
     private String pre_time_of_btc_for_long_short = "";
     private String pre_time_of_btc_kill_long_short = "";
 
@@ -2524,6 +2525,7 @@ public class BinanceServiceImpl implements BinanceService {
             String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
             String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
             curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
+            String curr_time_of_btc_pre1h = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
             BtcFuturesResponse dto = getBtcFuturesResponse(ID_1H_LIKE);
             BtcFuturesResponse dto_10d = getBtcFuturesResponse(ID_4H_LIKE);
@@ -2598,41 +2600,10 @@ public class BinanceServiceImpl implements BinanceService {
 
             // (Good time to buy)
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short)) {
-
-                if (price_at_binance.compareTo(dto_10d.getOpen_candle_h()) <= 0) {
-                    Utils.sendToTelegram("(Bitcoin bottomed in 10d)" + Utils.new_line_from_service
-                            + getMsgLong(price_at_binance, dto));
-
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-                }
-
-                if (price_at_binance.compareTo(dto.getOpen_candle_h()) <= 0) {
-                    Utils.sendToTelegram("(Bitcoin bottomed in 48h)" + Utils.new_line_from_service
-                            + getMsgLong(price_at_binance, dto));
-
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-                }
-
                 if (price_at_binance.compareTo(good_price_for_long) <= 0) {
 
                     Utils.sendToTelegram(
                             "(Long now)" + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
-
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-                }
-
-                if (price_at_binance.compareTo(dto_10d.getClose_candle_h()) >= 0) {
-
-                    Utils.sendToTelegram("(Bitcoin hits 10d peak)" + Utils.new_line_from_service
-                            + getMsgShort(price_at_binance, dto));
-
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-                }
-
-                if (price_at_binance.compareTo(dto.getClose_candle_h()) >= 0) {
-
-                    Utils.sendToTelegram("(Bitcoin hits 48h peak)" + Utils.new_line_from_service
-                            + getMsgShort(price_at_binance, dto));
 
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
@@ -2642,6 +2613,36 @@ public class BinanceServiceImpl implements BinanceService {
                     Utils.sendToTelegram(
                             "(Short now)" + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
+                }
+            }
+
+            if (!Objects.equals(curr_time_of_btc_pre1h, pre_time_of_btc_msg_1h)) {
+                if (price_at_binance.compareTo(dto_10d.getOpen_candle_h()) <= 0) {
+                    Utils.sendToTelegram("(Bitcoin bottomed in 10d)" + Utils.new_line_from_service + "(LONG)"
+                            + Utils.new_line_from_service + getMsgLong(price_at_binance, dto_10d));
+
+                    pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
+                }
+
+                if (price_at_binance.compareTo(dto.getOpen_candle_h()) <= 0) {
+                    Utils.sendToTelegram("(Bitcoin bottomed in 48h)" + Utils.new_line_from_service + "(LONG)"
+                            + Utils.new_line_from_service + getMsgLong(price_at_binance, dto));
+
+                    pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
+                }
+
+                if (price_at_binance.compareTo(dto_10d.getClose_candle_h()) >= 0) {
+                    Utils.sendToTelegram("(Bitcoin hits 10d peak)" + Utils.new_line_from_service + "(Short)"
+                            + Utils.new_line_from_service + getMsgShort(price_at_binance, dto_10d));
+
+                    pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
+                }
+
+                if (price_at_binance.compareTo(dto.getClose_candle_h()) >= 0) {
+                    Utils.sendToTelegram("(Bitcoin hits 48h peak)" + Utils.new_line_from_service + "(Short)"
+                            + Utils.new_line_from_service + getMsgShort(price_at_binance, dto));
+
+                    pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
                 }
             }
 
