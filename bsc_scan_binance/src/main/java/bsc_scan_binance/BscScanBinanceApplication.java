@@ -41,7 +41,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            //app_flag = Utils.const_app_flag_msg_on;
+            // app_flag = Utils.const_app_flag_msg_on;
 
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -98,8 +98,7 @@ public class BscScanBinanceApplication {
                             binance_service.monitorBtcPrice();
                         }
 
-                        String loadBinanceData = binance_service.loadBinanceData(coin.getGeckoid(),
-                                coin.getSymbol());
+                        String loadBinanceData = binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol());
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
 
                         log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
@@ -109,11 +108,10 @@ public class BscScanBinanceApplication {
                         log.error("dkd error LoadData:" + e.getMessage());
                     }
 
-                    if (BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
-                        wait(1800);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
-                    } else {
-                        wait(1800);
-                    }
+                    // if (BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
+                    // wait(1800);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                    // }
+                    wait(1200);
 
                     if (Objects.equals(idx, size - 1)) {
 

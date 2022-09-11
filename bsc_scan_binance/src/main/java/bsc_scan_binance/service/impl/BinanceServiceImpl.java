@@ -123,7 +123,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String TIME_5m = "5m";
     private static final String TIME_30m = "30m";
     // private static final int LIMIT_DATA_1m = 60;
-    private static final int LIMIT_DATA_5m = 48;
+    private static final int LIMIT_DATA_5m = 72;
 
     private static final String TIME_1h = "1h";
     private static final String TIME_4h = "4h";
