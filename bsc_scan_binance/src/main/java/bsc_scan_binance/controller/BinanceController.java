@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.request.CoinGeckoTokenRequest;
 import bsc_scan_binance.response.DepthResponse;
+import bsc_scan_binance.response.EntryCssResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.service.CoinGeckoService;
 import bsc_scan_binance.utils.Response;
@@ -96,6 +97,9 @@ public class BinanceController {
             model.addAttribute("short_list_perfect2",
                     new ArrayList<String>(Arrays.asList(long_short.get(4).split(Utils.new_line_from_service))));
         }
+
+        List<EntryCssResponse> scapling_list = service.findAllScalpingToday();
+        model.addAttribute("scapling_list", scapling_list);
 
         return "detail";
     }

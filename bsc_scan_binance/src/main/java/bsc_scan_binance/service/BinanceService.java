@@ -5,6 +5,7 @@ import java.util.List;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.DepthResponse;
+import bsc_scan_binance.response.EntryCssResponse;
 
 public interface BinanceService {
 
@@ -31,4 +32,6 @@ public interface BinanceService {
     public String loadPremarketSp500();
 
     public String getBtcBalancesOnExchanges();
+
+    public List<EntryCssResponse> findAllScalpingToday();
 }

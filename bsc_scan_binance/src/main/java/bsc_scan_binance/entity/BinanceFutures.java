@@ -48,4 +48,11 @@ public class BinanceFutures {
 
     @Column(name = "global_ftx_long_rate")
     private BigDecimal globalFtxLongRate;
+
+    @Column(name = "scalping_today")
+    private boolean scalpingToday;
+
+    @Column(name = "scalping_entry")
+    private String scalpingEntry;
+
 }

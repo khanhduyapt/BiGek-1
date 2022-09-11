@@ -17,6 +17,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
+import org.hibernate.hql.internal.CollectionSubqueryFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -63,6 +64,7 @@ import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
 import bsc_scan_binance.response.DepthResponse;
+import bsc_scan_binance.response.EntryCssResponse;
 import bsc_scan_binance.response.GeckoVolumeUpPre4hResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
@@ -116,13 +118,16 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private BitcoinBalancesOnExchangesRepository bitcoinBalancesOnExchangesRepository;
 
-    // private static final String TIME_1m = "1m";
-    // private static final String TIME_15m = "15m";
+    private static final String SYMBOL_BTC = "BTC";
+
+    private static final String TIME_5m = "5m";
+    private static final String TIME_30m = "30m";
     // private static final int LIMIT_DATA_1m = 60;
-    // private static final int LIMIT_DATA_15m = 50;
+    private static final int LIMIT_DATA_5m = 48;
 
     private static final String TIME_1h = "1h";
     private static final String TIME_4h = "4h";
+    private static final String TIME_1d = "1d";
 
     private static final String ID_1H_LIKE = "'1h_%'";
     private static final String ID_4H_LIKE = "'4h_%'";
@@ -1084,8 +1089,6 @@ public class BinanceServiceImpl implements BinanceService {
 
     public String monitorTokenSales(List<CandidateTokenCssResponse> results) {
 
-        boolean isUptrend = isUptrend1h();
-
         String buy_msg = "";
         int count = 1;
         int idx = 1;
@@ -1101,9 +1104,6 @@ public class BinanceServiceImpl implements BinanceService {
             idx += 1;
             if (idx > 100) {
                 break;
-            }
-            if (!isUptrend) {
-                idx = 101;
             }
 
             String msg = monitorToken(dto);
@@ -1710,44 +1710,6 @@ public class BinanceServiceImpl implements BinanceService {
         return "";
     }
 
-    public boolean isUptrend1h() {
-        List<bsc_scan_binance.entity.BtcFutures> list = Utils.loadData(5, "15m");
-        int count = 0;
-        String kill_msg = "";
-
-        for (int index = 0; index < list.size(); index++) {
-            BtcFutures dto = list.get(index);
-
-            if (dto.isUptrend()) {
-                count += 1;
-                if (index == 0) {
-                    count += 1;
-                }
-            }
-
-            if (dto.isKillLong()) {
-                log.info("Kill Long: " + dto.toString());
-                String key = Utils.convertDateToString("yyyyMMddHH_", Calendar.getInstance().getTime())
-                        + dto.toString();
-
-                if (!msg_vol_up_dict.contains(key)) {
-                    kill_msg += key + Utils.new_line_from_service;
-
-                    msg_vol_up_dict.put(key, key);
-                }
-            }
-        }
-
-        if (Utils.isNotBlank(kill_msg)) {
-            Utils.sendToMyTelegram(kill_msg);
-        }
-
-        if (count < 2) {
-            return false;
-        }
-        return Utils.isUptrend(list);
-    }
-
     // ------------------------------------------------------------------------------------
 
     @Override
@@ -1816,6 +1778,7 @@ public class BinanceServiceImpl implements BinanceService {
     public String loadBinanceData(String gecko_id, String symbol) {
         // debug
         // monitorBitcoinBalancesOnExchanges();
+        scalping(gecko_id, symbol);
 
         try {
             final Integer limit = 14;
@@ -1825,7 +1788,7 @@ public class BinanceServiceImpl implements BinanceService {
             final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD"
                     + "&interval=1d&limit=" + String.valueOf(limit);
 
-            BigDecimal price_at_binance = Utils.getBinancePrice();
+            BigDecimal price_at_binance = Utils.getBinancePrice(SYMBOL_BTC);
             if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
                 return "";
             }
@@ -2319,7 +2282,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     @Transactional
     public String getTextDepthData() {
-        BigDecimal price_now = Utils.getBinancePrice();
+        BigDecimal price_now = Utils.getBinancePrice(SYMBOL_BTC);
         saveDepthData("bitcoin", "BTC");
 
         String result = "";
@@ -2343,75 +2306,6 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         return result.trim();
-    }
-
-    @Transactional
-    private List<BtcFutures> loadData(String TIME, int LIMIT_DATA) {
-        try {
-            BigDecimal price_at_binance = Utils.getBinancePrice();
-
-            String url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=" + TIME + "&limit="
-                    + LIMIT_DATA;
-
-            List<Object> list = Utils.getBinanceData(url, LIMIT_DATA);
-
-            List<BtcFutures> list_entity = new ArrayList<BtcFutures>();
-            int id = 0;
-
-            for (int idx = LIMIT_DATA - 1; idx >= 0; idx--) {
-                Object obj_usdt = list.get(idx);
-
-                @SuppressWarnings("unchecked")
-                List<Object> arr_usdt = (List<Object>) obj_usdt;
-
-                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
-                BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
-                BigDecimal low_price = Utils.getBigDecimal(arr_usdt.get(3));
-                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
-                String open_time = arr_usdt.get(0).toString();
-
-                if (Objects.equals("0", open_time)) {
-                    break;
-                }
-
-                BtcFutures day = new BtcFutures();
-
-                String strid = String.valueOf(id);
-                if (strid.length() < 2) {
-                    strid = "0" + strid;
-                }
-                day.setId(TIME + "_" + strid);
-
-                if (idx == LIMIT_DATA - 1) {
-                    day.setCurrPrice(price_at_binance);
-                } else {
-                    day.setCurrPrice(BigDecimal.ZERO);
-                }
-
-                day.setLow_price(low_price);
-                day.setHight_price(hight_price);
-                day.setPrice_open_candle(price_open_candle);
-                day.setPrice_close_candle(price_close_candle);
-
-                if (price_open_candle.compareTo(price_close_candle) < 0) {
-                    day.setUptrend(true);
-                } else {
-                    day.setUptrend(false);
-                }
-
-                list_entity.add(day);
-
-                id += 1;
-            }
-
-            return list_entity;
-        } catch (
-
-        Exception e) {
-            e.printStackTrace();
-        }
-
-        return new ArrayList<BtcFutures>();
     }
 
     public BtcFuturesResponse getBtcFuturesResponse(String ID_LIKE) {
@@ -2488,14 +2382,15 @@ public class BinanceServiceImpl implements BinanceService {
             // btcFuturesRepository.deleteAll();
 
             // 1) Xem chart 1H xac dinh long/short (2 cay 1h truoc do)
-            BigDecimal price_at_binance = Utils.getBinancePrice();
 
-            List<BtcFutures> btc1hs = loadData(TIME_1h, LIMIT_DATA_1h);
+            List<BtcFutures> btc1hs = Utils.loadData("BTC", TIME_1h, LIMIT_DATA_1h);
             btcFuturesRepository.saveAll(btc1hs);
+
+            BigDecimal price_at_binance = btc1hs.get(0).getCurrPrice();
 
             int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
             if ((hh % 4 == 0) && !isSaved_LIMIT_DATA_4h) {
-                List<BtcFutures> btc4hs = loadData(TIME_4h, LIMIT_DATA_4h);
+                List<BtcFutures> btc4hs = Utils.loadData("BTC", TIME_4h, LIMIT_DATA_4h);
                 btcFuturesRepository.saveAll(btc4hs);
                 isSaved_LIMIT_DATA_4h = true;
             } else if (hh % 4 != 0) {
@@ -2908,4 +2803,224 @@ public class BinanceServiceImpl implements BinanceService {
 
         return "";
     }
+
+    // ra vao toi da 1h, char 5m, target 3%
+    // Xu huong gia, vi tri nen, boll
+    // 1d: xet 2 cay nen, dang xu huong tang,
+
+    /*
+     * / I. nen 1D, gia hien tai thap hon 5% gia trung binh (5*) hnay: xanh, hqua
+     * xanh; gia hien tai hnay > gia dong cua hqua.
+     *
+     * (3*) hqua xanh, hnay do hnay dang hoi: rau dai (rau > 2 lan than nen), than
+     * ngan, gia hien tai hnay > 50% chieu dai than nen hqua.
+     *
+     * (1*) hqua do, hnay xanh gia hien tai hom nay > gia cao nhat cua hqua
+     *
+     *
+     * II. Nen 4h hien tai bat buoc phai xanh. Loai truong hop sap cham AVG hoac BEL
+     * tren. cach bel > 5% or cach AVG > 5%. Chu y gio dong cua cay nen 4h.
+     *
+     * (5*) Cay nen truoc Xanh
+     *
+     * (3*) Cay nen truoc la do, dang co xu huong hoi len.
+     *
+     * III. Nen 1h, xu huong tang, gia hien tai cach bel > 5% or cach AVG > 5%.
+     *
+     * IV. 30m dang xu huong tang /
+     */
+    @Transactional
+    public void scalping(String gecko_id, String symbol) {
+        try {
+            BinanceFutures entity = binanceFuturesRepository.findById(gecko_id).orElse(null);
+            if (!Objects.equals(null, entity)) {
+                entity.setScalpingToday(false);
+                binanceFuturesRepository.save(entity);
+            }
+            // Check 4h hien tai bat buoc phai xanh.
+            {
+                List<BtcFutures> list4h = Utils.loadData(symbol, TIME_4h, 1);
+                if (CollectionUtils.isEmpty(list4h)) {
+                    return;
+                }
+                if (!list4h.get(0).isUptrend()) {
+                    return;
+                }
+            }
+
+            // check D1
+            {
+                List<BtcFutures> list1d = Utils.loadData(symbol, TIME_1d, 2);
+                if (CollectionUtils.isEmpty(list1d)) {
+                    return;
+                }
+                // hqua RED, hnay RED
+                if (!list1d.get(0).isUptrend() && !list1d.get(1).isUptrend()) {
+                    return;
+                }
+                Boolean isCandidate = false;
+                BigDecimal price_at_binance = list1d.get(0).getCurrPrice();
+
+                // (5*) hnay: GREEN, hqua GREEN; gia hien tai hnay > gia dong cua hqua.
+                if (list1d.get(1).isUptrend() && list1d.get(0).isUptrend()
+                        && list1d.get(1).getPrice_close_candle().compareTo(price_at_binance) < 0) {
+                    isCandidate = true;
+                }
+
+                // (3*) hqua GREEN, hnay RED
+                // gia hien tai hnay > 50% chieu dai than nen hqua.
+                if (list1d.get(1).isUptrend() && !list1d.get(0).isUptrend()) {
+                    BigDecimal yesterdayMidPrice = Utils.getPriceAtMidCandle(list1d.get(1).getPrice_open_candle(),
+                            list1d.get(1).getPrice_close_candle());
+                    if (price_at_binance.compareTo(yesterdayMidPrice) > 0) {
+                        isCandidate = true;
+                    }
+                }
+                // (1*) hqua RED, hnay GREEN, gia hien tai hom nay > gia cao nhat cua hqua
+                if (!list1d.get(1).isUptrend() && list1d.get(0).isUptrend()) {
+                    if (price_at_binance.compareTo(list1d.get(1).getHight_price()) > 0) {
+                        isCandidate = true;
+                    }
+                }
+
+                if (!isCandidate) {
+                    return;
+                }
+            }
+
+            // III. Nen 30m, xu huong tang
+            {
+                List<BtcFutures> list30m = Utils.loadData(symbol, TIME_30m, 5);
+
+                // RED, GREEN, GREEN
+                // RED, RED, GREEN
+                // GREEN, GREEN
+                Boolean isUptrend = false;
+                if ((!list30m.get(2).isUptrend() && list30m.get(1).isUptrend() && list30m.get(0).isUptrend())
+                        || (!list30m.get(2).isUptrend() && !list30m.get(1).isUptrend() && list30m.get(0).isUptrend())
+                        || (list30m.get(1).isUptrend() && list30m.get(0).isUptrend())) {
+                    isUptrend = true;
+                }
+
+                if (!isUptrend) {
+                    return;
+                }
+            }
+
+            List<BtcFutures> list5m = Utils.loadData(symbol, TIME_5m, LIMIT_DATA_5m);
+            BigDecimal min_low = BigDecimal.valueOf(1000000);
+            BigDecimal max_Hig = BigDecimal.ZERO;
+            for (BtcFutures dto : list5m) {
+                if (min_low.compareTo(dto.getLow_price()) > 0) {
+                    min_low = dto.getLow_price();
+                }
+
+                if (max_Hig.compareTo(dto.getHight_price()) < 0) {
+                    max_Hig = dto.getHight_price();
+                }
+            }
+
+            // cach AVG > 5%.
+            BigDecimal range = Utils.getPercent(max_Hig, min_low);
+            if (range.compareTo(BigDecimal.valueOf(3)) < 0) {
+                // return;
+            }
+
+            BigDecimal price_at_binance = list5m.get(0).getCurrPrice();
+            String msg = "(Scalping 5m)" + Utils.new_line_from_service + "(Long) " + symbol.toUpperCase()
+                    + Utils.new_line_from_service + getMsgLong(price_at_binance, min_low, max_Hig);
+
+            BigDecimal good_price = Utils.getGoodPriceLong(min_low, max_Hig);
+
+            if (!Objects.equals(null, entity) && good_price.compareTo(price_at_binance) > 0) {
+                entity.setScalpingToday(true);
+                entity.setScalpingEntry(msg);
+                binanceFuturesRepository.save(entity);
+            }
+
+            log.info("scalping: " + symbol + ", " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$");
+
+            if (Utils.isGoodPriceLong(price_at_binance, min_low, max_Hig)) {
+                Utils.sendToTelegram(msg);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public List<EntryCssResponse> findAllScalpingToday() {
+        List<EntryCssResponse> results = new ArrayList<EntryCssResponse>();
+
+        List<BinanceFutures> list = binanceFuturesRepository.findAllByScalpingToday();
+        if (!CollectionUtils.isEmpty(list)) {
+            for (BinanceFutures entity : list) {
+                String msg = entity.getScalpingEntry();
+                List<String> msgs = new ArrayList<String>(Arrays.asList(msg.split(Utils.new_line_from_service)));
+
+                if (!CollectionUtils.isEmpty(msgs) && msgs.size() > 4) {
+                    String entry = Utils.getStringValue(msgs.get(2));
+                    String stop_loss = Utils.getStringValue(msgs.get(3));
+                    String low = Utils.getStringValue(msgs.get(4));
+                    String tp1 = Utils.getStringValue(msgs.get(5));
+                    String tp2 = Utils.getStringValue(msgs.get(6));
+
+                    EntryCssResponse dto = new EntryCssResponse();
+                    dto.setSymbol(entity.getSymbol());
+                    dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
+                            + entity.getSymbol().toUpperCase() + "USDT");
+                    dto.setFutures_msg(entity.getFuturesMsg());
+                    dto.setEntry(entry);
+                    dto.setStop_loss(stop_loss);
+                    dto.setLow(low);
+                    dto.setTp1(tp1);
+                    dto.setTp2(tp2);
+
+                    results.add(dto);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private String getMsgLong(BigDecimal entry, BigDecimal low, BigDecimal hig) {
+        String msg = "";
+
+        BigDecimal candle_height = hig.subtract(entry);
+        BigDecimal stop_loss = low.subtract(candle_height);
+        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+        BigDecimal take_porfit_1 = entry.add(mid_candle);
+        BigDecimal take_porfit_2 = hig;
+
+        BigDecimal fee = BigDecimal.valueOf(2);
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(stop_loss.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(take_porfit_1.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(take_porfit_2.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+
+        msg += "E: " + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
+
+        msg += "SL: " + Utils.removeLastZero(String.valueOf(stop_loss)) + "(" + Utils.toPercent(stop_loss, entry)
+                + "%) 1000$/" + loss + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "L: " + Utils.removeLastZero(String.valueOf(low)) + "(" + Utils.toPercent(low, entry) + "%)";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP1: " + Utils.removeLastZero(String.valueOf(take_porfit_1)) + "("
+                + Utils.toPercent(take_porfit_1, entry) + "%) 1000$/" + tp1 + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP2: " + Utils.removeLastZero(String.valueOf(take_porfit_2)) + "("
+                + Utils.toPercent(take_porfit_2, entry) + "%) 1000$/" + tp2 + "$";
+
+        msg += checkRR(loss, tp1);
+
+        return msg;
+    }
+
 }

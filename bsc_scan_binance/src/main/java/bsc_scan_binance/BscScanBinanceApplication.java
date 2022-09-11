@@ -110,9 +110,9 @@ public class BscScanBinanceApplication {
                     }
 
                     if (BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
-                        wait(1000);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
+                        wait(1800);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
                     } else {
-                        wait(1200);
+                        wait(1800);
                     }
 
                     if (Objects.equals(idx, size - 1)) {

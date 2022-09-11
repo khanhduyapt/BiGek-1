@@ -175,9 +175,41 @@ p {
       </table>
   </div>
 
-  <a style="padding-top: 3rem;padding-left: 0.5rem;padding-bottom: 3rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
+  <a style="padding-top: 3rem;padding-left: 0.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
     <span>Trading View</span>
   </a>
-
+  <br><br>
+  
+  <p style="margin-top: 1rem; margin-left: 0.5rem; " class="font-weight-bold">(Scalping)</p>
+  
+  <table id="bnb_table" class="table table-bordered tableFixHead" style="min-width: 860px !important; max-width: 860px !important; padding-bottom: 3rem;">
+    <thead>
+      <tr>
+        <th class="text-center" scope="col">#</th>
+        <th class="text-center" scope="col">Symbol</th>
+        <th class="text-center" scope="col">Futures</th>
+        <th class="text-center" scope="col">Entry</th>
+        <th class="text-center" scope="col">Stop loss</th>
+        <th class="text-center" scope="col">Low</th>
+        <th class="text-center" scope="col">Tp1</th>
+        <th class="text-center" scope="col">Tp2</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="table_row" th:each="token,iter: ${scapling_list}">
+        <td style="text-align: center;" th:text="${iter.index + 1}"></td>
+        <td style="min-width:  60px !important; max-width:  60px !important;">
+          <a th:target="_blank" th:href="${token.tradingview}"><span th:text="${token.symbol}"></span></a>
+        </td>
+        <td style="min-width: 120px !important; max-width: 120px !important;" th:text="${token.futures_msg}"></td>
+        <td style="min-width:  80px !important; max-width:  80px !important;" th:text="${token.entry}"></td>
+        <td style="min-width: 200px !important; max-width: 200px !important;" th:text="${token.stop_loss}"></td>
+        <td style="min-width: 100px !important; max-width: 100px !important;" th:text="${token.low}"></td>
+        <td style="min-width: 200px !important; max-width: 200px !important;" th:text="${token.tp1}"></td>
+        <td style="min-width: 200px !important; max-width: 200px !important;" th:text="${token.tp2}"></td>
+      </tr>
+    </tbody>
+  </table>
+  <br><br>
 </body>
 </html>

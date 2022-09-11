@@ -27,6 +27,7 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.MessageSource;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 
@@ -121,6 +122,77 @@ public class Utils {
             + "     ) tmp                                                                                   \n"
             + " ) boll                                                                                      \n";
 
+    public static List<BtcFutures> loadData(String symbol, String TIME, int LIMIT_DATA) {
+        try {
+            BigDecimal price_at_binance = Utils.getBinancePrice(symbol);
+
+            String url = "https://api.binance.com/api/v3/klines?symbol=" + symbol.toUpperCase() + "USDT&interval="
+                    + TIME + "&limit=" + LIMIT_DATA;
+
+            List<Object> list = Utils.getBinanceData(url, LIMIT_DATA);
+
+            List<BtcFutures> list_entity = new ArrayList<BtcFutures>();
+            int id = 0;
+
+            for (int idx = LIMIT_DATA - 1; idx >= 0; idx--) {
+                Object obj_usdt = list.get(idx);
+
+                @SuppressWarnings("unchecked")
+                List<Object> arr_usdt = (List<Object>) obj_usdt;
+                if (CollectionUtils.isEmpty(arr_usdt) || arr_usdt.size() < 4) {
+                    return list_entity;
+                }
+
+                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
+                BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
+                BigDecimal low_price = Utils.getBigDecimal(arr_usdt.get(3));
+                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
+                String open_time = arr_usdt.get(0).toString();
+
+                if (Objects.equals("0", open_time)) {
+                    break;
+                }
+
+                BtcFutures day = new BtcFutures();
+
+                String strid = String.valueOf(id);
+                if (strid.length() < 2) {
+                    strid = "0" + strid;
+                }
+                day.setId(TIME + "_" + strid);
+
+                if (idx == LIMIT_DATA - 1) {
+                    day.setCurrPrice(price_at_binance);
+                } else {
+                    day.setCurrPrice(BigDecimal.ZERO);
+                }
+
+                day.setLow_price(low_price);
+                day.setHight_price(hight_price);
+                day.setPrice_open_candle(price_open_candle);
+                day.setPrice_close_candle(price_close_candle);
+
+                if (price_open_candle.compareTo(price_close_candle) < 0) {
+                    day.setUptrend(true);
+                } else {
+                    day.setUptrend(false);
+                }
+
+                list_entity.add(day);
+
+                id += 1;
+            }
+
+            return list_entity;
+        } catch (
+
+        Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<BtcFutures>();
+    }
+
     public static String toString(PriorityCoin tele) {
         return tele.getSymbol() + ":" + tele.getName() + " P:" + tele.getCurrent_price() + "$ Target:"
                 + tele.getTarget_percent() + " ema:" + tele.getEma();
@@ -201,72 +273,6 @@ public class Utils {
         return result;
     }
 
-    public static List<BtcFutures> loadData(int limit, String time) {
-        try {
-            BigDecimal price_at_binance = getBinancePrice();
-
-            String url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=" + time + "&limit=" + limit;
-            List<Object> list = getBinanceData(url, limit);
-
-            List<BtcFutures> list_entity = new ArrayList<BtcFutures>();
-            int id = 0;
-
-            for (int idx = limit - 1; idx >= 0; idx--) {
-                Object obj_usdt = list.get(idx);
-
-                @SuppressWarnings("unchecked")
-                List<Object> arr_usdt = (List<Object>) obj_usdt;
-
-                BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
-                BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
-                BigDecimal low_price = Utils.getBigDecimal(arr_usdt.get(3));
-                BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
-                String open_time = arr_usdt.get(0).toString();
-
-                if (Objects.equals("0", open_time)) {
-                    break;
-                }
-
-                BtcFutures day = new BtcFutures();
-
-                String strid = String.valueOf(id);
-                if (strid.length() < 2) {
-                    strid = "0" + strid;
-                }
-                day.setId(strid);
-
-                if (idx == limit - 1) {
-                    day.setCurrPrice(price_at_binance);
-                } else {
-                    day.setCurrPrice(BigDecimal.ZERO);
-                }
-
-                day.setLow_price(low_price);
-                day.setHight_price(hight_price);
-                day.setPrice_open_candle(price_open_candle);
-                day.setPrice_close_candle(price_close_candle);
-
-                if (price_open_candle.compareTo(price_close_candle) < 0) {
-                    day.setUptrend(true);
-                } else {
-                    day.setUptrend(false);
-                }
-
-                list_entity.add(day);
-
-                id += 1;
-            }
-
-            return list_entity;
-        } catch (
-
-        Exception e) {
-            e.printStackTrace();
-        }
-
-        return new ArrayList<BtcFutures>();
-    }
-
     public static boolean isUptrend(List<BtcFutures> list) {
         BtcFutures item00 = list.get(0);
         BtcFutures item99 = list.get(list.size() - 1);
@@ -334,9 +340,9 @@ public class Utils {
 
     }
 
-    public static BigDecimal getBinancePrice() {
+    public static BigDecimal getBinancePrice(String symbol) {
         try {
-            String url = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT";
+            String url = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
             RestTemplate restTemplate = new RestTemplate();
             Object result = restTemplate.getForObject(url, Object.class);
 
@@ -796,7 +802,7 @@ public class Utils {
         return result.toString();
     }
 
-    public static BigDecimal getGoodPriceLong(BigDecimal curr_price, BigDecimal low_price, BigDecimal hight_price) {
+    public static BigDecimal getGoodPriceLong(BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal good_price = (hight_price.subtract(low_price));
 
         good_price = good_price.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
@@ -811,6 +817,14 @@ public class Utils {
 
         BigDecimal stop_loss = low_price.subtract(candle_beard_length);
         return stop_loss;
+    }
+
+    public static BigDecimal getPriceAtMidCandle(BigDecimal open_candle, BigDecimal close_candle) {
+        BigDecimal candle_beard_length = close_candle.subtract(open_candle);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+
+        BigDecimal mid = open_candle.add(candle_beard_length);
+        return mid;
     }
 
     public static BigDecimal getStopLossForShort(BigDecimal hight_price, BigDecimal close_candle) {
@@ -860,11 +874,7 @@ public class Utils {
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
-        if (hi_price.subtract(lo_price).compareTo(BigDecimal.valueOf(250)) < 0) {
-            return false;
-        }
-
-        BigDecimal good_price = getGoodPriceLong(curr_price, low_price, hight_price);
+        BigDecimal good_price = getGoodPriceLong(low_price, hight_price);
 
         if (curr_price.compareTo(good_price) < 0) {
             return true;
@@ -876,10 +886,6 @@ public class Utils {
         BigDecimal curr_price = Utils.getBigDecimal(cur_price);
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
-
-        if (hi_price.subtract(lo_price).compareTo(BigDecimal.valueOf(250)) < 0) {
-            return false;
-        }
 
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(8), 5, RoundingMode.CEILING);

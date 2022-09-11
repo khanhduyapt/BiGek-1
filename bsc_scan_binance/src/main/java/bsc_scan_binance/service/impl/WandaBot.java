@@ -87,22 +87,19 @@ public class WandaBot extends TelegramLongPollingBot {
                 String btcrange = "";
                 if (!CollectionUtils.isEmpty(long_short)) {
 
-                    btcrange += long_short.get(0).replace(Utils.new_line_from_service,
-                            Utils.new_line_from_bot);
+                    btcrange += long_short.get(0).replace(Utils.new_line_from_service, Utils.new_line_from_bot);
 
                     btcrange += Utils.new_line_from_bot + Utils.new_line_from_bot;
 
-                    btcrange += long_short.get(1).replace(Utils.new_line_from_service,
-                            Utils.new_line_from_bot);
+                    btcrange += long_short.get(1).replace(Utils.new_line_from_service, Utils.new_line_from_bot);
 
                     btcrange += Utils.new_line_from_bot + Utils.new_line_from_bot;
 
-                    btcrange += long_short.get(2).replace(Utils.new_line_from_service,
-                            Utils.new_line_from_bot);
+                    btcrange += long_short.get(2).replace(Utils.new_line_from_service, Utils.new_line_from_bot);
 
                     btcrange += Utils.new_line_from_bot + Utils.new_line_from_bot;
                 } else {
-                    btcrange = "BTC:" + Utils.removeLastZero(Utils.getStringValue(Utils.getBinancePrice()))
+                    btcrange = "BTC:" + Utils.removeLastZero(Utils.getStringValue(Utils.getBinancePrice("BTC")))
                             + Utils.new_line_from_bot;
 
                     btcrange += "Btc sideway." + Utils.new_line_from_bot + Utils.new_line_from_bot;
@@ -138,8 +135,7 @@ public class WandaBot extends TelegramLongPollingBot {
 
                 Boolean allowNext = true;
                 if (!Utils.isGoodPriceLong(btc_now.getPriceAtBinance(), btc.getMin_price(), btc.getMax_price())) {
-                    BigDecimal good_price = Utils.getGoodPriceLong(btc_now.getPriceAtBinance(), btc.getMin_price(),
-                            btc.getMax_price());
+                    BigDecimal good_price = Utils.getGoodPriceLong(btc.getMin_price(), btc.getMax_price());
 
                     message.setText("The current price is unfavorable.\nWaiting for BTC correct to "
                             + Utils.removeLastZero(good_price.toString()) + "("
@@ -174,8 +170,7 @@ public class WandaBot extends TelegramLongPollingBot {
                 execute(message);
 
                 if (!Utils.isGoodPriceLong(dto.getPriceAtBinance(), temp.getMin_price(), temp.getMax_price())) {
-                    BigDecimal good_price = Utils.getGoodPriceLong(dto.getPriceAtBinance(), temp.getMin_price(),
-                            temp.getMax_price());
+                    BigDecimal good_price = Utils.getGoodPriceLong(temp.getMin_price(), temp.getMax_price());
 
                     message.setText("Waiting for " + dto.getId().getSymbol() + " correct to "
                             + Utils.removeLastZero(good_price.toString()) + "("
