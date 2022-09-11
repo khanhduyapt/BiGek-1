@@ -571,6 +571,15 @@ public class Utils {
         return value.toString();
     }
 
+    public static String lossPer1000(BigDecimal entry, BigDecimal take_porfit_price) {
+        BigDecimal fee = BigDecimal.valueOf(2);
+
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_price))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+
+        return "1000$/" + Utils.removeLastZero(String.valueOf(loss)) + "$";
+    }
+
     public static String toPercent(BigDecimal value, BigDecimal compareToValue) {
         return toPercent(value, compareToValue, 1);
     }
@@ -813,7 +822,7 @@ public class Utils {
 
     public static BigDecimal getStopLossForLong(BigDecimal low_price, BigDecimal open_candle) {
         BigDecimal candle_beard_length = open_candle.subtract(low_price);
-        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
 
         BigDecimal stop_loss = low_price.subtract(candle_beard_length);
         return stop_loss;
@@ -821,7 +830,7 @@ public class Utils {
 
     public static BigDecimal getPriceAtMidCandle(BigDecimal open_candle, BigDecimal close_candle) {
         BigDecimal candle_beard_length = close_candle.subtract(open_candle);
-        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
 
         BigDecimal mid = open_candle.add(candle_beard_length);
         return mid;
@@ -829,7 +838,7 @@ public class Utils {
 
     public static BigDecimal getStopLossForShort(BigDecimal hight_price, BigDecimal close_candle) {
         BigDecimal candle_beard_length = hight_price.subtract(close_candle);
-        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
 
         BigDecimal stop_loss = hight_price.add(candle_beard_length);
         return stop_loss;
@@ -899,4 +908,68 @@ public class Utils {
         return false;
     }
 
+    public static boolean isUptrend(String symbol) {
+
+        // check D1
+        {
+            List<BtcFutures> list1d = Utils.loadData(symbol, "1d", 2);
+            if (CollectionUtils.isEmpty(list1d)) {
+                return false;
+            }
+            // hqua RED, hnay RED
+            if (!list1d.get(0).isUptrend() && !list1d.get(1).isUptrend()) {
+                return false;
+            }
+            Boolean isCandidate = false;
+            BigDecimal price_at_binance = list1d.get(0).getCurrPrice();
+
+            // (5*) hnay: GREEN, hqua GREEN; gia hien tai hnay > gia dong cua hqua.
+            if (list1d.get(1).isUptrend() && list1d.get(0).isUptrend()
+                    && list1d.get(1).getPrice_close_candle().compareTo(price_at_binance) < 0) {
+                isCandidate = true;
+            }
+
+            // (3*) hqua GREEN, hnay RED
+            // gia hien tai hnay > 50% chieu dai than nen hqua.
+            if (list1d.get(1).isUptrend() && !list1d.get(0).isUptrend()) {
+                BigDecimal yesterdayMidPrice = Utils.getPriceAtMidCandle(list1d.get(1).getPrice_open_candle(),
+                        list1d.get(1).getPrice_close_candle());
+                if (price_at_binance.compareTo(yesterdayMidPrice) > 0) {
+                    isCandidate = true;
+                }
+            }
+            // (1*) hqua RED, hnay GREEN, gia hien tai hom nay > gia cao nhat cua hqua
+            if (!list1d.get(1).isUptrend() && list1d.get(0).isUptrend()) {
+                if (price_at_binance.compareTo(list1d.get(1).getHight_price()) > 0) {
+                    isCandidate = true;
+                }
+            }
+
+            if (!isCandidate) {
+                return false;
+            }
+        }
+
+        // III. Nen 30m, xu huong tang
+        {
+            List<BtcFutures> list30m = Utils.loadData(symbol, "30m", 5);
+
+            // RED, GREEN, GREEN
+            // RED, RED, GREEN
+            // GREEN, GREEN
+            Boolean isUptrend = false;
+            if ((!list30m.get(2).isUptrend() && list30m.get(1).isUptrend() && list30m.get(0).isUptrend())
+                    || (!list30m.get(2).isUptrend() && !list30m.get(1).isUptrend() && list30m.get(0).isUptrend())
+                    || (list30m.get(1).isUptrend() && list30m.get(0).isUptrend())) {
+                isUptrend = true;
+            }
+
+            if (!isUptrend) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
 }
