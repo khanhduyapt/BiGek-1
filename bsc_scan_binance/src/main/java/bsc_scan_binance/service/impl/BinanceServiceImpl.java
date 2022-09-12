@@ -868,7 +868,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     css.setAvg_boll_max("TP: " + take_profit_percent + "%");
 
-                    css.setStop_loss("SL: " + stop_loss + "(" + stop_loss_precent + "%)");
+                    css.setStop_loss("SL: " + Utils.removeLastZero(stop_loss) + "(" + stop_loss_precent + "%)");
 
                     String priceChange24h = dto.getPrice_change_percentage_24h().replace("%", "");
 
@@ -2571,8 +2571,8 @@ public class BinanceServiceImpl implements BinanceService {
 
         BigDecimal SL_short = Utils.getStopLossForShort(dto.getHight_price_h(), dto.getClose_candle_h());
 
-        low_height += "SL: " + SL_short + " (" + Utils.toPercent(SL_short, price_at_binance) + "%)"
-                + Utils.new_line_from_service;
+        low_height += "SL: " + Utils.removeLastZero(SL_short) + " (" + Utils.toPercent(SL_short, price_at_binance)
+                + "%)" + Utils.new_line_from_service;
 
         low_height += "H: " + dto.getHight_price_h() + " (" + Utils.toPercent(dto.getHight_price_h(), price_at_binance)
                 + "%)" + Utils.new_line_from_service;
@@ -2581,7 +2581,7 @@ public class BinanceServiceImpl implements BinanceService {
             low_height += btc_now;
         }
 
-        low_height += "C: " + dto.getClose_candle_h() + " ("
+        low_height += "C: " + Utils.removeLastZero(dto.getClose_candle_h()) + " ("
                 + Utils.toPercent(dto.getClose_candle_h(), price_at_binance) + "%)" + Utils.new_line_from_service;
 
         if (price_at_binance.compareTo(dto.getClose_candle_h()) < 0
@@ -2589,19 +2589,19 @@ public class BinanceServiceImpl implements BinanceService {
             low_height += btc_now;
         }
 
-        low_height += "O: " + dto.getOpen_candle_h() + " (" + Utils.toPercent(dto.getOpen_candle_h(), price_at_binance)
-                + "%)" + Utils.new_line_from_service;
+        low_height += "O: " + Utils.removeLastZero(dto.getOpen_candle_h()) + " ("
+                + Utils.toPercent(dto.getOpen_candle_h(), price_at_binance) + "%)" + Utils.new_line_from_service;
 
         if (price_at_binance.compareTo(dto.getOpen_candle_h()) < 0) {
             low_height += btc_now;
         }
 
-        low_height += "L: " + dto.getLow_price_h() + " (" + Utils.toPercent(dto.getLow_price_h(), price_at_binance)
-                + "%)" + Utils.new_line_from_service;
+        low_height += "L: " + Utils.removeLastZero(dto.getLow_price_h()) + " ("
+                + Utils.toPercent(dto.getLow_price_h(), price_at_binance) + "%)" + Utils.new_line_from_service;
 
         BigDecimal SL_long = Utils.getStopLossForLong(dto.getLow_price_h(), dto.getOpen_candle_h());
 
-        low_height += "SL: " + SL_long + " (" + Utils.toPercent(SL_long, price_at_binance) + "%)";
+        low_height += "SL: " + Utils.removeLastZero(SL_long) + " (" + Utils.toPercent(SL_long, price_at_binance) + "%)";
 
         return low_height;
     }
@@ -2626,16 +2626,20 @@ public class BinanceServiceImpl implements BinanceService {
 
         msg += "E: " + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
 
-        msg += "SL: " + stop_loss + "(" + Utils.toPercent(stop_loss, entry) + "%) 1000$/" + loss + "$";
+        msg += "SL: " + Utils.removeLastZero(stop_loss) + "(" + Utils.toPercent(stop_loss, entry) + "%) 1000$/" + loss
+                + "$";
         msg += Utils.new_line_from_service;
 
-        msg += "L: " + dto.getLow_price_h() + "(" + Utils.toPercent(dto.getLow_price_h(), entry) + "%)";
+        msg += "L: " + Utils.removeLastZero(dto.getLow_price_h()) + "(" + Utils.toPercent(dto.getLow_price_h(), entry)
+                + "%)";
         msg += Utils.new_line_from_service;
 
-        msg += "TP1: " + take_porfit_1 + "(" + Utils.toPercent(take_porfit_1, entry) + "%) 1000$/" + tp1 + "$";
+        msg += "TP1: " + Utils.removeLastZero(take_porfit_1) + "(" + Utils.toPercent(take_porfit_1, entry) + "%) 1000$/"
+                + tp1 + "$";
         msg += Utils.new_line_from_service;
 
-        msg += "TP2: " + take_porfit_2 + "(" + Utils.toPercent(take_porfit_2, entry) + "%) 1000$/" + tp2 + "$";
+        msg += "TP2: " + Utils.removeLastZero(take_porfit_2) + "(" + Utils.toPercent(take_porfit_2, entry) + "%) 1000$/"
+                + tp2 + "$";
 
         msg += checkRR(loss, tp1);
 
@@ -2661,16 +2665,22 @@ public class BinanceServiceImpl implements BinanceService {
 
         msg += "E: " + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
 
-        msg += "SL: " + stop_loss + "(" + Utils.toPercent(entry, stop_loss) + "%) 1000$/" + loss + "$";
+        msg += "SL: " + Utils.removeLastZero(stop_loss) + "(" + Utils.toPercent(entry, stop_loss) + "%) 1000$/" + loss
+                + "$";
+
         msg += Utils.new_line_from_service;
 
         msg += "H: " + dto.getHight_price_h() + "(" + Utils.toPercent(entry, dto.getHight_price_h()) + "%)";
+
         msg += Utils.new_line_from_service;
 
-        msg += "TP1: " + take_porfit_1 + "(" + Utils.toPercent(entry, take_porfit_1) + "%) 1000$/" + tp1 + "$";
+        msg += "TP1: " + Utils.removeLastZero(take_porfit_1) + "(" + Utils.toPercent(entry, take_porfit_1) + "%) 1000$/"
+                + tp1 + "$";
+
         msg += Utils.new_line_from_service;
 
-        msg += "TP2: " + take_porfit_2 + "(" + Utils.toPercent(entry, take_porfit_2) + "%) 1000$/" + tp2 + "$";
+        msg += "TP2: " + Utils.removeLastZero(take_porfit_2) + "(" + Utils.toPercent(entry, take_porfit_2) + "%) 1000$/"
+                + tp2 + "$";
 
         msg += checkRR(loss, tp1);
 

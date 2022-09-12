@@ -526,6 +526,10 @@ public class Utils {
         return String.format("%,.0f", val) + "M$";
     }
 
+    public static String removeLastZero(BigDecimal value) {
+        return removeLastZero(Utils.getStringValue(value));
+    }
+
     public static String removeLastZero(String value) {
         if ((value == null) || (Objects.equals("", value))) {
             return "";
