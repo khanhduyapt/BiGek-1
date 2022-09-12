@@ -17,7 +17,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
-import org.hibernate.hql.internal.CollectionSubqueryFactory;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -134,12 +133,12 @@ public class BinanceServiceImpl implements BinanceService {
 
     private static final int LIMIT_DATA_1h = 48;
     private static final int LIMIT_DATA_4h = 60;
-    private boolean isSaved_LIMIT_DATA_4h = false;
 
     private String pre_time_of_btc = "";
     private String pre_time_of_btc_msg_1h = "";
     private String pre_time_of_btc_for_long_short = "";
     private String pre_time_of_btc_kill_long_short = "";
+    private String pre_time_of_saved_data_4h = "";
 
     private String pre_yyyyMMddHH = "";
     private String sp500 = "";
@@ -2308,9 +2307,9 @@ public class BinanceServiceImpl implements BinanceService {
         return result.trim();
     }
 
-    public BtcFuturesResponse getBtcFuturesResponse(String ID_LIKE) {
+    public BtcFuturesResponse getBtcFuturesResponse(String symbol, String ID_LIKE) {
         // ID_1H_LIKE = "'1h_%'";
-        String header = ID_LIKE.replaceAll("'", "").replaceAll("%", ""); // 1h_
+        String header = symbol + "_" + ID_LIKE.replaceAll("'", "").replaceAll("%", ""); // 1h_
 
         String sql = "SELECT                                                                                            \n"
                 + "    (SELECT min(low_price) FROM btc_futures WHERE id like " + ID_LIKE + ") AS low_price_h, \n"
@@ -2369,6 +2368,9 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         BtcFuturesResponse dto = vol_list.get(0);
+        if (Objects.equals(null, dto.getLow_price_h())) {
+            return null;
+        }
         return dto;
     }
 
@@ -2388,13 +2390,11 @@ public class BinanceServiceImpl implements BinanceService {
 
             BigDecimal price_at_binance = btc1hs.get(0).getCurrPrice();
 
-            int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-            if ((hh % 4 == 0) && !isSaved_LIMIT_DATA_4h) {
+            String hh = Utils.convertDateToString("HH", Calendar.getInstance().getTime());
+            if (!Objects.equals(hh, pre_time_of_saved_data_4h)) {
                 List<BtcFutures> btc4hs = Utils.loadData("BTC", TIME_4h, LIMIT_DATA_4h);
                 btcFuturesRepository.saveAll(btc4hs);
-                isSaved_LIMIT_DATA_4h = true;
-            } else if (hh % 4 != 0) {
-                isSaved_LIMIT_DATA_4h = false;
+                pre_time_of_saved_data_4h = hh;
             }
 
             boolean isUptrend = false;
@@ -2422,8 +2422,14 @@ public class BinanceServiceImpl implements BinanceService {
             curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
             String curr_time_of_btc_pre1h = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
-            BtcFuturesResponse dto = getBtcFuturesResponse(ID_1H_LIKE);
-            BtcFuturesResponse dto_10d = getBtcFuturesResponse(ID_4H_LIKE);
+            BtcFuturesResponse dto = getBtcFuturesResponse("BTC", ID_1H_LIKE);
+            if (Objects.equals(null, dto)) {
+                return results;
+            }
+            BtcFuturesResponse dto_10d = getBtcFuturesResponse("BTC", ID_4H_LIKE);
+            if (Objects.equals(null, dto_10d)) {
+                return results;
+            }
 
             BigDecimal good_price_for_long = Utils.getGoodPriceLongByPercent(price_at_binance, dto.getLow_price_h(),
                     dto.getOpen_candle_h(), BigDecimal.valueOf(1));

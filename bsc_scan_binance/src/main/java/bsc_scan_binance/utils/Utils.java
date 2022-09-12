@@ -159,7 +159,7 @@ public class Utils {
                 if (strid.length() < 2) {
                     strid = "0" + strid;
                 }
-                day.setId(TIME + "_" + strid);
+                day.setId(symbol.toUpperCase() + "_" + TIME + "_" + strid);
 
                 if (idx == LIMIT_DATA - 1) {
                     day.setCurrPrice(price_at_binance);
@@ -825,6 +825,13 @@ public class Utils {
     }
 
     public static BigDecimal getStopLossForLong(BigDecimal low_price, BigDecimal open_candle) {
+        if (getBigDecimal(low_price).equals(BigDecimal.ZERO)) {
+            return BigDecimal.valueOf(1000000);
+        }
+        if (getBigDecimal(open_candle).equals(BigDecimal.ZERO)) {
+            return BigDecimal.valueOf(1000000);
+        }
+
         BigDecimal candle_beard_length = open_candle.subtract(low_price);
         candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
 
@@ -841,6 +848,13 @@ public class Utils {
     }
 
     public static BigDecimal getStopLossForShort(BigDecimal hight_price, BigDecimal close_candle) {
+        if (getBigDecimal(hight_price).equals(BigDecimal.ZERO)) {
+            return BigDecimal.valueOf(1000000);
+        }
+        if (getBigDecimal(close_candle).equals(BigDecimal.ZERO)) {
+            return BigDecimal.valueOf(1000000);
+        }
+
         BigDecimal candle_beard_length = hight_price.subtract(close_candle);
         candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
 
