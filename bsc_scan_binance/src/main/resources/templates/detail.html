@@ -74,11 +74,18 @@ p {
 <body class="">
     <p style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;" th:text="${sp500}" th:classappend="${#strings.contains(sp500, '-') ? 'text-danger' : 'text-primary'}"></p>
 
-  <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
-    <span>Bitcoin Balances on </span>
-    <a th:target="_blank" th:href="${'https://www.coinglass.com/Balance'}">Exchanges:</a>
-    <p th:text="${exchanges}"></p>
-  </div>
+    <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
+      <span>Bitcoin Balances on </span>
+      <a th:target="_blank" th:href="${'https://www.coinglass.com/Balance'}">Exchanges:</a>
+      <p th:text="${exchanges}"></p>
+    </div>
+
+    <div th:if="${#lists.size(scapling_list) > 0}" style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important; min-width: 400px !important; max-width: 400px !important;">
+      <p class="font-weight-bold">(Scalping)</p>
+      <div>
+        <a th:each="token,iter: ${scapling_list}" th:target="_blank" th:href="${token.tradingview}"><span style="margin-right: 0.5rem;" th:text="${token.symbol}"></span></a>
+      </div>
+    </div>
 
     <p style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;" th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'SHORT') ? 'text-danger font-weight-bold' : #strings.contains(long_short_header, 'LONG') ? 'text-primary font-weight-bold' : ''}"></p>
 
@@ -180,14 +187,13 @@ p {
   </a>
   <br><br>
   
-  <div th:if="${#lists.size(scapling_list) > 0}">
+  <div th:if="${false}">
     <p style="margin-top: 1rem; margin-left: 0.5rem; " class="font-weight-bold">(Scalping)</p>
-    <table id="bnb_table" class="table table-bordered tableFixHead" style="min-width: 860px !important; max-width: 860px !important; padding-bottom: 3rem;">
+    <table id="bnb_table" class="table table-bordered tableFixHead" style="min-width: 750px !important; max-width: 750px !important; padding-bottom: 3rem;">
       <thead>
         <tr>
           <th class="text-center" scope="col">#</th>
           <th class="text-center" scope="col">Symbol</th>
-          <th class="text-center" scope="col">Futures</th>
           <th class="text-center" scope="col">Entry</th>
           <th class="text-center" scope="col">Stop loss</th>
           <th class="text-center" scope="col">Low</th>
@@ -201,7 +207,6 @@ p {
           <td style="min-width:  60px !important; max-width:  60px !important;">
             <a th:target="_blank" th:href="${token.tradingview}"><span th:text="${token.symbol}"></span></a>
           </td>
-          <td style="min-width: 120px !important; max-width: 120px !important;" th:text="${token.futures_msg}"></td>
           <td style="min-width:  80px !important; max-width:  80px !important;" th:text="${token.entry}"></td>
           <td style="min-width: 200px !important; max-width: 200px !important;" th:text="${token.stop_loss}"></td>
           <td style="min-width: 100px !important; max-width: 100px !important;" th:text="${token.low}"></td>

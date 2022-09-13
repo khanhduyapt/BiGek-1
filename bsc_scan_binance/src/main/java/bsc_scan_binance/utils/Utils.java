@@ -35,6 +35,7 @@ import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
+import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinResponse;
@@ -924,6 +925,219 @@ public class Utils {
         }
 
         return false;
+    }
+
+    public static BigDecimal getNextEntry(BtcFuturesResponse dto_1h) {
+        BigDecimal entry0 = dto_1h.getOpen_price_half1().subtract(dto_1h.getOpen_price_half2());
+
+        BigDecimal percent_angle = Utils.getPercent(dto_1h.getOpen_price_half2(), dto_1h.getOpen_price_half1()).abs();
+        if (percent_angle.compareTo(BigDecimal.valueOf(2)) > 0) {
+            return null;
+        }
+        entry0 = entry0.multiply(Utils.getBigDecimal(dto_1h.getId_half1()));
+        int id_haft1 = Utils.getIntValue(dto_1h.getId_half1().replaceAll("BTC_1h_", ""));
+        int id_haft2 = Utils.getIntValue(dto_1h.getId_half2().replaceAll("BTC_1h_", ""));
+        entry0 = entry0.divide(BigDecimal.valueOf(id_haft2 - id_haft1), 0, RoundingMode.CEILING);
+        entry0 = dto_1h.getOpen_price_half1().add(entry0);
+
+        return entry0;
+    }
+
+    public static String checkTrend(BtcFuturesResponse dto) {
+        BigDecimal percent_angle = Utils.getPercent(dto.getOpen_price_half2(), dto.getOpen_price_half1());
+
+        //Uptrend
+        if (percent_angle.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+            return "1:Uptrend";
+        }
+
+        //Downtrend
+        if (percent_angle.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
+            return "2:Downtrend";
+        }
+
+        //Sideway
+        return "3:Sideway";
+    }
+
+    public static String getMsgLong(String symbol, BigDecimal entry, BigDecimal low, BigDecimal open, BigDecimal hig) {
+
+        BigDecimal stop_loss = Utils.getStopLossForLong(low, open);
+        BigDecimal candle_height = hig.subtract(entry);
+        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
+        BigDecimal take_porfit_1 = entry.add(mid_candle);
+        BigDecimal take_porfit_2 = hig;
+
+        BigDecimal fee = BigDecimal.valueOf(2);
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(stop_loss.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(take_porfit_1.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(take_porfit_2.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+
+        String msg = "(Long) Scalping: " + symbol + Utils.new_line_from_service;
+
+        msg += "E: " + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
+
+        msg += "SL: " + Utils.removeLastZero(String.valueOf(stop_loss)) + "(" + Utils.toPercent(stop_loss, entry)
+                + "%) 1000$/" + loss + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "L: " + Utils.removeLastZero(String.valueOf(low)) + "(" + Utils.toPercent(low, entry) + "%)";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP1: " + Utils.removeLastZero(String.valueOf(take_porfit_1)) + "("
+                + Utils.toPercent(take_porfit_1, entry) + "%) 1000$/" + tp1 + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP2: " + Utils.removeLastZero(String.valueOf(take_porfit_2)) + "("
+                + Utils.toPercent(take_porfit_2, entry) + "%) 1000$/" + tp2 + "$";
+
+        return msg;
+    }
+
+    public static String getMsgLowHeight(BigDecimal price_at_binance, BtcFuturesResponse dto) {
+        String low_height = "";
+
+        String btc_now = Utils.removeLastZero(String.valueOf(price_at_binance)) + " (now)"
+                + Utils.new_line_from_service;
+
+        BigDecimal SL_short = Utils.getStopLossForShort(dto.getHight_price_h(), dto.getClose_candle_h());
+
+        low_height += "SL: " + Utils.removeLastZero(SL_short) + " (" + Utils.toPercent(SL_short, price_at_binance)
+                + "%)" + Utils.new_line_from_service;
+
+        low_height += "H: " + dto.getHight_price_h() + " (" + Utils.toPercent(dto.getHight_price_h(), price_at_binance)
+                + "%)" + Utils.new_line_from_service;
+
+        if (price_at_binance.compareTo(dto.getClose_candle_h()) > 0) {
+            low_height += btc_now;
+        }
+
+        low_height += "C: " + Utils.removeLastZero(dto.getClose_candle_h()) + " ("
+                + Utils.toPercent(dto.getClose_candle_h(), price_at_binance) + "%)" + Utils.new_line_from_service;
+
+        if (price_at_binance.compareTo(dto.getClose_candle_h()) < 0
+                && price_at_binance.compareTo(dto.getOpen_candle_h()) > 0) {
+            low_height += btc_now;
+        }
+
+        low_height += "O: " + Utils.removeLastZero(dto.getOpen_candle_h()) + " ("
+                + Utils.toPercent(dto.getOpen_candle_h(), price_at_binance) + "%)" + Utils.new_line_from_service;
+
+        if (price_at_binance.compareTo(dto.getOpen_candle_h()) < 0) {
+            low_height += btc_now;
+        }
+
+        low_height += "L: " + Utils.removeLastZero(dto.getLow_price_h()) + " ("
+                + Utils.toPercent(dto.getLow_price_h(), price_at_binance) + "%)" + Utils.new_line_from_service;
+
+        BigDecimal SL_long = Utils.getStopLossForLong(dto.getLow_price_h(), dto.getOpen_candle_h());
+
+        low_height += "SL: " + Utils.removeLastZero(SL_long) + " (" + Utils.toPercent(SL_long, price_at_binance) + "%)";
+
+        return low_height;
+    }
+
+    public static String getMsgLong(BigDecimal entry, BtcFuturesResponse dto) {
+        String msg = "";
+
+        BigDecimal stop_loss = Utils.getStopLossForLong(dto.getLow_price_h(), dto.getOpen_candle_h());
+
+        BigDecimal candle_height = dto.getClose_candle_h().subtract(dto.getOpen_candle_h());
+        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+        BigDecimal take_porfit_1 = dto.getOpen_candle_h().add(mid_candle);
+        BigDecimal take_porfit_2 = dto.getHight_price_h().subtract(BigDecimal.valueOf(10));
+
+        BigDecimal fee = BigDecimal.valueOf(2);
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(stop_loss.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(take_porfit_1.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(take_porfit_2.subtract(entry))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+
+        msg += "E: " + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
+
+        msg += "SL: " + Utils.removeLastZero(stop_loss) + "(" + Utils.toPercent(stop_loss, entry) + "%) 1000$/" + loss
+                + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "L: " + Utils.removeLastZero(dto.getLow_price_h()) + "(" + Utils.toPercent(dto.getLow_price_h(), entry)
+                + "%)";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP1: " + Utils.removeLastZero(take_porfit_1) + "(" + Utils.toPercent(take_porfit_1, entry) + "%) 1000$/"
+                + tp1 + "$";
+        msg += Utils.new_line_from_service;
+
+        msg += "TP2: " + Utils.removeLastZero(take_porfit_2) + "(" + Utils.toPercent(take_porfit_2, entry) + "%) 1000$/"
+                + tp2 + "$";
+
+        msg += checkRR(loss, tp1);
+
+        return msg;
+    }
+
+    public static String getMsgShort(BigDecimal entry, BtcFuturesResponse dto) {
+        String msg = "";
+        BigDecimal stop_loss = Utils.getStopLossForShort(dto.getHight_price_h(), dto.getClose_candle_h());
+
+        BigDecimal candle_height = dto.getClose_candle_h().subtract(dto.getOpen_candle_h());
+        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
+        BigDecimal take_porfit_1 = dto.getOpen_candle_h().add(mid_candle);
+        BigDecimal take_porfit_2 = dto.getOpen_candle_h().add(BigDecimal.valueOf(10));
+
+        BigDecimal fee = BigDecimal.valueOf(2);
+        BigDecimal loss = BigDecimal.valueOf(1000).multiply(entry.subtract(stop_loss))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_1))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_2))
+                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
+
+        msg += "E: " + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
+
+        msg += "SL: " + Utils.removeLastZero(stop_loss) + "(" + Utils.toPercent(entry, stop_loss) + "%) 1000$/" + loss
+                + "$";
+
+        msg += Utils.new_line_from_service;
+
+        msg += "H: " + dto.getHight_price_h() + "(" + Utils.toPercent(entry, dto.getHight_price_h()) + "%)";
+
+        msg += Utils.new_line_from_service;
+
+        msg += "TP1: " + Utils.removeLastZero(take_porfit_1) + "(" + Utils.toPercent(entry, take_porfit_1) + "%) 1000$/"
+                + tp1 + "$";
+
+        msg += Utils.new_line_from_service;
+
+        msg += "TP2: " + Utils.removeLastZero(take_porfit_2) + "(" + Utils.toPercent(entry, take_porfit_2) + "%) 1000$/"
+                + tp2 + "$";
+
+        msg += checkRR(loss, tp1);
+
+        return msg;
+    }
+
+    public static String checkRR(BigDecimal loss, BigDecimal tp1) {
+        String msg = Utils.new_line_from_service + "(Bad)";
+
+        if (loss.add(tp1.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING)).compareTo(BigDecimal.ZERO) > 0) {
+            msg = Utils.new_line_from_service + "(Good x2)";
+
+        } else if (loss.add(tp1).compareTo(BigDecimal.ZERO) >= 0) {
+
+            msg = Utils.new_line_from_service + "(Good)";
+
+        } else if ((loss.add(tp1.add(BigDecimal.valueOf(2)))).compareTo(BigDecimal.ZERO) >= 0) {
+
+            msg = Utils.new_line_from_service + "...";
+
+        }
+
+        return msg;
     }
 
     public static boolean isUptrend(String symbol) {

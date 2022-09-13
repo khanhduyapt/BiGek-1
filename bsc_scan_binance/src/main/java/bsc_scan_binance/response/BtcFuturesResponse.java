@@ -15,8 +15,8 @@ public class BtcFuturesResponse {
     private BigDecimal close_candle_h;
     private BigDecimal hight_price_h;
 
-    private Integer id_half1;
+    private String id_half1;
     private BigDecimal open_price_half1;
-    private Integer id_half2;
+    private String id_half2;
     private BigDecimal open_price_half2;
 }
