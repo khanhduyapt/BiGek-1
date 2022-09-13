@@ -135,6 +135,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String pre_time_of_btc_msg_1h = "";
     private String pre_time_of_btc_for_long_short = "";
     private String pre_time_of_btc_kill_long_short = "";
+    private String pre_time_of_btc_kill_long_short_1m = "";
     private String pre_time_of_saved_data_4h = "";
 
     private String pre_yyyyMMddHH = "";
@@ -998,8 +999,6 @@ public class BinanceServiceImpl implements BinanceService {
                     if (sp500.contains("-")) {
                         css.setStar_css("bg-danger rounded-lg display-tity text-left text-white");
                     }
-
-                    monitorBtcPrice();
                 }
                 // ---------------------------------------------------
 
@@ -2384,6 +2383,7 @@ public class BinanceServiceImpl implements BinanceService {
         int mm = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
+        String str_cur_mm = String.valueOf(curr_time_of_btc);
         curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
         String curr_time_of_btc_pre10m = String.valueOf(curr_time_of_btc);
         String curr_time_of_btc_pre1h = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
@@ -2392,37 +2392,50 @@ public class BinanceServiceImpl implements BinanceService {
             log.info("Start monitorBtcPrice ---->");
 
             // https://www.binance.com/en-GB/futures/funding-history/3
-            if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_kill_long_short)) {
 
+            // if (!Objects.equals(str_cur_mm, pre_time_of_btc_kill_long_short_1m))
+            {
                 String url = "https://www.binance.com/fapi/v1/marketKlines?interval=15m&limit=1&symbol=pBTCUSDT";
                 List<Object> funding_rate_objs = Utils.getBinanceData(url, 1);
                 if (!CollectionUtils.isEmpty(funding_rate_objs)) {
+
                     Object obj = funding_rate_objs.get(0);
                     List<Object> arr_ = (List<Object>) obj;
 
-                    // BigDecimal open = Utils.getBigDecimal(arr_.get(1));
-                    BigDecimal high = Utils.getBigDecimal(arr_.get(2)).multiply(BigDecimal.valueOf(100));
-                    BigDecimal low = Utils.getBigDecimal(arr_.get(3)).multiply(BigDecimal.valueOf(100));
-                    // BigDecimal close = Utils.getBigDecimal(arr_.get(4));
+                    if (!CollectionUtils.isEmpty(arr_)) {
+                        // BigDecimal open = Utils.getBigDecimal(arr_.get(1));
+                        BigDecimal high = Utils.getBigDecimal(arr_.get(2)).multiply(BigDecimal.valueOf(100));
+                        BigDecimal low = Utils.getBigDecimal(arr_.get(3)).multiply(BigDecimal.valueOf(100));
+                        // BigDecimal close = Utils.getBigDecimal(arr_.get(4));
 
-                    if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
-                        Utils.sendToTelegram("(DANGER) CZ kill SHORT !!!");
-                        Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
-                        pre_time_of_btc_kill_long_short = curr_time_of_btc_pre10m;
-                    }
+                        if (high.compareTo(BigDecimal.valueOf(0.5)) > 0) {
 
-                    if (low.compareTo(BigDecimal.valueOf(-1)) < 0) {
+                            Utils.sendToTelegram("(DANGER DANGER) CZ kill SHORT !!!");
+                            pre_time_of_btc_kill_long_short_1m = str_cur_mm;
 
-                        Utils.sendToTelegram("(DANGER DANGER DANGER) CZ kill LONG !!!");
-                        Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
-                        pre_time_of_btc_kill_long_short = curr_time_of_btc_pre10m;
+                        } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
+                            Utils.sendToTelegram("(DANGER) CZ kill SHORT !!!");
+                            // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                            pre_time_of_btc_kill_long_short_1m = str_cur_mm;
+                        }
 
-                    } else if (low.compareTo(BigDecimal.valueOf(-0.3)) < 0) {
+                        if (low.compareTo(BigDecimal.valueOf(-1)) < 0) {
 
-                        Utils.sendToTelegram("(DANGER) CZ kill LONG !!!");
-                        Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
-                        pre_time_of_btc_kill_long_short = curr_time_of_btc_pre10m;
+                            Utils.sendToTelegram("(DANGER DANGER DANGER) CZ kill LONG !!!");
+                            // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                            pre_time_of_btc_kill_long_short_1m = str_cur_mm;
+                        } else if (low.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
 
+                            Utils.sendToTelegram("(DANGER DANGER) CZ kill LONG !!!");
+                            pre_time_of_btc_kill_long_short_1m = str_cur_mm;
+
+                        } else if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
+
+                            Utils.sendToTelegram("(DANGER) CZ kill LONG !!!");
+                            // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                            pre_time_of_btc_kill_long_short_1m = str_cur_mm;
+
+                        }
                     }
                 }
             }

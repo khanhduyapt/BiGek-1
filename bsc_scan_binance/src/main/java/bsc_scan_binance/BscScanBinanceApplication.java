@@ -92,17 +92,18 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        if (idx % 30 == 0) {
+                        if (idx % 15 == 0) {
                             binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol());
                             binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
                             binance_service.monitorBtcPrice();
+                            wait(1200);
                         }
 
-                        String loadBinanceData = binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol());
+                        binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol());
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
 
                         log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
-                                + loadBinanceData);
+                                + coin.getSymbol());
 
                     } catch (Exception e) {
                         log.error("dkd error LoadData:" + e.getMessage());
