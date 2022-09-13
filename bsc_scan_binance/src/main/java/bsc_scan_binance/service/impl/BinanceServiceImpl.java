@@ -1774,7 +1774,7 @@ public class BinanceServiceImpl implements BinanceService {
     public String loadBinanceData(String gecko_id, String symbol) {
         // debug
         // monitorBitcoinBalancesOnExchanges();
-        scalping(gecko_id, symbol);
+        // scalping(gecko_id, symbol);
 
         try {
             final Integer limit = 14;
@@ -2370,14 +2370,57 @@ public class BinanceServiceImpl implements BinanceService {
         return dto;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     @Transactional
     public List<String> monitorBtcPrice() {
         List<String> results = new ArrayList<String>();
+        String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
+        int mm = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+        int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
+        curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
+        String curr_time_of_btc_pre10m = String.valueOf(curr_time_of_btc);
+        String curr_time_of_btc_pre1h = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
+
         try {
             log.info("Start monitorBtcPrice ---->");
 
-            // btcFuturesRepository.deleteAll();
+            // https://www.binance.com/en-GB/futures/funding-history/3
+            if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_kill_long_short)) {
+
+                String url = "https://www.binance.com/fapi/v1/marketKlines?interval=1h&limit=1&symbol=pBTCUSDT";
+                List<Object> funding_rate_objs = Utils.getBinanceData(url, 1);
+                if (!CollectionUtils.isEmpty(funding_rate_objs)) {
+                    Object obj = funding_rate_objs.get(0);
+                    List<Object> arr_ = (List<Object>) obj;
+
+                    //BigDecimal open = Utils.getBigDecimal(arr_.get(1));
+                    BigDecimal high = Utils.getBigDecimal(arr_.get(2)).multiply(BigDecimal.valueOf(100));
+                    BigDecimal low = Utils.getBigDecimal(arr_.get(3)).multiply(BigDecimal.valueOf(100));
+                    //BigDecimal close = Utils.getBigDecimal(arr_.get(4));
+
+                    if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
+                        Utils.sendToTelegram("(DANGER) CZ kill SHORT !!!");
+                        Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                        pre_time_of_btc_kill_long_short = curr_time_of_btc_pre10m;
+                    }
+
+                    if (low.compareTo(BigDecimal.valueOf(-1)) < 0) {
+
+                        Utils.sendToTelegram("(DANGER DANGER DANGER) CZ kill LONG !!!");
+                        Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                        pre_time_of_btc_kill_long_short = curr_time_of_btc_pre10m;
+
+                    } else if (low.compareTo(BigDecimal.valueOf(-0.3)) < 0) {
+
+                        Utils.sendToTelegram("(DANGER) CZ kill LONG !!!");
+                        Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                        pre_time_of_btc_kill_long_short = curr_time_of_btc_pre10m;
+
+                    }
+                }
+            }
 
             // 1) Xem chart 1H xac dinh long/short (2 cay 1h truoc do)
 
@@ -2415,11 +2458,6 @@ public class BinanceServiceImpl implements BinanceService {
                     dto_1h.getHight_price_h(),
                     dto_1h.getClose_candle_h(), BigDecimal.valueOf(1));
 
-            String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
-            String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
-            curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
-            String curr_time_of_btc_pre10m = String.valueOf(curr_time_of_btc);
-            String curr_time_of_btc_pre1h = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
             String msg = time;
 
             String low_height = Utils.getMsgLowHeight(price_at_binance, dto_10d);
@@ -2493,7 +2531,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             // (48h)
-            if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_msg_10m)) {
+            if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_msg_10m) && (mm / 30 == 0)) {
                 if (price_at_binance.compareTo(dto_1h.getOpen_candle_h()) <= 0) {
                     //Utils.sendToTelegram("(Bitcoin bottomed in 48h)" + Utils.new_line_from_service + "(LONG)"
                     //        + Utils.new_line_from_service + getMsgLong(price_at_binance, dto_1h));
@@ -2526,17 +2564,17 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             // (10d)
-            if (!Objects.equals(curr_time_of_btc_pre1h, pre_time_of_btc_msg_1h)) {
+            if (!Objects.equals(curr_time_of_btc_pre1h, pre_time_of_btc_msg_1h) && (HH % 2 == 0)) {
                 if (price_at_binance.compareTo(dto_10d.getOpen_candle_h()) <= 0) {
                     Utils.sendToTelegram("(Bitcoin bottomed in 10d)" + Utils.new_line_from_service + "(LONG)"
-                            + Utils.new_line_from_service + Utils.getMsgLong(price_at_binance, dto_10d));
+                            + Utils.new_line_from_service + Utils.getMsgLong(dto_10d.getLow_price_h(), dto_10d));
 
                     pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
                 }
 
                 if (price_at_binance.compareTo(dto_10d.getClose_candle_h()) >= 0) {
                     Utils.sendToTelegram("(Bitcoin hits 10d peak)" + Utils.new_line_from_service + "(Short)"
-                            + Utils.new_line_from_service + Utils.getMsgShort(price_at_binance, dto_10d));
+                            + Utils.new_line_from_service + Utils.getMsgShort(dto_10d.getHight_price_h(), dto_10d));
 
                     pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
                 }
@@ -2739,7 +2777,7 @@ public class BinanceServiceImpl implements BinanceService {
                 entity.setScalpingEntry(msg);
 
                 binanceFuturesRepository.save(entity);
-                Utils.sendToMyTelegram("Scalping: " + symbol + Utils.new_line_from_service + msg);
+                //Utils.sendToMyTelegram("Scalping: " + symbol + Utils.new_line_from_service + msg);
 
                 log.info("scalping: " + symbol + ", " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$");
             }
