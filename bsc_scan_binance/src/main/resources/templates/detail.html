@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8" http-equiv="refresh" content="120">
+<meta charset="UTF-8" http-equiv="refresh" content="60">
 <title>Wanda-details</title>
 <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
@@ -108,25 +108,6 @@ p {
         </table>
     </div>
 
-    <div style="display: flex; margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
-        <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important;">
-            <tbody>
-              <tr th:each="msg,iter: ${long_list_perfect2}">
-                <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" class="font-weight-bold"></td>
-                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.25rem !important;" th:text="${msg}"></td>
-              </tr>
-            </tbody>
-        </table>
-        <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important; margin-left: 0.5rem; ">
-            <tbody>
-              <tr th:each="msg,iter: ${short_list_perfect2}">
-                <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" class="font-weight-bold"></td>
-                <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.25rem !important;" th:text="${msg}"></td>
-              </tr>
-            </tbody>
-        </table>
-    </div>
-
     <div style="display: flex; margin-top: 0.5rem;">
       <table class="table table-bordered tableFixHead" style="min-width: 125px !important; max-width: 125px !important;">
         <thead>
@@ -185,6 +166,28 @@ p {
   <a style="padding-top: 3rem;padding-left: 0.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
     <span>Trading View</span>
   </a>
+
+  <br><br>
+
+  <div style="display: flex; margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
+      <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important;">
+          <tbody>
+            <tr th:each="msg,iter: ${long_list_perfect2}">
+              <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" class="font-weight-bold"></td>
+              <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.25rem !important;" th:text="${msg}"></td>
+            </tr>
+          </tbody>
+      </table>
+      <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important; margin-left: 0.5rem; ">
+          <tbody>
+            <tr th:each="msg,iter: ${short_list_perfect2}">
+              <td th:if="${iter.index == 0}" style="text-align: center; background: #eee; padding: 0; padding-left: 0.5rem !important;" th:text="${msg}" class="font-weight-bold"></td>
+              <td th:if="${iter.index != 0}" style="padding: 0; padding-left: 0.25rem !important;" th:text="${msg}"></td>
+            </tr>
+          </tbody>
+      </table>
+  </div>
+
   <br><br>
 
   <div th:if="${false}">
