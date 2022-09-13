@@ -1778,11 +1778,11 @@ public class BinanceServiceImpl implements BinanceService {
 
         try {
             final Integer limit = 14;
-            final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT"
-                    + "&interval=" + TIME_1d + "&limit=" + String.valueOf(limit);
+            final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT" + "&interval="
+                    + TIME_1d + "&limit=" + String.valueOf(limit);
 
-            final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD"
-                    + "&interval=" + TIME_1d + "&limit=" + String.valueOf(limit);
+            final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD" + "&interval="
+                    + TIME_1d + "&limit=" + String.valueOf(limit);
 
             BigDecimal price_at_binance = Utils.getBinancePrice(SYMBOL_BTC);
             if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
@@ -1965,6 +1965,11 @@ public class BinanceServiceImpl implements BinanceService {
      */
     @SuppressWarnings("unchecked")
     private String setCoinGlassData(String gecko_id, String symbol) {
+        boolean exit = true;
+        if (exit) {
+            return "";
+        }
+
         String url = "https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=" + symbol.toUpperCase()
                 + "&exName=Binance&type=1&timeType=3";
 
@@ -2389,16 +2394,16 @@ public class BinanceServiceImpl implements BinanceService {
             // https://www.binance.com/en-GB/futures/funding-history/3
             if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_kill_long_short)) {
 
-                String url = "https://www.binance.com/fapi/v1/marketKlines?interval=1h&limit=1&symbol=pBTCUSDT";
+                String url = "https://www.binance.com/fapi/v1/marketKlines?interval=15m&limit=1&symbol=pBTCUSDT";
                 List<Object> funding_rate_objs = Utils.getBinanceData(url, 1);
                 if (!CollectionUtils.isEmpty(funding_rate_objs)) {
                     Object obj = funding_rate_objs.get(0);
                     List<Object> arr_ = (List<Object>) obj;
 
-                    //BigDecimal open = Utils.getBigDecimal(arr_.get(1));
+                    // BigDecimal open = Utils.getBigDecimal(arr_.get(1));
                     BigDecimal high = Utils.getBigDecimal(arr_.get(2)).multiply(BigDecimal.valueOf(100));
                     BigDecimal low = Utils.getBigDecimal(arr_.get(3)).multiply(BigDecimal.valueOf(100));
-                    //BigDecimal close = Utils.getBigDecimal(arr_.get(4));
+                    // BigDecimal close = Utils.getBigDecimal(arr_.get(4));
 
                     if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
                         Utils.sendToTelegram("(DANGER) CZ kill SHORT !!!");
@@ -2455,8 +2460,7 @@ public class BinanceServiceImpl implements BinanceService {
                     dto_1h.getOpen_candle_h(), BigDecimal.valueOf(1));
 
             BigDecimal good_price_for_short = Utils.getGoodPriceShortByPercent(price_at_binance,
-                    dto_1h.getHight_price_h(),
-                    dto_1h.getClose_candle_h(), BigDecimal.valueOf(1));
+                    dto_1h.getHight_price_h(), dto_1h.getClose_candle_h(), BigDecimal.valueOf(1));
 
             String msg = time;
 
@@ -2517,7 +2521,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (price_at_binance.compareTo(good_price_for_long) <= 0) {
 
                     Utils.sendToTelegram(
-                            "(Long now)" + Utils.new_line_from_service + Utils.getMsgLong(price_at_binance, dto_1h));
+                            "(Long)" + Utils.new_line_from_service + Utils.getMsgLong(price_at_binance, dto_1h));
 
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
@@ -2525,7 +2529,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (price_at_binance.compareTo(good_price_for_short) > 0) {
 
                     Utils.sendToTelegram(
-                            "(Short now)" + Utils.new_line_from_service + Utils.getMsgShort(price_at_binance, dto_1h));
+                            "(Short)" + Utils.new_line_from_service + Utils.getMsgShort(price_at_binance, dto_1h));
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
             }
@@ -2533,16 +2537,18 @@ public class BinanceServiceImpl implements BinanceService {
             // (48h)
             if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_msg_10m) && (mm / 30 == 0)) {
                 if (price_at_binance.compareTo(dto_1h.getOpen_candle_h()) <= 0) {
-                    //Utils.sendToTelegram("(Bitcoin bottomed in 48h)" + Utils.new_line_from_service + "(LONG)"
-                    //        + Utils.new_line_from_service + getMsgLong(price_at_binance, dto_1h));
+                    // Utils.sendToTelegram("(Bitcoin bottomed in 48h)" +
+                    // Utils.new_line_from_service + "(LONG)"
+                    // + Utils.new_line_from_service + getMsgLong(price_at_binance, dto_1h));
 
                     Utils.sendToTelegram("(Bitcoin bottomed in 48h)");
                     pre_time_of_btc_msg_10m = curr_time_of_btc_pre10m;
                 }
 
                 if (price_at_binance.compareTo(dto_1h.getClose_candle_h()) >= 0) {
-                    //Utils.sendToTelegram("(Bitcoin hits 48h peak)" + Utils.new_line_from_service + "(Short)"
-                    //        + Utils.new_line_from_service + getMsgShort(price_at_binance, dto_1h));
+                    // Utils.sendToTelegram("(Bitcoin hits 48h peak)" + Utils.new_line_from_service
+                    // + "(Short)"
+                    // + Utils.new_line_from_service + getMsgShort(price_at_binance, dto_1h));
 
                     Utils.sendToTelegram("(Bitcoin hits 48h peak)");
                     pre_time_of_btc_msg_10m = curr_time_of_btc_pre10m;
@@ -2777,7 +2783,8 @@ public class BinanceServiceImpl implements BinanceService {
                 entity.setScalpingEntry(msg);
 
                 binanceFuturesRepository.save(entity);
-                //Utils.sendToMyTelegram("Scalping: " + symbol + Utils.new_line_from_service + msg);
+                // Utils.sendToMyTelegram("Scalping: " + symbol + Utils.new_line_from_service +
+                // msg);
 
                 log.info("scalping: " + symbol + ", " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$");
             }

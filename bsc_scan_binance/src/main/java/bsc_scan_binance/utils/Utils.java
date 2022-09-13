@@ -946,17 +946,17 @@ public class Utils {
     public static String checkTrend(BtcFuturesResponse dto) {
         BigDecimal percent_angle = Utils.getPercent(dto.getOpen_price_half2(), dto.getOpen_price_half1());
 
-        //Uptrend
+        // Uptrend
         if (percent_angle.compareTo(BigDecimal.valueOf(0.5)) > 0) {
             return "1:Uptrend";
         }
 
-        //Downtrend
+        // Downtrend
         if (percent_angle.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
             return "2:Downtrend";
         }
 
-        //Sideway
+        // Sideway
         return "3:Sideway";
     }
 
@@ -1075,8 +1075,6 @@ public class Utils {
         msg += "TP2: " + Utils.removeLastZero(take_porfit_2) + "(" + Utils.toPercent(take_porfit_2, entry) + "%) 1000$/"
                 + tp2 + "$";
 
-        msg += checkRR(loss, tp1);
-
         return msg;
     }
 
@@ -1115,27 +1113,6 @@ public class Utils {
 
         msg += "TP2: " + Utils.removeLastZero(take_porfit_2) + "(" + Utils.toPercent(entry, take_porfit_2) + "%) 1000$/"
                 + tp2 + "$";
-
-        msg += checkRR(loss, tp1);
-
-        return msg;
-    }
-
-    public static String checkRR(BigDecimal loss, BigDecimal tp1) {
-        String msg = Utils.new_line_from_service + "(Bad)";
-
-        if (loss.add(tp1.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING)).compareTo(BigDecimal.ZERO) > 0) {
-            msg = Utils.new_line_from_service + "(Good x2)";
-
-        } else if (loss.add(tp1).compareTo(BigDecimal.ZERO) >= 0) {
-
-            msg = Utils.new_line_from_service + "(Good)";
-
-        } else if ((loss.add(tp1.add(BigDecimal.valueOf(2)))).compareTo(BigDecimal.ZERO) >= 0) {
-
-            msg = Utils.new_line_from_service + "...";
-
-        }
 
         return msg;
     }
