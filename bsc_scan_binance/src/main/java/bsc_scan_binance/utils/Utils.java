@@ -444,7 +444,7 @@ public class Utils {
         }
 
         if (!isBusinessTime()) {
-            return;
+            //return;
         }
 
         sendToChatId(Utils.chatId_duydk, text);
@@ -944,7 +944,7 @@ public class Utils {
     }
 
     public static String checkTrend(BtcFuturesResponse dto) {
-        BigDecimal percent_angle = Utils.getPercent(dto.getOpen_price_half2(), dto.getOpen_price_half1());
+        BigDecimal percent_angle = Utils.getPercent(dto.getOpen_price_half1(), dto.getOpen_price_half2());
 
         // Uptrend
         if (percent_angle.compareTo(BigDecimal.valueOf(0.5)) > 0) {

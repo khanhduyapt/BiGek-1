@@ -62,9 +62,19 @@ public class BinanceController {
         model.addAttribute("data_list_1", list_bids);
         model.addAttribute("data_list_2", list_asks);
         model.addAttribute("symbol", symbol);
-        model.addAttribute("sp500", service.loadPremarketSp500().replaceAll(Utils.new_line_from_bot, ", "));
-        model.addAttribute("exchanges",
-                service.getBtcBalancesOnExchanges().replaceAll(Utils.new_line_from_service, ", "));
+        model.addAttribute("sp500",
+                service.loadPremarketSp500().replaceAll(Utils.new_line_from_bot, ", ").replaceAll("S&P 500", ""));
+
+        String exchange = service.getBtcBalancesOnExchanges();
+        exchange = exchange.replaceAll("BTC 24h: ", "").replaceAll(" 07d: ", "");
+        List<String> exchanges = new ArrayList<String>(Arrays.asList(exchange.split(Utils.new_line_from_service)));
+        if (CollectionUtils.isEmpty(exchanges)) {
+            model.addAttribute("exchanges_24h", "");
+            model.addAttribute("exchanges_7d", "");
+        } else {
+            model.addAttribute("exchanges_24h", exchanges.get(0));
+            model.addAttribute("exchanges_7d", exchanges.get(1));
+        }
 
         List<String> long_short = service.monitorBtcPrice();
         if (CollectionUtils.isEmpty(long_short)) {

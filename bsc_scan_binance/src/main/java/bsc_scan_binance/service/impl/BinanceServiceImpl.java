@@ -2205,8 +2205,52 @@ public class BinanceServiceImpl implements BinanceService {
             List<DepthResponse> list_bids = getDepthDataBtc(2);
             List<DepthResponse> list_asks = getDepthDataBtc(3);
 
-            result.add(list_bids);
-            result.add(list_asks);
+            List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
+            List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
+
+            BigDecimal wall = BigDecimal.valueOf(2);
+            BigDecimal total_bids = BigDecimal.ZERO;
+            for (DepthResponse dto : list_bids) {
+                BigDecimal price = dto.getPrice();
+                BigDecimal val = dto.getVal_million_dolas();
+
+                if (val.compareTo(wall) < 0) {
+                    total_bids = total_bids.add(val);
+                }
+
+                if (val.compareTo(wall) >= 0) {
+                    DepthResponse real_wall = new DepthResponse();
+                    real_wall.setPrice(null);
+                    real_wall.setVal_million_dolas(total_bids);
+                    list_bids_ok.add(real_wall);
+                }
+
+                dto.setPrice(price);
+                list_bids_ok.add(dto);
+            }
+
+            BigDecimal total_asks = BigDecimal.ZERO;
+            for (DepthResponse dto : list_asks) {
+                BigDecimal price = dto.getPrice();
+                BigDecimal val = dto.getVal_million_dolas();
+
+                if (val.compareTo(wall) < 0) {
+                    total_asks = total_asks.add(val);
+                }
+
+                if (val.compareTo(wall) >= 0) {
+                    DepthResponse real_wall = new DepthResponse();
+                    real_wall.setPrice(null);
+                    real_wall.setVal_million_dolas(total_asks);
+                    list_asks_ok.add(real_wall);
+                }
+
+                dto.setPrice(price);
+                list_asks_ok.add(dto);
+            }
+
+            result.add(list_bids_ok);
+            result.add(list_asks_ok);
             return result;
         }
 
@@ -2258,8 +2302,24 @@ public class BinanceServiceImpl implements BinanceService {
             List<DepthResponse> list_asks = query.getResultList();
 
             List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
+            BigDecimal wall = BigDecimal.valueOf(2);
+            BigDecimal total_bids = BigDecimal.ZERO;
             for (DepthResponse dto : list_bids) {
-                dto.setPrice(Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice()))));
+                BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
+                BigDecimal val = dto.getVal_million_dolas();
+
+                if (val.compareTo(wall) < 0) {
+                    total_bids = total_bids.add(val);
+                }
+
+                if (val.compareTo(wall) >= 0) {
+                    DepthResponse real_wall = new DepthResponse();
+                    real_wall.setPrice(BigDecimal.valueOf(99999));
+                    real_wall.setVal_million_dolas(total_bids);
+                    list_bids_ok.add(real_wall);
+                }
+
+                dto.setPrice(price);
                 list_bids_ok.add(dto);
             }
 
@@ -2380,7 +2440,6 @@ public class BinanceServiceImpl implements BinanceService {
     public List<String> monitorBtcPrice() {
         List<String> results = new ArrayList<String>();
         String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
-        int mm = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
         String str_cur_mm = String.valueOf(curr_time_of_btc);
@@ -2392,7 +2451,6 @@ public class BinanceServiceImpl implements BinanceService {
             log.info("Start monitorBtcPrice ---->");
 
             // https://www.binance.com/en-GB/futures/funding-history/3
-
             // if (!Objects.equals(str_cur_mm, pre_time_of_btc_kill_long_short_1m))
             {
                 String url = "https://www.binance.com/fapi/v1/marketKlines?interval=15m&limit=1&symbol=pBTCUSDT";
@@ -2436,6 +2494,27 @@ public class BinanceServiceImpl implements BinanceService {
                             pre_time_of_btc_kill_long_short_1m = str_cur_mm;
 
                         }
+
+                        if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
+
+                            Utils.sendToMyTelegram(time + " (Funding Rate) CZ kill Long !!!");
+
+                        } else if (low.compareTo(BigDecimal.valueOf(-0.1)) < 0) {
+
+                            Utils.sendToMyTelegram(time + " (Funding Rate) Btc price hits bottom.");
+
+                        }
+
+                        if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
+
+                            Utils.sendToMyTelegram(time + " (Funding Rate) CZ kill Short !!!");
+
+                        } else if (high.compareTo(BigDecimal.valueOf(0.03)) > 0) {
+
+                            Utils.sendToMyTelegram(time + " (Funding Rate) Btc price hits top.");
+
+                        }
+
                     }
                 }
             }
@@ -2482,7 +2561,7 @@ public class BinanceServiceImpl implements BinanceService {
             low_height += "10d" + Utils.new_line_from_service + Utils.getMsgLowHeight(price_at_binance, dto_10d);
 
             if (isUptrend) {
-                msg += " LONG..." + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
+                msg += " Uptrend... " + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
                 if (Utils.isGoodPriceLong(price_at_binance, dto_1h.getLow_price_h(), dto_1h.getHight_price_h())) {
                     msg += " (Good)";
                 }
@@ -2503,7 +2582,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (isDowntrend) {
-                msg += " SHORT..." + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
+                msg += " Downtrend... " + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
                 if (Utils.isGoodPriceShort(price_at_binance, dto_1h.getOpen_candle_h(), dto_1h.getClose_candle_h())) {
                     msg += " (Good)";
                 }
@@ -2530,7 +2609,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             // (Good time to buy)
-            if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short)) {
+            if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short) && (HH % 4 == 0)) {
                 if (price_at_binance.compareTo(good_price_for_long) <= 0) {
 
                     Utils.sendToTelegram(
@@ -2548,7 +2627,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             // (48h)
-            if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_msg_10m) && (mm / 30 == 0)) {
+            if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_msg_10m) && (HH % 4 == 0)) {
                 if (price_at_binance.compareTo(dto_1h.getOpen_candle_h()) <= 0) {
                     // Utils.sendToTelegram("(Bitcoin bottomed in 48h)" +
                     // Utils.new_line_from_service + "(LONG)"
@@ -2583,7 +2662,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             // (10d)
-            if (!Objects.equals(curr_time_of_btc_pre1h, pre_time_of_btc_msg_1h) && (HH % 2 == 0)) {
+            if (!Objects.equals(curr_time_of_btc_pre1h, pre_time_of_btc_msg_1h) && (HH % 4 == 0)) {
                 if (price_at_binance.compareTo(dto_10d.getOpen_candle_h()) <= 0) {
                     Utils.sendToTelegram("(Bitcoin bottomed in 10d)" + Utils.new_line_from_service + "(LONG)"
                             + Utils.new_line_from_service + Utils.getMsgLong(dto_10d.getLow_price_h(), dto_10d));
