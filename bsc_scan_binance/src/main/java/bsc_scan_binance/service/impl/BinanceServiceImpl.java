@@ -137,7 +137,6 @@ public class BinanceServiceImpl implements BinanceService {
     List<String> monitorBtcPrice_results = new ArrayList<String>();
 
     private String pre_time_of_btc = "";
-    private String pre_time_of_btc_msg_10m = "";
     private String pre_time_of_btc_msg_1h = "";
     private String pre_time_of_btc_for_long_short = "";
     private String pre_time_of_btc_kill_long_short = "";
@@ -2512,13 +2511,13 @@ public class BinanceServiceImpl implements BinanceService {
                                     pre_funding_rate_low = Utils.removeLastZero(String.valueOf(low));
 
                                     Utils.sendToMyTelegram(time
-                                            + " (Funding Rate) CZ kill Long !!! Btc chuẩn bị xuống đáy, 5~6 phút nữa.");
+                                            + " (Funding Rate) CZ kill Long !!! Btc chuẩn bị xuống đáy, 3~5 phút nữa.");
 
                                 } else if (low.compareTo(BigDecimal.valueOf(-0.12)) < 0) {
                                     pre_funding_rate_low = Utils.removeLastZero(String.valueOf(low));
 
                                     Utils.sendToMyTelegram(time + " (Funding Rate:" + pre_funding_rate_low
-                                            + ") Btc chuẩn bị xuống đáy, 5~6 phút nữa.");
+                                            + ") Btc chuẩn bị xuống đáy, 3~5 phút nữa.");
                                 }
                             }
 
@@ -2527,13 +2526,13 @@ public class BinanceServiceImpl implements BinanceService {
                                     pre_funding_rate_high = Utils.removeLastZero(String.valueOf(high));
 
                                     Utils.sendToMyTelegram(time
-                                            + " (Funding Rate) CZ kill Short !!! Btc chuẩn bị lên đỉnh, 5~6 phút nữa.");
+                                            + " (Funding Rate) CZ kill Short !!! Btc chuẩn bị lên đỉnh, 3~5 phút nữa.");
 
                                 } else if (high.compareTo(BigDecimal.valueOf(0.03)) > 0) {
                                     pre_funding_rate_high = Utils.removeLastZero(String.valueOf(high));
 
                                     Utils.sendToMyTelegram(time + " (Funding Rate:" + pre_funding_rate_high
-                                            + ") Btc chuẩn bị lên đỉnh, 5~6 phút nữa.");
+                                            + ") Btc chuẩn bị lên đỉnh, 3~5 phút nữa.");
                                 }
                             }
                         }
@@ -2646,27 +2645,6 @@ public class BinanceServiceImpl implements BinanceService {
                     Utils.sendToTelegram(
                             "(Short)" + Utils.new_line_from_service + Utils.getMsgShort(price_at_binance, dto_1h));
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
-                }
-            }
-
-            // (48h)
-            if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_msg_10m) && (HH % 4 == 0)) {
-                if (price_at_binance.compareTo(dto_1h.getOpen_candle_h()) <= 0) {
-                    // Utils.sendToTelegram("(Bitcoin bottomed in 48h)" +
-                    // Utils.new_line_from_service + "(LONG)"
-                    // + Utils.new_line_from_service + getMsgLong(price_at_binance, dto_1h));
-
-                    Utils.sendToTelegram("(Bitcoin bottomed in 48h)");
-                    pre_time_of_btc_msg_10m = curr_time_of_btc_pre10m;
-                }
-
-                if (price_at_binance.compareTo(dto_1h.getClose_candle_h()) >= 0) {
-                    // Utils.sendToTelegram("(Bitcoin hits 48h peak)" + Utils.new_line_from_service
-                    // + "(Short)"
-                    // + Utils.new_line_from_service + getMsgShort(price_at_binance, dto_1h));
-
-                    Utils.sendToTelegram("(Bitcoin hits 48h peak)");
-                    pre_time_of_btc_msg_10m = curr_time_of_btc_pre10m;
                 }
             }
 
