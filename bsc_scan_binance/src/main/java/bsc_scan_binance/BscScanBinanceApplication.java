@@ -41,7 +41,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            // app_flag = Utils.const_app_flag_msg_on;
+            app_flag = Utils.const_app_flag_msg_on;
 
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -92,7 +92,7 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        if (idx % 10 == 0) {
+                        if (idx % 15 == 0) {
                             binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol());
                             binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
                             binance_service.monitorBtcPrice();

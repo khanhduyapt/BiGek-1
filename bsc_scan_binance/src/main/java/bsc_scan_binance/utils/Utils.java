@@ -444,7 +444,7 @@ public class Utils {
         }
 
         if (!isBusinessTime()) {
-            //return;
+            // return;
         }
 
         sendToChatId(Utils.chatId_duydk, text);
@@ -551,6 +551,21 @@ public class Utils {
         }
 
         return value;
+    }
+
+    public static Integer getCurrentHH() {
+        int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        return HH;
+    }
+
+    public static Integer getCurrentMinute() {
+        int mm = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+        return mm;
+    }
+
+    public static Integer getCurrentSeconds() {
+        int ss = Utils.getIntValue(Utils.convertDateToString("ss", Calendar.getInstance().getTime()));
+        return ss;
     }
 
     public static Integer getIntValue(Object value) {

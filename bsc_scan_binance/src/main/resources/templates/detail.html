@@ -88,9 +88,14 @@ p {
       </div>
     </div>
 
-    <p style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;" th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'Downtrend') ? 'text-danger font-weight-bold' : #strings.contains(long_short_header, 'Uptrend') ? 'text-primary font-weight-bold' : ''}"></p>
+  <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important; display: flex;">
+    <p th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'Downtrend') ? 'text-danger font-weight-bold' : #strings.contains(long_short_header, 'Uptrend') ? 'text-primary font-weight-bold' : ''}"></p>
+    <a style="padding-left: 0.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
+      <span>Trading View</span>
+    </a>
+  </div>
 
-    <div style="display: flex; margin-top: 0rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
+    <div style="display: flex; margin-top: 0.25rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
         <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important;">
             <tbody>
               <tr th:each="msg,iter: ${long_short_list_perfect}">
@@ -123,10 +128,10 @@ p {
             <!-- # -->
             <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) - iter.index}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
             <!-- Buy -->
-            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;" 
+            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
             <!-- Volume -->
-            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;" 
+            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' AND token.val_million_dolas >= 2 ? 'text-danger font-weight-bold' : '' }"></td>
           </tr>
         </tbody>
@@ -145,10 +150,10 @@ p {
             <!-- # -->
             <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) + iter.index + 1}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
             <!-- Sell -->
-            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;" 
+            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : ''}"></td>
             <!-- Volume -->
-            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;" 
+            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' AND token.val_million_dolas >= 2 ? 'text-danger font-weight-bold' : ''}"></td>
           </tr>
         </tbody>
@@ -168,13 +173,9 @@ p {
       </table>
   </div>
 
-  <a style="padding-top: 3rem;padding-left: 0.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
-    <span>Trading View</span>
-  </a>
-
   <br><br>
 
-  <div style="display: flex; margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
+  <div th:if="${false}" style="display: flex; margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
       <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important;">
           <tbody>
             <tr th:each="msg,iter: ${long_list_perfect2}">
