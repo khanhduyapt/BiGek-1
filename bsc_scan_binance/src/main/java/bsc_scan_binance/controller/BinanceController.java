@@ -68,7 +68,7 @@ public class BinanceController {
         String exchange = service.getBtcBalancesOnExchanges();
         exchange = exchange.replaceAll("BTC 24h: ", "").replaceAll(" 07d: ", "");
         List<String> exchanges = new ArrayList<String>(Arrays.asList(exchange.split(Utils.new_line_from_service)));
-        if (CollectionUtils.isEmpty(exchanges)) {
+        if (CollectionUtils.isEmpty(exchanges) || exchanges.size() < 2) {
             model.addAttribute("exchanges_24h", "");
             model.addAttribute("exchanges_7d", "");
         } else {
