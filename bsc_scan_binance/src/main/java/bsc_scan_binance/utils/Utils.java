@@ -37,6 +37,7 @@ import bsc_scan_binance.entity.PrepareOrders;
 import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
+import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinResponse;
 
@@ -529,6 +530,25 @@ public class Utils {
 
     public static String removeLastZero(BigDecimal value) {
         return removeLastZero(Utils.getStringValue(value));
+    }
+
+    public static String getNextBidsOrAsksWall(BigDecimal price_at_binance, List<DepthResponse> bidsOrAsksList) {
+
+        String next_bids_price = Utils.removeLastZero(price_at_binance) + "(now)";
+        int count = 1;
+        for (DepthResponse res : bidsOrAsksList) {
+            if (Objects.equals("BTC", res.getSymbol())) {
+                if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2)) > 0) {
+                    next_bids_price += "->" + res.getPrice() + "(" + res.getVal_million_dolas() + "m$)";
+                    count += 1;
+                }
+            }
+            if (count > 3) {
+                break;
+            }
+        }
+
+        return next_bids_price;
     }
 
     public static String removeLastZero(String value) {
