@@ -34,5 +34,6 @@ public class BinanceVolumnWeek {
 
     @Column(name = "max_price")
     private BigDecimal max_price = BigDecimal.ZERO;
+
 }
 
