@@ -1941,7 +1941,7 @@ public class BinanceServiceImpl implements BinanceService {
                 saveDepthData(gecko_id, symbol);
             }
 
-            return setCoinGlassData(gecko_id, symbol);
+            setCoinGlassData(gecko_id, symbol);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -2032,7 +2032,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String setCoinGlassData(String gecko_id, String symbol) {
         boolean exit = true;
         if (exit) {
-            return "";
+            //return "";
         }
 
         String url = "https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=" + symbol.toUpperCase()
