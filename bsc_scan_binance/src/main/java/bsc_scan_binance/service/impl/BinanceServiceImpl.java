@@ -347,7 +347,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    + "   AND vbvr.rate1d0h > -20                                                                 \n"
                     + ((BscScanBinanceApplication.app_flag != Utils.const_app_flag_all_coin)
                             ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
                             : "")
@@ -880,22 +879,23 @@ public class BinanceServiceImpl implements BinanceService {
 
                     String priceChange24h = dto.getPrice_change_percentage_24h().replace("%", "");
 
-                    if (!dto.getFutures().contains("Short:")) {
-                        if (price_can_buy_24h_percent.compareTo(BigDecimal.valueOf(-1.5)) > 0) {
-                            css.setAvg_boll_min_css("text-white bg-success rounded-lg");
-                        }
+                    if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(-20)) > 0) {
+                        if (!dto.getFutures().contains("Short:")) {
+                            if (price_can_buy_24h_percent.compareTo(BigDecimal.valueOf(-1.5)) > 0) {
+                                css.setAvg_boll_min_css("text-white bg-success rounded-lg");
+                            }
 
-                        if (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0) {
-                            if (Utils.isGoodPriceLong(price_now, price_can_buy_24h, price_can_sell_24h)) {
-                                if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
-                                    css.setStop_loss_css("bg-warning rounded-lg px-1");
-                                    css.setAvg_boll_min_css("text-white bg-success rounded-lg");
-                                    css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
+                            if (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0) {
+                                if (Utils.isGoodPriceLong(price_now, price_can_buy_24h, price_can_sell_24h)) {
+                                    if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
+                                        css.setStop_loss_css("bg-warning rounded-lg px-1");
+                                        css.setAvg_boll_min_css("text-white bg-success rounded-lg");
+                                        css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
+                                    }
                                 }
                             }
                         }
                     }
-
                     BigDecimal temp_prire_24h = Utils
                             .formatPrice(dto.getLow_price_24h().multiply(BigDecimal.valueOf(1.008)), 5);
                     if (dto.getPrice_can_buy().compareTo(temp_prire_24h) < 0) {
