@@ -45,7 +45,7 @@ public class BinanceVolumnDay {
     private BigDecimal rsi = BigDecimal.ZERO;
 
     @Column(name = "point")
-    private Integer point = 0;
+    private String point;
 
     public BinanceVolumnDay(BinanceVolumnDayKey id) {
         this.id = id;

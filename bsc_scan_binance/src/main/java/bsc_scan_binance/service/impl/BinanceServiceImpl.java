@@ -240,7 +240,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   vol.vol1d,                                                                              \n"
                     + "   vol.vol7d                                                                               \n"
                     + "   , gecko_week.vol_gecko_increate                                                         \n"
-                    + "   , '' opportunity                                                                        \n"
+                    + "   , cur.point AS opportunity                                                              \n"
                     + "                                                                                           \n"
                     + "   , concat('1h: ', rate1h, '%, 2h: ', rate2h, '%, 4h: ', rate4h, '%, 1d0h: ', rate1d0h, '%, 1d4h: ', rate1d4h, '%') as binance_vol_rate \n"
                     + "   , rate1h                                                                                \n"
@@ -249,7 +249,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , rate1d0h                                                                              \n"
                     + "   , rate1d4h                                                                              \n"
                     + "   , cur.rsi                                                                               \n"
-                    + "   , (select futures_msg from binance_futures where gecko_id = can.gecko_id)    as futures      \n"
+                    + "   , concat((select futures_msg from binance_futures where gecko_id = can.gecko_id), cur.point) as futures      \n"
                     + "   , (select futures_css from binance_futures where gecko_id = can.gecko_id)    as futures_css  \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
@@ -352,7 +352,7 @@ public class BinanceServiceImpl implements BinanceService {
                             : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
-                    + "   , cur.point desc                                                                        \n"
+                    //+ "   , cur.point desc                                                                        \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -879,19 +879,19 @@ public class BinanceServiceImpl implements BinanceService {
 
                     String priceChange24h = dto.getPrice_change_percentage_24h().replace("%", "");
 
-                    if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(-20)) > 0) {
-                        if (!dto.getFutures().contains("Short:")) {
+                    if (!dto.getFutures().contains("Short:")) {
+                        if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(-20)) > 0) {
                             if (price_can_buy_24h_percent.compareTo(BigDecimal.valueOf(-1.5)) > 0) {
                                 css.setAvg_boll_min_css("text-white bg-success rounded-lg");
                             }
+                        }
 
-                            if (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0) {
-                                if (Utils.isGoodPriceLong(price_now, price_can_buy_24h, price_can_sell_24h)) {
-                                    if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
-                                        css.setStop_loss_css("bg-warning rounded-lg px-1");
-                                        css.setAvg_boll_min_css("text-white bg-success rounded-lg");
-                                        css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
-                                    }
+                        if (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0) {
+                            if (Utils.isGoodPriceLong(price_now, price_can_buy_24h, price_can_sell_24h)) {
+                                if (roe.compareTo(BigDecimal.valueOf(3)) > 0) {
+                                    css.setStop_loss_css("bg-warning rounded-lg px-1");
+                                    css.setAvg_boll_min_css("text-white bg-success rounded-lg");
+                                    css.setAvg_boll_max_css("bg-warning rounded-lg px-1");
                                 }
                             }
                         }
@@ -1844,7 +1844,7 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal total_trans = number_of_trades1.add(number_of_trades2);
 
                     if (idx == limit - 1) {
-                        int point = calcPoint(gecko_id, symbol);
+                        String point = calcPoint(gecko_id, symbol);
                         Calendar calendar = Calendar.getInstance();
 
                         day.setId(new BinanceVolumnDayKey(gecko_id, symbol,
@@ -1950,20 +1950,19 @@ public class BinanceServiceImpl implements BinanceService {
         return "";
     }
 
-    public int calcPoint(String gecko_id, String symbol) {
-        int point = 0;
+    public String calcPoint(String gecko_id, String symbol) {
+        String point = "※";
 
         try {
             List<BtcFutures> list_4h = Utils.loadData(symbol, TIME_4h, 2);
             if (CollectionUtils.isEmpty(list_4h)) {
-                return 0;
-            }
-            if (!list_4h.get(1).isUptrend() && list_4h.get(0).isUptrend()) {
-                point += 15;
+                return "";
             }
 
-            if (list_4h.get(0).isUptrend()) {
-                point += 5;
+            if (!list_4h.get(1).isUptrend() && list_4h.get(0).isUptrend()) {
+                point += " 4h↓↑ ";
+            } else if (list_4h.get(0).isUptrend()) {
+                point += " 4h↑ ";
             }
 
             BigDecimal min_open = BigDecimal.valueOf(1000000);
@@ -1994,17 +1993,17 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal percent_to_bottom = Utils.getPercent(price_at_binance, min_low);
 
             if (percent_to_top.compareTo(percent_to_bottom.multiply(BigDecimal.valueOf(2))) > 0) {
-                point += 5;
+                point += "G% ";
             }
 
             if (Utils.isGoodPriceLong(price_at_binance, min_low, max_Hig)) {
-                point += 5;
+                point += "G$ ";
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return point;
+        return Objects.equals("※", point) ? "" : " " + point;
     }
 
     private Boolean isHasData(List<Object> result_usdt, int index) {
