@@ -347,6 +347,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
+                    + "   AND vbvr.rate1d0h > -20                                                                 \n"
                     + ((BscScanBinanceApplication.app_flag != Utils.const_app_flag_all_coin)
                             ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
                             : "")
