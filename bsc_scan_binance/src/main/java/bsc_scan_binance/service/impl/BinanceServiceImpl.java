@@ -352,6 +352,7 @@ public class BinanceServiceImpl implements BinanceService {
                             : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
+                    + "   , cur.point desc                                                                        \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -1789,7 +1790,7 @@ public class BinanceServiceImpl implements BinanceService {
             final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD" + "&interval="
                     + TIME_1d + "&limit=" + String.valueOf(limit);
 
-            BigDecimal price_at_binance = Utils.getBinancePrice(SYMBOL_BTC);
+            BigDecimal price_at_binance = Utils.getBinancePrice(symbol);
             if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
                 return "";
             }
@@ -1842,7 +1843,7 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal total_trans = number_of_trades1.add(number_of_trades2);
 
                     if (idx == limit - 1) {
-
+                        int point = calcPoint(gecko_id, symbol);
                         Calendar calendar = Calendar.getInstance();
 
                         day.setId(new BinanceVolumnDayKey(gecko_id, symbol,
@@ -1854,6 +1855,7 @@ public class BinanceServiceImpl implements BinanceService {
                         day.setHight_price(price_high);
                         day.setPrice_open_candle(price_open_candle);
                         day.setPrice_close_candle(price_close_candle);
+                        day.setPoint(point);
 
                         {
                             BinanceVolumeDateTime ddhh = new BinanceVolumeDateTime();
@@ -1915,6 +1917,7 @@ public class BinanceServiceImpl implements BinanceService {
                     entity.setTotalTrasaction(total_trans);
                     entity.setMin_price(price_low);
                     entity.setMax_price(price_high);
+
                     list_week.add(entity);
 
                     list_price_close_candle.add(avgPrice);
@@ -1944,6 +1947,63 @@ public class BinanceServiceImpl implements BinanceService {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public int calcPoint(String gecko_id, String symbol) {
+        int point = 0;
+
+        try {
+            List<BtcFutures> list_4h = Utils.loadData(symbol, TIME_4h, 2);
+            if (CollectionUtils.isEmpty(list_4h)) {
+                return 0;
+            }
+            if (!list_4h.get(1).isUptrend() && list_4h.get(0).isUptrend()) {
+                point += 15;
+            }
+
+            if (list_4h.get(0).isUptrend()) {
+                point += 5;
+            }
+
+            BigDecimal min_open = BigDecimal.valueOf(1000000);
+            BigDecimal min_low = BigDecimal.valueOf(1000000);
+            BigDecimal max_Hig = BigDecimal.ZERO;
+            for (BtcFutures dto : list_4h) {
+                if (min_low.compareTo(dto.getLow_price()) > 0) {
+                    min_low = dto.getLow_price();
+                }
+
+                if (max_Hig.compareTo(dto.getHight_price()) < 0) {
+                    max_Hig = dto.getHight_price();
+                }
+
+                if (dto.isUptrend()) {
+                    if (min_open.compareTo(dto.getPrice_open_candle()) > 0) {
+                        min_open = dto.getPrice_open_candle();
+                    }
+                } else {
+                    if (min_open.compareTo(dto.getPrice_close_candle()) > 0) {
+                        min_open = dto.getPrice_close_candle();
+                    }
+                }
+            }
+
+            BigDecimal price_at_binance = list_4h.get(0).getCurrPrice();
+            BigDecimal percent_to_top = Utils.getPercent(max_Hig, price_at_binance);
+            BigDecimal percent_to_bottom = Utils.getPercent(price_at_binance, min_low);
+
+            if (percent_to_top.compareTo(percent_to_bottom.multiply(BigDecimal.valueOf(2))) > 0) {
+                point += 5;
+            }
+
+            if (Utils.isGoodPriceLong(price_at_binance, min_low, max_Hig)) {
+                point += 5;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return point;
     }
 
     private Boolean isHasData(List<Object> result_usdt, int index) {
