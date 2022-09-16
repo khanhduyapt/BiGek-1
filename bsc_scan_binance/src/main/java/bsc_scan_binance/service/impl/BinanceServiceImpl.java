@@ -2550,7 +2550,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                     Utils.sendToMyTelegram(time + " (" + pre_funding_rate_low
                                             + ") Wait 3~5 minutes." + Utils.new_line_from_service
-                                            + "(Sell wall) " + wall);
+                                            + "(Buy wall) " + wall);
                                 }
                             }
 
