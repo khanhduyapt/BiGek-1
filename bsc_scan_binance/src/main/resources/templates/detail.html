@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" http-equiv="refresh" content="60">
-<title>Wanda-details</title>
+<title>Wanda-BTC</title>
 <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
 
@@ -88,12 +88,12 @@ p {
        <span>(Scalping)</span>
       </a>
 
-      <table class="table-bordered" style="min-width: 155px !important; max-width: 155px !important; font-size: 0.75rem !important;">
+      <table class="table-bordered" style="min-width: 155px !important; max-width: 155px !important; font-size: 0.75rem !important; border: none !important;">
         <tbody th:with="row_num = ${#lists.size(scapling_list) % 10 > 0 && #lists.size(scapling_list) % 10 < 10 ? #lists.size(scapling_list) / 10 + 1 : #lists.size(scapling_list) / 10}">
           <th:block th:each="row_index: ${#numbers.sequence(0, row_num - 1)}">
             <tr>
               <th:block th:each="col_index: ${#numbers.sequence(1, 10)}">
-                  <td th:with="idx= ${(row_index*10 + col_index)}" style="padding: 0; padding-left: 0.05rem !important; border: none !important;" >
+                  <td th:with="idx= ${(row_index*10 + col_index)}" style="padding: 0; padding-right: 0.25rem !important; border: none !important;" >
                     <a th:if="${idx < #lists.size(scapling_list)}" th:target="_blank" th:href="${scapling_list[idx].tradingview}"><span th:text="${scapling_list[idx].symbol}"></span></a>
                   </td>
                 </th:block>

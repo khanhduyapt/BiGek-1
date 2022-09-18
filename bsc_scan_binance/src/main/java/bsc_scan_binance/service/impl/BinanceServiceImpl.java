@@ -151,6 +151,9 @@ public class BinanceServiceImpl implements BinanceService {
     private BigDecimal pre_funding_rate_high = BigDecimal.ZERO;
     private BigDecimal pre_funding_rate_low = BigDecimal.ZERO;
 
+    private boolean coinglass_wait_1h = false;
+    private String pre_time_coinglass_wait_time = "";
+
     List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
 
@@ -2043,9 +2046,10 @@ public class BinanceServiceImpl implements BinanceService {
      */
     @SuppressWarnings("unchecked")
     private String setCoinGlassData(String gecko_id, String symbol) {
-        boolean exit = true;
-        if (exit) {
-            return "";
+        if (!Objects.equals(pre_time_coinglass_wait_time, Utils.getCurrentHH().toString())) {
+            if (coinglass_wait_1h) {
+                return "";
+            }
         }
 
         String url = "https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=" + symbol.toUpperCase()
@@ -2137,7 +2141,9 @@ public class BinanceServiceImpl implements BinanceService {
             return futuresMsg;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            coinglass_wait_1h = true;
+            pre_time_coinglass_wait_time = Utils.getCurrentHH().toString();
+            log.info("Error coinglass ---->" + e.getMessage());
         }
 
         return "";
@@ -2160,72 +2166,103 @@ public class BinanceServiceImpl implements BinanceService {
             }
             depthAsksRepository.saveAll(depthAsksList);
 
-            BigDecimal MIL_VOL = BigDecimal.valueOf(1000);
+            BigDecimal MIN_VOL = BigDecimal.valueOf(1000);
             if ("BTC".equals(symbol.toUpperCase())) {
-                MIL_VOL = BigDecimal.valueOf(10000);
+                MIN_VOL = BigDecimal.valueOf(10000);
             }
 
             String url = "https://api.binance.com/api/v3/depth?limit=5000&symbol=" + symbol.toUpperCase() + "USDT";
-
             RestTemplate restTemplate = new RestTemplate();
             Object result = restTemplate.getForObject(url, Object.class);
 
-            Object obj_bids = Utils.getLinkedHashMapValue(result, Arrays.asList("bids"));
-            Object obj_asks = Utils.getLinkedHashMapValue(result, Arrays.asList("asks"));
+            // BIDS
+            {
+                Object obj_bids = Utils.getLinkedHashMapValue(result, Arrays.asList("bids"));
+                if (obj_bids instanceof Collection) {
 
-            if (obj_bids instanceof Collection) {
-                List<Object> obj_bids2 = new ArrayList<>((Collection<Object>) obj_bids);
-                List<DepthBids> saveList = new ArrayList<DepthBids>();
-                BigInteger rowidx = BigInteger.ZERO;
-                for (Object obj : obj_bids2) {
-                    List<Double> bids = new ArrayList<>((Collection<Double>) obj);
-                    BigDecimal price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
-                    BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(bids.get(1)));
+                    List<Object> obj_bids2 = new ArrayList<>((Collection<Object>) obj_bids);
 
-                    BigDecimal volume = price.multiply(qty);
-                    if (volume.compareTo(MIL_VOL) < 0) {
-                        continue;
+                    BigDecimal curr_price = BigDecimal.ZERO;
+                    {
+                        Object obj = obj_bids2.get(0);
+                        List<Double> bids = new ArrayList<>((Collection<Double>) obj);
+                        curr_price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
                     }
+                    BigDecimal MIN_PRICE = curr_price.multiply(BigDecimal.valueOf(0.8));
 
-                    DepthBids entity = new DepthBids();
-                    rowidx = rowidx.add(BigInteger.valueOf(1));
-                    entity.setGeckoId(gecko_id);
-                    entity.setSymbol(symbol);
-                    entity.setPrice(price);
-                    entity.setRowidx(rowidx);
-                    entity.setQty(qty);
-                    saveList.add(entity);
+                    List<DepthBids> saveList = new ArrayList<DepthBids>();
+                    BigInteger rowidx = BigInteger.ZERO;
+                    for (Object obj : obj_bids2) {
+                        List<Double> bids = new ArrayList<>((Collection<Double>) obj);
+                        BigDecimal price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
+                        if (price.compareTo(MIN_PRICE) < 0) {
+                            break;
+                        }
 
+                        BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(bids.get(1)));
+
+                        BigDecimal volume = price.multiply(qty);
+                        if (volume.compareTo(MIN_VOL) < 0) {
+                            continue;
+                        }
+
+                        DepthBids entity = new DepthBids();
+                        rowidx = rowidx.add(BigInteger.valueOf(1));
+                        entity.setGeckoId(gecko_id);
+                        entity.setSymbol(symbol);
+                        entity.setPrice(price);
+                        entity.setRowidx(rowidx);
+                        entity.setQty(qty);
+                        saveList.add(entity);
+
+                    }
+                    depthBidsRepository.saveAll(saveList);
                 }
-                depthBidsRepository.saveAll(saveList);
             }
 
-            if (obj_asks instanceof Collection) {
-                List<Object> obj_asks2 = new ArrayList<>((Collection<Object>) obj_asks);
-                List<DepthAsks> saveList = new ArrayList<DepthAsks>();
-                BigInteger rowidx = BigInteger.ZERO;
-                for (Object obj : obj_asks2) {
-                    List<Double> asks = new ArrayList<>((Collection<Double>) obj);
-                    BigDecimal price = Utils.getBigDecimalValue(String.valueOf(asks.get(0)));
-                    BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(asks.get(1)));
+            // ASKS
+            {
+                Object obj_asks = Utils.getLinkedHashMapValue(result, Arrays.asList("asks"));
+                if (obj_asks instanceof Collection) {
+                    List<Object> obj_asks2 = new ArrayList<>((Collection<Object>) obj_asks);
 
-                    BigDecimal volume = price.multiply(qty);
-                    if (volume.compareTo(MIL_VOL) < 0) {
-                        continue;
+                    BigDecimal curr_price = BigDecimal.ZERO;
+                    {
+                        Object obj = obj_asks2.get(0);
+                        List<Double> ask = new ArrayList<>((Collection<Double>) obj);
+                        curr_price = Utils.getBigDecimalValue(String.valueOf(ask.get(0)));
                     }
+                    BigDecimal MAX_PRICE = curr_price.multiply(BigDecimal.valueOf(1.2));
 
-                    DepthAsks entity = new DepthAsks();
-                    rowidx = rowidx.add(BigInteger.valueOf(1));
-                    entity.setGeckoId(gecko_id);
-                    entity.setSymbol(symbol);
-                    entity.setPrice(price);
-                    entity.setRowidx(rowidx);
-                    entity.setQty(qty);
-                    saveList.add(entity);
+                    List<DepthAsks> saveList = new ArrayList<DepthAsks>();
+                    BigInteger rowidx = BigInteger.ZERO;
+                    for (Object obj : obj_asks2) {
+                        List<Double> asks = new ArrayList<>((Collection<Double>) obj);
+                        BigDecimal price = Utils.getBigDecimalValue(String.valueOf(asks.get(0)));
+
+                        if (price.compareTo(MAX_PRICE) > 0) {
+                            break;
+                        }
+
+                        BigDecimal qty = Utils.getBigDecimalValue(String.valueOf(asks.get(1)));
+
+                        BigDecimal volume = price.multiply(qty);
+                        if (volume.compareTo(MIN_VOL) < 0) {
+                            continue;
+                        }
+
+                        DepthAsks entity = new DepthAsks();
+                        rowidx = rowidx.add(BigInteger.valueOf(1));
+                        entity.setGeckoId(gecko_id);
+                        entity.setSymbol(symbol);
+                        entity.setPrice(price);
+                        entity.setRowidx(rowidx);
+                        entity.setQty(qty);
+                        saveList.add(entity);
+                    }
+                    depthAsksRepository.saveAll(saveList);
                 }
-                depthAsksRepository.saveAll(saveList);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2355,7 +2392,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "FROM                                                                                         \n"
                     + "    depth_bids                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
-                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price ASC                             \n";
+                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price DESC                             \n";
 
             String sql_asks = "                                                                                     \n"
                     + " select * from (                                                                             \n"
@@ -2370,7 +2407,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    depth_asks                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
 
-                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price DESC                            \n";
+                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price ASC                            \n";
 
             Query query = entityManager.createNativeQuery(sql_bids, "DepthResponse");
             @SuppressWarnings("unchecked")
@@ -2381,23 +2418,9 @@ public class BinanceServiceImpl implements BinanceService {
             List<DepthResponse> list_asks = query.getResultList();
 
             List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
-            BigDecimal wall = BigDecimal.valueOf(2);
-            BigDecimal total_bids = BigDecimal.ZERO;
+
             for (DepthResponse dto : list_bids) {
                 BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
-                BigDecimal val = dto.getVal_million_dolas();
-
-                if (val.compareTo(wall) < 0) {
-                    total_bids = total_bids.add(val);
-                }
-
-                if (val.compareTo(wall) >= 0) {
-                    DepthResponse real_wall = new DepthResponse();
-                    real_wall.setPrice(BigDecimal.valueOf(99999));
-                    real_wall.setVal_million_dolas(total_bids);
-                    list_bids_ok.add(real_wall);
-                }
-
                 dto.setPrice(price);
                 list_bids_ok.add(dto);
             }
@@ -2454,7 +2477,7 @@ public class BinanceServiceImpl implements BinanceService {
         String sql = "SELECT                                                                                            \n"
                 + "    (SELECT min(low_price) FROM btc_futures WHERE id like " + str_id + ") AS low_price_h, \n"
                 + "    (SELECT                                                                                          \n"
-                + "        ROUND(AVG(COALESCE(open_price, 0)), 0) open_candle                                           \n"
+                + "        ROUND(AVG(COALESCE(open_price, 0)), 5) open_candle                                           \n"
                 + "    FROM(                                                                                            \n"
                 + "        SELECT open_price                                                                            \n"
                 + "        FROM                                                                                         \n"
@@ -2465,7 +2488,7 @@ public class BinanceServiceImpl implements BinanceService {
                 + "        ORDER BY open_price asc limit 5                                                              \n"
                 + "    ) low_candle) open_candle_h                                                                      \n"
                 + "    ,                                                                                                \n"
-                + "    (SELECT ROUND(AVG(COALESCE(close_price, 0)), 0) open_candle                                      \n"
+                + "    (SELECT ROUND(AVG(COALESCE(close_price, 0)), 5) open_candle                                      \n"
                 + "     FROM(                                                                                           \n"
                 + "        SELECT close_price                                                                           \n"
                 + "        FROM                                                                                         \n"
@@ -2511,6 +2534,24 @@ public class BinanceServiceImpl implements BinanceService {
             return null;
         }
         return dto;
+    }
+
+    @Override
+    @Transactional
+    public String getLs48h(String symbol) {
+        List<BtcFutures> btc1hs = Utils.loadData(symbol, TIME_1h, LIMIT_DATA_1h);
+        if (CollectionUtils.isEmpty(btc1hs)) {
+            return "";
+        }
+        btcFuturesRepository.saveAll(btc1hs);
+        BtcFuturesResponse dto_1h = getBtcFuturesResponse(symbol, TIME_1h);
+        if (Objects.equals(null, dto_1h)) {
+            return "";
+        }
+        BigDecimal price_at_binance = btc1hs.get(0).getCurrPrice();
+        String low_height = Utils.getMsgLowHeight(price_at_binance, dto_1h);
+
+        return low_height;
     }
 
     @Override
@@ -2692,6 +2733,12 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private String monitorBitcoinBalancesOnExchanges() {
 
+        if (!Objects.equals(pre_time_coinglass_wait_time, Utils.getCurrentHH().toString())) {
+            if (coinglass_wait_1h) {
+                return "";
+            }
+        }
+
         log.info("Start monitorBitcoinBalancesOnExchanges ---->");
         String url = "https://fapi.coinglass.com/api/exchange/chain/balance/list";
 
@@ -2778,10 +2825,13 @@ public class BinanceServiceImpl implements BinanceService {
 
             msg += " 07d: " + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)";
 
+            coinglass_wait_1h = false;
             return msg;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            coinglass_wait_1h = true;
+            pre_time_coinglass_wait_time = Utils.getCurrentHH().toString();
+            log.info("Error coinglass ---->" + e.getMessage());
         }
         return "";
     }

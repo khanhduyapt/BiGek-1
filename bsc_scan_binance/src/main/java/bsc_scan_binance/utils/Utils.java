@@ -1044,8 +1044,8 @@ public class Utils {
         low_height += "SL: " + Utils.removeLastZero(SL_short) + " (" + Utils.toPercent(SL_short, price_at_binance)
                 + "%)" + Utils.new_line_from_service;
 
-        low_height += "H: " + dto.getHight_price_h() + " (" + Utils.toPercent(dto.getHight_price_h(), price_at_binance)
-                + "%)" + Utils.new_line_from_service;
+        low_height += "H: " + Utils.removeLastZero(dto.getHight_price_h()) + " ("
+                + Utils.toPercent(dto.getHight_price_h(), price_at_binance) + "%)" + Utils.new_line_from_service;
 
         if (price_at_binance.compareTo(dto.getClose_candle_h()) > 0) {
             low_height += btc_now;

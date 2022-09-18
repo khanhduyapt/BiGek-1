@@ -72,7 +72,7 @@ p {
 </style>
 <script type="text/javascript">
   $(function() {
-	$('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="tooltip"]').tooltip();
 
     $(document).on("click", ".table_row", function() {
       $(this).addClass('highlight').siblings().removeClass('highlight');
@@ -265,7 +265,7 @@ p {
             <a th:case="'BTC'" th:target="_blank" th:href="${'/' + token.symbol}">
               <span th:text="${token.symbol}"></span>
             </a>
-            <a th:case="*" th:target="_blank" th:href="${token.trading_view}">
+            <a th:case="*" th:target="_blank" th:href="${'/' + token.symbol}">
               <span th:text="${token.symbol}"></span>
             </a>
           </td>

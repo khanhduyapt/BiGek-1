@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" http-equiv="refresh" content="60">
+<title th:text="${'Wanda-' + symbol}" ></title>
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+</head>
+<style>
+.tableFixHead {
+  height: 100px;
+  margin-left: 0.5rem;
+}
+
+/* Just common table stuff. Really. */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 8px 16px;
+  font-size: 0.75rem !important;
+}
+
+th {
+  background: #eee;
+  font-size: 0.75rem !important;
+}
+
+p {
+  margin-bottom: 0px !important;
+}
+
+.highlight {
+  background-color: #CFF5FF !important;
+}
+
+.oco_css:focus {
+  color: red !important;
+}
+
+.fix_width {
+    min-width: 138px !important;
+    max-width: 138px !important;
+    font-size: 0.8rem !important;
+}
+
+.fix_width2 {
+    min-width: 300px !important;
+    max-width: 300px !important;
+    font-size: 0.8rem !important;
+}
+
+.display-tity{
+    font-size: 0.65rem !important;
+}
+
+.table td, .table th {
+  padding: 0.25rem !important;
+  vertical-align: middle !important;
+}
+.custom_header {
+  text-align: center !important;
+  background: #eee !important;
+}
+
+</style>
+<body class="">
+    <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
+      <a th:target="_blank" th:href="${'http://localhost:8090'}">Home</a>
+      <a style="padding-left: 0.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
+        <span>Trading View</span>
+      </a>
+      <span style="padding-left: 2rem;" >Binance:</span><a style="padding-left: 0.5rem;" th:target="_blank" th:href="${'https://www.binance.com/en/futures/' + symbol + 'USDT'}" th:text="${symbol}"></a>
+    </div>
+
+    <div style="display: flex; margin-top: 0.5rem;">
+      <table class="table table-bordered tableFixHead" style="min-width: 125px !important; max-width: 125px !important;">
+        <thead>
+          <tr>
+            <th class="text-center" scope="col">#</th>
+            <th class="text-center" scope="col">Bids</th>
+            <th class="text-center" scope="col">Vol (K$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.val_million_dolas >= 100 ? 'bg-warning text-primary font-weight-bold' : ''}" >
+            <!-- # -->
+            <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) - iter.index}" >
+            <!-- Sell -->
+            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;"></td>
+            <!-- Volume -->
+            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="table table-bordered tableFixHead" style="min-width: 155px !important; max-width: 155px !important;">
+        <thead>
+          <tr>
+            <th class="text-center" scope="col">#</th>
+            <th class="text-center" scope="col">Asks</th>
+            <th class="text-center" scope="col">Vol (K$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.val_million_dolas >= 100 ? 'bg-warning text-primary font-weight-bold' : ''}" >
+            <!-- # -->
+            <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) + iter.index + 1}" th:classappend="${ ''} " >
+            <!-- Sell -->
+            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;"></td>
+            <!-- Volume -->
+            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="table table-bordered tableFixHead" style="min-width: 70px !important; max-width: 70px !important;">
+        <thead>
+          <tr>
+            <th class="text-center" scope="col">48h</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="table_row" th:each="msg,iter: ${token_48h}">
+            <td style="text-align: center; max-width: 70px !important; font-size: 0.7rem !important;" th:text="${msg}" th:classappend="${#strings.contains(msg, '10d') ? 'font-weight-bold custom_header' : #strings.contains(msg, 'now') ? 'text-primary' : ''}"></td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
+
+  <br><br>
+
+</body>
+</html>

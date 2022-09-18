@@ -34,4 +34,6 @@ public interface BinanceService {
     public String getBtcBalancesOnExchanges();
 
     public List<EntryCssResponse> findAllScalpingToday();
+
+    public String getLs48h(String symbol);
 }

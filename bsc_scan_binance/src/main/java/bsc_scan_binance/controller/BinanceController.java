@@ -38,7 +38,7 @@ public class BinanceController {
     public String list(Model model) {
         BscScanBinanceApplication.callFormBinance = "";
 
-        model.addAttribute("data_list", service.getList(true));
+        model.addAttribute("data_list", service.getList(false));
         return "binance";
     }
 
@@ -47,10 +47,6 @@ public class BinanceController {
         List<List<DepthResponse>> list = new ArrayList<List<DepthResponse>>();
 
         list = service.getListDepthData(symbol);
-        if (symbol.toUpperCase().equals("BTC")) {
-            // list = service.getListDepthData(symbol);
-        }
-
         List<DepthResponse> list_bids = new ArrayList<DepthResponse>();
         List<DepthResponse> list_asks = new ArrayList<DepthResponse>();
 
@@ -58,10 +54,19 @@ public class BinanceController {
             list_bids = list.get(0);
             list_asks = list.get(1);
         }
-
         model.addAttribute("data_list_1", list_bids);
         model.addAttribute("data_list_2", list_asks);
         model.addAttribute("symbol", symbol);
+
+        if (!symbol.toUpperCase().equals("BTC")) {
+            String long_short = service.getLs48h(symbol);
+
+            List<String> headers = new ArrayList<String>(Arrays.asList(long_short.split(Utils.new_line_from_service)));
+            model.addAttribute("token_48h", headers);
+
+            return "detail_others";
+        }
+
         model.addAttribute("sp500",
                 service.loadPremarketSp500().replaceAll(Utils.new_line_from_bot, ", ").replaceAll("S&P 500", ""));
 
@@ -111,7 +116,7 @@ public class BinanceController {
         List<EntryCssResponse> scapling_list = service.findAllScalpingToday();
         model.addAttribute("scapling_list", scapling_list);
 
-        return "detail";
+        return "detail"; // BTC
     }
 
     @GetMapping("/binance")
