@@ -133,7 +133,7 @@ p {
       <table class="table table-bordered tableFixHead" style="min-width: 125px !important; max-width: 125px !important;">
         <thead>
           <tr>
-            <th class="text-center" scope="col">#</th>
+            <th class="text-center" scope="col">%</th>
             <th class="text-center" scope="col">Bids</th>
             <th class="text-center" scope="col">Vol (m$)</th>
           </tr>
@@ -141,12 +141,12 @@ p {
         <tbody>
           <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'bg-warning text-primary font-weight-bold' : ''}">
             <!-- # -->
-            <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) - iter.index}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
+            <td class="" style="text-align: center; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
             <!-- Buy -->
-            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;"
+            <td th:text="${token.price}" style="text-align: center; min-width: 50px !important; max-width: 50px !important;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' ? 'text-white' : ''}"></td>
             <!-- Volume -->
-            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;"
+            <td th:text="${token.val_million_dolas}" style=" min-width: 55px !important; max-width: 55px !important; text-align: center;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' AND token.val_million_dolas >= 2 ? 'text-danger font-weight-bold' : '' }"></td>
           </tr>
         </tbody>
@@ -155,7 +155,7 @@ p {
       <table class="table table-bordered tableFixHead" style="min-width: 155px !important; max-width: 155px !important;">
         <thead>
           <tr>
-            <th class="text-center" scope="col">#</th>
+            <th class="text-center" scope="col">%</th>
             <th class="text-center" scope="col">Asks</th>
             <th class="text-center" scope="col">Vol (m$)</th>
           </tr>
@@ -163,12 +163,12 @@ p {
         <tbody>
           <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'bg-warning text-primary font-weight-bold' : ''}">
             <!-- # -->
-            <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) + iter.index + 1}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
+            <td class="" style="text-align: center; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
             <!-- Sell -->
-            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;"
+            <td th:text="${token.price}" style="text-align: center; min-width: 50px !important; max-width: 50px !important;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' ? 'text-white' : ''}"></td>
             <!-- Volume -->
-            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;"
+            <td th:text="${token.val_million_dolas}" style=" min-width: 55px !important; max-width: 55px !important; text-align: center;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' AND token.val_million_dolas >= 2 ? 'text-danger font-weight-bold' : ''}"></td>
           </tr>
         </tbody>

@@ -646,6 +646,12 @@ public class Utils {
         return percent;
     }
 
+    public static String getPercentStr(BigDecimal value, BigDecimal compareToValue) {
+
+        return removeLastZero(getPercent(value, compareToValue))+ "%";
+
+    }
+
     public static BigDecimal getBigDecimalValue(String value) {
         try {
             if (Objects.equals(null, value)) {

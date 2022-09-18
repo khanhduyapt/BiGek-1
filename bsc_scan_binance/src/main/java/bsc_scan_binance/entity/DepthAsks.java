@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "price", type = BigDecimal.class),
                 @ColumnResult(name = "qty", type = BigDecimal.class),
                 @ColumnResult(name = "val_million_dolas", type = BigDecimal.class),
+                @ColumnResult(name = "percent", type = String.class),
         })
 })
 

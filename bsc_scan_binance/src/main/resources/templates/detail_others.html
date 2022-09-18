@@ -84,19 +84,19 @@ p {
       <table class="table table-bordered tableFixHead" style="min-width: 125px !important; max-width: 125px !important;">
         <thead>
           <tr>
-            <th class="text-center" scope="col">#</th>
+            <th class="text-center" scope="col">%</th>
             <th class="text-center" scope="col">Bids</th>
-            <th class="text-center" scope="col">Vol (K$)</th>
+            <th class="text-center" scope="col">Vol(K$)</th>
           </tr>
         </thead>
         <tbody>
           <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.val_million_dolas >= 100 ? 'bg-warning text-primary font-weight-bold' : ''}" >
             <!-- # -->
-            <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) - iter.index}" >
+            <td class="" style="text-align: left; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" > <!-- ${#lists.size(data_list_1) - iter.index} -->
             <!-- Sell -->
-            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;"></td>
+            <td th:text="${token.price}" style="text-align: center; min-width: 50px !important; max-width: 60px !important;"></td>
             <!-- Volume -->
-            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;"></td>
+            <td th:text="${token.val_million_dolas}" style=" min-width: 55px !important; max-width: 65px !important; text-align: center;"></td>
           </tr>
         </tbody>
       </table>
@@ -104,19 +104,19 @@ p {
       <table class="table table-bordered tableFixHead" style="min-width: 155px !important; max-width: 155px !important;">
         <thead>
           <tr>
-            <th class="text-center" scope="col">#</th>
+            <th class="text-center" scope="col">%</th>
             <th class="text-center" scope="col">Asks</th>
-            <th class="text-center" scope="col">Vol (K$)</th>
+            <th class="text-center" scope="col">Vol(K$)</th>
           </tr>
         </thead>
         <tbody>
           <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.val_million_dolas >= 100 ? 'bg-warning text-primary font-weight-bold' : ''}" >
             <!-- # -->
-            <td class="" style="text-align: center; min-width: 30px !important; max-width: 30px !important;" th:text="${#lists.size(data_list_1) + iter.index + 1}" th:classappend="${ ''} " >
+            <td class="" style="text-align: center; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}"  > <!-- ${#lists.size(data_list_1) + iter.index + 1} -->
             <!-- Sell -->
-            <td th:text="${token.price}" style="text-align: center; min-width: 60px !important; max-width: 60px !important;"></td>
+            <td th:text="${token.price}" style="text-align: center; min-width: 50px !important; max-width: 50px !important;"></td>
             <!-- Volume -->
-            <td th:text="${token.val_million_dolas}" style=" min-width: 65px !important; max-width: 65px !important; text-align: center;"></td>
+            <td th:text="${token.val_million_dolas}" style=" min-width: 55px !important; max-width: 55px !important; text-align: center;"></td>
           </tr>
         </tbody>
       </table>

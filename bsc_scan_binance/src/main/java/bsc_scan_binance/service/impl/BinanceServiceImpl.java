@@ -357,10 +357,10 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    + (isBynaceUrl
-                            ? " AND (rate1d0h > -20) AND (can.volumn_div_marketcap > 0.05) AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump) \n"
+                    + (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump) \n"
                             // event_time > TO_CHAR(NOW() - interval '1 hours', 'YYYYMMDD_HH24MI_SS.MS'))
                             // hours
+                            // AND (rate1d0h > -20) AND (can.volumn_div_marketcap > 0.05)
                             : "")
                     + ((BscScanBinanceApplication.app_flag != Utils.const_app_flag_all_coin)
                             ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
@@ -2188,7 +2188,7 @@ public class BinanceServiceImpl implements BinanceService {
                         List<Double> bids = new ArrayList<>((Collection<Double>) obj);
                         curr_price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
                     }
-                    BigDecimal MIN_PRICE = curr_price.multiply(BigDecimal.valueOf(0.8));
+                    BigDecimal MIN_PRICE = curr_price.multiply(BigDecimal.valueOf(0.9));
 
                     List<DepthBids> saveList = new ArrayList<DepthBids>();
                     BigInteger rowidx = BigInteger.ZERO;
@@ -2232,7 +2232,7 @@ public class BinanceServiceImpl implements BinanceService {
                         List<Double> ask = new ArrayList<>((Collection<Double>) obj);
                         curr_price = Utils.getBigDecimalValue(String.valueOf(ask.get(0)));
                     }
-                    BigDecimal MAX_PRICE = curr_price.multiply(BigDecimal.valueOf(1.2));
+                    BigDecimal MAX_PRICE = curr_price.multiply(BigDecimal.valueOf(1.1));
 
                     List<DepthAsks> saveList = new ArrayList<DepthAsks>();
                     BigInteger rowidx = BigInteger.ZERO;
@@ -2291,7 +2291,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    symbol,                                                                                \n"
                     + "    price,                                                                                 \n"
                     + "    qty,                                                                                   \n"
-                    + "    val_million_dolas                                                                      \n"
+                    + "    val_million_dolas,                                                                     \n"
+                    + "    0 AS percent                                                                           \n"
                     + "FROM " + view + "                                                                          \n"
                     + "WHERE val_million_dolas > 0                                                                \n"
                     + "ORDER BY " + orderby;
@@ -2314,6 +2315,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public List<List<DepthResponse>> getListDepthData(String symbol) {
         List<List<DepthResponse>> result = new ArrayList<List<DepthResponse>>();
+        BigDecimal current_price = Utils.getBinancePrice(symbol);
 
         // BTC
         if (symbol.toUpperCase().equals("BTC")) {
@@ -2338,10 +2340,12 @@ public class BinanceServiceImpl implements BinanceService {
                     DepthResponse real_wall = new DepthResponse();
                     real_wall.setPrice(price);
                     real_wall.setVal_million_dolas(total_bids);
+                    real_wall.setPercent(Utils.getPercentStr(price, current_price));
                     list_bids_ok.add(real_wall);
                 }
 
                 dto.setPrice(price);
+                dto.setPercent(Utils.getPercentStr(price, current_price));
                 list_bids_ok.add(dto);
             }
 
@@ -2358,10 +2362,12 @@ public class BinanceServiceImpl implements BinanceService {
                     DepthResponse real_wall = new DepthResponse();
                     real_wall.setPrice(price);
                     real_wall.setVal_million_dolas(total_asks);
+                    real_wall.setPercent(Utils.getPercentStr(price, current_price));
                     list_asks_ok.add(real_wall);
                 }
 
                 dto.setPrice(price);
+                dto.setPercent(Utils.getPercentStr(price, current_price));
                 list_asks_ok.add(dto);
             }
 
@@ -2380,7 +2386,7 @@ public class BinanceServiceImpl implements BinanceService {
             String geckoId = temp.get(0).getId().getGeckoid();
             saveDepthData(geckoId, symbol.toUpperCase());
 
-            String sql_bids = "                                                                                          \n"
+            String sql_bids = "                                                                                     \n"
                     + " select * from (                                                                             \n"
 
                     + "SELECT                                                                                       \n"
@@ -2389,10 +2395,11 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    price,                                                                                   \n"
                     + "    qty,                                                                                     \n"
                     + "    round(price * qty / 1000, 1) as val_million_dolas                                        \n"
+                    + "    , 0 AS percent                                                                           \n"
                     + "FROM                                                                                         \n"
                     + "    depth_bids                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
-                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price DESC                             \n";
+                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price DESC                            \n";
 
             String sql_asks = "                                                                                     \n"
                     + " select * from (                                                                             \n"
@@ -2403,6 +2410,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    price,                                                                                   \n"
                     + "    qty,                                                                                     \n"
                     + "    round(price * qty / 1000, 1) as val_million_dolas                                        \n"
+                    + "    , 0 AS percent                                                                           \n"
                     + "FROM                                                                                         \n"
                     + "    depth_asks                                                                               \n"
                     + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
@@ -2422,12 +2430,15 @@ public class BinanceServiceImpl implements BinanceService {
             for (DepthResponse dto : list_bids) {
                 BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
                 dto.setPrice(price);
+                dto.setPercent(Utils.getPercentStr(price, current_price));
                 list_bids_ok.add(dto);
             }
 
             List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
             for (DepthResponse dto : list_asks) {
-                dto.setPrice(Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice()))));
+                BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
+                dto.setPrice(price);
+                dto.setPercent(Utils.getPercentStr(price, current_price));
                 list_asks_ok.add(dto);
             }
 
@@ -2949,8 +2960,7 @@ public class BinanceServiceImpl implements BinanceService {
                 for (FundingHistory entity : list) {
                     EntryCssResponse dto = new EntryCssResponse();
                     dto.setSymbol(entity.getSymbol());
-                    dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
-                            + entity.getSymbol().toUpperCase() + "USDT");
+                    dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
 
                     results.add(dto);
                 }
@@ -3083,7 +3093,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private void loadFundingHistory(String gecko_id, String symbol) {
         try {
-            BigDecimal CONST_RATE = BigDecimal.valueOf(2);
+            BigDecimal CONST_RATE_HIGH = BigDecimal.valueOf(0.2);
 
             FundingResponse rate = Utils.loadFundingRate(symbol);
             BigDecimal highUp = rate.getHighUp();
@@ -3111,19 +3121,19 @@ public class BinanceServiceImpl implements BinanceService {
             entity.setCountHigh(highUp.intValue());
             entity.setCountLow(lowUp.intValue());
 
-            String note = "";
-            if ((highUp.compareTo(CONST_RATE) > 0) || (lowUp.compareTo(CONST_RATE) > 0)) {
-                if (highUp.compareTo(lowUp) > 0) {
-                    note = "PUMP";
-                    // Utils.sendToMyTelegram(currEventTime + " (Warning) PUMP: " + symbol);
-                } else {
-                    note = "PUMP";
-                }
+            entity.setNote("");
+            entity.setPumpdump(false);
+
+            if (rate.getHigh().compareTo(CONST_RATE_HIGH) > 0) {
+                String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
+                String note = time + " Kill Short";
+                entity.setNote(note);
                 entity.setPumpdump(true);
-            } else {
-                entity.setPumpdump(false);
+
+                if (!fundingHistoryRepository.existsPumDump(gecko_id)) {
+                    Utils.sendToMyTelegram(note + ": " + symbol);
+                }
             }
-            entity.setNote(note);
 
             fundingHistoryRepository.save(entity);
         } catch (Exception e) {

@@ -15,6 +15,7 @@ public class DepthResponse {
     private BigDecimal price;
     private BigDecimal qty;
     private BigDecimal val_million_dolas;
+    private String percent;
 
     public String toString(int max_qty_length) {
         String str_qty = String.valueOf(qty);
