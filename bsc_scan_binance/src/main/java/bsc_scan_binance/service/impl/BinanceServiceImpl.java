@@ -41,6 +41,8 @@ import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
 import bsc_scan_binance.entity.DepthAsks;
 import bsc_scan_binance.entity.DepthBids;
+import bsc_scan_binance.entity.FundingHistory;
+import bsc_scan_binance.entity.FundingHistoryKey;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.PriorityCoin;
@@ -54,6 +56,7 @@ import bsc_scan_binance.repository.BtcFuturesRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
 import bsc_scan_binance.repository.DepthAsksRepository;
 import bsc_scan_binance.repository.DepthBidsRepository;
+import bsc_scan_binance.repository.FundingHistoryRepository;
 import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
@@ -64,6 +67,7 @@ import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
 import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.EntryCssResponse;
+import bsc_scan_binance.response.FundingResponse;
 import bsc_scan_binance.response.GeckoVolumeUpPre4hResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
@@ -115,6 +119,9 @@ public class BinanceServiceImpl implements BinanceService {
     private BtcFuturesRepository btcFuturesRepository;
 
     @Autowired
+    private FundingHistoryRepository fundingHistoryRepository;
+
+    @Autowired
     private BitcoinBalancesOnExchangesRepository bitcoinBalancesOnExchangesRepository;
 
     private static final String SYMBOL_BTC = "BTC";
@@ -141,8 +148,8 @@ public class BinanceServiceImpl implements BinanceService {
     private String pre_time_of_btc_for_long_short = "";
     private String pre_time_of_btc_kill_long_short = "";
     private String pre_time_of_saved_data_4h = "";
-    private String pre_funding_rate_low = "";
-    private String pre_funding_rate_high = "";
+    private BigDecimal pre_funding_rate_high = BigDecimal.ZERO;
+    private BigDecimal pre_funding_rate_low = BigDecimal.ZERO;
 
     List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
@@ -153,7 +160,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public List<CandidateTokenCssResponse> getList(Boolean isOrderByBynaceVolume) {
+    public List<CandidateTokenCssResponse> getList(Boolean isBynaceUrl) {
         try {
             log.info("Start getList ---->");
             String sql = " select                                                                                 \n"
@@ -347,12 +354,17 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
+                    + (isBynaceUrl
+                            ? " AND (rate1d0h > -20) AND (can.volumn_div_marketcap > 0.05) AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump) \n"
+                            // event_time > TO_CHAR(NOW() - interval '1 hours', 'YYYYMMDD_HH24MI_SS.MS'))
+                            // hours
+                            : "")
                     + ((BscScanBinanceApplication.app_flag != Utils.const_app_flag_all_coin)
                             ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
                             : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
-                    //+ "   , cur.point desc                                                                        \n"
+                    // + " , cur.point desc \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -1782,6 +1794,7 @@ public class BinanceServiceImpl implements BinanceService {
     public String loadBinanceData(String gecko_id, String symbol) {
         // debug
         // scalping(gecko_id, symbol);
+        loadFundingHistory(gecko_id, symbol);
 
         try {
             final Integer limit = 14;
@@ -1960,9 +1973,9 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (!list_4h.get(1).isUptrend() && list_4h.get(0).isUptrend()) {
-                point += " 4h↓↑ ";
+                point += "↓↑";
             } else if (list_4h.get(0).isUptrend()) {
-                point += " 4h↑ ";
+                point += "↑";
             }
 
             BigDecimal min_open = BigDecimal.valueOf(1000000);
@@ -2003,7 +2016,7 @@ public class BinanceServiceImpl implements BinanceService {
             e.printStackTrace();
         }
 
-        return Objects.equals("※", point) ? "" : " " + point;
+        return Objects.equals("※", point.trim()) ? "" : " " + point.trim();
     }
 
     private Boolean isHasData(List<Object> result_usdt, int index) {
@@ -2032,7 +2045,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String setCoinGlassData(String gecko_id, String symbol) {
         boolean exit = true;
         if (exit) {
-            //return "";
+            return "";
         }
 
         String url = "https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=" + symbol.toUpperCase()
@@ -2500,7 +2513,6 @@ public class BinanceServiceImpl implements BinanceService {
         return dto;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     @Transactional
     public List<String> monitorBtcPrice() {
@@ -2523,123 +2535,15 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             log.info(time + " Start monitorBtcPrice ---->");
             List<BtcFutures> btc1hs = Utils.loadData("BTC", TIME_1h, LIMIT_DATA_1h);
+            if (CollectionUtils.isEmpty(btc1hs)) {
+                return results;
+            }
             btcFuturesRepository.saveAll(btc1hs);
 
             BigDecimal price_at_binance = btc1hs.get(0).getCurrPrice();
 
             // https://www.binance.com/en-GB/futures/funding-history/3
-            //
-            {
-                String url = "https://www.binance.com/fapi/v1/marketKlines?interval=15m&limit=1&symbol=pBTCUSDT";
-                List<Object> funding_rate_objs = Utils.getBinanceData(url, 1);
-                if (!CollectionUtils.isEmpty(funding_rate_objs)) {
-
-                    Object obj = funding_rate_objs.get(0);
-                    List<Object> arr_ = (List<Object>) obj;
-
-                    if (!CollectionUtils.isEmpty(arr_)) {
-                        // BigDecimal open = Utils.getBigDecimal(arr_.get(1));
-                        BigDecimal high = Utils.getBigDecimal(arr_.get(2)).multiply(BigDecimal.valueOf(100));
-                        BigDecimal low = Utils.getBigDecimal(arr_.get(3)).multiply(BigDecimal.valueOf(100));
-                        // BigDecimal close = Utils.getBigDecimal(arr_.get(4));
-
-                        if (high.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-
-                            getListDepthData("BTC");
-                            String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-
-                            Utils.sendToTelegram("(DANGER DANGER) CZ kill SHORT !!! Wait 3~5 minutes."
-                                    + Utils.new_line_from_service + "(Sell wall) " + wall);
-
-                        } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
-
-                            getListDepthData("BTC");
-                            String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-
-                            Utils.sendToTelegram("(DANGER) CZ kill SHORT !!! Wait 3~5 minutes."
-                                    + Utils.new_line_from_service + "(Sell wall) " + wall);
-                            // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
-                        }
-
-                        if (low.compareTo(BigDecimal.valueOf(-1)) < 0) {
-
-                            getListDepthData("BTC");
-                            String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
-
-                            Utils.sendToTelegram("(DANGER DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes."
-                                    + Utils.new_line_from_service + "(Buy wall) " + wall);
-                            // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
-
-                        } else if (low.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
-
-                            getListDepthData("BTC");
-                            String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
-
-                            Utils.sendToTelegram("(DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes."
-                                    + Utils.new_line_from_service + "(Buy wall) " + wall);
-
-                        } else if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
-
-                            getListDepthData("BTC");
-                            String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
-
-                            Utils.sendToTelegram("(DANGER) CZ kill LONG !!! Wait 3~5 minutes."
-                                    + Utils.new_line_from_service + "(Buy wall) " + wall);
-                            // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
-
-                        }
-
-                        // MyTelegram
-                        {
-                            if (!Objects.equals(String.valueOf(low), pre_funding_rate_low)) {
-                                if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
-
-                                    getListDepthData("BTC");
-                                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
-
-                                    pre_funding_rate_low = String.valueOf(low);
-
-                                    Utils.sendToMyTelegram(time + " (DANGER) CZ kill Long !!! Wait 3~5 minutes."
-                                            + Utils.new_line_from_service + "(Buy wall) " + wall);
-
-                                } else if (low.compareTo(BigDecimal.valueOf(-0.12)) < 0) {
-                                    pre_funding_rate_low = String.valueOf(low);
-
-                                    getListDepthData("BTC");
-                                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
-
-                                    Utils.sendToMyTelegram(time + " (" + pre_funding_rate_low
-                                            + ") Wait 3~5 minutes." + Utils.new_line_from_service
-                                            + "(Buy wall) " + wall);
-                                }
-                            }
-
-                            if (!Objects.equals(String.valueOf(high), pre_funding_rate_high)) {
-                                if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
-                                    pre_funding_rate_high = String.valueOf(high);
-
-                                    getListDepthData("BTC");
-                                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-
-                                    Utils.sendToMyTelegram(time + " (Sell wall) CZ kill Short !!! wait 3~5 minutes."
-                                            + Utils.new_line_from_service + wall);
-
-                                } else if (high.compareTo(BigDecimal.valueOf(0.02)) > 0) {
-                                    pre_funding_rate_high = String.valueOf(high);
-
-                                    getListDepthData("BTC");
-                                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-
-                                    Utils.sendToMyTelegram(time + " (" + pre_funding_rate_high
-                                            + ") Wait 3~5 minutes" + Utils.new_line_from_service
-                                            + "(Sell wall) " + wall);
-                                }
-                            }
-                        }
-
-                    }
-                }
-            }
+            monitorBtcFundingRate(time, price_at_binance);
 
             String hh = Utils.convertDateToString("HH", Calendar.getInstance().getTime());
             if (!Objects.equals(hh, pre_time_of_saved_data_4h)) {
@@ -2671,7 +2575,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             String msg = time;
 
-            String low_height = Utils.getMsgLowHeight(price_at_binance, dto_10d);
+            String low_height = Utils.getMsgLowHeight(price_at_binance, dto_1h);
             low_height += " " + Utils.new_line_from_service;
             low_height += "10d" + Utils.new_line_from_service + Utils.getMsgLowHeight(price_at_binance, dto_10d);
 
@@ -2989,37 +2893,194 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     public List<EntryCssResponse> findAllScalpingToday() {
         List<EntryCssResponse> results = new ArrayList<EntryCssResponse>();
-
-        List<BinanceFutures> list = binanceFuturesRepository.findAllByScalpingToday();
-        if (!CollectionUtils.isEmpty(list)) {
-            for (BinanceFutures entity : list) {
-                String msg = entity.getScalpingEntry();
-                List<String> msgs = new ArrayList<String>(Arrays.asList(msg.split(Utils.new_line_from_service)));
-
-                if (!CollectionUtils.isEmpty(msgs) && msgs.size() > 4) {
-                    String entry = Utils.getStringValue(msgs.get(1));
-                    String stop_loss = Utils.getStringValue(msgs.get(2));
-                    String low = Utils.getStringValue(msgs.get(3));
-                    String tp1 = msgs.size() > 4 ? Utils.getStringValue(msgs.get(4)) : "";
-                    String tp2 = msgs.size() > 5 ? Utils.getStringValue(msgs.get(5)) : "";
-
+        try {
+            List<FundingHistory> list = fundingHistoryRepository.findAllByPumpdump(true);
+            if (!CollectionUtils.isEmpty(list)) {
+                for (FundingHistory entity : list) {
                     EntryCssResponse dto = new EntryCssResponse();
                     dto.setSymbol(entity.getSymbol());
                     dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
                             + entity.getSymbol().toUpperCase() + "USDT");
-                    dto.setFutures_msg(entity.getFuturesMsg());
-                    dto.setEntry(entry);
-                    dto.setStop_loss(stop_loss);
-                    dto.setLow(low);
-                    dto.setTp1(tp1);
-                    dto.setTp2(tp2);
 
                     results.add(dto);
                 }
             }
+        } catch (Exception e) {
+            log.info("Error findAllScalpingToday ---->");
+            e.printStackTrace();
         }
 
         return results;
+    }
+
+    private void monitorBtcFundingRate(String time, BigDecimal price_at_binance) {
+        try {
+
+            FundingResponse rate = Utils.loadFundingRate("BTC");
+            BigDecimal high = rate.getHigh();
+            BigDecimal low = rate.getLow();
+
+            if (high.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+
+                getListDepthData("BTC");
+                String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
+
+                Utils.sendToTelegram("(DANGER DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                        + "(Sell wall) " + wall);
+
+                return;
+
+            } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
+
+                getListDepthData("BTC");
+                String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
+
+                Utils.sendToTelegram("(DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                        + "(Sell wall) " + wall);
+                // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+
+                return;
+            }
+
+            if (low.compareTo(BigDecimal.valueOf(-1)) < 0) {
+
+                getListDepthData("BTC");
+                String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
+
+                Utils.sendToTelegram("(DANGER DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes."
+                        + Utils.new_line_from_service + "(Buy wall) " + wall);
+                // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                return;
+
+            } else if (low.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
+
+                getListDepthData("BTC");
+                String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
+
+                Utils.sendToTelegram("(DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                        + "(Buy wall) " + wall);
+                return;
+            } else if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
+
+                getListDepthData("BTC");
+                String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
+
+                Utils.sendToTelegram("(DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                        + "(Buy wall) " + wall);
+                // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                return;
+            }
+
+            // -----------------------------------------------------------------------------------------//
+
+            // MyTelegram
+            {
+                if (!Objects.equals(low, pre_funding_rate_low)) {
+                    if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
+
+                        getListDepthData("BTC");
+                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
+
+                        pre_funding_rate_low = low;
+
+                        Utils.sendToMyTelegram(time + " (DANGER) CZ kill Long !!! Wait 3~5 minutes."
+                                + Utils.new_line_from_service + "(Buy wall) " + wall);
+                        return;
+                    } else if (low.compareTo(BigDecimal.valueOf(-0.12)) < 0) {
+                        pre_funding_rate_low = low;
+
+                        getListDepthData("BTC");
+                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
+
+                        Utils.sendToMyTelegram(time + " (" + pre_funding_rate_low + ") Wait 3~5 minutes."
+                                + Utils.new_line_from_service + "(Buy wall) " + wall);
+
+                        return;
+                    }
+                }
+
+                if (!Objects.equals(high, pre_funding_rate_high)) {
+                    if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
+                        pre_funding_rate_high = high;
+
+                        getListDepthData("BTC");
+                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
+
+                        Utils.sendToMyTelegram(time + " (Sell wall) CZ kill Short !!! wait 3~5 minutes."
+                                + Utils.new_line_from_service + wall);
+
+                        return;
+                    } else if (high.compareTo(BigDecimal.valueOf(0.02)) > 0) {
+                        pre_funding_rate_high = high;
+
+                        getListDepthData("BTC");
+                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
+
+                        Utils.sendToMyTelegram(time + " (" + pre_funding_rate_high + ") Wait 3~5 minutes"
+                                + Utils.new_line_from_service + "(Sell wall) " + wall);
+
+                        return;
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            log.info("Error monitorBtcFundingRate ---->");
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    private void loadFundingHistory(String gecko_id, String symbol) {
+        try {
+            BigDecimal CONST_RATE = BigDecimal.valueOf(2);
+
+            FundingResponse rate = Utils.loadFundingRate(symbol);
+            BigDecimal highUp = rate.getHighUp();
+            BigDecimal lowUp = rate.getLowUp();
+
+            // String currDay = Utils.convertDateToString("yyyyMMdd",
+            // Calendar.getInstance().getTime());
+            String eventTime = "TODO";
+            // Utils.convertDateToString("yyyyMMdd_HHmm_ss.SSS",
+            // Calendar.getInstance().getTime());
+
+            FundingHistory entity = new FundingHistory();
+            FundingHistoryKey id = new FundingHistoryKey();
+            id.setEventTime(eventTime);
+            id.setGeckoid(gecko_id);
+            entity.setId(id);
+            entity.setSymbol(symbol);
+
+            entity.setHigh(rate.getHigh());
+            entity.setLow(rate.getLow());
+
+            entity.setAvgHigh(rate.getAvg_high());
+            entity.setAvgLow(rate.getAvg_low());
+
+            entity.setCountHigh(highUp.intValue());
+            entity.setCountLow(lowUp.intValue());
+
+            String note = "";
+            if ((highUp.compareTo(CONST_RATE) > 0) || (lowUp.compareTo(CONST_RATE) > 0)) {
+                if (highUp.compareTo(lowUp) > 0) {
+                    note = "PUMP";
+                    // Utils.sendToMyTelegram(currEventTime + " (Warning) PUMP: " + symbol);
+                } else {
+                    note = "PUMP";
+                }
+                entity.setPumpdump(true);
+            } else {
+                entity.setPumpdump(false);
+            }
+            entity.setNote(note);
+
+            fundingHistoryRepository.save(entity);
+        } catch (Exception e) {
+            log.info("Error loadFundingHistory ---->");
+            e.printStackTrace();
+        }
+
     }
 
 }

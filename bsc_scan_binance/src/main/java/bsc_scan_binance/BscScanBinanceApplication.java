@@ -41,7 +41,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            // app_flag = Utils.const_app_flag_msg_on;
+            app_flag = Utils.const_app_flag_msg_on;
 
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -93,14 +93,14 @@ public class BscScanBinanceApplication {
                         }
 
                         if (idx % 15 == 0) {
-                            binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol());
-                            binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol());
+                            binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol().toUpperCase());
+                            binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol().toUpperCase());
                             binance_service.monitorBtcPrice();
                             wait(1200);
                         }
 
-                        binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol());
-                        binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol());
+                        binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase());
+                        binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol().toUpperCase());
 
                         log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
                                 + coin.getSymbol());

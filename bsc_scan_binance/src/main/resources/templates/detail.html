@@ -72,7 +72,9 @@ p {
 
 </style>
 <body class="">
-    <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;"><a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=VANTAGE%3ASP500'}">S&P 500</a><span　th:text="${sp500}" th:classappend="${#strings.contains(sp500, '-') ? 'text-danger' : 'text-primary'}"></span>
+    <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
+      <a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=VANTAGE%3ASP500'}">S&P 500</a><span　th:text="${sp500}" th:classappend="${#strings.contains(sp500, '-') ? 'text-danger' : 'text-primary'}"></span>
+      <a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=CRYPTOCAP%3ABTC.D'}">Btc.D</a>
     </div>
 
     <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
@@ -82,10 +84,23 @@ p {
     </div>
 
     <div th:if="${#lists.size(scapling_list) > 0}" style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important; min-width: 400px !important; max-width: 400px !important;">
-      <p class="font-weight-bold">(Scalping)</p>
-      <div>
-        <a th:each="token,iter: ${scapling_list}" th:target="_blank" th:href="${token.tradingview}"><span style="margin-right: 0.5rem;" th:text="${token.symbol}"></span></a>
-      </div>
+      <a class="font-weight-bold" style="padding-left: 0.5rem;" th:target="_blank" th:href="${'http://localhost:8090/binance'}">
+       <span>(Scalping)</span>
+      </a>
+
+      <table class="table-bordered" style="min-width: 155px !important; max-width: 155px !important; font-size: 0.75rem !important;">
+        <tbody th:with="row_num = ${#lists.size(scapling_list) % 10 > 0 && #lists.size(scapling_list) % 10 < 10 ? #lists.size(scapling_list) / 10 + 1 : #lists.size(scapling_list) / 10}">
+          <th:block th:each="row_index: ${#numbers.sequence(0, row_num - 1)}">
+            <tr>
+              <th:block th:each="col_index: ${#numbers.sequence(1, 10)}">
+                  <td th:with="idx= ${(row_index*10 + col_index)}" style="padding: 0; padding-left: 0.05rem !important; border: none !important;" >
+                    <a th:if="${idx < #lists.size(scapling_list)}" th:target="_blank" th:href="${scapling_list[idx].tradingview}"><span th:text="${scapling_list[idx].symbol}"></span></a>
+                  </td>
+                </th:block>
+             </tr>
+          </th:block>
+        </tbody>
+      </table>
     </div>
 
   <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important; display: flex;">

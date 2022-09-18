@@ -38,6 +38,7 @@ import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.DepthResponse;
+import bsc_scan_binance.response.FundingResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.response.PriorityCoinResponse;
 
@@ -1152,68 +1153,62 @@ public class Utils {
         return msg;
     }
 
-    public static boolean isUptrend(String symbol) {
+    public static FundingResponse loadFundingRate(String symbol) {
+        FundingResponse dto = new FundingResponse();
+        int limit = 4;
+        BigDecimal high = BigDecimal.valueOf(-100);
+        BigDecimal low = BigDecimal.valueOf(100);
 
-        // check D1
-        {
-            List<BtcFutures> list1d = Utils.loadData(symbol, "1d", 2);
-            if (CollectionUtils.isEmpty(list1d)) {
-                return false;
-            }
-            // hqua RED, hnay RED
-            if (!list1d.get(0).isUptrend() && !list1d.get(1).isUptrend()) {
-                return false;
-            }
-            Boolean isCandidate = false;
-            BigDecimal price_at_binance = list1d.get(0).getCurrPrice();
+        // https://www.binance.com/fapi/v1/marketKlines?interval=15m&limit=4&symbol=pBTCUSDT
+        String url = "https://www.binance.com/fapi/v1/marketKlines?interval=15m&limit=" + limit + "&symbol=p" + symbol
+                + "USDT";
+        List<Object> funding_rate_objs = Utils.getBinanceData(url, limit);
+        if (CollectionUtils.isEmpty(funding_rate_objs)) {
+            dto.setHigh(high);
+            dto.setLow(low);
+            dto.setAvg_high(high);
+            dto.setAvg_low(low);
 
-            // (5*) hnay: GREEN, hqua GREEN; gia hien tai hnay > gia dong cua hqua.
-            if (list1d.get(1).isUptrend() && list1d.get(0).isUptrend()
-                    && list1d.get(1).getPrice_close_candle().compareTo(price_at_binance) < 0) {
-                isCandidate = true;
-            }
+            return dto;
+        }
 
-            // (3*) hqua GREEN, hnay RED
-            // gia hien tai hnay > 50% chieu dai than nen hqua.
-            if (list1d.get(1).isUptrend() && !list1d.get(0).isUptrend()) {
-                BigDecimal yesterdayMidPrice = Utils.getPriceAtMidCandle(list1d.get(1).getPrice_open_candle(),
-                        list1d.get(1).getPrice_close_candle());
-                if (price_at_binance.compareTo(yesterdayMidPrice) > 0) {
-                    isCandidate = true;
-                }
+        BigDecimal total_high = BigDecimal.ZERO;
+        BigDecimal total_low = BigDecimal.ZERO;
+        for (int index = 0; index < funding_rate_objs.size(); index++) {
+            Object obj = funding_rate_objs.get(index);
+
+            @SuppressWarnings("unchecked")
+            List<Object> arr_ = (List<Object>) obj;
+            if (CollectionUtils.isEmpty(arr_) || arr_.size() < 4) {
+                continue;
             }
-            // (1*) hqua RED, hnay GREEN, gia hien tai hom nay > gia cao nhat cua hqua
-            if (!list1d.get(1).isUptrend() && list1d.get(0).isUptrend()) {
-                if (price_at_binance.compareTo(list1d.get(1).getHight_price()) > 0) {
-                    isCandidate = true;
-                }
+            // BigDecimal open = Utils.getBigDecimal(arr_.get(1));
+            BigDecimal tmp_high = Utils.getBigDecimal(arr_.get(2)).multiply(BigDecimal.valueOf(100));
+            BigDecimal tmp_low = Utils.getBigDecimal(arr_.get(3)).multiply(BigDecimal.valueOf(100));
+            // BigDecimal close = Utils.getBigDecimal(arr_.get(4));
+
+            if (tmp_high.compareTo(high) > 0) {
+                high = tmp_high;
             }
 
-            if (!isCandidate) {
-                return false;
+            if (tmp_low.compareTo(low) < 0) {
+                low = tmp_low;
+            }
+
+            if (index < limit) {
+                total_high = total_high.add(tmp_high);
+                total_low = total_low.add(tmp_low);
             }
         }
 
-        // III. Nen 30m, xu huong tang
-        {
-            List<BtcFutures> list30m = Utils.loadData(symbol, "30m", 5);
+        BigDecimal avg_high = total_high.divide(BigDecimal.valueOf(limit - 1), 5, RoundingMode.CEILING);
+        BigDecimal avg_low = total_low.divide(BigDecimal.valueOf(limit - 1), 5, RoundingMode.CEILING);
 
-            // RED, GREEN, GREEN
-            // RED, RED, GREEN
-            // GREEN, GREEN
-            Boolean isUptrend = false;
-            if ((!list30m.get(2).isUptrend() && list30m.get(1).isUptrend() && list30m.get(0).isUptrend())
-                    || (!list30m.get(2).isUptrend() && !list30m.get(1).isUptrend() && list30m.get(0).isUptrend())
-                    || (list30m.get(1).isUptrend() && list30m.get(0).isUptrend())) {
-                isUptrend = true;
-            }
+        dto.setHigh(high);
+        dto.setLow(low);
+        dto.setAvg_high(avg_high);
+        dto.setAvg_low(avg_low);
 
-            if (!isUptrend) {
-                return false;
-            }
-        }
-
-        return true;
-
+        return dto;
     }
 }
