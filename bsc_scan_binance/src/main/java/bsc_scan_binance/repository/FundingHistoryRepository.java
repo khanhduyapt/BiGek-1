@@ -18,7 +18,7 @@ public interface FundingHistoryRepository extends JpaRepository<FundingHistory, 
 
     public List<FundingHistory> findAllByPumpdump(boolean pumpdump);
 
-    @Query(value = "select (case when count(gecko_id)> 0 then true else false end) from funding_history where gecko_id = :geckoid", nativeQuery = true)
-    boolean existsPumDump(@Param("geckoid") String geckoid);
+    @Query(value = "select (case when count(gecko_id)> 0 then true else false end) from funding_history where gecko_id = :geckoid AND event_time = :event ", nativeQuery = true)
+    boolean existsPumDump(@Param("geckoid") String geckoid, @Param("event") String event);
 
 }

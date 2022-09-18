@@ -71,6 +71,7 @@ import bsc_scan_binance.response.FundingResponse;
 import bsc_scan_binance.response.GeckoVolumeUpPre4hResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
+import bsc_scan_binance.utils.GoinglassUtils;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +137,10 @@ public class BinanceServiceImpl implements BinanceService {
     private static final int LIMIT_DATA_15m = 48;
     private static final int LIMIT_DATA_1h = 48;
     private static final int LIMIT_DATA_4h = 60;
+
+    private static final String EVENT_FUNDING_RATE = "FUNDING_RATE";
+    private static final String EVENT_COINGLASS_SHORT = "COINGLASS_SHORT";
+    private static final String EVENT_DANGER_CZ_KILL_LONG = "CZ_KILL_LONG";
 
     private int pre_monitorBitcoinBalancesOnExchanges_HH = 0;
     private String monitorBitcoinBalancesOnExchanges_temp = "";
@@ -1788,6 +1793,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
             btcVolumeDayRepository.saveAll(list_day);
         } catch (Exception e) {
+            log.info("Error loadDataVolumeHour  ----->");
             e.printStackTrace();
         }
     }
@@ -1949,8 +1955,12 @@ public class BinanceServiceImpl implements BinanceService {
                 binanceVolumnDayRepository.save(day);
                 binanceVolumnWeekRepository.saveAll(list_week);
                 if (!Objects.equals("", sql_pump_dump)) {
-                    Query query = entityManager.createNativeQuery(sql_pump_dump);
-                    query.executeUpdate();
+                    // ERROR: numeric field overflow
+                    // Detail: A field with precision 5, scale 5 must round to an absolute value
+                    // less than 1.
+
+                    // Query query = entityManager.createNativeQuery(sql_pump_dump);
+                    // query.executeUpdate();
                 }
             }
 
@@ -1961,6 +1971,7 @@ public class BinanceServiceImpl implements BinanceService {
             setCoinGlassData(gecko_id, symbol);
 
         } catch (Exception e) {
+            log.info("Error loadBinanceData  ----->");
             e.printStackTrace();
         }
         return "";
@@ -2016,6 +2027,7 @@ public class BinanceServiceImpl implements BinanceService {
                 point += "G$ ";
             }
         } catch (Exception e) {
+            log.info("Error calcPoint  ----->");
             e.printStackTrace();
         }
 
@@ -2045,6 +2057,7 @@ public class BinanceServiceImpl implements BinanceService {
      *
      */
     @SuppressWarnings("unchecked")
+    @Transactional
     private String setCoinGlassData(String gecko_id, String symbol) {
         if (!Objects.equals(pre_time_coinglass_wait_time, Utils.getCurrentHH().toString())) {
             if (coinglass_wait_1h) {
@@ -2054,7 +2067,6 @@ public class BinanceServiceImpl implements BinanceService {
 
         String url = "https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=" + symbol.toUpperCase()
                 + "&exName=Binance&type=1&timeType=3";
-
         /*
          *
          * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=
@@ -2066,6 +2078,8 @@ public class BinanceServiceImpl implements BinanceService {
 
         List<String> list = new ArrayList<String>();
         try {
+            // --------------------------------------
+
             RestTemplate restTemplate = new RestTemplate();
             Object result = restTemplate.getForObject(url, Object.class);
 
@@ -2084,11 +2098,6 @@ public class BinanceServiceImpl implements BinanceService {
                 if (longRatioList2.size() > 0) {
                     int index = longRatioList2.size() - 1;
 
-                    // List<String> dateList2 = new ArrayList<>((Collection<String>) dateList);
-                    // String abc = String.valueOf(dateList2.get(index));
-                    // Date date = Utils.getDate(abc);
-                    // String str_date = Utils.convertDateToString("HH:mm", date);
-
                     double longShortRatio = longShortRatioList2.get(index);
                     topTraderBinanceLongRate = Utils.getBigDecimal(longRatioList2.get(index));
 
@@ -2097,6 +2106,29 @@ public class BinanceServiceImpl implements BinanceService {
                         msg += "Long:" + String.valueOf(longRatioList2.get(index)) + "%";
                     } else {
                         msg += "Short:" + String.valueOf(shortRatioList2.get(index)) + "%";
+
+                        String event_id = EVENT_COINGLASS_SHORT + Utils.getToday_YyyyMMdd();
+                        if (!fundingHistoryRepository.existsPumDump(gecko_id, event_id)) {
+
+                            FundingHistory coin = new FundingHistory();
+                            FundingHistoryKey id = new FundingHistoryKey();
+                            id.setEventTime(event_id);
+                            id.setGeckoid(gecko_id);
+                            coin.setId(id);
+                            coin.setSymbol(symbol);
+                            coin.setNote(Utils.getToday_YyyyMMdd() + " Short");
+                            coin.setPumpdump(true);
+
+                            coin.setHigh(BigDecimal.ZERO);
+                            coin.setLow(BigDecimal.ZERO);
+                            coin.setAvgHigh(BigDecimal.ZERO);
+                            coin.setAvgLow(BigDecimal.ZERO);
+                            coin.setCountHigh(1);
+                            coin.setCountLow(1);
+
+                            fundingHistoryRepository.save(coin);
+                            Utils.sendToMyTelegram("(Coinglass Short) " + symbol);
+                        }
                     }
 
                     // log.info("End getCoinGlassData <--");
@@ -2143,7 +2175,8 @@ public class BinanceServiceImpl implements BinanceService {
         } catch (Exception e) {
             coinglass_wait_1h = true;
             pre_time_coinglass_wait_time = Utils.getCurrentHH().toString();
-            log.info("Error coinglass ---->" + e.getMessage());
+            log.info("Error setCoinGlassData ---->" + e.getMessage());
+            e.printStackTrace();
         }
 
         return "";
@@ -2264,6 +2297,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } catch (Exception e) {
+            log.info("Error saveDepthData  ----->");
             e.printStackTrace();
         }
     }
@@ -2305,6 +2339,7 @@ public class BinanceServiceImpl implements BinanceService {
             return list;
 
         } catch (Exception e) {
+            log.info("Error getDepthDataBtc  ----->");
             e.printStackTrace();
         }
 
@@ -2340,12 +2375,12 @@ public class BinanceServiceImpl implements BinanceService {
                     DepthResponse real_wall = new DepthResponse();
                     real_wall.setPrice(price);
                     real_wall.setVal_million_dolas(total_bids);
-                    real_wall.setPercent(Utils.getPercentStr(price, current_price));
+                    real_wall.setPercent(Utils.getPercentStr(current_price, price));
                     list_bids_ok.add(real_wall);
                 }
 
                 dto.setPrice(price);
-                dto.setPercent(Utils.getPercentStr(price, current_price));
+                dto.setPercent(Utils.getPercentStr(current_price, price));
                 list_bids_ok.add(dto);
             }
 
@@ -2430,7 +2465,7 @@ public class BinanceServiceImpl implements BinanceService {
             for (DepthResponse dto : list_bids) {
                 BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
                 dto.setPrice(price);
-                dto.setPercent(Utils.getPercentStr(price, current_price));
+                dto.setPercent(Utils.getPercentStr(current_price, price));
                 list_bids_ok.add(dto);
             }
 
@@ -2444,8 +2479,10 @@ public class BinanceServiceImpl implements BinanceService {
 
             result.add(list_bids_ok);
             result.add(list_asks_ok);
+
             return result;
         } catch (Exception e) {
+            log.info("Error getListDepthData  ----->");
             e.printStackTrace();
         }
 
@@ -2740,7 +2777,7 @@ public class BinanceServiceImpl implements BinanceService {
         return results;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "unchecked" })
     @Transactional
     private String monitorBitcoinBalancesOnExchanges() {
 
@@ -2751,66 +2788,11 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         log.info("Start monitorBitcoinBalancesOnExchanges ---->");
-        String url = "https://fapi.coinglass.com/api/exchange/chain/balance/list";
-
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            Object result = restTemplate.getForObject(url, Object.class);
-            Object dataList = Utils.getLinkedHashMapValue(result, Arrays.asList("data"));
-
-            if (dataList instanceof Collection) {
-                List<LinkedHashMap> exchangeList = new ArrayList<>((Collection<LinkedHashMap>) dataList);
-
-                if (exchangeList.size() > 0) {
-
-                    String yyyyMMdd = Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime());
-                    List<BitcoinBalancesOnExchanges> entities = new ArrayList<BitcoinBalancesOnExchanges>();
-
-                    for (LinkedHashMap exchange : exchangeList) {
-
-                        Object exchangeName = Utils.getLinkedHashMapValue(exchange, Arrays.asList("exchangeName"));
-                        Object symbol = Utils.getLinkedHashMapValue(exchange, Arrays.asList("symbol"));
-                        Object balance = Utils.getLinkedHashMapValue(exchange, Arrays.asList("balance"));
-
-                        Object balanceChange = Utils.getLinkedHashMapValue(exchange, Arrays.asList("balanceChange"));
-                        Object balanceChangePercent = Utils.getLinkedHashMapValue(exchange,
-                                Arrays.asList("balanceChangePercent"));
-
-                        Object d7BalanceChange = Utils.getLinkedHashMapValue(exchange,
-                                Arrays.asList("d7BalanceChange"));
-                        Object d7BalanceChangePercent = Utils.getLinkedHashMapValue(exchange,
-                                Arrays.asList("d7BalanceChangePercent"));
-
-                        Object d30BalanceChange = Utils.getLinkedHashMapValue(exchange,
-                                Arrays.asList("d30BalanceChange"));
-                        Object d30BalanceChangePercent = Utils.getLinkedHashMapValue(exchange,
-                                Arrays.asList("d30BalanceChangePercent"));
-                        Object exLogo = Utils.getLinkedHashMapValue(exchange, Arrays.asList("exLogo"));
-
-                        BitcoinBalancesOnExchanges entity = new BitcoinBalancesOnExchanges();
-                        BitcoinBalancesOnExchangesKey id = new BitcoinBalancesOnExchangesKey();
-                        id.setYyyymmdd(yyyyMMdd);
-                        id.setExchangeName(Utils.getStringValue(exchangeName));
-                        id.setSymbol(Utils.getStringValue(symbol));
-
-                        entity.setId(id);
-                        entity.setBalance(Utils.getBigDecimal(balance));
-                        entity.setBalanceChange(Utils.getBigDecimal(balanceChange));
-                        entity.setBalanceChangePercent(Utils.getBigDecimal(balanceChangePercent));
-                        entity.setD7BalanceChange(Utils.getBigDecimal(d7BalanceChange));
-                        entity.setD7BalanceChangePercent(Utils.getBigDecimal(d7BalanceChangePercent));
-                        entity.setD30BalanceChange(Utils.getBigDecimal(d30BalanceChange));
-                        entity.setD30BalanceChangePercent(Utils.getBigDecimal(d30BalanceChangePercent));
-                        entity.setExLogo(Utils.getStringValue(exLogo));
-
-                        entities.add(entity);
-                    }
-
-                    bitcoinBalancesOnExchangesRepository.saveAll(entities);
-                }
+            List<BitcoinBalancesOnExchanges> entities = GoinglassUtils.getBtcExchangeBalance();
+            if (entities.size() > 0) {
+                bitcoinBalancesOnExchangesRepository.saveAll(entities);
             }
-
-            log.info("Start getBtcBalancesOnExchanges ---->");
 
             String sql = " SELECT                                                                                   \n"
                     + "  fun_btc_price_now()                                              as price_now              \n"
@@ -2857,98 +2839,6 @@ public class BinanceServiceImpl implements BinanceService {
         } else {
             return monitorBitcoinBalancesOnExchanges_temp;
         }
-    }
-
-    // ra vao toi da 1h, char 5m, target 3%
-    // Xu huong gia, vi tri nen, boll
-    // 1d: xet 2 cay nen, dang xu huong tang,
-
-    /*
-     * / I. nen 1D, gia hien tai thap hon 5% gia trung binh (5*) hnay: xanh, hqua
-     * xanh; gia hien tai hnay > gia dong cua hqua.
-     *
-     * (3*) hqua xanh, hnay do hnay dang hoi: rau dai (rau > 2 lan than nen), than
-     * ngan, gia hien tai hnay > 50% chieu dai than nen hqua.
-     *
-     * (1*) hqua do, hnay xanh gia hien tai hom nay > gia cao nhat cua hqua
-     *
-     *
-     * II. Nen 4h hien tai bat buoc phai xanh. Loai truong hop sap cham AVG hoac BEL
-     * tren. cach bel > 5% or cach AVG > 5%. Chu y gio dong cua cay nen 4h.
-     *
-     * (5*) Cay nen truoc Xanh
-     *
-     * (3*) Cay nen truoc la do, dang co xu huong hoi len.
-     *
-     * III. Nen 1h, xu huong tang, gia hien tai cach bel > 5% or cach AVG > 5%.
-     *
-     * IV. 30m dang xu huong tang /
-     */
-    @Transactional
-    public void scalping(String gecko_id, String symbol) {
-        try {
-            BinanceFutures entity = binanceFuturesRepository.findById(gecko_id).orElse(null);
-
-            if (!Objects.equals(null, entity)) {
-                entity.setScalpingToday(false);
-                binanceFuturesRepository.save(entity);
-            }
-            // Check 4h hien tai bat buoc phai xanh.
-            List<BtcFutures> list_4h = Utils.loadData(symbol, TIME_4h, 1);
-            if (CollectionUtils.isEmpty(list_4h)) {
-                return;
-            }
-            if (!list_4h.get(0).isUptrend()) {
-                return;
-            }
-
-            List<BtcFutures> list15m = Utils.loadData(symbol, TIME_15m, LIMIT_DATA_15m);
-
-            BigDecimal min_open = BigDecimal.valueOf(1000000);
-            BigDecimal min_low = BigDecimal.valueOf(1000000);
-            BigDecimal max_Hig = BigDecimal.ZERO;
-            for (BtcFutures dto : list15m) {
-                if (min_low.compareTo(dto.getLow_price()) > 0) {
-                    min_low = dto.getLow_price();
-                }
-
-                if (max_Hig.compareTo(dto.getHight_price()) < 0) {
-                    max_Hig = dto.getHight_price();
-                }
-
-                if (dto.isUptrend()) {
-                    if (min_open.compareTo(dto.getPrice_open_candle()) > 0) {
-                        min_open = dto.getPrice_open_candle();
-                    }
-                } else {
-                    if (min_open.compareTo(dto.getPrice_close_candle()) > 0) {
-                        min_open = dto.getPrice_close_candle();
-                    }
-                }
-            }
-
-            BigDecimal price_at_binance = list15m.get(0).getCurrPrice();
-            BigDecimal percent_to_top = Utils.getPercent(max_Hig, price_at_binance);
-            BigDecimal percent_to_bottom = Utils.getPercent(price_at_binance, min_low);
-
-            if (!Objects.equals(null, entity)
-                    && percent_to_top.compareTo(percent_to_bottom.multiply(BigDecimal.valueOf(2))) > 0) {
-
-                String msg = Utils.getMsgLong(symbol, price_at_binance, min_low, min_open, max_Hig);
-                entity.setScalpingToday(true);
-                entity.setScalpingEntry(msg);
-
-                binanceFuturesRepository.save(entity);
-                // Utils.sendToMyTelegram("Scalping: " + symbol + Utils.new_line_from_service +
-                // msg);
-
-                log.info("scalping: " + symbol + ", " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override
@@ -3101,23 +2991,20 @@ public class BinanceServiceImpl implements BinanceService {
 
             // String currDay = Utils.convertDateToString("yyyyMMdd",
             // Calendar.getInstance().getTime());
-            String eventTime = "TODO";
             // Utils.convertDateToString("yyyyMMdd_HHmm_ss.SSS",
             // Calendar.getInstance().getTime());
 
             FundingHistory entity = new FundingHistory();
             FundingHistoryKey id = new FundingHistoryKey();
-            id.setEventTime(eventTime);
+            id.setEventTime(EVENT_FUNDING_RATE);
             id.setGeckoid(gecko_id);
             entity.setId(id);
             entity.setSymbol(symbol);
 
             entity.setHigh(rate.getHigh());
             entity.setLow(rate.getLow());
-
             entity.setAvgHigh(rate.getAvg_high());
             entity.setAvgLow(rate.getAvg_low());
-
             entity.setCountHigh(highUp.intValue());
             entity.setCountLow(lowUp.intValue());
 
@@ -3130,7 +3017,7 @@ public class BinanceServiceImpl implements BinanceService {
                 entity.setNote(note);
                 entity.setPumpdump(true);
 
-                if (!fundingHistoryRepository.existsPumDump(gecko_id)) {
+                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_FUNDING_RATE)) {
                     Utils.sendToMyTelegram(note + ": " + symbol);
                 }
             }

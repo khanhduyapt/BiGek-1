@@ -45,8 +45,8 @@ public class BinanceController {
     @GetMapping("/{symbol}")
     public String getListDepthData(@PathVariable("symbol") String symbol, Model model) {
         List<List<DepthResponse>> list = new ArrayList<List<DepthResponse>>();
-
-        list = service.getListDepthData(symbol);
+        String SYMBOL = symbol.toUpperCase();
+        list = service.getListDepthData(SYMBOL);
         List<DepthResponse> list_bids = new ArrayList<DepthResponse>();
         List<DepthResponse> list_asks = new ArrayList<DepthResponse>();
 
@@ -56,10 +56,10 @@ public class BinanceController {
         }
         model.addAttribute("data_list_1", list_bids);
         model.addAttribute("data_list_2", list_asks);
-        model.addAttribute("symbol", symbol);
+        model.addAttribute("symbol", SYMBOL);
 
-        if (!symbol.toUpperCase().equals("BTC")) {
-            String long_short = service.getLs48h(symbol);
+        if (!SYMBOL.equals("BTC")) {
+            String long_short = service.getLs48h(SYMBOL);
 
             List<String> headers = new ArrayList<String>(Arrays.asList(long_short.split(Utils.new_line_from_service)));
             model.addAttribute("token_48h", headers);

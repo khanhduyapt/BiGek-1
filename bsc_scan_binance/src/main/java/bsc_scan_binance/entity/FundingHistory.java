@@ -26,22 +26,22 @@ public class FundingHistory {
     private String symbol;
 
     @Column(name = "low")
-    private BigDecimal low;
+    private BigDecimal low = BigDecimal.ZERO;
 
     @Column(name = "high")
-    private BigDecimal high;
+    private BigDecimal high = BigDecimal.ZERO;
 
     @Column(name = "avg_low")
-    private BigDecimal avgLow;
+    private BigDecimal avgLow = BigDecimal.ZERO;
 
     @Column(name = "avg_high")
-    private BigDecimal avgHigh;
+    private BigDecimal avgHigh = BigDecimal.ZERO;
 
     @Column(name = "count_low")
-    private int countLow;
+    private int countLow = 1;
 
     @Column(name = "count_high")
-    private int countHigh;
+    private int countHigh = 1;
 
     @Column(name = "note")
     private String note;

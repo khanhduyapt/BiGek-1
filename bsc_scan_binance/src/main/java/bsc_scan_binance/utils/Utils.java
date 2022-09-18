@@ -450,7 +450,7 @@ public class Utils {
         }
 
         sendToChatId(Utils.chatId_duydk, text);
-        sendToChatId(Utils.chatId_linkdk, text);
+        // sendToChatId(Utils.chatId_linkdk, text);
     }
 
     public static boolean isBusinessTime() {
@@ -535,12 +535,13 @@ public class Utils {
 
     public static String getNextBidsOrAsksWall(BigDecimal price_at_binance, List<DepthResponse> bidsOrAsksList) {
 
-        String next_bids_price = Utils.removeLastZero(price_at_binance) + "(now)";
+        String next_price = Utils.removeLastZero(price_at_binance) + "(now)";
         int count = 1;
         for (DepthResponse res : bidsOrAsksList) {
             if (Objects.equals("BTC", res.getSymbol())) {
                 if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2)) > 0) {
-                    next_bids_price += "->" + res.getPrice() + "(" + res.getVal_million_dolas() + "m$)";
+                    next_price += "->" + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
+                            + res.getVal_million_dolas() + "m$" + ")";
                     count += 1;
                 }
             }
@@ -549,7 +550,7 @@ public class Utils {
             }
         }
 
-        return next_bids_price;
+        return next_price;
     }
 
     public static String removeLastZero(String value) {
@@ -572,6 +573,11 @@ public class Utils {
         }
 
         return value;
+    }
+
+    public static String getToday_YyyyMMdd() {
+
+        return Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime());
     }
 
     public static Integer getCurrentHH() {
@@ -648,7 +654,7 @@ public class Utils {
 
     public static String getPercentStr(BigDecimal value, BigDecimal compareToValue) {
 
-        return removeLastZero(getPercent(value, compareToValue))+ "%";
+        return removeLastZero(getPercent(value, compareToValue)) + "%";
 
     }
 
