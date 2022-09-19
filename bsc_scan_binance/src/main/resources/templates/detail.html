@@ -84,6 +84,8 @@ p {
 
     <div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
       <a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=VANTAGE%3ASP500'}">S&P 500</a><span　th:text="${sp500}" th:classappend="${#strings.contains(sp500, '-') ? 'text-danger' : 'text-primary'}"></span>
+      <a th:target="_blank" th:href="${'https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3ATOTAL'}">Total</a>
+      <a th:target="_blank" th:href="${'https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D'}">Usdt.D</a>
       <a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=CRYPTOCAP%3ABTC.D'}">Btc.D</a>
     </div>
 
