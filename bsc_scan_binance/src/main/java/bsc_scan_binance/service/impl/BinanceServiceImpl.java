@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,7 +34,6 @@ import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.BitcoinBalancesOnExchanges;
-import bsc_scan_binance.entity.BitcoinBalancesOnExchangesKey;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
@@ -2119,13 +2117,6 @@ public class BinanceServiceImpl implements BinanceService {
                             coin.setNote(Utils.getToday_YyyyMMdd() + " Short");
                             coin.setPumpdump(true);
 
-                            coin.setHigh(BigDecimal.ZERO);
-                            coin.setLow(BigDecimal.ZERO);
-                            coin.setAvgHigh(BigDecimal.ZERO);
-                            coin.setAvgLow(BigDecimal.ZERO);
-                            coin.setCountHigh(1);
-                            coin.setCountLow(1);
-
                             fundingHistoryRepository.save(coin);
                             Utils.sendToMyTelegram("(Coinglass Short) " + symbol);
                         }
@@ -2720,16 +2711,16 @@ public class BinanceServiceImpl implements BinanceService {
             if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short) && (HH % 4 == 0)) {
                 if (price_at_binance.compareTo(good_price_for_long) <= 0) {
 
-                    Utils.sendToTelegram(
-                            "(Long)" + Utils.new_line_from_service + Utils.getMsgLong(price_at_binance, dto_1h));
+                    //Utils.sendToTelegram(
+                    //        "(Long)" + Utils.new_line_from_service + Utils.getMsgLong(price_at_binance, dto_1h));
 
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
 
                 if (price_at_binance.compareTo(good_price_for_short) > 0) {
 
-                    Utils.sendToTelegram(
-                            "(Short)" + Utils.new_line_from_service + Utils.getMsgShort(price_at_binance, dto_1h));
+                    //Utils.sendToTelegram(
+                    //        "(Short)" + Utils.new_line_from_service + Utils.getMsgShort(price_at_binance, dto_1h));
                     pre_time_of_btc_for_long_short = curr_time_of_btc;
                 }
             }
@@ -2743,7 +2734,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (price_at_binance.compareTo(dto_1h.getHight_price_h()) >= 0) {
                     // kill short: loss 30$ 2022/09/09
-                    Utils.sendToTelegram("CZ kill SHORT !!!");
+                    Utils.sendToTelegram("CZ kill LONG/SHORT !!!");
                     pre_time_of_btc_kill_long_short = curr_time_of_btc_pre10m;
                 }
             }
@@ -2751,15 +2742,15 @@ public class BinanceServiceImpl implements BinanceService {
             // (10d)
             if (!Objects.equals(curr_time_of_btc_pre1h, pre_time_of_btc_msg_1h) && (HH % 4 == 0)) {
                 if (price_at_binance.compareTo(dto_10d.getOpen_candle_h()) <= 0) {
-                    Utils.sendToTelegram("(Bitcoin bottomed in 10d)" + Utils.new_line_from_service + "(LONG)"
-                            + Utils.new_line_from_service + Utils.getMsgLong(dto_10d.getLow_price_h(), dto_10d));
+                    //Utils.sendToTelegram("(Bitcoin bottomed in 10d)" + Utils.new_line_from_service + "(LONG)"
+                    //        + Utils.new_line_from_service + Utils.getMsgLong(dto_10d.getLow_price_h(), dto_10d));
 
                     pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
                 }
 
                 if (price_at_binance.compareTo(dto_10d.getClose_candle_h()) >= 0) {
-                    Utils.sendToTelegram("(Bitcoin hits 10d peak)" + Utils.new_line_from_service + "(Short)"
-                            + Utils.new_line_from_service + Utils.getMsgShort(dto_10d.getHight_price_h(), dto_10d));
+                    //Utils.sendToTelegram("(Bitcoin hits 10d peak)" + Utils.new_line_from_service + "(Short)"
+                    //        + Utils.new_line_from_service + Utils.getMsgShort(dto_10d.getHight_price_h(), dto_10d));
 
                     pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
                 }
@@ -2768,9 +2759,8 @@ public class BinanceServiceImpl implements BinanceService {
             monitorBtcPrice_results = new ArrayList<>(results);
             return results;
 
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
+            log.info("ERROR monitorBtcPrice ----->");
             e.printStackTrace();
         }
 
@@ -2870,26 +2860,23 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal high = rate.getHigh();
             BigDecimal low = rate.getLow();
 
+            String msg = "";
+            String my_msg = "";
             if (high.compareTo(BigDecimal.valueOf(0.5)) > 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-
-                Utils.sendToTelegram("(DANGER DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
-                        + "(Sell wall) " + wall);
-
-                return;
+                msg = "(DANGER DANGER) CZ kill LONG/SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                        + "(Sell wall) " + wall;
 
             } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                Utils.sendToTelegram("(DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
-                        + "(Sell wall) " + wall);
-                // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
+                msg = "(DANGER) CZ kill LONG/SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                        + "(Sell wall) " + wall;
 
-                return;
             }
 
             if (low.compareTo(BigDecimal.valueOf(-1)) < 0) {
@@ -2897,28 +2884,25 @@ public class BinanceServiceImpl implements BinanceService {
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                Utils.sendToTelegram("(DANGER DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes."
-                        + Utils.new_line_from_service + "(Buy wall) " + wall);
-                // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
-                return;
+                msg = "(DANGER DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes."
+                        + Utils.new_line_from_service + "(Buy wall) " + wall;
 
             } else if (low.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                Utils.sendToTelegram("(DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
-                        + "(Buy wall) " + wall);
-                return;
+                msg = "(DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                        + "(Buy wall) " + wall;
+
             } else if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                Utils.sendToTelegram("(DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
-                        + "(Buy wall) " + wall);
-                // Utils.sendToTelegram("https://www.binance.com/en-GB/futures/funding-history/3");
-                return;
+                msg = "(DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                        + "(Buy wall) " + wall;
+
             }
 
             // -----------------------------------------------------------------------------------------//
@@ -2933,19 +2917,18 @@ public class BinanceServiceImpl implements BinanceService {
 
                         pre_funding_rate_low = low;
 
-                        Utils.sendToMyTelegram(time + " (DANGER) CZ kill Long !!! Wait 3~5 minutes."
-                                + Utils.new_line_from_service + "(Buy wall) " + wall);
-                        return;
+                        my_msg = time + " (DANGER) CZ kill Long !!! Wait 3~5 minutes."
+                                + Utils.new_line_from_service + "(Buy wall) " + wall;
+
                     } else if (low.compareTo(BigDecimal.valueOf(-0.12)) < 0) {
                         pre_funding_rate_low = low;
 
                         getListDepthData("BTC");
                         String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                        Utils.sendToMyTelegram(time + " (" + pre_funding_rate_low + ") Wait 3~5 minutes."
-                                + Utils.new_line_from_service + "(Buy wall) " + wall);
+                        my_msg = time + " (" + pre_funding_rate_low + ") Wait 3~5 minutes."
+                                + Utils.new_line_from_service + "(Buy wall) " + wall;
 
-                        return;
                     }
                 }
 
@@ -2956,24 +2939,50 @@ public class BinanceServiceImpl implements BinanceService {
                         getListDepthData("BTC");
                         String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                        Utils.sendToMyTelegram(time + " (Sell wall) CZ kill Short !!! wait 3~5 minutes."
-                                + Utils.new_line_from_service + wall);
+                        my_msg = time + " (Sell wall) CZ kill LONG/SHORT !!! wait 3~5 minutes."
+                                + Utils.new_line_from_service + wall;
 
-                        return;
                     } else if (high.compareTo(BigDecimal.valueOf(0.02)) > 0) {
                         pre_funding_rate_high = high;
 
                         getListDepthData("BTC");
                         String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                        Utils.sendToMyTelegram(time + " (" + pre_funding_rate_high + ") Wait 3~5 minutes"
-                                + Utils.new_line_from_service + "(Sell wall) " + wall);
+                        my_msg = time + " (" + pre_funding_rate_high + ") Wait 3~5 minutes"
+                                + Utils.new_line_from_service + "(Sell wall) " + wall;
 
-                        return;
+                    }
+                }
+            }
+
+            if (Utils.isNotBlank(msg) || (Utils.isNotBlank(my_msg))) {
+
+                String EVENT_ID = EVENT_DANGER_CZ_KILL_LONG + "_" + high + "_" + low;
+
+                if (fundingHistoryRepository.existsPumDump("bitcoin", EVENT_ID)) {
+
+                    FundingHistory coin = new FundingHistory();
+                    FundingHistoryKey id = new FundingHistoryKey();
+                    id.setEventTime(EVENT_ID);
+                    id.setGeckoid("bitcoin");
+                    coin.setId(id);
+                    coin.setSymbol("BTC");
+                    coin.setNote(Utils.getToday_YyyyMMdd() + " Long/Short");
+                    coin.setPumpdump(true);
+
+                    fundingHistoryRepository.save(coin);
+
+                    if (Utils.isNotBlank(msg)) {
+                        Utils.sendToMyTelegram(msg);
+                    }
+
+                    if (Utils.isNotBlank(my_msg)) {
+                        Utils.sendToMyTelegram(my_msg);
                     }
                 }
 
             }
+
         } catch (Exception e) {
             log.info("Error monitorBtcFundingRate ---->");
             e.printStackTrace();
@@ -2988,11 +2997,6 @@ public class BinanceServiceImpl implements BinanceService {
             FundingResponse rate = Utils.loadFundingRate(symbol);
             BigDecimal highUp = rate.getHighUp();
             BigDecimal lowUp = rate.getLowUp();
-
-            // String currDay = Utils.convertDateToString("yyyyMMdd",
-            // Calendar.getInstance().getTime());
-            // Utils.convertDateToString("yyyyMMdd_HHmm_ss.SSS",
-            // Calendar.getInstance().getTime());
 
             FundingHistory entity = new FundingHistory();
             FundingHistoryKey id = new FundingHistoryKey();
@@ -3013,7 +3017,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (rate.getHigh().compareTo(CONST_RATE_HIGH) > 0) {
                 String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
-                String note = time + " Kill Short";
+                String note = time + " Kill Long/Short";
                 entity.setNote(note);
                 entity.setPumpdump(true);
 
