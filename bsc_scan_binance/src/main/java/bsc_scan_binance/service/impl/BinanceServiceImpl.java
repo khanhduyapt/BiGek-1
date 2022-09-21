@@ -2800,11 +2800,15 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             List<FundingHistory> list = fundingHistoryRepository.findAllByPumpdump(true);
             if (!CollectionUtils.isEmpty(list)) {
+                String symbols = "";
                 for (FundingHistory entity : list) {
+                    if (symbols.contains(entity.getSymbol())) {
+                        continue;
+                    }
                     EntryCssResponse dto = new EntryCssResponse();
                     dto.setSymbol(entity.getSymbol());
                     dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
-
+                    symbols += entity.getSymbol() + ",";
                     results.add(dto);
                 }
             }

@@ -103,9 +103,6 @@ public class BinanceController {
             model.addAttribute("long_short_list_curr_price",
                     new ArrayList<String>(Arrays.asList(long_short.get(2).split(Utils.new_line_from_service))));
 
-            // model.addAttribute("long_list_perfect2", new ArrayList<String>());
-            // model.addAttribute("short_list_perfect2", new ArrayList<String>());
-
             model.addAttribute("long_list_perfect2",
                     new ArrayList<String>(Arrays.asList(long_short.get(3).split(Utils.new_line_from_service))));
 
