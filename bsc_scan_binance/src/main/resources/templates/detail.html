@@ -90,7 +90,11 @@ p {
     </div>
 
     <div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
-      <span>Bitcoin Balances on </span><a th:target="_blank" th:href="${'https://www.coinglass.com/Balance'}">24h</a>: <span th:text="${exchanges_24h}" th:classappend="${#strings.contains(exchanges_24h, '-') ? '' : 'text-danger'}"></span>, 07d: <span th:text="${exchanges_7d}"></span>　(<a th:target="_blank" th:href="${'https://www.binance.com/en-GB/futures/funding-history/3'}">Funding rate</a>)
+      <span>Bitcoin Balances on </span><a th:target="_blank" th:href="${'https://www.coinglass.com/Balance'}">24h</a>:
+      <span th:text="${exchanges_24h}" th:classappend="${#strings.contains(exchanges_24h, '-') ? '' : 'text-danger'}"></span>
+      , 07d: <span th:text="${exchanges_7d}"></span>
+
+      <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://sslecal2.forexprostools.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_centralBanks,_confidenceIndex,_balance&features=datepicker,timezone,timeselector,filters&countries=5&importance=3&calType=week&timeZone=27&lang=52'}">Investing.com</a>
     </div>
 
     <div th:if="${#lists.size(scapling_list) > 0}" style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important; min-width: 400px !important; max-width: 400px !important;">
@@ -170,7 +174,7 @@ p {
         <tbody>
           <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'bg-warning text-primary font-weight-bold' : ''}">
             <!-- # -->
-            <td class="" style="text-align: center; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
+            <td class="" style="text-align: left; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
             <!-- Sell -->
             <td th:text="${token.price}" style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
             th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' ? 'text-white' : ''}"></td>

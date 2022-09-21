@@ -132,6 +132,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String TIME_4h = "4h";
     private static final String TIME_1d = "1d";
 
+    @SuppressWarnings("unused")
     private static final int LIMIT_DATA_15m = 48;
     private static final int LIMIT_DATA_1h = 48;
     private static final int LIMIT_DATA_4h = 60;
@@ -147,10 +148,9 @@ public class BinanceServiceImpl implements BinanceService {
     List<String> monitorBtcPrice_results = new ArrayList<String>();
 
     private String pre_time_of_btc = "";
-    private String pre_time_of_btc_msg_1h = "";
-    private String pre_time_of_btc_for_long_short = "";
-    private String pre_time_of_btc_kill_long_short = "";
     private String pre_time_of_saved_data_4h = "";
+    private String pre_time_of_btc_kill_long_short = "";
+
     private BigDecimal pre_funding_rate_high = BigDecimal.ZERO;
     private BigDecimal pre_funding_rate_low = BigDecimal.ZERO;
 
@@ -2606,11 +2606,9 @@ public class BinanceServiceImpl implements BinanceService {
         List<String> results = new ArrayList<String>();
         monitorBtcPrice_results = new ArrayList<String>();
 
-        int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
         curr_time_of_btc = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
         String curr_time_of_btc_pre10m = String.valueOf(curr_time_of_btc);
-        String curr_time_of_btc_pre1h = curr_time_of_btc.substring(0, curr_time_of_btc.length() - 1);
 
         try {
             log.info(time + " Start monitorBtcPrice ---->");
@@ -2707,26 +2705,6 @@ public class BinanceServiceImpl implements BinanceService {
                 results.add("(Short*)" + Utils.new_line_from_service + Utils.getMsgShort(good_price_for_short, dto_1h));
             }
 
-            // (Good time to buy)
-            if (!Objects.equals(curr_time_of_btc, pre_time_of_btc_for_long_short) && (HH % 4 == 0)) {
-                if (price_at_binance.compareTo(good_price_for_long) <= 0) {
-
-                    // Utils.sendToTelegram(
-                    // "(Long)" + Utils.new_line_from_service + Utils.getMsgLong(price_at_binance,
-                    // dto_1h));
-
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-                }
-
-                if (price_at_binance.compareTo(good_price_for_short) > 0) {
-
-                    // Utils.sendToTelegram(
-                    // "(Short)" + Utils.new_line_from_service + Utils.getMsgShort(price_at_binance,
-                    // dto_1h));
-                    pre_time_of_btc_for_long_short = curr_time_of_btc;
-                }
-            }
-
             // kill long/short 10m
             if (!Objects.equals(curr_time_of_btc_pre10m, pre_time_of_btc_kill_long_short)) {
                 if (price_at_binance.compareTo(dto_1h.getLow_price_h()) <= 0) {
@@ -2738,27 +2716,6 @@ public class BinanceServiceImpl implements BinanceService {
                     // kill short: loss 30$ 2022/09/09
                     Utils.sendToTelegram("CZ kill LONG/SHORT !!!");
                     pre_time_of_btc_kill_long_short = curr_time_of_btc_pre10m;
-                }
-            }
-
-            // (10d)
-            if (!Objects.equals(curr_time_of_btc_pre1h, pre_time_of_btc_msg_1h) && (HH % 4 == 0)) {
-                if (price_at_binance.compareTo(dto_10d.getOpen_candle_h()) <= 0) {
-                    // Utils.sendToTelegram("(Bitcoin bottomed in 10d)" +
-                    // Utils.new_line_from_service + "(LONG)"
-                    // + Utils.new_line_from_service + Utils.getMsgLong(dto_10d.getLow_price_h(),
-                    // dto_10d));
-
-                    pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
-                }
-
-                if (price_at_binance.compareTo(dto_10d.getClose_candle_h()) >= 0) {
-                    // Utils.sendToTelegram("(Bitcoin hits 10d peak)" + Utils.new_line_from_service
-                    // + "(Short)"
-                    // + Utils.new_line_from_service + Utils.getMsgShort(dto_10d.getHight_price_h(),
-                    // dto_10d));
-
-                    pre_time_of_btc_msg_1h = curr_time_of_btc_pre1h;
                 }
             }
 
