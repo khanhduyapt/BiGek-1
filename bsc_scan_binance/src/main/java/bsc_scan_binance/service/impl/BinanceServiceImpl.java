@@ -151,9 +151,6 @@ public class BinanceServiceImpl implements BinanceService {
     private String pre_time_of_saved_data_4h = "";
     private String pre_time_of_btc_kill_long_short = "";
 
-    private BigDecimal pre_funding_rate_high = BigDecimal.ZERO;
-    private BigDecimal pre_funding_rate_low = BigDecimal.ZERO;
-
     private boolean coinglass_wait_1h = false;
     private String pre_time_coinglass_wait_time = "";
 
@@ -2598,11 +2595,6 @@ public class BinanceServiceImpl implements BinanceService {
     public List<String> monitorBtcPrice() {
         String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
 
-        if (Objects.equals(time, pre_monitorBtcPrice_mm)) {
-            return monitorBtcPrice_results;
-        }
-        pre_monitorBtcPrice_mm = time;
-
         List<String> results = new ArrayList<String>();
         monitorBtcPrice_results = new ArrayList<String>();
 
@@ -2829,11 +2821,12 @@ public class BinanceServiceImpl implements BinanceService {
 
             String msg = "";
             String my_msg = "";
+
             if (high.compareTo(BigDecimal.valueOf(0.5)) > 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-                msg = "(DANGER DANGER) CZ kill Long/Short !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                msg = "(DANGER DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
                         + "(Sell wall) " + wall;
 
             } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
@@ -2841,17 +2834,16 @@ public class BinanceServiceImpl implements BinanceService {
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                msg = "(DANGER) CZ kill Long/Short !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Sell wall) "
+                msg = "(DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Sell wall) "
                         + wall;
 
             }
 
             if (low.compareTo(BigDecimal.valueOf(-1)) < 0) {
-
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                msg = "(DANGER DANGER DANGER) CZ kill Long/Short !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                msg = "(DANGER DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
                         + "(Buy wall) " + wall;
 
             } else if (low.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
@@ -2859,66 +2851,39 @@ public class BinanceServiceImpl implements BinanceService {
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                msg = "(DANGER DANGER) CZ kill Long/Short !!! Wait 3~5 minutes." + Utils.new_line_from_service
-                        + "(Buy wall) " + wall;
+                msg = "(DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
+                        + wall;
 
             } else if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                msg = "(DANGER) CZ kill Long/Short !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
+                msg = "(DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
                         + wall;
-
             }
 
             // -----------------------------------------------------------------------------------------//
 
             // MyTelegram
             {
-                if (!Objects.equals(low, pre_funding_rate_low)) {
-                    if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
+                if (low.compareTo(BigDecimal.valueOf(-0.12)) < 0) {
 
-                        getListDepthData("BTC");
-                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
+                    getListDepthData("BTC");
+                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                        pre_funding_rate_low = low;
+                    my_msg = time + " (" + low + ") Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
+                            + wall;
 
-                        my_msg = time + " (DANGER) CZ kill Long/Short !!! Wait 3~5 minutes."
-                                + Utils.new_line_from_service + "(Buy wall) " + wall;
-
-                    } else if (low.compareTo(BigDecimal.valueOf(-0.12)) < 0) {
-                        pre_funding_rate_low = low;
-
-                        getListDepthData("BTC");
-                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
-
-                        my_msg = time + " (" + pre_funding_rate_low + ") Wait 3~5 minutes."
-                                + Utils.new_line_from_service + "(Buy wall) " + wall;
-
-                    }
                 }
+                if (high.compareTo(BigDecimal.valueOf(0.02)) > 0) {
 
-                if (!Objects.equals(high, pre_funding_rate_high)) {
-                    if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
-                        pre_funding_rate_high = high;
+                    getListDepthData("BTC");
+                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                        getListDepthData("BTC");
-                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
+                    my_msg = time + " (" + high + ") Wait 3~5 minutes" + Utils.new_line_from_service + "(Sell wall) "
+                            + wall;
 
-                        my_msg = time + " (Sell wall) CZ kill LONG/SHORT !!! wait 3~5 minutes."
-                                + Utils.new_line_from_service + wall;
-
-                    } else if (high.compareTo(BigDecimal.valueOf(0.02)) > 0) {
-                        pre_funding_rate_high = high;
-
-                        getListDepthData("BTC");
-                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-
-                        my_msg = time + " (" + pre_funding_rate_high + ") Wait 3~5 minutes"
-                                + Utils.new_line_from_service + "(Sell wall) " + wall;
-
-                    }
                 }
             }
 
@@ -2948,7 +2913,9 @@ public class BinanceServiceImpl implements BinanceService {
 
             }
 
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             log.info("Error monitorBtcFundingRate ---->");
             e.printStackTrace();
         }
