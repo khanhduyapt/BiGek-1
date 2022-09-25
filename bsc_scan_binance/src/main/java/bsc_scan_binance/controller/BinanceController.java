@@ -59,7 +59,7 @@ public class BinanceController {
         model.addAttribute("symbol", SYMBOL);
 
         if (!SYMBOL.equals("BTC")) {
-            String long_short = service.getLs48h(SYMBOL);
+            String long_short = service.getLongShortIn48h(SYMBOL);
 
             List<String> headers = new ArrayList<String>(Arrays.asList(long_short.split(Utils.new_line_from_service)));
             model.addAttribute("token_48h", headers);

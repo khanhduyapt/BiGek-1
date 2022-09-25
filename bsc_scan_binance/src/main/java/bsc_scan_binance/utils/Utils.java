@@ -235,9 +235,10 @@ public class Utils {
 
     public static String createMsgPriorityToken(PriorityCoin dto, String newline) {
         String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGeckoid())
-                + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline + "Price: "
-                + dto.getCurrent_price().toString() + "$" + newline + dto.getNote().replace("~", newline) + newline
-                + createMsgLowHeight(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price());
+                + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline;
+        // + "Price: " + dto.getCurrent_price().toString() + "$" + newline
+        // + dto.getNote().replace("~", newline) + newline
+        result += createMsgLowHeight(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price());
         return result;
     }
 
@@ -534,20 +535,31 @@ public class Utils {
     }
 
     public static String getNextBidsOrAsksWall(BigDecimal price_at_binance, List<DepthResponse> bidsOrAsksList) {
-
+        int count = 0;
         String next_price = Utils.removeLastZero(price_at_binance) + "(now)";
-        int count = 1;
         for (DepthResponse res : bidsOrAsksList) {
             if (Objects.equals("BTC", res.getSymbol())) {
                 if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2)) > 0) {
-                    next_price += "->" + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
+                    next_price += ">" + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
                             + res.getVal_million_dolas() + "m$" + ")";
+
+                    count += 1;
+                }
+            } else {
+                BigDecimal percent = Utils.getPercent(res.getPrice(), price_at_binance);
+
+                if (percent.compareTo(BigDecimal.valueOf(-3)) > 0 && percent.compareTo(BigDecimal.valueOf(3)) < 0) {
+                    next_price += ">" + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
+                            + res.getVal_million_dolas() + "k)";
+
                     count += 1;
                 }
             }
-            if (count > 3) {
+
+            if (count > 15) {
                 break;
             }
+
         }
 
         return next_price;

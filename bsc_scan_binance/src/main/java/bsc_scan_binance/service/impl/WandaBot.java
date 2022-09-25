@@ -2,6 +2,7 @@ package bsc_scan_binance.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
+import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
@@ -98,8 +100,7 @@ public class WandaBot extends TelegramLongPollingBot {
                     btcrange += "Btc sideway." + Utils.new_line_from_bot + Utils.new_line_from_bot;
                 }
 
-                String depth = binance_service.getTextDepthData();
-                depth += Utils.new_line_from_bot + Utils.new_line_from_bot;
+                String depth = createBidsAsks("BTC") + Utils.new_line_from_bot + Utils.new_line_from_bot;
 
                 String premarket = binance_service.loadPremarket();
 
@@ -419,39 +420,6 @@ public class WandaBot extends TelegramLongPollingBot {
                 message.setText("Total: " + Utils.formatPrice(total, 0) + "$, Profits: " + profit + "$");
                 execute(message);
 
-            } else if (command.contains("/mute")) {
-                List<PriorityCoin> list = priorityCoinRepository.findAllByMute(true);
-                if (!CollectionUtils.isEmpty(list)) {
-                    String msg = "Muting: ";
-                    for (PriorityCoin dto : list) {
-                        msg += dto.getSymbol() + ", ";
-                    }
-                    message.setText(msg);
-                    execute(message);
-                } else {
-                    message.setText("Muting list is empty");
-                    execute(message);
-                }
-
-                String[] arr = command.split(" ");
-                if (arr.length < 2) {
-                    return;
-                }
-                // binance_service.getList(false);
-                list = priorityCoinRepository.searchBySymbol(arr[1].toUpperCase());
-                if (CollectionUtils.isEmpty(list)) {
-                    message.setText("Empty");
-                    execute(message);
-                    return;
-                }
-
-                PriorityCoin coin = list.get(0);
-                coin.setMute(!coin.getMute());
-                priorityCoinRepository.save(coin);
-
-                message.setText(String.format("Muting: [%s]_[%s] = [%s]", list.get(0).getSymbol(),
-                        list.get(0).getGeckoid(), coin.getMute()));
-                execute(message);
             } else {
                 if (Utils.isNotBlank(command) && !command.contains("/")) {
                     checkCommand(message, command);
@@ -478,16 +446,42 @@ public class WandaBot extends TelegramLongPollingBot {
     }
 
     private void checkCommand(SendMessage message, String token) throws TelegramApiException {
+        String SYMBOL = token.toUpperCase();
         // binance_service.getList(false);
-        List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(token.toUpperCase());
+        List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(SYMBOL);
         if (CollectionUtils.isEmpty(list)) {
             message.setText("Empty");
             execute(message);
             return;
         }
 
-        message.setText(Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot));
-        execute(message);
+        String msg = Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot);
+        msg += Utils.new_line_from_bot + Utils.new_line_from_bot + createBidsAsks(SYMBOL);
 
+        message.setText(msg);
+        execute(message);
+    }
+
+    private String createBidsAsks(String SYMBOL) {
+        List<List<DepthResponse>> list_depth = new ArrayList<List<DepthResponse>>();
+        list_depth = binance_service.getListDepthData(SYMBOL);
+        List<DepthResponse> list_bids = new ArrayList<DepthResponse>();
+        List<DepthResponse> list_asks = new ArrayList<DepthResponse>();
+
+        if (!CollectionUtils.isEmpty(list_depth)) {
+            list_bids = list_depth.get(0);
+            list_asks = list_depth.get(1);
+        }
+
+        BigDecimal price_at_binance = Utils.getBinancePrice(SYMBOL);
+        String bids = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids).replaceAll(">", " < ");
+        String asks = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks).replaceAll(">", " > ");
+
+        String msg = "";
+
+        msg += "Bids: " + bids + Utils.new_line_from_bot + Utils.new_line_from_bot;
+        msg += "Asks: " + asks;
+
+        return msg;
     }
 }
