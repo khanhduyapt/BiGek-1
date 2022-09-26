@@ -474,8 +474,8 @@ public class WandaBot extends TelegramLongPollingBot {
         }
 
         BigDecimal price_at_binance = Utils.getBinancePrice(SYMBOL);
-        String bids = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids).replaceAll(">", " < ");
-        String asks = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks).replaceAll(">", " > ");
+        String bids = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids).replaceAll(">", "<");
+        String asks = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks).replaceAll(">", ">");
 
         String msg = "";
 

@@ -2130,27 +2130,31 @@ public class BinanceServiceImpl implements BinanceService {
                     topTraderBinanceLongRate = Utils.getBigDecimal(longRatioList2.get(index));
 
                     String msg = "";
+
+                    FundingHistory coin = new FundingHistory();
+                    FundingHistoryKey id = new FundingHistoryKey();
+                    String event_id = EVENT_COINGLASS_SHORT + "_" + symbol;
+                    id.setEventTime(event_id);
+                    id.setGeckoid(gecko_id);
+                    coin.setId(id);
+                    coin.setSymbol(symbol);
+
                     if (longShortRatio > 1) {
                         msg += "Long:" + String.valueOf(longRatioList2.get(index)) + "%";
+
+                        coin.setNote(Utils.getToday_YyyyMMdd() + " Short");
+                        coin.setPumpdump(false);
                     } else {
                         msg += "Short:" + String.valueOf(shortRatioList2.get(index)) + "%";
 
-                        String event_id = EVENT_COINGLASS_SHORT + Utils.getToday_YyyyMMdd();
-                        if (!fundingHistoryRepository.existsPumDump(gecko_id, event_id)) {
-
-                            FundingHistory coin = new FundingHistory();
-                            FundingHistoryKey id = new FundingHistoryKey();
-                            id.setEventTime(event_id);
-                            id.setGeckoid(gecko_id);
-                            coin.setId(id);
-                            coin.setSymbol(symbol);
-                            coin.setNote(Utils.getToday_YyyyMMdd() + " Short");
-                            coin.setPumpdump(true);
-
-                            fundingHistoryRepository.save(coin);
-                            Utils.sendToMyTelegram("(Coinglass Short) " + symbol);
-                        }
+                        coin.setNote(Utils.getToday_YyyyMMdd() + " Short");
+                        coin.setPumpdump(true);
                     }
+
+                    if (!fundingHistoryRepository.existsPumDump(gecko_id, event_id)) {
+                        // Utils.sendToMyTelegram("(Coinglass Short) " + symbol);
+                    }
+                    fundingHistoryRepository.save(coin);
 
                     // log.info("End getCoinGlassData <--");
                     msg = "(" + msg + ")";

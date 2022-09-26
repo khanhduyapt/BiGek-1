@@ -540,16 +540,16 @@ public class Utils {
         for (DepthResponse res : bidsOrAsksList) {
             if (Objects.equals("BTC", res.getSymbol())) {
                 if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2)) > 0) {
-                    next_price += ">" + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
+                    next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
                             + res.getVal_million_dolas() + "m$" + ")";
 
                     count += 1;
                 }
-            } else {
+            } else if (Utils.isNotBlank(res.getSymbol())) {
                 BigDecimal percent = Utils.getPercent(res.getPrice(), price_at_binance);
 
                 if (percent.compareTo(BigDecimal.valueOf(-3)) > 0 && percent.compareTo(BigDecimal.valueOf(3)) < 0) {
-                    next_price += ">" + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
+                    next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
                             + res.getVal_million_dolas() + "k)";
 
                     count += 1;
