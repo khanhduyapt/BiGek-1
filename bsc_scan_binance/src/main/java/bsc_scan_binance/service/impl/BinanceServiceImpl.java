@@ -2925,7 +2925,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (Utils.isNotBlank(msg) || (Utils.isNotBlank(my_msg))) {
-                String EVENT_ID = EVENT_DANGER_CZ_KILL_LONG + "_" + high + "_" + low;
+                String EVENT_ID = EVENT_DANGER_CZ_KILL_LONG + "_" + high;
                 if (!fundingHistoryRepository.existsPumDump("bitcoin", EVENT_ID)) {
 
                     FundingHistory coin = new FundingHistory();
