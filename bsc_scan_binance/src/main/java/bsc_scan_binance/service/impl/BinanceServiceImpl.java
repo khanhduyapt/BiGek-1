@@ -2829,7 +2829,7 @@ public class BinanceServiceImpl implements BinanceService {
                         continue;
                     }
                     EntryCssResponse dto = new EntryCssResponse();
-                    dto.setSymbol("(S)" + entity.getSymbol());
+                    dto.setSymbol("S:" + entity.getSymbol());
 
                     //dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
                     dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
@@ -2851,7 +2851,7 @@ public class BinanceServiceImpl implements BinanceService {
                         continue;
                     }
                     EntryCssResponse dto = new EntryCssResponse();
-                    dto.setSymbol("(B)" + entity.getSymbol());
+                    dto.setSymbol("B:" + entity.getSymbol());
 
                     //dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
                     dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
