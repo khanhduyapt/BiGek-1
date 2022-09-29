@@ -463,6 +463,18 @@ public class Utils {
         return true;
     }
 
+    public static String getTimeChangeDailyChart() {
+        Calendar calendar = Calendar.getInstance();
+
+        int hh = Utils.getIntValue(Utils.convertDateToString("HH", calendar.getTime()));
+        if (hh >= 0 && hh < 7) {
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+        }
+        String result = Utils.convertDateToString("yyyyMMdd", calendar.getTime()) + "_07";
+
+        return result;
+    }
+
     public static String getChatId(String userName) {
         if (Objects.equals(userName, chatUser_linkdk)) {
             return chatId_linkdk;
@@ -539,7 +551,7 @@ public class Utils {
         String next_price = Utils.removeLastZero(price_at_binance) + "(now)";
         for (DepthResponse res : bidsOrAsksList) {
             if (Objects.equals("BTC", res.getSymbol())) {
-                if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2)) > 0) {
+                if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2.9)) > 0) {
                     next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
                             + res.getVal_million_dolas() + "m$" + ")";
 

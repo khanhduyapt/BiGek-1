@@ -118,7 +118,8 @@ p {
     </div>
 
   <div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important; display: flex;">
-    <p th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'Downtrend') ? 'text-danger font-weight-bold' : #strings.contains(long_short_header, 'Uptrend') ? 'text-success font-weight-bold' : ''}"></p>
+    <span th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'Downtrend') ? 'text-danger font-weight-bold' : #strings.contains(long_short_header, 'Uptrend') ? 'text-success font-weight-bold' : ''}"></span>
+    <span th:text="${wall_today}" style="margin-left: 1rem;" class="text-primary font-weight-bold"></span>
   </div>
 
     <div style="display: flex; margin-top: 0.25rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
@@ -150,15 +151,15 @@ p {
           </tr>
         </thead>
         <tbody>
-          <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'bg-warning text-primary font-weight-bold' : ''}">
+          <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 3 ? 'bg-warning text-primary font-weight-bold' : ''}">
             <!-- # -->
-            <td class="" style="text-align: left; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
+            <td class="" style="text-align: left; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : ''} " >
             <!-- Buy -->
             <td th:text="${token.price}" style="text-align: center; min-width: 50px !important; max-width: 50px !important;"
-            th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' ? 'text-white' : ''}"></td>
+            th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 3 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' ? 'text-white' : ''}"></td>
             <!-- Volume -->
             <td th:text="${token.val_million_dolas}" style=" min-width: 55px !important; max-width: 55px !important; text-align: center;"
-            th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' AND token.val_million_dolas >= 2 ? 'text-danger font-weight-bold' : '' }"></td>
+            th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 3 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' AND token.val_million_dolas >= 3 ? 'text-danger font-weight-bold' : '' }"></td>
           </tr>
         </tbody>
       </table>
@@ -172,15 +173,15 @@ p {
           </tr>
         </thead>
         <tbody>
-          <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'bg-warning text-primary font-weight-bold' : ''}">
+          <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 3 ? 'bg-warning text-primary font-weight-bold' : ''}">
             <!-- # -->
-            <td class="" style="text-align: left; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : ''} " >
+            <td class="" style="text-align: left; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" th:classappend="${token.symbol != 'BTC' ? 'text-white' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : ''} " >
             <!-- Sell -->
             <td th:text="${token.price}" style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
-            th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' ? 'text-white' : ''}"></td>
+            th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 3 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' ? 'text-white' : ''}"></td>
             <!-- Volume -->
             <td th:text="${token.val_million_dolas}" style=" min-width: 55px !important; max-width: 55px !important; text-align: center;"
-            th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 2 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' AND token.val_million_dolas >= 2 ? 'text-danger font-weight-bold' : ''}"></td>
+            th:classappend="${token.symbol == 'BTC' AND token.val_million_dolas >= 3 ? 'text-primary font-weight-bold' : token.symbol == 'BTC' AND token.val_million_dolas >= 1 ? 'text-primary' : token.symbol != 'BTC' AND token.val_million_dolas >= 3 ? 'text-danger font-weight-bold' : ''}"></td>
           </tr>
         </tbody>
       </table>

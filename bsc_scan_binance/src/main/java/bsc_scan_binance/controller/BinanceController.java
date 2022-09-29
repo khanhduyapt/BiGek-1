@@ -113,6 +113,8 @@ public class BinanceController {
         List<EntryCssResponse> scapling_list = service.findAllScalpingToday();
         model.addAttribute("scapling_list", scapling_list);
 
+        model.addAttribute("wall_today", service.wallToday());
+
         return "detail"; // BTC
     }
 

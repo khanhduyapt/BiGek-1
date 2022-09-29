@@ -141,6 +141,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_FUNDING_RATE = "FUNDING_RATE";
     private static final String EVENT_COINGLASS_SHORT = "COINGLASS_SHORT";
     private static final String EVENT_DANGER_CZ_KILL_LONG = "CZ_KILL_LONG";
+    private static final String EVENT_BTC_RANGE = "BTC_RANGE";
     @SuppressWarnings("unused")
     private static final String EVENT_FIBO_LONG_SHORT = "FIBO";
 
@@ -1017,7 +1018,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         pre_yyyyMMddHH = Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime());
                     }
-
+                    wallToday();
                     css.setNote("");
                     String btcOnEx = getBtcBalancesOnExchanges().replaceAll(Utils.new_line_from_service, " ");
                     css.setPumping_history(btcOnEx);
@@ -2386,17 +2387,18 @@ public class BinanceServiceImpl implements BinanceService {
             list_bids_ok = new ArrayList<DepthResponse>();
             list_asks_ok = new ArrayList<DepthResponse>();
 
-            BigDecimal wall = BigDecimal.valueOf(2);
+            BigDecimal WALL_3 = BigDecimal.valueOf(3);
+
             BigDecimal total_bids = BigDecimal.ZERO;
             for (DepthResponse dto : list_bids) {
                 BigDecimal price = dto.getPrice();
                 BigDecimal val = dto.getVal_million_dolas();
 
-                if (val.compareTo(wall) < 0) {
+                if (val.compareTo(WALL_3) < 0) {
                     total_bids = total_bids.add(val);
                 }
 
-                if (val.compareTo(wall) >= 0) {
+                if (val.compareTo(WALL_3) >= 0) {
                     DepthResponse real_wall = new DepthResponse();
                     real_wall.setPrice(price);
                     real_wall.setVal_million_dolas(total_bids);
@@ -2414,11 +2416,11 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal price = dto.getPrice();
                 BigDecimal val = dto.getVal_million_dolas();
 
-                if (val.compareTo(wall) < 0) {
+                if (val.compareTo(WALL_3) < 0) {
                     total_asks = total_asks.add(val);
                 }
 
-                if (val.compareTo(wall) >= 0) {
+                if (val.compareTo(WALL_3) >= 0) {
                     DepthResponse real_wall = new DepthResponse();
                     real_wall.setPrice(price);
                     real_wall.setVal_million_dolas(total_asks);
@@ -2857,7 +2859,6 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal low = rate.getLow();
 
             String msg = "";
-            String my_msg = "";
 
             if (high.compareTo(BigDecimal.valueOf(0.5)) > 0) {
 
@@ -2903,14 +2904,17 @@ public class BinanceServiceImpl implements BinanceService {
             // -----------------------------------------------------------------------------------------//
 
             // MyTelegram
-            {
+            String my_msg = "";
+            if (!Utils.isNotBlank(msg)) {
                 if (low.compareTo(BigDecimal.valueOf(-0.12)) < 0) {
 
                     getListDepthData("BTC");
                     String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                    my_msg = time + " (" + low + ") Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
-                            + wall;
+                    if (wall.contains(">")) {
+                        my_msg = time + " (" + low + ") Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
+                                + wall;
+                    }
 
                 }
                 if (high.compareTo(BigDecimal.valueOf(0.02)) > 0) {
@@ -2918,9 +2922,11 @@ public class BinanceServiceImpl implements BinanceService {
                     getListDepthData("BTC");
                     String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                    my_msg = time + " (" + high + ") Wait 3~5 minutes" + Utils.new_line_from_service + "(Sell wall) "
-                            + wall;
-
+                    if (wall.contains(">")) {
+                        my_msg = time + " (" + high + ") Wait 3~5 minutes" + Utils.new_line_from_service
+                                + "(Sell wall) "
+                                + wall;
+                    }
                 }
             }
 
@@ -2940,11 +2946,11 @@ public class BinanceServiceImpl implements BinanceService {
                     fundingHistoryRepository.save(coin);
 
                     if (Utils.isNotBlank(msg)) {
-                        Utils.sendToMyTelegram(msg);
+                        Utils.sendToMyTelegram(msg + Utils.new_line_from_service + wallToday());
                     }
 
                     if (Utils.isNotBlank(my_msg)) {
-                        Utils.sendToMyTelegram(my_msg);
+                        Utils.sendToMyTelegram(my_msg + Utils.new_line_from_service + wallToday());
                     }
                 }
 
@@ -3001,6 +3007,76 @@ public class BinanceServiceImpl implements BinanceService {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    @Transactional
+    public String wallToday() {
+        String key = Utils.getTimeChangeDailyChart();
+
+        BigDecimal max_bid = BigDecimal.ZERO;
+        BigDecimal max_ask = BigDecimal.ZERO;
+
+        BigDecimal low = BigDecimal.ZERO;
+        BigDecimal high = BigDecimal.ZERO;
+
+        for (DepthResponse dto : list_bids_ok) {
+            if (dto.getVal_million_dolas().compareTo(max_bid) > 0) {
+                max_bid = dto.getVal_million_dolas();
+                low = dto.getPrice();
+            }
+        }
+
+        for (DepthResponse dto : list_asks_ok) {
+            if (dto.getVal_million_dolas().compareTo(max_ask) > 0) {
+                max_ask = dto.getVal_million_dolas();
+                high = dto.getPrice();
+            }
+        }
+
+        String EVENT_ID = EVENT_BTC_RANGE + "_" + key;
+        FundingHistoryKey id = new FundingHistoryKey();
+        id.setEventTime(EVENT_ID);
+        id.setGeckoid("bitcoin");
+
+        if (!fundingHistoryRepository.existsPumDump("bitcoin", EVENT_ID)) {
+            FundingHistory coin = new FundingHistory();
+            coin.setId(id);
+            coin.setSymbol("BTC");
+            coin.setNote(low + "~" + high);
+            coin.setPumpdump(true);
+
+            coin.setLow(low);
+            coin.setHigh(high);
+            fundingHistoryRepository.save(coin);
+        } else {
+            FundingHistory coin = fundingHistoryRepository.findById(id).orElse(null);
+            if (!Objects.equals(null, coin)) {
+                boolean hasChangeValue = false;
+
+                if (low.compareTo(Utils.getBigDecimal(coin.getLow())) < 0) {
+                    coin.setLow(low);
+                    hasChangeValue = true;
+                } else {
+                    low = coin.getLow();
+                }
+
+                if (high.compareTo(Utils.getBigDecimal(coin.getHigh())) > 0) {
+                    coin.setHigh(high);
+                    hasChangeValue = true;
+                } else {
+                    high = coin.getHigh();
+                }
+
+                if (hasChangeValue) {
+                    fundingHistoryRepository.save(coin);
+                }
+            }
+        }
+
+        String result = Utils.removeLastZero(low) + "~" + Utils.removeLastZero(high);
+
+        return result;
     }
 
 }

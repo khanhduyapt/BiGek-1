@@ -36,4 +36,6 @@ public interface BinanceService {
     public List<EntryCssResponse> findAllScalpingToday();
 
     public String getLongShortIn48h(String symbol);
+
+    public String wallToday();
 }
