@@ -1978,8 +1978,9 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     public String calcPoint(String gecko_id, String symbol) {
-        String point = "※";
+        String result = "";
 
+        String point = "※";
         try {
             List<BtcFutures> list_2d = Utils.loadData(symbol, TIME_1h, 48);
             if (CollectionUtils.isEmpty(list_2d)) {
@@ -2014,53 +2015,52 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
             }
-            if (symbol.equals("OCEAN")) {
-                // boolean test = true;
-            }
+            //if (symbol.equals("OCEAN")) {
+            // boolean test = true;
+            //}
             BigDecimal price_at_binance = list_2d.get(0).getCurrPrice();
             BigDecimal fibo_short_0786 = max_Hig.divide(BigDecimal.valueOf(1.02), 5, RoundingMode.CEILING);
             BigDecimal fibo_long_0236 = min_low.multiply(BigDecimal.valueOf(1.02));
 
+            String note = "";
             if (fibo_long_0236.compareTo(fibo_short_0786) < 0) {
                 if (price_at_binance.compareTo(fibo_long_0236) < 0) {
-                    point += "Fibo(Long) ";
+                    note = "Fibo(Long) ";
                 }
 
                 if (price_at_binance.compareTo(fibo_short_0786) > 0) {
-                    point += "Fibo(Short) ";
+                    note = "Fibo(Short) ";
                 }
             }
+            point += note;
 
-            // if (point.contains("Fibo")) {
-            // String today = Utils.getToday_YyyyMMdd();
-            // String EVENT_ID = EVENT_FIBO_LONG_SHORT + "_" + today + "_" + symbol;
-            // if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID)) {
-            //
-            // FundingHistory coin = new FundingHistory();
-            // FundingHistoryKey id = new FundingHistoryKey();
-            // id.setEventTime(EVENT_ID);
-            // id.setGeckoid(gecko_id);
-            // coin.setId(id);
-            // coin.setSymbol(symbol);
-            // coin.setNote(point);
-            // coin.setPumpdump(true);
-            //
-            // fundingHistoryRepository.save(coin);
-            //
-            // String time = Utils.convertDateToString("(hh:mm)",
-            // Calendar.getInstance().getTime());
-            //
-            // msg = time + point + msg + symbol;
-            // //Utils.sendToMyTelegram(msg);
-            // }
-            // }
+            String EVENT_ID = EVENT_FIBO_LONG_SHORT + "_" + symbol;
+            FundingHistoryKey id = new FundingHistoryKey();
+            id.setEventTime(EVENT_ID);
+            id.setGeckoid(gecko_id);
+
+            FundingHistory coin = new FundingHistory();
+            coin.setId(id);
+            coin.setSymbol(symbol);
+            coin.setNote(point);
+            if (point.contains("Fibo")) {
+                coin.setPumpdump(true);
+            } else {
+                coin.setPumpdump(false);
+            }
+            coin.setLow(min_low);
+            coin.setHigh(max_Hig);
+            coin.setNote(note);
+
+            fundingHistoryRepository.save(coin);
 
         } catch (Exception e) {
             log.info("Error calcPoint  ----->");
             e.printStackTrace();
         }
 
-        return point.trim().length() < 5 ? "" : " " + point.trim();
+        result = point.trim().length() < 5 ? "" : " " + point.trim();
+        return result;
     }
 
     private Boolean isHasData(List<Object> result_usdt, int index) {
@@ -2819,20 +2819,49 @@ public class BinanceServiceImpl implements BinanceService {
     public List<EntryCssResponse> findAllScalpingToday() {
         List<EntryCssResponse> results = new ArrayList<EntryCssResponse>();
         try {
-            List<FundingHistory> list = fundingHistoryRepository.findAllByPumpdump(true);
-            if (!CollectionUtils.isEmpty(list)) {
+            //List<FundingHistory> list = fundingHistoryRepository.findAllByPumpdump(true);
+            List<FundingHistory> list_short = fundingHistoryRepository.findAllFiboShort();
+
+            if (!CollectionUtils.isEmpty(list_short)) {
                 String symbols = "";
-                for (FundingHistory entity : list) {
+                for (FundingHistory entity : list_short) {
                     if (symbols.contains(entity.getSymbol())) {
                         continue;
                     }
                     EntryCssResponse dto = new EntryCssResponse();
-                    dto.setSymbol(entity.getSymbol());
-                    dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
+                    dto.setSymbol("(S)" + entity.getSymbol());
+
+                    //dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
+                    dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
+                            + entity.getSymbol().toUpperCase() + "USDT");
+
+                    symbols += entity.getSymbol() + ",";
+                    results.add(dto);
+                }
+                for (int i = results.size() % 10; i <= 10; i++) {
+                    results.add(new EntryCssResponse());
+                }
+            }
+
+            List<FundingHistory> list_long = fundingHistoryRepository.findAllFiboLong();
+            if (!CollectionUtils.isEmpty(list_long)) {
+                String symbols = "";
+                for (FundingHistory entity : list_long) {
+                    if (symbols.contains(entity.getSymbol())) {
+                        continue;
+                    }
+                    EntryCssResponse dto = new EntryCssResponse();
+                    dto.setSymbol("(B)" + entity.getSymbol());
+
+                    //dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
+                    dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
+                            + entity.getSymbol().toUpperCase() + "USDT");
+
                     symbols += entity.getSymbol() + ",";
                     results.add(dto);
                 }
             }
+
         } catch (Exception e) {
             log.info("Error findAllScalpingToday ---->");
             e.printStackTrace();
@@ -2855,14 +2884,14 @@ public class BinanceServiceImpl implements BinanceService {
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
                 msg = "(DANGER DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
-                        + "(Sell wall) " + wall;
+                        + "(Pump) " + wall;
 
             } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                msg = "(DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Sell wall) "
+                msg = "(DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Pump) "
                         + wall;
 
             }
@@ -2872,14 +2901,14 @@ public class BinanceServiceImpl implements BinanceService {
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
                 msg = "(DANGER DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
-                        + "(Buy wall) " + wall;
+                        + "(Dump) " + wall;
 
             } else if (low.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                msg = "(DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
+                msg = "(DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Dump) "
                         + wall;
 
             } else if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
@@ -2887,7 +2916,7 @@ public class BinanceServiceImpl implements BinanceService {
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                msg = "(DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
+                msg = "(DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Dump) "
                         + wall;
             }
 
@@ -2902,7 +2931,7 @@ public class BinanceServiceImpl implements BinanceService {
                     String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
                     if (wall.contains(">")) {
-                        my_msg = time + " (" + low + ") Wait 3~5 minutes." + Utils.new_line_from_service + "(Buy wall) "
+                        my_msg = time + " (" + low + ") Wait 3~5 minutes." + Utils.new_line_from_service + "(Dump) "
                                 + wall;
                     }
 
@@ -2914,7 +2943,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     if (wall.contains(">")) {
                         my_msg = time + " (" + high + ") Wait 3~5 minutes" + Utils.new_line_from_service
-                                + "(Sell wall) "
+                                + "(Pump) "
                                 + wall;
                     }
                 }
@@ -3004,6 +3033,8 @@ public class BinanceServiceImpl implements BinanceService {
     public String wallToday() {
         String key = Utils.getTimeChangeDailyChart();
 
+        BigDecimal WALL_3 = BigDecimal.valueOf(3);
+
         BigDecimal max_bid = BigDecimal.ZERO;
         BigDecimal max_ask = BigDecimal.ZERO;
 
@@ -3011,14 +3042,16 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal high = BigDecimal.ZERO;
 
         for (DepthResponse dto : list_bids_ok) {
-            if (dto.getVal_million_dolas().compareTo(max_bid) > 0) {
+            if ((dto.getVal_million_dolas().compareTo(max_bid) > 0)
+                    && (dto.getVal_million_dolas().compareTo(WALL_3) >= 0)) {
                 max_bid = dto.getVal_million_dolas();
                 low = dto.getPrice();
             }
         }
 
         for (DepthResponse dto : list_asks_ok) {
-            if (dto.getVal_million_dolas().compareTo(max_ask) > 0) {
+            if ((dto.getVal_million_dolas().compareTo(max_ask) > 0)
+                    && (dto.getVal_million_dolas().compareTo(WALL_3) >= 0)) {
                 max_ask = dto.getVal_million_dolas();
                 high = dto.getPrice();
             }
@@ -3044,14 +3077,16 @@ public class BinanceServiceImpl implements BinanceService {
             if (!Objects.equals(null, coin)) {
                 boolean hasChangeValue = false;
 
-                if (low.compareTo(Utils.getBigDecimal(coin.getLow())) < 0) {
+                if ((low.compareTo(Utils.getBigDecimal(coin.getLow())) < 0)
+                        || (Utils.getBigDecimal(coin.getLow()).compareTo(BigDecimal.ZERO) < 1)) {
                     coin.setLow(low);
                     hasChangeValue = true;
                 } else {
                     low = coin.getLow();
                 }
 
-                if (high.compareTo(Utils.getBigDecimal(coin.getHigh())) > 0) {
+                if ((high.compareTo(Utils.getBigDecimal(coin.getHigh())) > 0)
+                        || (Utils.getBigDecimal(coin.getHigh()).compareTo(BigDecimal.ZERO) < 1)) {
                     coin.setHigh(high);
                     hasChangeValue = true;
                 } else {
@@ -3065,7 +3100,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String result = Utils.createMsgLowHeight(Utils.getBinancePrice("BTC"), low, high);
-        result = result.replace("L:", "").replace("-H:", " ~ ").replace("$", "");
+        //result = result.replace("L:", "").replace("-H:", " ~ ").replace("$", "");
+
         return result;
     }
 

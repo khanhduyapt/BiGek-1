@@ -12,9 +12,12 @@ import bsc_scan_binance.entity.FundingHistoryKey;
 
 @Repository
 public interface FundingHistoryRepository extends JpaRepository<FundingHistory, FundingHistoryKey> {
-    // @Query(value = "SELECT m.* FROM binance_futures m WHERE scalping_today",
-    // nativeQuery = true)
-    // public List<BinanceFutures> findAllByScalpingToday();
+
+    @Query(value = "SELECT m.* FROM funding_history m WHERE event_time like 'FIBO%' and note like '%Short%' and pumpdump", nativeQuery = true)
+    public List<FundingHistory> findAllFiboShort();
+
+    @Query(value = "SELECT m.* FROM funding_history m WHERE event_time like 'FIBO%' and note like '%Long%' and pumpdump", nativeQuery = true)
+    public List<FundingHistory> findAllFiboLong();
 
     public List<FundingHistory> findAllByPumpdump(boolean pumpdump);
 
