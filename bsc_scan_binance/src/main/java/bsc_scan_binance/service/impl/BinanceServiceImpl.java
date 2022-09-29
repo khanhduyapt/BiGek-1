@@ -2078,13 +2078,6 @@ public class BinanceServiceImpl implements BinanceService {
         return true;
     }
 
-    /**
-     * https://fapi.coinglass.com/api/futures/longShortRate?symbol=BTC&timeType=3
-     *
-     * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=Okex&type=-1&timeType=3
-     * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=Huobi&type=1&timeType=3
-     *
-     */
     @SuppressWarnings("unchecked")
     @Transactional
     private String setCoinGlassData(String gecko_id, String symbol) {
@@ -2094,15 +2087,12 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
+        // timeType=1 -> 4h
+        // timeType=2 -> 1h
+        // timeType=3 -> 5m
         String url = "https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=" + symbol.toUpperCase()
-                + "&exName=Binance&type=1&timeType=3";
-        /*
-         *
-         * https://fapi.coinglass.com/api/tradingData/accountLSRatio?symbol=BTC&exName=
-         * Binance&type=1&timeType=3
-         * https://fapi.coinglass.com/api/tradingData/positionLSRatio?symbol=BTC&exName=
-         * Binance&type=1&timeType=3
-         */
+                + "&exName=Binance&type=1&timeType=2";
+
         BigDecimal topTraderBinanceLongRate = BigDecimal.ZERO;
 
         List<String> list = new ArrayList<String>();
@@ -3074,8 +3064,8 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        String result = Utils.removeLastZero(low) + "~" + Utils.removeLastZero(high);
-
+        String result = Utils.createMsgLowHeight(Utils.getBinancePrice("BTC"), low, high);
+        result = result.replace("L:", "").replace("-H:", " ~ ").replace("$", "");
         return result;
     }
 
