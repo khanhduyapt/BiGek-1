@@ -264,8 +264,10 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , rate1d0h                                                                              \n"
                     + "   , rate1d4h                                                                              \n"
                     + "   , cur.rsi                                                                               \n"
-                    + "   , concat((select futures_msg from binance_futures where gecko_id = can.gecko_id), cur.point) as futures      \n"
-                    + "   , (select futures_css from binance_futures where gecko_id = can.gecko_id)    as futures_css  \n"
+                    //+ "   , concat((select futures_msg from binance_futures where gecko_id = can.gecko_id), cur.point) as futures      \n"
+                    //+ "   , (select futures_css from binance_futures where gecko_id = can.gecko_id)    as futures_css  \n"
+                    + "   , concat(can.symbol, cur.point) as futures                                              \n"
+                    + "   , (CASE WHEN cur.point LIKE '%Long%' THEN 'text-primary' WHEN cur.point LIKE '%Short%' THEN 'text-danger' ELSE '' END) as futures_css                                                                     \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
                     + "   candidate_coin can,                                                                     \n"
@@ -2081,6 +2083,11 @@ public class BinanceServiceImpl implements BinanceService {
     @SuppressWarnings("unchecked")
     @Transactional
     private String setCoinGlassData(String gecko_id, String symbol) {
+        boolean exit = true;
+        if(exit) {
+            return "";
+        }
+
         if (!Objects.equals(pre_time_coinglass_wait_time, Utils.getCurrentHH().toString())) {
             if (coinglass_wait_1h) {
                 return "";
@@ -2169,6 +2176,8 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
+            // futures_msg
+            // futures_css
             if (CollectionUtils.isEmpty(list)) {
                 list.add("(Futures)");
                 list.add("");
@@ -2829,39 +2838,18 @@ public class BinanceServiceImpl implements BinanceService {
                         continue;
                     }
                     EntryCssResponse dto = new EntryCssResponse();
-                    dto.setSymbol("S:" + entity.getSymbol());
-
-                    //dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
+                    dto.setSymbol(entity.getSymbol());
+                    dto.setFutures_msg("http://localhost:8090/" + entity.getSymbol());
                     dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
                             + entity.getSymbol().toUpperCase() + "USDT");
 
                     symbols += entity.getSymbol() + ",";
                     results.add(dto);
                 }
-                for (int i = results.size() % 10; i <= 10; i++) {
-                    results.add(new EntryCssResponse());
-                }
+                //for (int i = results.size() % 10; i <= 10; i++) {
+                //    results.add(new EntryCssResponse());
+                //}
             }
-
-            List<FundingHistory> list_long = fundingHistoryRepository.findAllFiboLong();
-            if (!CollectionUtils.isEmpty(list_long)) {
-                String symbols = "";
-                for (FundingHistory entity : list_long) {
-                    if (symbols.contains(entity.getSymbol())) {
-                        continue;
-                    }
-                    EntryCssResponse dto = new EntryCssResponse();
-                    dto.setSymbol("B:" + entity.getSymbol());
-
-                    //dto.setTradingview("http://localhost:8090/" + entity.getSymbol());
-                    dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
-                            + entity.getSymbol().toUpperCase() + "USDT");
-
-                    symbols += entity.getSymbol() + ",";
-                    results.add(dto);
-                }
-            }
-
         } catch (Exception e) {
             log.info("Error findAllScalpingToday ---->");
             e.printStackTrace();

@@ -670,6 +670,10 @@ public class Utils {
     }
 
     public static BigDecimal getPercent(BigDecimal value, BigDecimal compareToValue) {
+        if(Utils.getBigDecimal(compareToValue).equals(BigDecimal.ZERO)){
+            return BigDecimal.ZERO;
+        }
+
         BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, 4, RoundingMode.CEILING)
                 .multiply(BigDecimal.valueOf(100));
 
