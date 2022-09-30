@@ -451,7 +451,7 @@ public class Utils {
         }
 
         sendToChatId(Utils.chatId_duydk, text);
-        // sendToChatId(Utils.chatId_linkdk, text);
+        sendToChatId(Utils.chatId_linkdk, text);
     }
 
     public static boolean isBusinessTime() {

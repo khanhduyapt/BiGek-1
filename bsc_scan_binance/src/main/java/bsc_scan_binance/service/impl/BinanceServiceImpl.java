@@ -358,6 +358,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + " WHERE                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   AND can.gecko_id = cur.gecko_id                                                         \n"
+                    + (isBynaceUrl
+                            ? "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 then false else true end) \n"
+                            : "")
                     + "   AND can.gecko_id = vbvr.gecko_id                                                        \n"
                     + "   AND can.symbol = cur.symbol                                                             \n"
                     + "   AND can.gecko_id = macd.gecko_id                                                        \n"
@@ -836,7 +839,6 @@ public class BinanceServiceImpl implements BinanceService {
                                 + dto.getSymbol();
 
                         if (!msg_vol_up_dict.contains(key_hold)) {
-                            // Utils.sendToMyTelegram(hold);
                             msg_vol_up_dict.put(key_hold, key_hold);
                         }
 
@@ -2084,7 +2086,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private String setCoinGlassData(String gecko_id, String symbol) {
         boolean exit = true;
-        if(exit) {
+        if (exit) {
             return "";
         }
 
@@ -2149,9 +2151,6 @@ public class BinanceServiceImpl implements BinanceService {
                         coin.setPumpdump(true);
                     }
 
-                    if (!fundingHistoryRepository.existsPumDump(gecko_id, event_id)) {
-                        // Utils.sendToMyTelegram("(Coinglass Short) " + symbol);
-                    }
                     fundingHistoryRepository.save(coin);
 
                     // log.info("End getCoinGlassData <--");
@@ -2953,11 +2952,13 @@ public class BinanceServiceImpl implements BinanceService {
                     fundingHistoryRepository.save(coin);
 
                     if (Utils.isNotBlank(msg)) {
-                        Utils.sendToMyTelegram(msg + Utils.new_line_from_service + wallToday());
+                        Utils.sendToTelegram(
+                                msg + Utils.new_line_from_service + Utils.new_line_from_service + wallToday());
                     }
 
                     if (Utils.isNotBlank(my_msg)) {
-                        Utils.sendToMyTelegram(my_msg + Utils.new_line_from_service + wallToday());
+                        Utils.sendToTelegram(
+                                my_msg + Utils.new_line_from_service + Utils.new_line_from_service + wallToday());
                     }
                 }
 
@@ -3002,10 +3003,6 @@ public class BinanceServiceImpl implements BinanceService {
                 String note = time + " Kill Long/Short";
                 entity.setNote(note);
                 entity.setPumpdump(true);
-
-                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_FUNDING_RATE)) {
-                    Utils.sendToMyTelegram(note + ": " + symbol);
-                }
             }
 
             fundingHistoryRepository.save(entity);
@@ -3065,18 +3062,22 @@ public class BinanceServiceImpl implements BinanceService {
             if (!Objects.equals(null, coin)) {
                 boolean hasChangeValue = false;
 
-                if ((low.compareTo(Utils.getBigDecimal(coin.getLow())) < 0)
-                        || (Utils.getBigDecimal(coin.getLow()).compareTo(BigDecimal.ZERO) < 1)) {
-                    coin.setLow(low);
-                    hasChangeValue = true;
+                if (low.compareTo(Utils.getBigDecimal(BigDecimal.ZERO)) > 0) {
+                    if ((low.compareTo(Utils.getBigDecimal(coin.getLow())) < 0)
+                            || (Utils.getBigDecimal(coin.getLow()).compareTo(BigDecimal.ZERO) < 1)) {
+                        coin.setLow(low);
+                        hasChangeValue = true;
+                    }
                 } else {
                     low = coin.getLow();
                 }
 
-                if ((high.compareTo(Utils.getBigDecimal(coin.getHigh())) > 0)
-                        || (Utils.getBigDecimal(coin.getHigh()).compareTo(BigDecimal.ZERO) < 1)) {
-                    coin.setHigh(high);
-                    hasChangeValue = true;
+                if (high.compareTo(Utils.getBigDecimal(BigDecimal.ZERO)) > 0) {
+                    if ((high.compareTo(Utils.getBigDecimal(coin.getHigh())) > 0)
+                            || (Utils.getBigDecimal(coin.getHigh()).compareTo(BigDecimal.ZERO) < 1)) {
+                        coin.setHigh(high);
+                        hasChangeValue = true;
+                    }
                 } else {
                     high = coin.getHigh();
                 }
