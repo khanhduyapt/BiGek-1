@@ -364,6 +364,13 @@ public class Utils {
         return true;
     }
 
+    public static boolean isBlank(String value) {
+        if (Objects.equals(null, value) || Objects.equals("", value)) {
+            return true;
+        }
+        return true;
+    }
+
     public static String appendSpace(String value, int length) {
         int len = value.length();
         if (len > length) {
@@ -670,7 +677,7 @@ public class Utils {
     }
 
     public static BigDecimal getPercent(BigDecimal value, BigDecimal compareToValue) {
-        if(Utils.getBigDecimal(compareToValue).equals(BigDecimal.ZERO)){
+        if (Utils.getBigDecimal(compareToValue).equals(BigDecimal.ZERO)) {
             return BigDecimal.ZERO;
         }
 

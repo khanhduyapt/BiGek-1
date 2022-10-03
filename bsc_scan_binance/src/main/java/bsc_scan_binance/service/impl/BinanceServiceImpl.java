@@ -2865,24 +2865,6 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal low = rate.getLow();
 
             String msg = "";
-
-            if (high.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-
-                getListDepthData("BTC");
-                String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-                msg = "(DANGER DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
-                        + "(Pump) " + wall;
-
-            } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
-
-                getListDepthData("BTC");
-                String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-
-                msg = "(DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Pump) "
-                        + wall;
-
-            }
-
             if (low.compareTo(BigDecimal.valueOf(-1)) < 0) {
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
@@ -2907,13 +2889,31 @@ public class BinanceServiceImpl implements BinanceService {
                         + wall;
             }
 
+            if (Utils.isBlank(msg)) {
+                if (high.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+
+                    getListDepthData("BTC");
+                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
+                    msg = "(DANGER DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                            + "(Pump) " + wall;
+
+                } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
+
+                    getListDepthData("BTC");
+                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
+
+                    msg = "(DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Pump) "
+                            + wall;
+
+                }
+            }
             // -----------------------------------------------------------------------------------------//
 
             // MyTelegram
             String my_msg = "";
-            if (!Utils.isNotBlank(msg)) {
-                if (low.compareTo(BigDecimal.valueOf(-0.12)) < 0) {
+            if (Utils.isBlank(msg)) {
 
+                if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
                     getListDepthData("BTC");
                     String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
@@ -2921,19 +2921,21 @@ public class BinanceServiceImpl implements BinanceService {
                         my_msg = time + " (" + low + ") Wait 3~5 minutes." + Utils.new_line_from_service + "(Dump) "
                                 + wall;
                     }
-
                 }
-                if (high.compareTo(BigDecimal.valueOf(0.02)) > 0) {
 
-                    getListDepthData("BTC");
-                    String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
+                if (Utils.isBlank(my_msg)) {
+                    if (high.compareTo(BigDecimal.valueOf(0.05)) > 0) {
+                        getListDepthData("BTC");
+                        String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                    if (wall.contains(">")) {
-                        my_msg = time + " (" + high + ") Wait 3~5 minutes" + Utils.new_line_from_service
-                                + "(Pump) "
-                                + wall;
+                        if (wall.contains(">")) {
+                            my_msg = time + " (" + high + ") Wait 3~5 minutes" + Utils.new_line_from_service
+                                    + "(Pump) "
+                                    + wall;
+                        }
                     }
                 }
+
             }
 
             if (Utils.isNotBlank(msg) || (Utils.isNotBlank(my_msg))) {
@@ -2950,6 +2952,11 @@ public class BinanceServiceImpl implements BinanceService {
                     coin.setPumpdump(true);
 
                     fundingHistoryRepository.save(coin);
+
+                    if (msg.contains("DANGER")) {
+                        Utils.sendToMyTelegram(
+                                msg + Utils.new_line_from_service + Utils.new_line_from_service + wallToday());
+                    }
 
                     if (Utils.isNotBlank(msg)) {
                         Utils.sendToTelegram(
@@ -2974,6 +2981,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Transactional
     private void loadFundingHistory(String gecko_id, String symbol) {
+        if (Objects.equals("BTC", symbol)) {
+            return;
+        }
         try {
             BigDecimal CONST_RATE_HIGH = BigDecimal.valueOf(0.2);
 
