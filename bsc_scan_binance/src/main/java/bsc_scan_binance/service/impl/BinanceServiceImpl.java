@@ -3028,7 +3028,7 @@ public class BinanceServiceImpl implements BinanceService {
     public String wallToday() {
         String key = Utils.getTimeChangeDailyChart();
 
-        BigDecimal WALL_3 = BigDecimal.valueOf(3);
+        BigDecimal WALL_3 = BigDecimal.valueOf(2.9);
 
         BigDecimal max_bid = BigDecimal.ZERO;
         BigDecimal max_ask = BigDecimal.ZERO;
@@ -3078,8 +3078,6 @@ public class BinanceServiceImpl implements BinanceService {
                         coin.setLow(low);
                         hasChangeValue = true;
                     }
-                } else {
-                    low = coin.getLow();
                 }
 
                 if (high.compareTo(Utils.getBigDecimal(BigDecimal.ZERO)) > 0) {
@@ -3088,13 +3086,13 @@ public class BinanceServiceImpl implements BinanceService {
                         coin.setHigh(high);
                         hasChangeValue = true;
                     }
-                } else {
-                    high = coin.getHigh();
                 }
 
                 if (hasChangeValue) {
                     fundingHistoryRepository.save(coin);
                 }
+                low = coin.getLow();
+                high = coin.getHigh();
             }
         }
 
