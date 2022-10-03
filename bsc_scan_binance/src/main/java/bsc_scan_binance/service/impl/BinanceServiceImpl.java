@@ -266,7 +266,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , cur.rsi                                                                               \n"
                     //+ "   , concat((select futures_msg from binance_futures where gecko_id = can.gecko_id), cur.point) as futures      \n"
                     //+ "   , (select futures_css from binance_futures where gecko_id = can.gecko_id)    as futures_css  \n"
-                    + "   , concat(can.symbol, cur.point) as futures                                              \n"
+                    + "   , concat(can.symbol,  case when can.market_cap < 400000000 and cur.point LIKE '%Short%' then '' else cur.point end) as futures                                              \n"
                     + "   , (CASE WHEN cur.point LIKE '%Long%' THEN 'text-primary' WHEN cur.point LIKE '%Short%' THEN 'text-danger' ELSE '' END) as futures_css                                                                     \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
@@ -358,19 +358,18 @@ public class BinanceServiceImpl implements BinanceService {
                     + " WHERE                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   AND can.gecko_id = cur.gecko_id                                                         \n"
-                    + (isBynaceUrl
-                            ? "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 then false else true end) \n"
-                            : "")
+                    +  "  AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 AND cur.hh > '10' then false else true end) \n"
                     + "   AND can.gecko_id = vbvr.gecko_id                                                        \n"
                     + "   AND can.symbol = cur.symbol                                                             \n"
                     + "   AND can.gecko_id = macd.gecko_id                                                        \n"
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    + (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump) \n"
+                    + "   AND (rate1d0h > -20)                                                                    \n"
+                    + (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump)  \n"
                             // event_time > TO_CHAR(NOW() - interval '1 hours', 'YYYYMMDD_HH24MI_SS.MS'))
                             // hours
-                            // AND (rate1d0h > -20) AND (can.volumn_div_marketcap > 0.05)
+                            //
                             : "")
                     + ((BscScanBinanceApplication.app_flag != Utils.const_app_flag_all_coin)
                             ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
