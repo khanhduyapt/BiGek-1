@@ -3096,7 +3096,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String result = Utils.createMsgLowHeight(Utils.getBinancePrice("BTC"), low, high);
-        //result = result.replace("L:", "").replace("-H:", " ~ ").replace("$", "");
+        result = result.replace("L:", "Wall: ").replace("-H:", " ~ ").replace("$", "");
 
         return result;
     }
