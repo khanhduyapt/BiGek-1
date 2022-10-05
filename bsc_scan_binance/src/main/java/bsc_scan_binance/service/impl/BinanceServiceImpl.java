@@ -155,6 +155,8 @@ public class BinanceServiceImpl implements BinanceService {
     private String pre_time_of_btc = "";
     private String pre_time_of_saved_data_4h = "";
     private String pre_time_of_btc_kill_long_short = "";
+    private String pre_Bitfinex_status = "";
+    private String pre_Bitfinex_msg = "";
 
     List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
@@ -2088,6 +2090,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     public String getBitfinexLongShortBtc() {
         String msg = "";
+        String time = Utils.convertDateToString("(HH:mm)", Calendar.getInstance().getTime());
 
         // timeType=1 -> 4h
         // timeType=2 -> 1h
@@ -2107,19 +2110,40 @@ public class BinanceServiceImpl implements BinanceService {
                     if (exchange_list.size() > 6) {
                         Object Bitfinex = exchange_list.get(6);
                         Object exchangeName = Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("exchangeName"));
-                        Object longRate = Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("longRate"));
-                        Object longVolUsd = Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("longVolUsd"));
 
-                        Object shortRate = Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("shortRate"));
-                        Object shortVolUsd = Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("shortVolUsd"));
+                        BigDecimal longRate = Utils
+                                .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("longRate")));
+                        BigDecimal longVolUsd = Utils
+                                .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("longVolUsd")));
+                        longVolUsd = longVolUsd.divide(BigDecimal.valueOf(1000), 0, RoundingMode.CEILING);
+
+                        BigDecimal shortRate = Utils
+                                .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("shortRate")));
+                        BigDecimal shortVolUsd = Utils
+                                .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("shortVolUsd")));
+                        shortVolUsd = longVolUsd.divide(BigDecimal.valueOf(1000), 0, RoundingMode.CEILING);
 
                         msg = Utils.getStringValue(exchangeName) + " 1h";
-                        msg += " Long: " + Utils.getStringValue(longRate) + "%("
-                                + Utils.removeLastZero(Utils.getStringValue(longVolUsd)) + ")";
-                        msg += " Short: " + Utils.getStringValue(shortRate) + "%("
-                                + Utils.removeLastZero(Utils.getStringValue(shortVolUsd)) + ")";
 
-                        msg += " " + Utils.convertDateToString("(HH:mm)", Calendar.getInstance().getTime());
+                        msg += " Long: " + Utils.getStringValue(longRate) + "%("
+                                + Utils.removeLastZero(Utils.getStringValue(longVolUsd)) + ")k";
+
+                        msg += " Short: " + Utils.getStringValue(shortRate) + "%("
+                                + Utils.removeLastZero(Utils.getStringValue(shortVolUsd)) + "k)";
+
+                        String cur_Bitfinex_status = "SW";
+                        if (longRate.compareTo(BigDecimal.valueOf(60)) > 0) {
+                            cur_Bitfinex_status = "LONG";
+                        } else if (shortRate.compareTo(BigDecimal.valueOf(60)) > 0) {
+                            cur_Bitfinex_status = "SHORT";
+                        }
+
+                        if (!Objects.equals(cur_Bitfinex_status, pre_Bitfinex_status)) {
+                            pre_Bitfinex_status = cur_Bitfinex_status;
+                            Utils.sendToMyTelegram(time + " " + msg);
+                        }
+
+                        msg += " " + time;
                     }
 
                 }
