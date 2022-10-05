@@ -358,7 +358,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + " WHERE                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   AND can.gecko_id = cur.gecko_id                                                         \n"
-                    +  "  AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 AND cur.hh > '10' then false else true end) \n"
+                    + "  AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 AND cur.hh > '10' then false else true end) \n"
                     + "   AND can.gecko_id = vbvr.gecko_id                                                        \n"
                     + "   AND can.symbol = cur.symbol                                                             \n"
                     + "   AND can.gecko_id = macd.gecko_id                                                        \n"
@@ -2828,10 +2828,16 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             //List<FundingHistory> list = fundingHistoryRepository.findAllByPumpdump(true);
             List<FundingHistory> list_short = fundingHistoryRepository.findAllFiboShort();
-
+            int count = list_short.size();
+            int MAX_LENGTH = 20;
+            if (count > MAX_LENGTH) {
+                count = MAX_LENGTH;
+            }
             if (!CollectionUtils.isEmpty(list_short)) {
                 String symbols = "";
-                for (FundingHistory entity : list_short) {
+                for (int index = 0; index < count; index++) {
+                    FundingHistory entity = list_short.get(index);
+
                     if (symbols.contains(entity.getSymbol())) {
                         continue;
                     }
@@ -2844,9 +2850,15 @@ public class BinanceServiceImpl implements BinanceService {
                     symbols += entity.getSymbol() + ",";
                     results.add(dto);
                 }
-                //for (int i = results.size() % 10; i <= 10; i++) {
-                //    results.add(new EntryCssResponse());
-                //}
+
+                if (list_short.size() > MAX_LENGTH) {
+                    EntryCssResponse dto = new EntryCssResponse();
+                    dto.setSymbol(".........");
+                    dto.setFutures_msg("http://localhost:8090/BTC");
+                    dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
+                    results.add(dto);
+                }
+
             }
         } catch (Exception e) {
             log.info("Error findAllScalpingToday ---->");
@@ -3036,6 +3048,10 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal high = BigDecimal.ZERO;
 
         for (DepthResponse dto : list_bids_ok) {
+            if (!Objects.equals("BTC", dto.getSymbol())) {
+                continue;
+            }
+
             if ((dto.getVal_million_dolas().compareTo(max_bid) > 0)
                     && (dto.getVal_million_dolas().compareTo(WALL_3) >= 0)) {
                 max_bid = dto.getVal_million_dolas();
@@ -3044,6 +3060,10 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         for (DepthResponse dto : list_asks_ok) {
+            if (!Objects.equals("BTC", dto.getSymbol())) {
+                continue;
+            }
+
             if ((dto.getVal_million_dolas().compareTo(max_ask) > 0)
                     && (dto.getVal_million_dolas().compareTo(WALL_3) >= 0)) {
                 max_ask = dto.getVal_million_dolas();
@@ -3056,40 +3076,73 @@ public class BinanceServiceImpl implements BinanceService {
         id.setEventTime(EVENT_ID);
         id.setGeckoid("bitcoin");
 
+        String note = low + "~" + high;
         if (!fundingHistoryRepository.existsPumDump("bitcoin", EVENT_ID)) {
             FundingHistory coin = new FundingHistory();
             coin.setId(id);
             coin.setSymbol("BTC");
-            coin.setNote(low + "~" + high);
+            coin.setNote(note);
             coin.setPumpdump(true);
 
             coin.setLow(low);
             coin.setHigh(high);
+
+            coin.setAvgLow(max_bid);
+            coin.setAvgHigh(max_ask);
+
             fundingHistoryRepository.save(coin);
         } else {
             FundingHistory coin = fundingHistoryRepository.findById(id).orElse(null);
             if (!Objects.equals(null, coin)) {
+
                 boolean hasChangeValue = false;
 
                 if (low.compareTo(Utils.getBigDecimal(BigDecimal.ZERO)) > 0) {
-                    if ((low.compareTo(Utils.getBigDecimal(coin.getLow())) < 0)
-                            || (Utils.getBigDecimal(coin.getLow()).compareTo(BigDecimal.ZERO) < 1)) {
-                        coin.setLow(low);
-                        hasChangeValue = true;
+                    if (max_bid.compareTo(Utils.getBigDecimal(coin.getAvgLow())) > 0) {
+                        if (low.compareTo(Utils.getBigDecimal(coin.getLow())) < 0) {
+                            coin.setNote(note);
+                            coin.setLow(low);
+                            coin.setAvgLow(max_bid);
+                            hasChangeValue = true;
+                        }
                     }
                 }
 
+                if ((Utils.getBigDecimal(coin.getLow()).compareTo(BigDecimal.ZERO) < 1)
+                        || (Utils.getBigDecimal(coin.getAvgLow()).compareTo(BigDecimal.ZERO) < 1)) {
+                    coin.setNote(note);
+                    coin.setLow(low);
+                    coin.setAvgLow(max_bid);
+                    hasChangeValue = true;
+                }
+
+                //------------------------------
+
                 if (high.compareTo(Utils.getBigDecimal(BigDecimal.ZERO)) > 0) {
-                    if ((high.compareTo(Utils.getBigDecimal(coin.getHigh())) > 0)
-                            || (Utils.getBigDecimal(coin.getHigh()).compareTo(BigDecimal.ZERO) < 1)) {
-                        coin.setHigh(high);
-                        hasChangeValue = true;
+                    if (max_ask.compareTo(Utils.getBigDecimal(coin.getAvgHigh())) > 0) {
+                        if (high.compareTo(Utils.getBigDecimal(coin.getHigh())) > 0) {
+                            coin.setNote(note);
+                            coin.setHigh(high);
+                            coin.setAvgHigh(max_ask);
+                            hasChangeValue = true;
+                        }
                     }
                 }
+
+                if ((Utils.getBigDecimal(coin.getHigh()).compareTo(BigDecimal.ZERO) < 1)
+                        || (Utils.getBigDecimal(coin.getAvgHigh()).compareTo(BigDecimal.ZERO) < 1)) {
+                    coin.setNote(note);
+                    coin.setHigh(high);
+                    coin.setAvgHigh(max_ask);
+                    hasChangeValue = true;
+                }
+
+                //------------------------------
 
                 if (hasChangeValue) {
                     fundingHistoryRepository.save(coin);
                 }
+
                 low = coin.getLow();
                 high = coin.getHigh();
             }

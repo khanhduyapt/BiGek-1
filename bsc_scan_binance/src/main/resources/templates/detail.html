@@ -83,7 +83,8 @@ p {
     </div>
 
     <div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
-      <a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=VANTAGE%3ASP500'}">S&P 500</a><span　th:text="${sp500}" th:classappend="${#strings.contains(sp500, '-') ? 'text-danger' : 'text-primary'}"></span>
+      <a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=VANTAGE%3ASP500'}">S&P 500</a>
+      <span th:text="${sp500}" th:classappend="${#strings.contains(sp500, '-') ? 'text-danger' : 'text-primary'}"></span>
       <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3ATOTAL'}">Total</a>
       <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D'}">Usdt.D</a>
       <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=CRYPTOCAP%3ABTC.D'}">Btc.D</a>
@@ -96,7 +97,16 @@ p {
 
       <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://sslecal2.forexprostools.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_centralBanks,_confidenceIndex,_balance&features=datepicker,timezone,timeselector,filters&countries=5&importance=3&calType=week&timeZone=27&lang=52'}">Investing.com</a>
     </div>
-
+    
+    <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.7rem !important;">
+        <p class="font-weight-bold">Check list:</p>
+        <ul>
+            <li>1) Nến 1D, 4H hôm nay triển vọng đi ntn?</li>
+            <li>2) SP500 hôm nay xu hướng tăng hay giảm?</li>
+            <li>3) Giữ lệnh hiện tại đến 9h30; 14h; 19h có lợi gì?</li>
+        </ul>
+    </div>
+    
     <div th:if="${#lists.size(scapling_list) > 0}" style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important; min-width: 400px !important; max-width: 400px !important;">
       <a class="font-weight-bold" th:target="_blank" th:href="${'http://localhost:8090/binance'}">
        <span>(Scalping)</span>
@@ -252,13 +262,6 @@ p {
       </tbody>
     </table>
   </div>
-  
-  <p style="margin-top: 1rem; margin-left: 0.5rem;" class="font-weight-bold">Check list:</p>
-  <ul style="margin-top: 1rem; margin-left: 0.5rem;">
-    <li>1) Nến 1D, 4H hôm nay triển vọng đi ntn? Lệnh hiện tại có thuận xu hướng không?</li>
-    <li>2) SP500 hôm nay xu hướng tăng hay giảm? Vào lệnh có theo xu hướng thị trường không?</li>
-    <li>3) Giữ lệnh hiện tại sang thời kỳ pump 9h30; 14h; 19h có triển vọng gì thêm không?</li>
-  </ul>
-  <br><br>
+
 </body>
 </html>
