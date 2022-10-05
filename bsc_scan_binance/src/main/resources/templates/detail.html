@@ -70,6 +70,11 @@ p {
   background: #eee !important;
 }
 
+.css-1ifhear{
+  width: 16px;
+  height: 16px;
+}
+
 </style>
 <body class="">
     <div style="margin-top: 0.5rem; margin-left: 0.5rem;">
@@ -101,9 +106,8 @@ p {
     <div style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.7rem !important;">
         <p class="font-weight-bold">Check list:</p>
         <ul>
-            <li>1) Nến 1D, 4H hôm nay triển vọng đi ntn?</li>
-            <li>2) SP500 hôm nay xu hướng tăng hay giảm?</li>
-            <li>3) Giữ lệnh hiện tại đến 9h30; 14h; 19h có lợi gì?</li>
+            <li>Btc 1D, 4H, SP500 hôm nay triển vọng đi ntn?</li>
+            <li>Giữ lệnh hiện tại đến 9h30; 14h; 19h có lợi gì?</li>
         </ul>
     </div>
     
@@ -127,11 +131,18 @@ p {
       </table>
     </div>
 
-  <div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important; display: flex;">
-    <span th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'Downtrend') ? 'text-danger font-weight-bold' : #strings.contains(long_short_header, 'Uptrend') ? 'text-success font-weight-bold' : ''}"></span>
-    <span th:text="${wall_today}" style="margin-left: 1rem;" class="text-primary font-weight-bold"></span>
-  </div>
+	<div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important; display: flex;">
+		<span th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'Downtrend') ? 'text-danger font-weight-bold' : #strings.contains(long_short_header, 'Uptrend') ? 'text-success font-weight-bold' : ''}"></span>
+		<span th:text="${wall_today}" style="margin-left: 1rem;" class="text-primary font-weight-bold"></span>
+	</div>
 
+	<div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.8rem !important;">
+		<a th:target="_blank" th:href="${'https://www.coinglass.com/LongShortRatio'}">
+		  <img src="https://cdn.coinglasscdn.com/static/exchanges/bitfinex.jpg" class="css-1ifhear" style="margin-top: -3px;"> Bitfinex 
+		</a>
+		<span th:text="${Bitfinex}"></span>
+	</div>
+  
     <div style="display: flex; margin-top: 0.25rem; margin-left: 0.5rem; font-size: 0.75rem !important;">
         <table class="table-bordered" style="min-width: 195px !important; max-width: 195px !important;">
             <tbody>

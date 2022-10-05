@@ -114,6 +114,7 @@ public class BinanceController {
         model.addAttribute("scapling_list", scapling_list);
 
         model.addAttribute("wall_today", service.wallToday());
+        model.addAttribute("Bitfinex", service.getBitfinexLongShortBtc().replace("Bitfinex", ""));
 
         return "detail"; // BTC
     }

@@ -478,10 +478,13 @@ public class WandaBot extends TelegramLongPollingBot {
         String asks = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks).replaceAll(">", ">");
 
         String msg = "";
-        msg += binance_service.wallToday() + Utils.new_line_from_bot;
+        msg += binance_service.wallToday() + Utils.new_line_from_bot + Utils.new_line_from_bot;
         msg += "Bids: " + bids + Utils.new_line_from_bot;
         msg += "Asks: " + asks;
 
+        if (Objects.equal("BTC", SYMBOL)) {
+            msg += Utils.new_line_from_bot + Utils.new_line_from_bot + binance_service.getBitfinexLongShortBtc();
+        }
         return msg;
     }
 }

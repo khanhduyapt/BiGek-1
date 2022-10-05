@@ -38,4 +38,6 @@ public interface BinanceService {
     public String getLongShortIn48h(String symbol);
 
     public String wallToday();
+
+    public String getBitfinexLongShortBtc();
 }
