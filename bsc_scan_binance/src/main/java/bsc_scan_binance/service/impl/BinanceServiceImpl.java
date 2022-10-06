@@ -2134,13 +2134,9 @@ public class BinanceServiceImpl implements BinanceService {
                         if (longRate.compareTo(BigDecimal.valueOf(60)) > 0) {
                             cur_Bitfinex_status = "LONG";
 
-                        } else if (shortRate.compareTo(BigDecimal.valueOf(60)) > 0) {
+                        }
+                        if (shortRate.compareTo(BigDecimal.valueOf(60)) > 0) {
                             cur_Bitfinex_status = "SHORT";
-
-                        } else if (longRate.compareTo(BigDecimal.valueOf(55)) < 0
-                                && shortRate.compareTo(BigDecimal.valueOf(55)) < 0) {
-
-                            //cur_Bitfinex_status = "SW";
                         }
 
                         if (!Objects.equals(cur_Bitfinex_status, pre_Bitfinex_status)
