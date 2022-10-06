@@ -27,7 +27,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import bsc_scan_binance.BscScanBinanceApplication;
-import bsc_scan_binance.entity.BinanceFutures;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
 import bsc_scan_binance.entity.BinanceVolumeDateTimeKey;
 import bsc_scan_binance.entity.BinanceVolumnDay;
@@ -2134,11 +2133,14 @@ public class BinanceServiceImpl implements BinanceService {
                         String cur_Bitfinex_status = "";
                         if (longRate.compareTo(BigDecimal.valueOf(60)) > 0) {
                             cur_Bitfinex_status = "LONG";
+
                         } else if (shortRate.compareTo(BigDecimal.valueOf(60)) > 0) {
                             cur_Bitfinex_status = "SHORT";
+
                         } else if (longRate.compareTo(BigDecimal.valueOf(55)) < 0
                                 && shortRate.compareTo(BigDecimal.valueOf(55)) < 0) {
-                            cur_Bitfinex_status = "SW";
+
+                            //cur_Bitfinex_status = "SW";
                         }
 
                         if (!Objects.equals(cur_Bitfinex_status, pre_Bitfinex_status)
