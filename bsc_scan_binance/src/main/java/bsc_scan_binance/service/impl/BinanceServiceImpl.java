@@ -359,14 +359,14 @@ public class BinanceServiceImpl implements BinanceService {
                     + " WHERE                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   AND can.gecko_id = cur.gecko_id                                                         \n"
-                    + "  AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 AND cur.hh > '10' then false else true end) \n"
+                    + "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 AND cur.hh > '10' then false else true end) \n"
                     + "   AND can.gecko_id = vbvr.gecko_id                                                        \n"
                     + "   AND can.symbol = cur.symbol                                                             \n"
                     + "   AND can.gecko_id = macd.gecko_id                                                        \n"
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    + "   AND (rate1d0h > -20)                                                                    \n"
+                    + "   AND (case when can.symbol <> 'BTC' and rate1d0h < -20 then false else true end)         \n"
                     + (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump)  \n"
                             // event_time > TO_CHAR(NOW() - interval '1 hours', 'YYYYMMDD_HH24MI_SS.MS'))
                             // hours
@@ -2115,35 +2115,37 @@ public class BinanceServiceImpl implements BinanceService {
                                 .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("longRate")));
                         BigDecimal longVolUsd = Utils
                                 .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("longVolUsd")));
-                        longVolUsd = longVolUsd.divide(BigDecimal.valueOf(1000), 0, RoundingMode.CEILING);
+                        longVolUsd = longVolUsd.divide(BigDecimal.valueOf(1000), 1, RoundingMode.CEILING);
 
                         BigDecimal shortRate = Utils
                                 .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("shortRate")));
                         BigDecimal shortVolUsd = Utils
                                 .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("shortVolUsd")));
-                        shortVolUsd = longVolUsd.divide(BigDecimal.valueOf(1000), 0, RoundingMode.CEILING);
+                        shortVolUsd = longVolUsd.divide(BigDecimal.valueOf(1000), 1, RoundingMode.CEILING);
 
-                        msg = Utils.getStringValue(exchangeName) + " 1h";
+                        msg = time + " " + Utils.getStringValue(exchangeName) + " 1h";
 
-                        msg += " Long: " + Utils.getStringValue(longRate) + "%("
-                                + Utils.removeLastZero(Utils.getStringValue(longVolUsd)) + ")k";
+                        msg += " Long: " + Utils.formatPrice(longRate, 1) + "%("
+                                + Utils.removeLastZero(Utils.getStringValue(longVolUsd)) + "k)";
 
-                        msg += " Short: " + Utils.getStringValue(shortRate) + "%("
+                        msg += " Short: " + Utils.formatPrice(shortRate, 1) + "%("
                                 + Utils.removeLastZero(Utils.getStringValue(shortVolUsd)) + "k)";
 
-                        String cur_Bitfinex_status = "SW";
+                        String cur_Bitfinex_status = "";
                         if (longRate.compareTo(BigDecimal.valueOf(60)) > 0) {
                             cur_Bitfinex_status = "LONG";
                         } else if (shortRate.compareTo(BigDecimal.valueOf(60)) > 0) {
                             cur_Bitfinex_status = "SHORT";
+                        } else if (longRate.compareTo(BigDecimal.valueOf(55)) < 0
+                                && shortRate.compareTo(BigDecimal.valueOf(55)) < 0) {
+                            cur_Bitfinex_status = "SW";
                         }
 
-                        if (!Objects.equals(cur_Bitfinex_status, pre_Bitfinex_status)) {
+                        if (!Objects.equals(cur_Bitfinex_status, pre_Bitfinex_status)
+                                && !Objects.equals(cur_Bitfinex_status, "")) {
                             pre_Bitfinex_status = cur_Bitfinex_status;
-                            Utils.sendToMyTelegram(time + " " + msg);
+                            Utils.sendToTelegram(msg);
                         }
-
-                        msg += " " + time;
                     }
 
                 }
