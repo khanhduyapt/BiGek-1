@@ -1021,7 +1021,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         pre_yyyyMMddHH = Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime());
 
-                        Utils.sendToMyTelegram(getBitfinexLongShortBtc());
+                        getBitfinexLongShortBtc();
                     }
                     wallToday();
                     css.setNote("");
