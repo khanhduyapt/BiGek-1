@@ -22,9 +22,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.socket.client.WebSocketClient;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
@@ -155,7 +160,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String pre_time_of_saved_data_4h = "";
     private String pre_time_of_btc_kill_long_short = "";
     private String pre_Bitfinex_status = "";
-    private String pre_Bitfinex_msg = "";
+    private int preSaveDepthData;
 
     List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
@@ -262,10 +267,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , rate1d0h                                                                              \n"
                     + "   , rate1d4h                                                                              \n"
                     + "   , cur.rsi                                                                               \n"
-                    // + " , concat((select futures_msg from binance_futures where gecko_id =
-                    // can.gecko_id), cur.point) as futures \n"
-                    // + " , (select futures_css from binance_futures where gecko_id = can.gecko_id)
-                    // as futures_css \n"
                     + "   , concat(can.symbol, case when can.market_cap < 400000000 and cur.point LIKE '%Short%' then '' else cur.point end) as futures                                              \n"
                     + "   , (CASE WHEN cur.point LIKE '%Long%' THEN 'text-primary' WHEN cur.point LIKE '%Short%' THEN 'text-danger' ELSE '' END) as futures_css                                                                     \n"
                     + "                                                                                           \n"
@@ -358,7 +359,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + " WHERE                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   AND can.gecko_id = cur.gecko_id                                                         \n"
-                    + "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 AND cur.hh > '10' then false else true end) \n"
                     + "   AND can.gecko_id = vbvr.gecko_id                                                        \n"
                     + "   AND can.symbol = cur.symbol                                                             \n"
                     + "   AND can.gecko_id = macd.gecko_id                                                        \n"
@@ -367,16 +367,15 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
                     + "   AND (case when can.symbol <> 'BTC' and rate1d0h < -20 then false else true end)         \n"
                     + (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump)  \n"
-                            // event_time > TO_CHAR(NOW() - interval '1 hours', 'YYYYMMDD_HH24MI_SS.MS'))
-                            // hours
-                            //
+                            : "")
+                    + (isBynaceUrl
+                            ? "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 then false else true end) \n"
                             : "")
                     + ((BscScanBinanceApplication.app_flag != Utils.const_app_flag_all_coin)
                             ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
                             : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
-                    // + " , cur.point desc \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -2120,7 +2119,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("shortRate")));
                         BigDecimal shortVolUsd = Utils
                                 .getBigDecimal(Utils.getLinkedHashMapValue(Bitfinex, Arrays.asList("shortVolUsd")));
-                        shortVolUsd = longVolUsd.divide(BigDecimal.valueOf(1000), 1, RoundingMode.CEILING);
+                        shortVolUsd = shortVolUsd.divide(BigDecimal.valueOf(1000), 1, RoundingMode.CEILING);
 
                         msg = time + " " + Utils.getStringValue(exchangeName) + " 1h";
 
@@ -2160,6 +2159,13 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
         try {
+            // https://binance-docs.github.io/apidocs/spot/en/#websocket-blvt-info-streams
+
+            int curSaveDepthData = Utils.getCurrentMinute();
+            if (curSaveDepthData == preSaveDepthData) {
+                return;
+            }
+            preSaveDepthData = curSaveDepthData;
 
             List<DepthBids> depthBidsList = depthBidsRepository.findAll();
             for (DepthBids entity : depthBidsList) {
