@@ -16,7 +16,7 @@ public interface FundingHistoryRepository extends JpaRepository<FundingHistory, 
     @Query(value = "SELECT m.* FROM funding_history m WHERE event_time like 'FIBO%' and note like '%Short%' and pumpdump", nativeQuery = true)
     public List<FundingHistory> findAllFiboShort();
 
-    @Query(value = "SELECT m.* FROM funding_history m WHERE event_time like 'FIBO%' and note like '%Long%' and pumpdump", nativeQuery = true)
+    @Query(value = "SELECT m.* FROM funding_history m WHERE event_time like 'FIBO%' and note like '%Long2%' and pumpdump", nativeQuery = true)
     public List<FundingHistory> findAllFiboLong();
 
     public List<FundingHistory> findAllByPumpdump(boolean pumpdump);

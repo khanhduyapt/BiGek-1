@@ -160,7 +160,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String pre_time_of_saved_data_4h = "";
     private String pre_time_of_btc_kill_long_short = "";
     private String pre_Bitfinex_status = "";
-    private int preSaveDepthData;
+    private String preSaveDepthData;
 
     List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
@@ -1988,7 +1988,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String point = "※";
         try {
-            List<BtcFutures> list_2d = Utils.loadData(symbol, TIME_1h, 48);
+            List<BtcFutures> list_2d = Utils.loadData(symbol, TIME_1h, 28);
             if (CollectionUtils.isEmpty(list_2d)) {
                 return "";
             }
@@ -2002,7 +2002,23 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal min_open = BigDecimal.valueOf(1000000);
             BigDecimal min_low = BigDecimal.valueOf(1000000);
             BigDecimal max_Hig = BigDecimal.ZERO;
+
+            BigDecimal min_12h = BigDecimal.valueOf(1000000);
+            BigDecimal max_12h = BigDecimal.ZERO;
+
+            int index = 0;
             for (BtcFutures dto : list_2d) {
+                index += 1;
+                if (index <= 12) {
+                    if (min_12h.compareTo(dto.getLow_price()) > 0) {
+                        min_12h = dto.getLow_price();
+                    }
+
+                    if (max_12h.compareTo(dto.getHight_price()) < 0) {
+                        max_12h = dto.getHight_price();
+                    }
+                }
+
                 if (min_low.compareTo(dto.getLow_price()) > 0) {
                     min_low = dto.getLow_price();
                 }
@@ -2021,9 +2037,9 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
             }
-            // if (symbol.equals("OCEAN")) {
-            // boolean test = true;
-            // }
+
+            BigDecimal percent = Utils.getPercent(max_12h, min_12h);
+
             BigDecimal price_at_binance = list_2d.get(0).getCurrPrice();
             BigDecimal fibo_short_0786 = max_Hig.divide(BigDecimal.valueOf(1.02), 5, RoundingMode.CEILING);
             BigDecimal fibo_long_0236 = min_low.multiply(BigDecimal.valueOf(1.02));
@@ -2037,6 +2053,9 @@ public class BinanceServiceImpl implements BinanceService {
                 if (price_at_binance.compareTo(fibo_short_0786) > 0) {
                     note = "Fibo(Short) ";
                 }
+            }
+            if (percent.compareTo(BigDecimal.valueOf(2)) < 0) {
+                note = "Fibo(Long2%)" + symbol;
             }
             point += note;
 
@@ -2161,7 +2180,7 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             // https://binance-docs.github.io/apidocs/spot/en/#websocket-blvt-info-streams
 
-            int curSaveDepthData = Utils.getCurrentMinute();
+            String curSaveDepthData = symbol + "_" + Utils.getCurrentMinute();
             if (curSaveDepthData == preSaveDepthData) {
                 return;
             }
@@ -2788,38 +2807,53 @@ public class BinanceServiceImpl implements BinanceService {
         List<EntryCssResponse> results = new ArrayList<EntryCssResponse>();
         try {
             // List<FundingHistory> list = fundingHistoryRepository.findAllByPumpdump(true);
-            List<FundingHistory> list_short = fundingHistoryRepository.findAllFiboShort();
-            int count = list_short.size();
-            int MAX_LENGTH = 20;
-            if (count > MAX_LENGTH) {
-                count = MAX_LENGTH;
-            }
-            if (!CollectionUtils.isEmpty(list_short)) {
-                String symbols = "";
-                for (int index = 0; index < count; index++) {
-                    FundingHistory entity = list_short.get(index);
+            results.add(new EntryCssResponse());
 
-                    if (symbols.contains(entity.getSymbol())) {
-                        continue;
+            for (int loop = 0; loop < 2; loop++) {
+                List<FundingHistory> list;
+                if (loop == 0) {
+                    list = fundingHistoryRepository.findAllFiboLong();
+
+                } else {
+                    list = fundingHistoryRepository.findAllFiboShort();
+                }
+
+                int count = list.size();
+                int MAX_LENGTH = 9;
+                if (count > MAX_LENGTH) {
+                    count = MAX_LENGTH;
+                }
+                if (!CollectionUtils.isEmpty(list)) {
+                    String symbols = "";
+                    for (int index = 0; index < count; index++) {
+                        FundingHistory entity = list.get(index);
+
+                        if (symbols.contains(entity.getSymbol())) {
+                            continue;
+                        }
+                        EntryCssResponse dto = new EntryCssResponse();
+                        dto.setSymbol(entity.getSymbol());
+                        // dto.setFutures_msg("http://localhost:8090/" + entity.getSymbol());
+                        // dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
+                        // + entity.getSymbol().toUpperCase() + "USDT");
+                        dto.setTradingview(
+                                "https://www.binance.com/en/futures/" + entity.getSymbol().toUpperCase() + "USDT");
+                        symbols += entity.getSymbol() + ",";
+                        results.add(dto);
                     }
-                    EntryCssResponse dto = new EntryCssResponse();
-                    dto.setSymbol(entity.getSymbol());
-                    dto.setFutures_msg("http://localhost:8090/" + entity.getSymbol());
-                    dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
-                            + entity.getSymbol().toUpperCase() + "USDT");
 
-                    symbols += entity.getSymbol() + ",";
-                    results.add(dto);
+                    if (list.size() > MAX_LENGTH) {
+                        EntryCssResponse dto = new EntryCssResponse();
+                        dto.setSymbol(".........");
+                        dto.setFutures_msg("http://localhost:8090/BTC");
+                        dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
+                        results.add(dto);
+                    } else {
+                        for (int j = list.size(); j <= MAX_LENGTH; j++) {
+                            results.add(new EntryCssResponse());
+                        }
+                    }
                 }
-
-                if (list_short.size() > MAX_LENGTH) {
-                    EntryCssResponse dto = new EntryCssResponse();
-                    dto.setSymbol(".........");
-                    dto.setFutures_msg("http://localhost:8090/BTC");
-                    dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
-                    results.add(dto);
-                }
-
             }
         } catch (Exception e) {
             log.info("Error findAllScalpingToday ---->");
