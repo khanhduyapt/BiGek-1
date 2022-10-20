@@ -22,14 +22,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.StompSessionHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.socket.client.WebSocketClient;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumeDateTime;
@@ -2160,7 +2155,7 @@ public class BinanceServiceImpl implements BinanceService {
                         if (!Objects.equals(cur_Bitfinex_status, pre_Bitfinex_status)
                                 && !Objects.equals(cur_Bitfinex_status, "")) {
                             pre_Bitfinex_status = cur_Bitfinex_status;
-                            Utils.sendToTelegram(msg);
+                            //Utils.sendToTelegram(msg);
                         }
                     }
 
@@ -2874,7 +2869,7 @@ public class BinanceServiceImpl implements BinanceService {
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                msg = "(DANGER DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                msg = "(DANGER DANGER DANGER) CZ kill LONG !!! Wait 15~30 minutes." + Utils.new_line_from_service
                         + "(Dump) " + wall;
 
             } else if (low.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
@@ -2882,7 +2877,7 @@ public class BinanceServiceImpl implements BinanceService {
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
-                msg = "(DANGER DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Dump) "
+                msg = "(DANGER DANGER) CZ kill LONG !!! Wait 10~15 minutes." + Utils.new_line_from_service + "(Dump) "
                         + wall;
 
             } else if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
@@ -2898,7 +2893,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     getListDepthData("BTC");
                     String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
-                    msg = "(DANGER DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service
+                    msg = "(DANGER DANGER) CZ kill SHORT !!! Wait 15~30 minutes." + Utils.new_line_from_service
                             + "(Pump) " + wall;
 
                 } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
@@ -2906,7 +2901,7 @@ public class BinanceServiceImpl implements BinanceService {
                     getListDepthData("BTC");
                     String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
-                    msg = "(DANGER) CZ kill SHORT !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Pump) "
+                    msg = "(DANGER) CZ kill SHORT !!! Wait 10~15 minutes." + Utils.new_line_from_service + "(Pump) "
                             + wall;
 
                 }
@@ -2968,9 +2963,9 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (Utils.isNotBlank(my_msg)) {
-                        Utils.sendToTelegram(my_msg + Utils.new_line_from_service + Utils.new_line_from_service
-                                + wallToday() + Utils.new_line_from_service + Utils.new_line_from_service
-                                + getBitfinexLongShortBtc());
+                        //Utils.sendToTelegram(my_msg + Utils.new_line_from_service + Utils.new_line_from_service
+                        //        + wallToday() + Utils.new_line_from_service + Utils.new_line_from_service
+                        //        + getBitfinexLongShortBtc());
                     }
                 }
 
