@@ -143,6 +143,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_BTC_RANGE = "BTC_RANGE";
     private static final String EVENT_BTC_ON_EXCHANGES = "BTC_EXCHANGES";
     private static final String EVENT_FIBO_LONG_SHORT = "FIBO";
+    private static final String EVENT_LONG_SHORT_5DAYS = "BTC_5DAYS_LONG_SHORT";
 
     private int pre_monitorBitcoinBalancesOnExchanges_HH = 0;
     private String monitorBitcoinBalancesOnExchanges_temp = "";
@@ -2155,7 +2156,7 @@ public class BinanceServiceImpl implements BinanceService {
                         if (!Objects.equals(cur_Bitfinex_status, pre_Bitfinex_status)
                                 && !Objects.equals(cur_Bitfinex_status, "")) {
                             pre_Bitfinex_status = cur_Bitfinex_status;
-                            //Utils.sendToTelegram(msg);
+                            // Utils.sendToTelegram(msg);
                         }
                     }
 
@@ -2597,9 +2598,72 @@ public class BinanceServiceImpl implements BinanceService {
         return low_height;
     }
 
+    private void monitorBtcLongShortIn5Days() {
+        List<BtcFutures> btc6days = Utils.loadData("BTC", TIME_1d, 6);
+        BigDecimal price_at_binance = btc6days.get(0).getCurrPrice();
+
+        BigDecimal min = BigDecimal.valueOf(1000000);
+        BigDecimal max = BigDecimal.ZERO;
+
+        for (int index = 1; index < btc6days.size(); index++) {
+            BtcFutures dto = btc6days.get(index);
+            if (min.compareTo(dto.getLow_price()) > 0) {
+                min = dto.getLow_price();
+            }
+            if (max.compareTo(dto.getHight_price()) < 0) {
+                max = dto.getHight_price();
+            }
+        }
+
+        boolean allowLong = true;
+        boolean allowShort = true;
+        if (price_at_binance.compareTo(min) > 0) {
+            allowLong = false;
+        }
+
+        if (price_at_binance.compareTo(max) < 0) {
+            allowShort = false;
+        }
+
+        String msg = "";
+        String time = Utils.convertDateToString("(hh:mm) ", Calendar.getInstance().getTime());
+        if (allowLong) {
+            msg = time + "Long BTC: " + Utils.removeLastZero(price_at_binance) + ", SL: "
+                    + Utils.removeLastZero(price_at_binance.multiply(BigDecimal.valueOf(0.99))) + "(1%)";
+        }
+
+        if (allowShort) {
+            msg = time + "Short BTC: " + Utils.removeLastZero(price_at_binance) + ", SL: "
+                    + Utils.removeLastZero(price_at_binance.multiply(BigDecimal.valueOf(1.01))) + "(1%)";
+        }
+
+        if (Utils.isNotBlank(msg)) {
+            String EVENT_ID = EVENT_LONG_SHORT_5DAYS + "_" + Utils.getCurrentHH();
+            if (!fundingHistoryRepository.existsPumDump("bitcoin", EVENT_ID)) {
+
+                FundingHistory coin = new FundingHistory();
+                FundingHistoryKey id = new FundingHistoryKey();
+                id.setEventTime(EVENT_ID);
+                id.setGeckoid("bitcoin");
+                coin.setId(id);
+                coin.setSymbol("BTC");
+                coin.setNote(Utils.getToday_YyyyMMdd() + " Long/Short");
+                coin.setPumpdump(true);
+
+                fundingHistoryRepository.save(coin);
+
+                Utils.sendToMyTelegram(msg + Utils.new_line_from_service + Utils.new_line_from_service + wallToday()
+                        + Utils.new_line_from_service + Utils.new_line_from_service + getBitfinexLongShortBtc());
+            }
+        }
+    }
+
     @Override
     @Transactional
     public List<String> monitorBtcPrice() {
+
+        monitorBtcLongShortIn5Days();
+
         String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
 
         List<String> results = new ArrayList<String>();
@@ -2963,9 +3027,10 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (Utils.isNotBlank(my_msg)) {
-                        //Utils.sendToTelegram(my_msg + Utils.new_line_from_service + Utils.new_line_from_service
-                        //        + wallToday() + Utils.new_line_from_service + Utils.new_line_from_service
-                        //        + getBitfinexLongShortBtc());
+                        // Utils.sendToTelegram(my_msg + Utils.new_line_from_service +
+                        // Utils.new_line_from_service
+                        // + wallToday() + Utils.new_line_from_service + Utils.new_line_from_service
+                        // + getBitfinexLongShortBtc());
                     }
                 }
 
