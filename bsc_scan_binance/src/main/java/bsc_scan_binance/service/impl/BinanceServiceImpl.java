@@ -935,8 +935,14 @@ public class BinanceServiceImpl implements BinanceService {
                             css.setStr_entry_price_css("text-white bg-success rounded-lg");
                         }
                     }
-                    css.setTrading_view("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
-                            + dto.getSymbol().toUpperCase() + "USDT");
+
+                    if (css.getName().toUpperCase().contains("FUTURES")) {
+                        css.setTrading_view("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
+                                + dto.getSymbol().toUpperCase() + "USDTPERP");
+                    } else {
+                        css.setTrading_view("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
+                                + dto.getSymbol().toUpperCase() + "USDT");
+                    }
 
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
@@ -2900,9 +2906,6 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                         EntryCssResponse dto = new EntryCssResponse();
                         dto.setSymbol(entity.getSymbol());
-                        // dto.setFutures_msg("http://localhost:8090/" + entity.getSymbol());
-                        // dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
-                        // + entity.getSymbol().toUpperCase() + "USDT");
                         dto.setTradingview(
                                 "https://www.binance.com/en/futures/" + entity.getSymbol().toUpperCase() + "USDT");
                         symbols += entity.getSymbol() + ",";
@@ -2913,7 +2916,7 @@ public class BinanceServiceImpl implements BinanceService {
                         EntryCssResponse dto = new EntryCssResponse();
                         dto.setSymbol(".........");
                         dto.setFutures_msg("http://localhost:8090/BTC");
-                        dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDT");
+                        dto.setTradingview("https://vn.tradingview.com/chart/?symbol=BINANCE%3ABTCUSDTPERP");
                         results.add(dto);
                     } else {
                         for (int j = list.size(); j <= MAX_LENGTH; j++) {
