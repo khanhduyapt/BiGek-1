@@ -470,18 +470,6 @@ public class Utils {
         return true;
     }
 
-    public static String getTimeChangeDailyChart() {
-        Calendar calendar = Calendar.getInstance();
-
-        int hh = Utils.getIntValue(Utils.convertDateToString("HH", calendar.getTime()));
-        if (hh >= 0 && hh < 7) {
-            calendar.add(Calendar.DAY_OF_MONTH, -1);
-        }
-        String result = Utils.convertDateToString("yyyyMMdd", calendar.getTime()) + "_07";
-
-        return result;
-    }
-
     public static String getChatId(String userName) {
         if (Objects.equals(userName, chatUser_linkdk)) {
             return chatId_linkdk;
@@ -604,6 +592,18 @@ public class Utils {
         }
 
         return value;
+    }
+
+    public static String getTimeChangeDailyChart() {
+        Calendar calendar = Calendar.getInstance();
+
+        int hh = Utils.getIntValue(Utils.convertDateToString("HH", calendar.getTime()));
+        if (hh >= 0 && hh < 7) {
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+        }
+        String result = Utils.convertDateToString("yyyyMMdd", calendar.getTime()) + "_07";
+
+        return result;
     }
 
     public static String getToday_YyyyMMdd() {

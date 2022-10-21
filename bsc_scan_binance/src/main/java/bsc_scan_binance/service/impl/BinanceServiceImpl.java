@@ -157,6 +157,8 @@ public class BinanceServiceImpl implements BinanceService {
     private String pre_time_of_btc_kill_long_short = "";
     private String pre_Bitfinex_status = "";
     private String preSaveDepthData;
+    private String pre_btc6days = "";
+    List<BtcFutures> btc6days = new ArrayList<BtcFutures>();
 
     List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
@@ -2599,8 +2601,14 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void monitorBtcLongShortIn5Days() {
-        List<BtcFutures> btc6days = Utils.loadData("BTC", TIME_1d, 6);
-        BigDecimal price_at_binance = btc6days.get(0).getCurrPrice();
+        String curr_btc6days = Utils.getTimeChangeDailyChart();
+
+        if (!Objects.equals(pre_btc6days, curr_btc6days)) {
+            btc6days = Utils.loadData("BTC", TIME_1d, 6);
+            pre_btc6days = curr_btc6days;
+        }
+
+        BigDecimal price_at_binance = Utils.getBinancePrice("BTC");
 
         BigDecimal min = BigDecimal.valueOf(1000000);
         BigDecimal max = BigDecimal.ZERO;
@@ -2652,7 +2660,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 fundingHistoryRepository.save(coin);
 
-                Utils.sendToMyTelegram(msg + Utils.new_line_from_service + Utils.new_line_from_service + wallToday()
+                Utils.sendToTelegram(msg + Utils.new_line_from_service + Utils.new_line_from_service + wallToday()
                         + Utils.new_line_from_service + Utils.new_line_from_service + getBitfinexLongShortBtc());
             }
         }
@@ -3014,11 +3022,6 @@ public class BinanceServiceImpl implements BinanceService {
                     coin.setPumpdump(true);
 
                     fundingHistoryRepository.save(coin);
-
-                    if (msg.contains("DANGER")) {
-                        Utils.sendToMyTelegram(
-                                msg + Utils.new_line_from_service + Utils.new_line_from_service + wallToday());
-                    }
 
                     if (Utils.isNotBlank(msg)) {
                         Utils.sendToTelegram(msg + Utils.new_line_from_service + Utils.new_line_from_service
