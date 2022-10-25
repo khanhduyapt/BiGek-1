@@ -980,6 +980,68 @@ public class Utils {
         return good_price;
     }
 
+    public static Boolean isInTheBeardOfPinBar(BtcFutures dto, BigDecimal cur_price) {
+        BigDecimal max = dto.getPrice_open_candle().compareTo(dto.getPrice_close_candle()) > 0
+                ? dto.getPrice_open_candle()
+                : dto.getPrice_close_candle();
+
+        if (cur_price.compareTo(max) < 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static Boolean isInTheBeardOfHamver(BtcFutures dto, BigDecimal cur_price) {
+        BigDecimal max = dto.getPrice_open_candle().compareTo(dto.getPrice_close_candle()) > 0
+                ? dto.getPrice_open_candle()
+                : dto.getPrice_close_candle();
+
+        if (cur_price.compareTo(max) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static Boolean isPinBar(BtcFutures dto) {
+        if (dto.isUptrend()) {
+            BigDecimal range_candle = getPercent(dto.getPrice_close_candle(), dto.getPrice_open_candle());
+            BigDecimal range_beard = getPercent(dto.getPrice_open_candle(), dto.getLow_price());
+
+            if (range_beard.compareTo(range_candle.multiply(BigDecimal.valueOf(3))) > 0) {
+                return true;
+            }
+        } else {
+            BigDecimal range_candle = getPercent(dto.getPrice_open_candle(), dto.getPrice_close_candle());
+            BigDecimal range_beard = getPercent(dto.getPrice_close_candle(), dto.getLow_price());
+
+            if (range_beard.compareTo(range_candle.multiply(BigDecimal.valueOf(3))) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static Boolean isHammer(BtcFutures dto) {
+        if (dto.isUptrend()) {
+            BigDecimal range_candle = getPercent(dto.getPrice_close_candle(), dto.getPrice_open_candle());
+            BigDecimal range_beard = getPercent(dto.getHight_price(), dto.getPrice_close_candle());
+
+            if (range_beard.compareTo(range_candle.multiply(BigDecimal.valueOf(1))) > 0) {
+                return true;
+            }
+        } else {
+            BigDecimal range_candle = getPercent(dto.getPrice_open_candle(), dto.getPrice_close_candle());
+            BigDecimal range_beard = getPercent(dto.getHight_price(), dto.getPrice_open_candle());
+
+            if (range_beard.compareTo(range_candle.multiply(BigDecimal.valueOf(1))) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static Boolean isGoodPriceLong(BigDecimal cur_price, BigDecimal lo_price, BigDecimal hi_price) {
         BigDecimal curr_price = Utils.getBigDecimal(cur_price);
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
