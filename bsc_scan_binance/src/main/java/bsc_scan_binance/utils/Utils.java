@@ -445,7 +445,7 @@ public class Utils {
             return;
         }
 
-        sendToChatId(Utils.chatId_duydk, text);
+        sendToChatId(Utils.chatId_duydk, text + "(0)");
     }
 
     public static void sendToTelegram(String text) {
