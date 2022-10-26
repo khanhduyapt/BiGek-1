@@ -112,9 +112,13 @@ p {
     </div>
 
     <div th:if="${#lists.size(scapling_list) > 0}" style="margin-top: 1rem; margin-left: 0.5rem; font-size: 0.75rem !important; min-width: 400px !important; max-width: 400px !important;">
-      <a class="font-weight-bold" th:target="_blank" th:href="${'http://localhost:8090/binance'}">
-       <span>(Scalping)</span>
-      </a>
+        <div>
+            <a tyle="margin-left: 1rem;" class="font-weight-bold" th:target="_blank" th:href="${'http://localhost:8090/binance'}">
+                <span>(Scalping)</span>
+            </a>
+            <a tyle="margin-left: 1rem;" th:target="_blank" th:href="${'https://www.coinglass.com/BitfinexMargin'}">Margin</a>
+            <a tyle="margin-left: 1rem;" th:target="_blank" th:href="${'https://www.coinglass.com/merge/BTC-USDT'}">OrderBook</a>
+        </div>
 
       <table class="table-bordered" style="min-width: 155px !important; max-width: 155px !important; font-size: 0.75rem !important; border: none !important;">
         <tbody th:with="row_num = ${#lists.size(scapling_list) % 10 > 0 && #lists.size(scapling_list) % 10 < 10 ? #lists.size(scapling_list) / 10 + 1 : #lists.size(scapling_list) / 10}">
