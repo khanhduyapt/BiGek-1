@@ -2760,8 +2760,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (allowShort) {
-            msg = time + "Short BTC: " + Utils.removeLastZero(price_at_binance) + ", SL: "
-                    + Utils.removeLastZero(price_at_binance.multiply(BigDecimal.valueOf(1.01))) + "(1%)";
+            //    msg = time + "Short BTC: " + Utils.removeLastZero(price_at_binance) + ", SL: "
+            //            + Utils.removeLastZero(price_at_binance.multiply(BigDecimal.valueOf(1.01))) + "(1%)";
         }
 
         if (Utils.isNotBlank(msg)) {
@@ -3112,8 +3112,7 @@ public class BinanceServiceImpl implements BinanceService {
                         String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
                         if (wall.contains(">")) {
-                            my_msg = time + " (" + high + ") Wait 3~5 minutes" + Utils.new_line_from_service + "(Pump) "
-                                    + wall;
+                            my_msg = time + "(Pump) " + wall;
 
                             key = high;
                         }
@@ -3124,8 +3123,9 @@ public class BinanceServiceImpl implements BinanceService {
                         String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
                         if (wall.contains(">")) {
-                            my_msg = time + " (" + low + ") Wait 3~5 minutes." + Utils.new_line_from_service + "(Dump) "
-                                    + wall;
+                            my_msg = time + "(Dump) " + wall;
+
+                            key = low;
                         }
                     }
                 }
