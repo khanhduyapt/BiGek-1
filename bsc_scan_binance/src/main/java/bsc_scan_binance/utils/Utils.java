@@ -988,6 +988,11 @@ public class Utils {
         if (cur_price.compareTo(max) < 0) {
             return true;
         }
+
+        if (cur_price.compareTo(dto.getHight_price()) < 0) {
+            return true;
+        }
+
         return false;
     }
 
@@ -999,6 +1004,11 @@ public class Utils {
         if (cur_price.compareTo(max) > 0) {
             return true;
         }
+
+        if (cur_price.compareTo(dto.getLow_price()) > 0) {
+            return true;
+        }
+
         return false;
     }
 

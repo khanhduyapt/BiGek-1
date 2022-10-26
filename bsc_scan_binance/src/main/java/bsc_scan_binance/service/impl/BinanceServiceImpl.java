@@ -37,6 +37,7 @@ import bsc_scan_binance.entity.BitcoinBalancesOnExchanges;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
+import bsc_scan_binance.entity.CandidateCoin;
 import bsc_scan_binance.entity.DepthAsks;
 import bsc_scan_binance.entity.DepthBids;
 import bsc_scan_binance.entity.FundingHistory;
@@ -52,6 +53,7 @@ import bsc_scan_binance.repository.BitcoinBalancesOnExchangesRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcFuturesRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
+import bsc_scan_binance.repository.CandidateCoinRepository;
 import bsc_scan_binance.repository.DepthAsksRepository;
 import bsc_scan_binance.repository.DepthBidsRepository;
 import bsc_scan_binance.repository.FundingHistoryRepository;
@@ -116,6 +118,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private BtcFuturesRepository btcFuturesRepository;
+
+    @Autowired
+    private CandidateCoinRepository candidateCoinRepository;
 
     @Autowired
     private FundingHistoryRepository fundingHistoryRepository;
@@ -2119,7 +2124,12 @@ public class BinanceServiceImpl implements BinanceService {
                             fundingHistoryRepository.save(coin3);
 
                             if (btc_is_good_price_for_long) {
-                                Utils.sendToMyTelegram(msg);
+                                CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
+                                if (!Objects.equals(null, entity)
+                                        && entity.getVolumnDivMarketcap().compareTo(BigDecimal.valueOf(0.1)) > 0) {
+
+                                    Utils.sendToMyTelegram(msg);
+                                }
                             }
 
                             return " Fibo(Long) PinBar";
@@ -2156,7 +2166,12 @@ public class BinanceServiceImpl implements BinanceService {
                             fundingHistoryRepository.save(coin4);
 
                             //if (btc_is_good_price_for_short) {
-                            Utils.sendToMyTelegram(msg);
+                            CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
+                            if (!Objects.equals(null, entity)
+                                    && entity.getVolumnDivMarketcap().compareTo(BigDecimal.valueOf(0.1)) > 0) {
+
+                                Utils.sendToMyTelegram(msg);
+                            }
                             //}
 
                             return " Fibo(Short) Hammer";
@@ -3032,6 +3047,7 @@ public class BinanceServiceImpl implements BinanceService {
     private void monitorBtcFundingRate(String time, BigDecimal price_at_binance) {
         try {
             FundingResponse rate = Utils.loadFundingRate("BTC");
+            BigDecimal key = BigDecimal.ZERO;
             BigDecimal high = rate.getHigh();
             BigDecimal low = rate.getLow();
 
@@ -3043,6 +3059,8 @@ public class BinanceServiceImpl implements BinanceService {
                 msg = "(DANGER DANGER DANGER) CZ kill LONG !!! Wait 15~30 minutes." + Utils.new_line_from_service
                         + "(Dump) " + wall;
 
+                key = low;
+
             } else if (low.compareTo(BigDecimal.valueOf(-0.5)) < 0) {
 
                 getListDepthData("BTC");
@@ -3051,12 +3069,16 @@ public class BinanceServiceImpl implements BinanceService {
                 msg = "(DANGER DANGER) CZ kill LONG !!! Wait 10~15 minutes." + Utils.new_line_from_service + "(Dump) "
                         + wall;
 
+                key = low;
+
             } else if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
 
                 getListDepthData("BTC");
                 String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
                 msg = "(DANGER) CZ kill LONG !!! Wait 3~5 minutes." + Utils.new_line_from_service + "(Dump) " + wall;
+
+                key = low;
             }
 
             if (Utils.isBlank(msg)) {
@@ -3067,6 +3089,7 @@ public class BinanceServiceImpl implements BinanceService {
                     msg = "(DANGER DANGER) CZ kill SHORT !!! Wait 15~30 minutes." + Utils.new_line_from_service
                             + "(Pump) " + wall;
 
+                    key = high;
                 } else if (high.compareTo(BigDecimal.valueOf(0.2)) > 0) {
 
                     getListDepthData("BTC");
@@ -3075,6 +3098,7 @@ public class BinanceServiceImpl implements BinanceService {
                     msg = "(DANGER) CZ kill SHORT !!! Wait 10~15 minutes." + Utils.new_line_from_service + "(Pump) "
                             + wall;
 
+                    key = high;
                 }
             }
             // -----------------------------------------------------------------------------------------//
@@ -3083,24 +3107,28 @@ public class BinanceServiceImpl implements BinanceService {
             String my_msg = "";
             if (Utils.isBlank(msg)) {
 
-                if (low.compareTo(BigDecimal.valueOf(-0.2)) < 0) {
+                if (low.compareTo(BigDecimal.valueOf(-0.1)) < 0) {
                     getListDepthData("BTC");
                     String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids_ok);
 
                     if (wall.contains(">")) {
                         my_msg = time + " (" + low + ") Wait 3~5 minutes." + Utils.new_line_from_service + "(Dump) "
                                 + wall;
+
+                        key = low;
                     }
                 }
 
                 if (Utils.isBlank(my_msg)) {
-                    if (high.compareTo(BigDecimal.valueOf(0.05)) > 0) {
+                    if (high.compareTo(BigDecimal.valueOf(0.1)) > 0) {
                         getListDepthData("BTC");
                         String wall = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks_ok);
 
                         if (wall.contains(">")) {
                             my_msg = time + " (" + high + ") Wait 3~5 minutes" + Utils.new_line_from_service + "(Pump) "
                                     + wall;
+
+                            key = high;
                         }
                     }
                 }
@@ -3108,7 +3136,9 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (Utils.isNotBlank(msg) || (Utils.isNotBlank(my_msg))) {
-                String EVENT_ID = EVENT_DANGER_CZ_KILL_LONG + "_" + high;
+
+                String EVENT_ID = EVENT_DANGER_CZ_KILL_LONG + "_" + key;
+
                 if (!fundingHistoryRepository.existsPumDump("bitcoin", EVENT_ID)) {
 
                     FundingHistory coin = new FundingHistory();
@@ -3129,10 +3159,10 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (Utils.isNotBlank(my_msg)) {
-                        // Utils.sendToTelegram(my_msg + Utils.new_line_from_service +
-                        // Utils.new_line_from_service
-                        // + wallToday() + Utils.new_line_from_service + Utils.new_line_from_service
-                        // + getBitfinexLongShortBtc());
+                        Utils.sendToMyTelegram(my_msg + Utils.new_line_from_service +
+                                Utils.new_line_from_service
+                                + wallToday() + Utils.new_line_from_service + Utils.new_line_from_service
+                                + getBitfinexLongShortBtc());
                     }
                 }
 
