@@ -146,22 +146,22 @@ public class Utils {
                     return list_entity;
                 }
 
-                //[
-                //    [
-                //        1666843200000,                            0
-                //        "20755.90000000",     Open price          1
-                //        "20766.01000000",     High price          2
-                //        "20747.86000000",     Low price           3
-                //        "20755.25000000",     Close price         4
-                //        "1109.22670000",      trading qty         5
-                //        1666846799999,                            6
-                //        "23022631.35991350",  trading volume      7
-                //        37665,                Number of trades    8
-                //        "553.36539000",       Taker Qty           9
-                //        "11485577.89938500",  Taker volume       10
-                //        "0"   -> avg_price = 20,769
-                //    ]
-                //]
+                // [
+                // [
+                // 1666843200000, 0
+                // "20755.90000000", Open price 1
+                // "20766.01000000", High price 2
+                // "20747.86000000", Low price 3
+                // "20755.25000000", Close price 4
+                // "1109.22670000", trading qty 5
+                // 1666846799999, 6
+                // "23022631.35991350", trading volume 7
+                // 37665, Number of trades 8
+                // "553.36539000", Taker Qty 9
+                // "11485577.89938500", Taker volume 10
+                // "0" -> avg_price = 20,769
+                // ]
+                // ]
 
                 BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
                 BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
@@ -475,7 +475,7 @@ public class Utils {
             return;
         }
 
-        sendToChatId(Utils.chatId_duydk, text + "(only)");
+        sendToChatId(Utils.chatId_duydk, text + " (only)");
     }
 
     public static void sendToTelegram(String text) {
@@ -586,37 +586,40 @@ public class Utils {
         }
 
         if (last_wall.compareTo(price_at_binance) > 0) {
-            next_price += " Short: " + removeLastZero(last_wall)
-                    + "(" + getPercentStr(last_wall, price_at_binance) + ")";
+            next_price += " Short: " + removeLastZero(last_wall) + "(" + getPercentStr(last_wall, price_at_binance)
+                    + ")";
         } else if (last_wall.compareTo(price_at_binance) < 0) {
-            next_price += " Long: " + removeLastZero(last_wall)
-                    + "(" + getPercentStr(price_at_binance, last_wall) + ")";
+            next_price += " Long: " + removeLastZero(last_wall) + "(" + getPercentStr(price_at_binance, last_wall)
+                    + ")";
         }
 
-        //int count = 0;
-        //        for (DepthResponse res : bidsOrAsksList) {
-        //            if (Objects.equals("BTC", res.getSymbol())) {
-        //                if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2.9)) > 0) {
-        //                    next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
-        //                            + res.getVal_million_dolas() + "m$" + ")";
+        // int count = 0;
+        // for (DepthResponse res : bidsOrAsksList) {
+        // if (Objects.equals("BTC", res.getSymbol())) {
+        // if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2.9)) > 0) {
+        // next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(),
+        // price_at_binance) + ")("
+        // + res.getVal_million_dolas() + "m$" + ")";
         //
-        //                    count += 1;
-        //                }
-        //            } else if (Utils.isNotBlank(res.getSymbol())) {
-        //                BigDecimal percent = Utils.getPercent(res.getPrice(), price_at_binance);
+        // count += 1;
+        // }
+        // } else if (Utils.isNotBlank(res.getSymbol())) {
+        // BigDecimal percent = Utils.getPercent(res.getPrice(), price_at_binance);
         //
-        //                if (percent.compareTo(BigDecimal.valueOf(-3)) > 0 && percent.compareTo(BigDecimal.valueOf(3)) < 0) {
-        //                    next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
-        //                            + res.getVal_million_dolas() + "k)";
+        // if (percent.compareTo(BigDecimal.valueOf(-3)) > 0 &&
+        // percent.compareTo(BigDecimal.valueOf(3)) < 0) {
+        // next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(),
+        // price_at_binance) + ")("
+        // + res.getVal_million_dolas() + "k)";
         //
-        //                    count += 1;
-        //                }
-        //            }
+        // count += 1;
+        // }
+        // }
         //
-        //            if (count > 15) {
-        //                break;
-        //            }
-        //        }
+        // if (count > 15) {
+        // break;
+        // }
+        // }
 
         return next_price;
     }
@@ -1101,7 +1104,7 @@ public class Utils {
         return false;
     }
 
-    public static Boolean hasPumpCandle(String symbol, Boolean isLong) {
+    public static Boolean hasPumpCandle(String symbol) {
         List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 8);
         if (CollectionUtils.isEmpty(list_15m)) {
             return false;
@@ -1110,11 +1113,9 @@ public class Utils {
         int count_x4_vol = 0;
         BigDecimal max_vol = list_15m.get(0).getTrading_volume();
 
-        if (isLong) {
-            for (BtcFutures dto : list_15m) {
-                if (dto.getTrading_volume().compareTo(max_vol) > 0) {
-                    max_vol = dto.getTrading_volume();
-                }
+        for (BtcFutures dto : list_15m) {
+            if (dto.getTrading_volume().compareTo(max_vol) > 0) {
+                max_vol = dto.getTrading_volume();
             }
         }
 
