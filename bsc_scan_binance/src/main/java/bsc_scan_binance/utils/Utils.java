@@ -157,7 +157,7 @@ public class Utils {
                 //        1666846799999,                            6
                 //        "23022631.35991350",  trading volume      7
                 //        37665,                Number of trades    8
-                //        "553.36539000",       Qty                 9
+                //        "553.36539000",       Taker Qty           9
                 //        "11485577.89938500",  Taker volume       10
                 //        "0"   -> avg_price = 20,769
                 //    ]
@@ -167,6 +167,13 @@ public class Utils {
                 BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
                 BigDecimal low_price = Utils.getBigDecimal(arr_usdt.get(3));
                 BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
+
+                BigDecimal trading_qty = Utils.getBigDecimal(arr_usdt.get(5));
+                BigDecimal trading_volume = Utils.getBigDecimal(arr_usdt.get(7));
+
+                BigDecimal taker_qty = Utils.getBigDecimal(arr_usdt.get(9));
+                BigDecimal taker_volume = Utils.getBigDecimal(arr_usdt.get(10));
+
                 String open_time = arr_usdt.get(0).toString();
 
                 if (Objects.equals("0", open_time)) {
@@ -191,6 +198,12 @@ public class Utils {
                 day.setHight_price(hight_price);
                 day.setPrice_open_candle(price_open_candle);
                 day.setPrice_close_candle(price_close_candle);
+
+                day.setTrading_qty(trading_qty);
+                day.setTrading_volume(trading_volume);
+
+                day.setTaker_qty(taker_qty);
+                day.setTaker_volume(taker_volume);
 
                 if (price_open_candle.compareTo(price_close_candle) < 0) {
                     day.setUptrend(true);
@@ -1083,6 +1096,40 @@ public class Utils {
             if (range_beard.compareTo(range_candle.multiply(BigDecimal.valueOf(1))) > 0) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public static Boolean hasPumpCandle(String symbol, Boolean isLong) {
+        List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 8);
+        if (CollectionUtils.isEmpty(list_15m)) {
+            return false;
+        }
+
+        int count_x4_vol = 0;
+        BigDecimal max_vol = list_15m.get(0).getTrading_volume();
+
+        if (isLong) {
+            for (BtcFutures dto : list_15m) {
+                if (dto.getTrading_volume().compareTo(max_vol) > 0) {
+                    max_vol = dto.getTrading_volume();
+                }
+            }
+        }
+
+        for (BtcFutures dto : list_15m) {
+            if (dto.getTrading_volume().multiply(BigDecimal.valueOf(3)).compareTo(max_vol) < 0) {
+                count_x4_vol += 1;
+            }
+
+            if (dto.isZeroPercentCandle()) {
+                count_x4_vol += 1;
+            }
+        }
+
+        if (count_x4_vol > 4) {
+            return true;
         }
 
         return false;

@@ -124,6 +124,15 @@ public class BtcFutures {
                 + Utils.removeLastZero(change.toString()) + "%, Amplitude: " + amplitude + "]";
     }
 
+    public boolean isZeroPercentCandle() {
+        BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(price_close_candle, price_open_candle, 2)).abs();
+
+        if ((percent.compareTo(BigDecimal.ZERO) > 0) && (percent.compareTo(BigDecimal.valueOf(0.1)) < 0)) {
+            return true;
+        }
+        return false;
+    }
+
     public BigDecimal getCandleHeight() {
         BigDecimal change = (Utils.getBigDecimal(price_open_candle).subtract(price_close_candle)).abs();
 
