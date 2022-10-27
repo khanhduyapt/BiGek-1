@@ -146,6 +146,23 @@ public class Utils {
                     return list_entity;
                 }
 
+                //[
+                //    [
+                //        1666843200000,                            0
+                //        "20755.90000000",     Open price          1
+                //        "20766.01000000",     High price          2
+                //        "20747.86000000",     Low price           3
+                //        "20755.25000000",     Close price         4
+                //        "1109.22670000",      trading qty         5
+                //        1666846799999,                            6
+                //        "23022631.35991350",  trading volume      7
+                //        37665,                Number of trades    8
+                //        "553.36539000",       Qty                 9
+                //        "11485577.89938500",  Taker volume       10
+                //        "0"   -> avg_price = 20,769
+                //    ]
+                //]
+
                 BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
                 BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
                 BigDecimal low_price = Utils.getBigDecimal(arr_usdt.get(3));
@@ -445,7 +462,7 @@ public class Utils {
             return;
         }
 
-        sendToChatId(Utils.chatId_duydk, text + "(0)");
+        sendToChatId(Utils.chatId_duydk, text + "(only)");
     }
 
     public static void sendToTelegram(String text) {

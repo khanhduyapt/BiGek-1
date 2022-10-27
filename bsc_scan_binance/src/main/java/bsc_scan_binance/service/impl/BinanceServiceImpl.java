@@ -2074,7 +2074,12 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_2)) {
                     String time = Utils.convertDateToString("(HH:mm)", Calendar.getInstance().getTime());
-                    String msg = time + " (Dump) " + symbol + " " + Utils.removeLastZero(price_at_binance);
+
+                    String pump_dump = " (Dump) ";
+                    if (cur_1h.isUptrend()) {
+                        pump_dump = " (Pump) ";
+                    }
+                    String msg = time + pump_dump + symbol + " " + Utils.removeLastZero(price_at_binance);
 
                     FundingHistory coin2 = new FundingHistory();
                     FundingHistoryKey id = new FundingHistoryKey();
@@ -2093,6 +2098,11 @@ public class BinanceServiceImpl implements BinanceService {
                     return note;
                 }
             }
+
+
+            //pump dump performance
+
+
 
             if ((range_2d.compareTo(BigDecimal.valueOf(5)) > 0) || Objects.equals("BTC", symbol)) {
 
@@ -3160,7 +3170,6 @@ public class BinanceServiceImpl implements BinanceService {
                                 + getBitfinexLongShortBtc());
                     }
                 }
-
             }
 
         } catch (
@@ -3279,14 +3288,12 @@ public class BinanceServiceImpl implements BinanceService {
                 boolean hasChangeValue = false;
 
                 if (low.compareTo(Utils.getBigDecimal(BigDecimal.ZERO)) > 0) {
-                    // if (max_bid.compareTo(Utils.getBigDecimal(coin.getAvgLow())) > 0) {
                     if (low.compareTo(Utils.getBigDecimal(coin.getLow())) < 0) {
                         coin.setNote(note);
                         coin.setLow(low);
                         coin.setAvgLow(max_bid);
                         hasChangeValue = true;
                     }
-                    // }
                 }
 
                 if ((Utils.getBigDecimal(coin.getLow()).compareTo(BigDecimal.ZERO) < 1)
@@ -3300,14 +3307,12 @@ public class BinanceServiceImpl implements BinanceService {
                 // ------------------------------
 
                 if (high.compareTo(Utils.getBigDecimal(BigDecimal.ZERO)) > 0) {
-                    // if (max_ask.compareTo(Utils.getBigDecimal(coin.getAvgHigh())) > 0) {
                     if (high.compareTo(Utils.getBigDecimal(coin.getHigh())) > 0) {
                         coin.setNote(note);
                         coin.setHigh(high);
                         coin.setAvgHigh(max_ask);
                         hasChangeValue = true;
                     }
-                    // }
                 }
 
                 if ((Utils.getBigDecimal(coin.getHigh()).compareTo(BigDecimal.ZERO) < 1)

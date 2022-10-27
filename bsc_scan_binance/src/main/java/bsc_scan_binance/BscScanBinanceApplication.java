@@ -70,11 +70,11 @@ public class BscScanBinanceApplication {
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-                CandidateCoin btc = new CandidateCoin();
-                if (!CollectionUtils.isEmpty(list)) {
-                    btc = list.stream().filter(item -> Objects.equals("BTC", item.getSymbol())).findFirst()
-                            .orElse(new CandidateCoin());
-                }
+                //CandidateCoin btc = new CandidateCoin();
+                //if (!CollectionUtils.isEmpty(list)) {
+                //    btc = list.stream().filter(item -> Objects.equals("BTC", item.getSymbol())).findFirst()
+                //            .orElse(new CandidateCoin());
+                //}
 
                 int size = list.size();
                 int idx = 0;
@@ -92,9 +92,9 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        if (idx % 15 == 0) {
-                            binance_service.loadBinanceData(btc.getGeckoid(), btc.getSymbol().toUpperCase());
-                            binance_service.loadDataVolumeHour(btc.getGeckoid(), btc.getSymbol().toUpperCase());
+                        if (idx % 10 == 0) {
+                            binance_service.loadBinanceData("bitcoin", "BTC");
+                            binance_service.loadDataVolumeHour("bitcoin", "BTC");
                             binance_service.monitorBtcPrice();
                             wait(1200);
                         }
