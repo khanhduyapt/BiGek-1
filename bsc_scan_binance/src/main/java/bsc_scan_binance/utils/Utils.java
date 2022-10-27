@@ -1104,7 +1104,7 @@ public class Utils {
         return false;
     }
 
-    public static Boolean hasPumpCandle(String symbol) {
+    public static Boolean hasPumpCandle(String symbol, boolean isLong) {
         List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 8);
         if (CollectionUtils.isEmpty(list_15m)) {
             return false;
@@ -1115,7 +1115,13 @@ public class Utils {
 
         for (BtcFutures dto : list_15m) {
             if (dto.getTrading_volume().compareTo(max_vol) > 0) {
-                max_vol = dto.getTrading_volume();
+                if (isLong) {
+                    if (dto.isUptrend()) {
+                        max_vol = dto.getTrading_volume();
+                    }
+                } else {
+                    max_vol = dto.getTrading_volume();
+                }
             }
         }
 

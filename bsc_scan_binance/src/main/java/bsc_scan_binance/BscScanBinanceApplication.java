@@ -70,11 +70,12 @@ public class BscScanBinanceApplication {
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-                //CandidateCoin btc = new CandidateCoin();
-                //if (!CollectionUtils.isEmpty(list)) {
-                //    btc = list.stream().filter(item -> Objects.equals("BTC", item.getSymbol())).findFirst()
-                //            .orElse(new CandidateCoin());
-                //}
+                // CandidateCoin btc = new CandidateCoin();
+                // if (!CollectionUtils.isEmpty(list)) {
+                // btc = list.stream().filter(item -> Objects.equals("BTC",
+                // item.getSymbol())).findFirst()
+                // .orElse(new CandidateCoin());
+                // }
 
                 int size = list.size();
                 int idx = 0;
