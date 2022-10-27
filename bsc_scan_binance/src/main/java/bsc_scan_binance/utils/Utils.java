@@ -542,32 +542,51 @@ public class Utils {
     }
 
     public static String getNextBidsOrAsksWall(BigDecimal price_at_binance, List<DepthResponse> bidsOrAsksList) {
-        int count = 0;
+
         String next_price = Utils.removeLastZero(price_at_binance) + "(now)";
+
+        BigDecimal last_wall = BigDecimal.ZERO;
         for (DepthResponse res : bidsOrAsksList) {
             if (Objects.equals("BTC", res.getSymbol())) {
+
                 if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2.9)) > 0) {
-                    next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
-                            + res.getVal_million_dolas() + "m$" + ")";
-
-                    count += 1;
-                }
-            } else if (Utils.isNotBlank(res.getSymbol())) {
-                BigDecimal percent = Utils.getPercent(res.getPrice(), price_at_binance);
-
-                if (percent.compareTo(BigDecimal.valueOf(-3)) > 0 && percent.compareTo(BigDecimal.valueOf(3)) < 0) {
-                    next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
-                            + res.getVal_million_dolas() + "k)";
-
-                    count += 1;
+                    last_wall = res.getPrice();
                 }
             }
-
-            if (count > 15) {
-                break;
-            }
-
         }
+
+        if (last_wall.compareTo(price_at_binance) > 0) {
+            next_price += " Short: " + removeLastZero(last_wall)
+                    + "(" + getPercentStr(last_wall, price_at_binance) + ")";
+        } else if (last_wall.compareTo(price_at_binance) < 0) {
+            next_price += " Long: " + removeLastZero(last_wall)
+                    + "(" + getPercentStr(price_at_binance, last_wall) + ")";
+        }
+
+        //int count = 0;
+        //        for (DepthResponse res : bidsOrAsksList) {
+        //            if (Objects.equals("BTC", res.getSymbol())) {
+        //                if (res.getVal_million_dolas().compareTo(BigDecimal.valueOf(2.9)) > 0) {
+        //                    next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
+        //                            + res.getVal_million_dolas() + "m$" + ")";
+        //
+        //                    count += 1;
+        //                }
+        //            } else if (Utils.isNotBlank(res.getSymbol())) {
+        //                BigDecimal percent = Utils.getPercent(res.getPrice(), price_at_binance);
+        //
+        //                if (percent.compareTo(BigDecimal.valueOf(-3)) > 0 && percent.compareTo(BigDecimal.valueOf(3)) < 0) {
+        //                    next_price += " > " + res.getPrice() + "(" + getPercentStr(res.getPrice(), price_at_binance) + ")("
+        //                            + res.getVal_million_dolas() + "k)";
+        //
+        //                    count += 1;
+        //                }
+        //            }
+        //
+        //            if (count > 15) {
+        //                break;
+        //            }
+        //        }
 
         return next_price;
     }
