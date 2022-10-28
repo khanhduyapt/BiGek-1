@@ -376,6 +376,7 @@ public class Utils {
 
     public static BigDecimal getBinancePrice(String symbol) {
         try {
+            // /fapi/v1/ticker/price
             String url = "https://api.binance.com/api/v3/ticker/price?symbol=" + symbol + "USDT";
             RestTemplate restTemplate = new RestTemplate();
             Object result = restTemplate.getForObject(url, Object.class);
@@ -1105,7 +1106,7 @@ public class Utils {
     }
 
     public static Boolean hasPumpCandle(String symbol, boolean isLong) {
-        List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 8);
+        List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 16);
         if (CollectionUtils.isEmpty(list_15m)) {
             return false;
         }
