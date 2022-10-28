@@ -1007,6 +1007,14 @@ public class BinanceServiceImpl implements BinanceService {
 
                             }
                         }
+
+                        if (btc_is_uptrend_today) {
+                            css.setFutures(css.getFutures() + " 1d: Uptrend");
+                            css.setFutures_css("bg-success rounded-lg");
+                        } else {
+                            css.setFutures(css.getFutures() + " 1d: Downtrend");
+                            css.setFutures_css("bg-danger rounded-lg");
+                        }
                     }
 
                 }
@@ -1034,7 +1042,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 chart += " 📉 ".trim();
                             }
                         }
-                        Utils.sendToMyTelegram(
+                        Utils.sendToTelegram(
                                 chart + (btc_is_uptrend_today ? " Btc 4h: Uptrend" : " Btc 4h: Downtrend"));
                     }
 
@@ -3227,7 +3235,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 + ", SL: " + Utils.removeLastZero(mySL);
                         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
-                        Utils.sendToMyTelegram(msg);
+                        Utils.sendToTelegram(msg);
 
                         return " Fibo(Long) PinBar";
                     }
@@ -3251,6 +3259,7 @@ public class BinanceServiceImpl implements BinanceService {
                             BigDecimal tp = Utils.getMidPrice(min_low, max_Hig);
 
                             BigDecimal mySL = BigDecimal.ZERO;
+                            saveDepthData(gecko_id, symbol.toUpperCase());
                             List<DepthResponse> list = getBids(gecko_id, price_at_binance);
                             mySL = getSL(list);
 
@@ -3262,7 +3271,7 @@ public class BinanceServiceImpl implements BinanceService {
                             if (!Objects.equals(null, coin)) {
                                 msg += Utils.new_line_from_service + Utils.getStringValue(coin.getNote());
                             }
-                            Utils.sendToMyTelegram(msg);
+                            Utils.sendToTelegram(msg);
 
                             return " Fibo(Long) Volx4";
                         }
@@ -3277,7 +3286,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         if (!Objects.equals(null, coin)
                                 && Utils.getBigDecimal(coin.getMarketCap())
-                                        .compareTo(BigDecimal.valueOf(150000000)) > 0) {
+                                        .compareTo(BigDecimal.valueOf(80000000)) > 0) {
 
                             if (Utils.hasPumpCandle(symbol, false)) {
 
@@ -3291,6 +3300,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 BigDecimal tp = entry.multiply(BigDecimal.valueOf(0.8));
 
                                 BigDecimal mySL = BigDecimal.ZERO;
+                                saveDepthData(gecko_id, symbol.toUpperCase());
                                 List<DepthResponse> list = getAsks(gecko_id, price_at_binance);
                                 mySL = getSL(list);
 
@@ -3303,7 +3313,7 @@ public class BinanceServiceImpl implements BinanceService {
                                     msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
                                 }
 
-                                Utils.sendToMyTelegram(msg);
+                                Utils.sendToTelegram(msg);
 
                                 return " Fibo(Short) Volx4";
                             }
