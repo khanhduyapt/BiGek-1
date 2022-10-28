@@ -171,7 +171,7 @@ public class BinanceServiceImpl implements BinanceService {
     List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
 
-    private String pre_yyyyMMddHH = "";
+    private int pre_HH = 0;
     private String sp500 = "";
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
 
@@ -371,7 +371,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    + "   AND (case when can.symbol <> 'BTC' and rate1d0h < -20 then false else true end)         \n"
+                    // + " AND (case when can.symbol <> 'BTC' and rate1d0h < -20 then false else
+                    // true end) \n"
                     + (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump)  \n"
                             : "")
                     + (isBynaceUrl
@@ -1019,7 +1020,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
                     // TIME_4h TIME_1d
-                    boolean temp_btc_is_uptrend_today = Utils.loadData("BTC", TIME_4h, 1).get(0).isUptrend();
+                    boolean temp_btc_is_uptrend_today = Utils.loadData("BTC", TIME_1d, 1).get(0).isUptrend();
 
                     if (btc_is_uptrend_today != temp_btc_is_uptrend_today) {
                         btc_is_uptrend_today = temp_btc_is_uptrend_today;
@@ -1039,13 +1040,12 @@ public class BinanceServiceImpl implements BinanceService {
 
                     // monitorToken(css); // debug
 
-                    if (!Objects.equals(pre_yyyyMMddHH,
-                            Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime()))) {
+                    if (pre_HH != Utils.getCurrentHH()) {
 
                         sp500 = loadPremarketSp500().replace(" ", "").replace("Futures", "(Futures)")
                                 .replace(Utils.new_line_from_bot, " ");
 
-                        pre_yyyyMMddHH = Utils.convertDateToString("yyyyMMddHH", Calendar.getInstance().getTime());
+                        pre_HH = Utils.getCurrentHH();
 
                         getBitfinexLongShortBtc();
                     }
@@ -2012,6 +2012,10 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     public String calcPointCompressedChart(String gecko_id, String symbol) {
+        if (23 <= pre_HH || pre_HH <= 7) {
+            return "";
+        }
+
         String note = "";
         // Utils.sendToMyTelegram(" 💹 Long: 📉 💚 💔");
         try {
@@ -2087,11 +2091,23 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 if (Utils.isNotBlank(longshort)) {
+
                     String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentHH();
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
+                        saveDepthData(gecko_id, symbol.toUpperCase());
+                        BigDecimal mySL = BigDecimal.ZERO;
+                        if (longshort.contains("")) {
+                            List<DepthResponse> list = getBids(gecko_id, price_at_binance);
+                            mySL = getSL(list);
+                        } else {
+                            List<DepthResponse> list = getAsks(gecko_id, price_at_binance);
+                            mySL = getSL(list);
+                        }
+
                         String time = Utils.convertDateToString("(HH:mm)", Calendar.getInstance().getTime());
-                        String msg = time + longshort + symbol + " " + Utils.removeLastZero(price_at_binance);
+                        String msg = time + longshort + symbol + " , Entry: " + Utils.removeLastZero(price_at_binance)
+                                + ", SL: " + Utils.removeLastZero(mySL);
                         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
                         Utils.sendToMyTelegram(msg);
@@ -2116,9 +2132,14 @@ public class BinanceServiceImpl implements BinanceService {
                             BigDecimal entry = (price_at_binance.compareTo(min_low) < 0) ? price_at_binance : min_low;
 
                             BigDecimal tp = Utils.getMidPrice(min_low, max_Hig);
-                            Utils.sendToMyTelegram(
-                                    time + " 💹 Long: " + symbol + " Entry:" + Utils.removeLastZero(entry) + " TP:"
-                                            + Utils.removeLastZero(tp) + " (" + Utils.toPercent(tp, entry) + "%)");
+
+                            BigDecimal mySL = BigDecimal.ZERO;
+                            List<DepthResponse> list = getBids(gecko_id, price_at_binance);
+                            mySL = getSL(list);
+
+                            Utils.sendToMyTelegram(time + " 💹 Long: " + symbol + ", Entry: "
+                                    + Utils.removeLastZero(entry) + " TP:" + Utils.removeLastZero(tp) + " ("
+                                    + Utils.toPercent(tp, entry) + "%), SL: " + Utils.removeLastZero(mySL));
 
                             return " Fibo(Long) Volx4";
                         }
@@ -2129,7 +2150,7 @@ public class BinanceServiceImpl implements BinanceService {
                     CandidateCoin coin = candidateCoinRepository.findById(gecko_id).orElse(null);
 
                     if (!Objects.equals(null, coin)
-                            && Utils.getBigDecimal(coin.getMarketCap()).compareTo(BigDecimal.valueOf(50000000)) > 0) {
+                            && Utils.getBigDecimal(coin.getMarketCap()).compareTo(BigDecimal.valueOf(300000000)) > 0) {
 
                         if (Utils.hasPumpCandle(symbol, false)) {
 
@@ -2145,9 +2166,13 @@ public class BinanceServiceImpl implements BinanceService {
                                         : max_Hig;
                                 BigDecimal tp = entry.multiply(BigDecimal.valueOf(0.8));
 
-                                Utils.sendToMyTelegram(time + " 📉Short: " + " " + symbol + " Entry:"
-                                        + Utils.removeLastZero(entry) + " TP:" + Utils.removeLastZero(tp) + " ("
-                                        + Utils.toPercent(entry, tp) + "%)");
+                                BigDecimal mySL = BigDecimal.ZERO;
+                                List<DepthResponse> list = getAsks(gecko_id, price_at_binance);
+                                mySL = getSL(list);
+
+                                Utils.sendToMyTelegram(time + " 📉Short: " + " " + symbol + ", Entry: "
+                                        + Utils.removeLastZero(entry) + ", TP:" + Utils.removeLastZero(tp) + " ("
+                                        + Utils.toPercent(entry, tp) + "%), SL: " + Utils.removeLastZero(mySL));
 
                                 return " Fibo(Short) Volx4";
                             }
@@ -2518,61 +2543,8 @@ public class BinanceServiceImpl implements BinanceService {
             String geckoId = temp.get(0).getId().getGeckoid();
             saveDepthData(geckoId, symbol.toUpperCase());
 
-            String sql_bids = "                                                                                     \n"
-                    + " select * from (                                                                             \n"
-
-                    + "SELECT                                                                                       \n"
-                    + "    gecko_id,                                                                                \n"
-                    + "    symbol,                                                                                  \n"
-                    + "    price,                                                                                   \n"
-                    + "    qty,                                                                                     \n"
-                    + "    round(price * qty / 1000, 1) as val_million_dolas                                        \n"
-                    + "    , 0 AS percent                                                                           \n"
-                    + "FROM                                                                                         \n"
-                    + "    depth_bids                                                                               \n"
-                    + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
-                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price DESC                            \n";
-
-            String sql_asks = "                                                                                     \n"
-                    + " select * from (                                                                             \n"
-
-                    + "SELECT                                                                                       \n"
-                    + "    gecko_id,                                                                                \n"
-                    + "    symbol,                                                                                  \n"
-                    + "    price,                                                                                   \n"
-                    + "    qty,                                                                                     \n"
-                    + "    round(price * qty / 1000, 1) as val_million_dolas                                        \n"
-                    + "    , 0 AS percent                                                                           \n"
-                    + "FROM                                                                                         \n"
-                    + "    depth_asks                                                                               \n"
-                    + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
-
-                    + " ) depth where depth.val_million_dolas > 10   ORDER BY price ASC                            \n";
-
-            Query query = entityManager.createNativeQuery(sql_bids, "DepthResponse");
-            @SuppressWarnings("unchecked")
-            List<DepthResponse> list_bids = query.getResultList();
-
-            query = entityManager.createNativeQuery(sql_asks, "DepthResponse");
-            @SuppressWarnings("unchecked")
-            List<DepthResponse> list_asks = query.getResultList();
-
-            List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
-
-            for (DepthResponse dto : list_bids) {
-                BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
-                dto.setPrice(price);
-                dto.setPercent(Utils.getPercentStr(current_price, price));
-                list_bids_ok.add(dto);
-            }
-
-            List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
-            for (DepthResponse dto : list_asks) {
-                BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
-                dto.setPrice(price);
-                dto.setPercent(Utils.getPercentStr(price, current_price));
-                list_asks_ok.add(dto);
-            }
+            list_bids_ok = getBids(geckoId, current_price);
+            list_asks_ok = getAsks(geckoId, current_price);
 
             result.add(list_bids_ok);
             result.add(list_asks_ok);
@@ -2584,6 +2556,94 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         return result;
+    }
+
+    private List<DepthResponse> getBids(String geckoId, BigDecimal current_price) {
+
+        String sql_bids = "                                                                                     \n"
+                + " select * from (                                                                             \n"
+
+                + "SELECT                                                                                       \n"
+                + "    gecko_id,                                                                                \n"
+                + "    symbol,                                                                                  \n"
+                + "    price,                                                                                   \n"
+                + "    qty,                                                                                     \n"
+                + "    round(price * qty / 1000, 1) as val_million_dolas                                        \n"
+                + "    , 0 AS percent                                                                           \n"
+                + "FROM                                                                                         \n"
+                + "    depth_bids                                                                               \n"
+                + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
+                + " ) depth where depth.val_million_dolas > 10   ORDER BY price DESC                            \n";
+
+        Query query = entityManager.createNativeQuery(sql_bids, "DepthResponse");
+        @SuppressWarnings("unchecked")
+        List<DepthResponse> list_bids = query.getResultList();
+
+        List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
+        for (DepthResponse dto : list_bids) {
+            BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
+            dto.setPrice(price);
+            dto.setPercent(Utils.getPercentStr(current_price, price));
+            list_bids_ok.add(dto);
+        }
+
+        return list_bids_ok;
+    }
+
+    private BigDecimal getSL(List<DepthResponse> list) {
+        if (CollectionUtils.isEmpty(list)) {
+            return BigDecimal.ZERO;
+        }
+
+        int max_index = 0;
+        BigDecimal maxSL = BigDecimal.ZERO;
+
+        for (int index = 0; index < list.size(); index++) {
+            DepthResponse dto = list.get(index);
+
+            if (dto.getVal_million_dolas().compareTo(maxSL) > 0) {
+                maxSL = dto.getVal_million_dolas();
+                max_index = index + 1;
+            }
+        }
+
+        if (max_index > list.size()) {
+            max_index -= 1;
+        }
+
+        return list.get(max_index).getPrice();
+    }
+
+    private List<DepthResponse> getAsks(String geckoId, BigDecimal current_price) {
+        String sql_asks = "                                                                                     \n"
+                + " select * from (                                                                             \n"
+
+                + "SELECT                                                                                       \n"
+                + "    gecko_id,                                                                                \n"
+                + "    symbol,                                                                                  \n"
+                + "    price,                                                                                   \n"
+                + "    qty,                                                                                     \n"
+                + "    round(price * qty / 1000, 1) as val_million_dolas                                        \n"
+                + "    , 0 AS percent                                                                           \n"
+                + "FROM                                                                                         \n"
+                + "    depth_asks                                                                               \n"
+                + "WHERE gecko_id = '" + geckoId + "'                                                           \n"
+
+                + " ) depth where depth.val_million_dolas > 10   ORDER BY price ASC                            \n";
+
+        Query query = entityManager.createNativeQuery(sql_asks, "DepthResponse");
+        @SuppressWarnings("unchecked")
+        List<DepthResponse> list_asks = query.getResultList();
+        List<DepthResponse> list_asks_ok = getBids(geckoId, current_price);
+
+        for (DepthResponse dto : list_asks) {
+            BigDecimal price = Utils.getBigDecimalValue(Utils.removeLastZero(String.valueOf(dto.getPrice())));
+            dto.setPrice(price);
+            dto.setPercent(Utils.getPercentStr(price, current_price));
+            list_asks_ok.add(dto);
+        }
+
+        return list_asks_ok;
     }
 
     @Override

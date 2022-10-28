@@ -493,7 +493,7 @@ public class Utils {
 
     public static boolean isBusinessTime() {
         int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        if ((23 <= hh && hh <= 7)) {
+        if ((23 <= hh || hh <= 7)) {
             return false;
         }
 
