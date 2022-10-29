@@ -3328,51 +3328,51 @@ public class BinanceServiceImpl implements BinanceService {
 
             }
 
-            if (longshort.contains("Long")) {
-                if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
-                    String msg = note.trim().replace("Fibo",
-                            time + " (Open Order) Long: " + " " + symbol + " "
-                                    + Utils.removeLastZero(price_at_binance));
-
-                    String EVENT_ID = EVENT_DUMP + "_" + symbol + "_" + min_low + "_" + max_Hig;
-                    if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID)) {
-                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, true));
-
-                        PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
-                        if (!Objects.equals(null, coin2)) {
-                            msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
-                        }
-
-                        Utils.sendToMyTelegram(msg);
-                    }
-                }
-            }
-
-            if (longshort.contains("Short")) {
-                // Pumping = Short
-                if (Utils.isPumpingCandle(list_15m)) {
-                    if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
-
-                        String msg = note.trim().replace("Fibo",
-                                time + " (Open Order) Short: " + " " + symbol + " "
-                                        + Utils.removeLastZero(price_at_binance));
-
-                        String EVENT_ID_4 = EVENT_PUMP + "_" + symbol + "_" + min_low + "_" + max_Hig;
-                        if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
-                            fundingHistoryRepository
-                                    .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
-
-                            PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
-                            if (!Objects.equals(null, coin2)) {
-                                msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
-                            }
-
-                            Utils.sendToMyTelegram(msg);
-                        }
-                    }
-
-                }
-            }
+//            if (longshort.contains("Long")) {
+//                if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
+//                    String msg = note.trim().replace("Fibo",
+//                            time + " (Open Order) Long: " + " " + symbol + " "
+//                                    + Utils.removeLastZero(price_at_binance));
+//
+//                    String EVENT_ID = EVENT_DUMP + "_" + symbol + "_" + min_low + "_" + max_Hig;
+//                    if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID)) {
+//                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, true));
+//
+//                        PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
+//                        if (!Objects.equals(null, coin2)) {
+//                            msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
+//                        }
+//
+//                        Utils.sendToMyTelegram(msg);
+//                    }
+//                }
+//            }
+//
+//            if (longshort.contains("Short")) {
+//                // Pumping = Short
+//                if (Utils.isPumpingCandle(list_15m)) {
+//                    if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
+//
+//                        String msg = note.trim().replace("Fibo",
+//                                time + " (Open Order) Short: " + " " + symbol + " "
+//                                        + Utils.removeLastZero(price_at_binance));
+//
+//                        String EVENT_ID_4 = EVENT_PUMP + "_" + symbol + "_" + min_low + "_" + max_Hig;
+//                        if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
+//                            fundingHistoryRepository
+//                                    .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
+//
+//                            PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
+//                            if (!Objects.equals(null, coin2)) {
+//                                msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
+//                            }
+//
+//                            Utils.sendToMyTelegram(msg);
+//                        }
+//                    }
+//
+//                }
+//            }
 
             String EVENT_ID = EVENT_FIBO_LONG_SHORT + "_" + symbol;
             fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, false));
