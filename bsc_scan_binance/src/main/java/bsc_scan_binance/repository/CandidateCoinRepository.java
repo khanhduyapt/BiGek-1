@@ -20,7 +20,7 @@ public interface CandidateCoinRepository extends JpaRepository<CandidateCoin, St
     @Query("SELECT m FROM CandidateCoin m WHERE m.symbol = :symbol ")
     List<CandidateCoin> searchBySymbol(@Param("symbol") String symbol);
 
-    @Query(value = "SELECT case when (market_cap > 100000000) and (volumn_div_marketcap > 0.1) then true else false end FROM candidate_coin m WHERE m.gecko_id = :gecko_id ", nativeQuery = true)
+    @Query(value = "SELECT case when (market_cap > 150000000) and (volumn_div_marketcap > 0.1) then true else false end FROM candidate_coin m WHERE m.gecko_id = :gecko_id ", nativeQuery = true)
     boolean checkConditionsForShort(@Param("gecko_id") String gecko_id);
 
     @Query(value = "SELECT case when (volumn_div_marketcap > 0.05) then true else false end FROM candidate_coin m WHERE m.gecko_id = :gecko_id ", nativeQuery = true)

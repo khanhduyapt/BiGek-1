@@ -37,7 +37,6 @@ import bsc_scan_binance.entity.BitcoinBalancesOnExchanges;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
-import bsc_scan_binance.entity.CandidateCoin;
 import bsc_scan_binance.entity.DepthAsks;
 import bsc_scan_binance.entity.DepthBids;
 import bsc_scan_binance.entity.FundingHistory;
@@ -3226,22 +3225,6 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = new ArrayList<BtcFutures>();
             if (Utils.isNotBlank(longshort)) {
                 list_15m = Utils.loadData(symbol, "15m", 16); // 16h15=4h
-
-                // Pumping = Short
-                if (Utils.isPumpingCandle(list_15m)) {
-                    if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
-                        String msg = note.trim().replace("Fibo",
-                                time + " " + symbol + " " + Utils.removeLastZero(price_at_binance) + " (Pumping) ");
-
-                        String EVENT_ID_4 = EVENT_PUMP + "_" + symbol + "_" + min_low + "_" + max_Hig;
-                        if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
-                            fundingHistoryRepository
-                                    .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
-
-                            Utils.sendToMyTelegram(msg);
-                        }
-                    }
-                }
             }
 
             if (Objects.equals("BTC", symbol) && Utils.isNotBlank(longshort)) {
@@ -3348,14 +3331,46 @@ public class BinanceServiceImpl implements BinanceService {
             if (longshort.contains("Long")) {
                 if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
                     String msg = note.trim().replace("Fibo",
-                            time + " " + symbol + " " + Utils.removeLastZero(price_at_binance) + " (Open Order) ");
+                            time + " (Open Order) Long: " + " " + symbol + " "
+                                    + Utils.removeLastZero(price_at_binance));
 
                     String EVENT_ID = EVENT_DUMP + "_" + symbol + "_" + min_low + "_" + max_Hig;
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID)) {
                         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, true));
 
+                        PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
+                        if (!Objects.equals(null, coin2)) {
+                            msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
+                        }
+
                         Utils.sendToMyTelegram(msg);
                     }
+                }
+            }
+
+            if (longshort.contains("Short")) {
+                // Pumping = Short
+                if (Utils.isPumpingCandle(list_15m)) {
+                    if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
+
+                        String msg = note.trim().replace("Fibo",
+                                time + " (Open Order) Short: " + " " + symbol + " "
+                                        + Utils.removeLastZero(price_at_binance));
+
+                        String EVENT_ID_4 = EVENT_PUMP + "_" + symbol + "_" + min_low + "_" + max_Hig;
+                        if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
+                            fundingHistoryRepository
+                                    .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
+
+                            PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
+                            if (!Objects.equals(null, coin2)) {
+                                msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
+                            }
+
+                            Utils.sendToMyTelegram(msg);
+                        }
+                    }
+
                 }
             }
 
