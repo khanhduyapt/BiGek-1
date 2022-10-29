@@ -485,7 +485,7 @@ public class Utils {
         }
 
         if (!isBusinessTime()) {
-            // return;
+            return;
         }
 
         sendToChatId(Utils.chatId_duydk, text);
@@ -1105,8 +1105,36 @@ public class Utils {
         return false;
     }
 
-    public static Boolean hasPumpCandle(String symbol, boolean isLong) {
-        List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 16);
+    public static Boolean isPumpingCandle(List<BtcFutures> list_15m) {
+        if (CollectionUtils.isEmpty(list_15m)) {
+            return false;
+        }
+
+        if (!list_15m.get(0).isUptrend()) {
+            return false;
+        }
+
+        int count_x4_vol = 0;
+        BigDecimal max_vol = list_15m.get(0).getTrading_volume();
+
+        for (BtcFutures dto : list_15m) {
+            if (dto.getTrading_volume().multiply(BigDecimal.valueOf(3)).compareTo(max_vol) < 0) {
+                count_x4_vol += 1;
+            }
+
+            if (dto.isZeroPercentCandle()) {
+                count_x4_vol += 1;
+            }
+        }
+
+        if (count_x4_vol > 4) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Boolean hasPumpCandle(List<BtcFutures> list_15m, boolean isLong) {
         if (CollectionUtils.isEmpty(list_15m)) {
             return false;
         }
