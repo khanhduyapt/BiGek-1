@@ -46,6 +46,7 @@ public class BinanceController {
     public String getListDepthData(@PathVariable("symbol") String symbol, Model model) {
         List<List<DepthResponse>> list = new ArrayList<List<DepthResponse>>();
         String SYMBOL = symbol.toUpperCase();
+        
         list = service.getListDepthData(SYMBOL);
         List<DepthResponse> list_bids = new ArrayList<DepthResponse>();
         List<DepthResponse> list_asks = new ArrayList<DepthResponse>();

@@ -740,6 +740,12 @@ public class Utils {
         return percent;
     }
 
+    public static String getPercentToEntry(BigDecimal curr_price, BigDecimal entry, boolean isLong) {
+        String mySL = Utils.removeLastZero(entry) + "("
+                + (isLong ? Utils.getPercentStr(curr_price, entry) : Utils.getPercentStr(entry, curr_price)) + ")";
+        return mySL;
+    }
+
     public static String getPercentStr(BigDecimal value, BigDecimal compareToValue) {
 
         return removeLastZero(getPercent(value, compareToValue)) + "%";

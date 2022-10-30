@@ -32,51 +32,49 @@ import lombok.NoArgsConstructor;
                 @ColumnResult(name = "id_half1", type = String.class),
                 @ColumnResult(name = "open_price_half1", type = BigDecimal.class),
                 @ColumnResult(name = "id_half2", type = String.class),
-                @ColumnResult(name = "open_price_half2", type = BigDecimal.class),
-        })
-})
+                @ColumnResult(name = "open_price_half2", type = BigDecimal.class), }) })
 
 public class BtcFutures {
 
-    //https://binance-docs.github.io/apidocs/spot/en/#compressed-aggregate-trades-list
-    //    [
-    //     [
-    //       1499040000000,      // Kline open time
-    //       "0.01634790",       // Open price
-    //       "0.80000000",       // High price
-    //       "0.01575800",       // Low price
-    //       "0.01577100",       // Close price
-    //       "148976.11427815",  // Volume
-    //       1499644799999,      // Kline Close time
-    //       "2434.19055334",    // Quote asset volume
-    //       308,                // Number of trades
-    //       "28.46694368",      // Taker buy quote asset volume
-    //       "1756.87402397",    // Taker buy base asset volume
-    //       "0"                 // Unused field, ignore.
-    //     ]
-    //   ]
-    //-------------------------------------------------------------//
-    //[
-    //    [
-    //        1666843200000,
+    // https://binance-docs.github.io/apidocs/spot/en/#compressed-aggregate-trades-list
+    // [
+    // [
+    // 1499040000000, // Kline open time
+    // "0.01634790", // Open price
+    // "0.80000000", // High price
+    // "0.01575800", // Low price
+    // "0.01577100", // Close price
+    // "148976.11427815", // Volume
+    // 1499644799999, // Kline Close time
+    // "2434.19055334", // Quote asset volume
+    // 308, // Number of trades
+    // "28.46694368", // Taker buy quote asset volume
+    // "1756.87402397", // Taker buy base asset volume
+    // "0" // Unused field, ignore.
+    // ]
+    // ]
+    // -------------------------------------------------------------//
+    // [
+    // [
+    // 1666843200000,
 
-    //        "20755.90000000",     Open price
-    //        "20766.01000000",     High price
-    //        "20747.86000000",     Low price
-    //        "20755.25000000",     Close price
+    // "20755.90000000", Open price
+    // "20766.01000000", High price
+    // "20747.86000000", Low price
+    // "20755.25000000", Close price
 
-    //        "1109.22670000",      trading qty
+    // "1109.22670000", trading qty
 
-    //        1666846799999,
+    // 1666846799999,
 
-    //        "23022631.35991350",  trading volume
+    // "23022631.35991350", trading volume
 
-    //        37665,                Number of trades
-    //        "553.36539000",       Qty
-    //        "11485577.89938500",  Taker volume
-    //        "0"   -> avg_price = 20,769
-    //    ]
-    //]
+    // 37665, Number of trades
+    // "553.36539000", Qty
+    // "11485577.89938500", Taker volume
+    // "0" -> avg_price = 20,769
+    // ]
+    // ]
 
     @Id
     @Column(name = "id")
@@ -127,7 +125,7 @@ public class BtcFutures {
     public boolean isZeroPercentCandle() {
         BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(price_close_candle, price_open_candle, 2)).abs();
 
-        if ((percent.compareTo(BigDecimal.ZERO) > 0) && (percent.compareTo(BigDecimal.valueOf(0.1)) < 0)) {
+        if ((percent.compareTo(BigDecimal.ZERO) > 0) && (percent.compareTo(BigDecimal.valueOf(0.05)) < 0)) {
             return true;
         }
         return false;
