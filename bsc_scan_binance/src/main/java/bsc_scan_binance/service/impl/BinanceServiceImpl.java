@@ -3298,7 +3298,7 @@ public class BinanceServiceImpl implements BinanceService {
                                     msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
                                 }
 
-                                Utils.sendToMyTelegram(msg);
+                                Utils.sendToTelegram(msg);
 
                                 return " Fibo(Short) Volx4";
                             }
