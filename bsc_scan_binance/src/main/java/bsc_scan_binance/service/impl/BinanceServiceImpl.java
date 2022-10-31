@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -75,7 +74,6 @@ import bsc_scan_binance.utils.GoinglassUtils;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import sun.misc.Perf.GetPerfAction;
 
 @Service
 @Slf4j
@@ -152,7 +150,8 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_PUMP = "Pump_1";
     private static final String EVENT_LONG_SHORT_5DAYS = "BTC_5DAYS_LONG_SHORT";
     private Boolean btc_is_good_price_for_long = false;
-    private Boolean btc_is_uptrend_today = true;
+    private Boolean btc_4h_is_uptrend_today = true;
+    private Boolean btc_1d_is_uptrend_today = true;
 
     private int pre_monitorBitcoinBalancesOnExchanges_HH = 0;
     private String monitorBitcoinBalancesOnExchanges_temp = "";
@@ -174,19 +173,35 @@ public class BinanceServiceImpl implements BinanceService {
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
 
     private int pre_HH = 0;
+    private int pre_HH_h4 = 0;
     private String sp500 = "";
     private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
 
-    private void checkLongOrShort(BtcFutures candle4h) {
-        String chart = " 📉 ".trim();
-        if (candle4h.isUptrend()) {
-            chart = " 💹 ".trim();
+    private void checkLongOrShort() {
+
+        if (pre_HH_h4 != Utils.getCurrentHH()) {
+            pre_HH_h4 = Utils.getCurrentHH();
+
+            List<BtcFutures> btc4hs = Utils.loadData("BTC", TIME_4h, 1);
+            BtcFutures candle4h = btc4hs.get(0);
+
+            String chart = " 📉 ".trim();
+            if (candle4h.isUptrend()) {
+                chart = " 💹 ".trim();
+            }
+
+            if (btc_4h_is_uptrend_today != candle4h.isUptrend()) {
+                btc_4h_is_uptrend_today = candle4h.isUptrend();
+
+                btc_1d_is_uptrend_today = Utils.loadData("BTC", TIME_1d, 1).get(0).isUptrend();
+            }
+
+            if (!candle4h.isZeroPercentCandle() && Utils.isNotBlank(chart)) {
+                CHART_BTC_4H = chart + (btc_4h_is_uptrend_today ? " Btc 4h: Uptrend" : " Btc 4h: Downtrend");
+                Utils.sendToTelegram(CHART_BTC_4H);
+            }
         }
 
-        if (!candle4h.isZeroPercentCandle() && Utils.isNotBlank(chart)) {
-            CHART_BTC_4H = chart + (btc_is_uptrend_today ? " Btc 4h: Uptrend" : " Btc 4h: Downtrend");
-            Utils.sendToTelegram(CHART_BTC_4H);
-        }
     }
 
     @Override
@@ -1022,7 +1037,7 @@ public class BinanceServiceImpl implements BinanceService {
                             }
                         }
 
-                        if (btc_is_uptrend_today) {
+                        if (btc_4h_is_uptrend_today) {
                             css.setFutures(css.getFutures() + " 1d: Uptrend");
                             css.setFutures_css("bg-success rounded-lg");
                         } else {
@@ -1914,13 +1929,13 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal total_trans = number_of_trades1.add(number_of_trades2);
 
                     if (idx == limit - 1) {
-//if ("BTC".contains(symbol.toUpperCase())) {
-//    boolean uptrend = false;
-//    if (price_open_candle.compareTo(price_close_candle) < 0) {
-//        uptrend = true;
-//    }
-//    btc_is_uptrend_today = uptrend;
-//}
+                        //if ("BTC".contains(symbol.toUpperCase())) {
+                        //    boolean uptrend = false;
+                        //    if (price_open_candle.compareTo(price_close_candle) < 0) {
+                        //        uptrend = true;
+                        //    }
+                        //    btc_is_uptrend_today = uptrend;
+                        //}
                         String point = calcPointCompressedChart(gecko_id, symbol);
                         Calendar calendar = Calendar.getInstance();
 
@@ -2601,12 +2616,12 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void monitorBtcLongShortIn5Days() {
+        checkLongOrShort();
         String curr_btc6days = Utils.getTimeChangeDailyChart();
 
         if (!Objects.equals(pre_btc6days, curr_btc6days)) {
             btc6days = Utils.loadData("BTC", TIME_1d, 6);
             pre_btc6days = curr_btc6days;
-            // btc_is_uptrend_today = btc6days.get(0).isUptrend();
         }
 
         BigDecimal price_at_binance = Utils.getBinancePrice("BTC");
@@ -2681,9 +2696,6 @@ public class BinanceServiceImpl implements BinanceService {
             String hh = Utils.convertDateToString("HH", Calendar.getInstance().getTime());
             if (!Objects.equals(hh, pre_time_of_saved_data_4h)) {
                 List<BtcFutures> btc4hs = Utils.loadData("BTC", TIME_4h, LIMIT_DATA_4h);
-
-                checkLongOrShort(btc4hs.get(0));
-
                 btcFuturesRepository.saveAll(btc4hs);
                 pre_time_of_saved_data_4h = hh;
             }
@@ -2710,7 +2722,7 @@ public class BinanceServiceImpl implements BinanceService {
             low_height += " " + Utils.new_line_from_service;
             low_height += "10d" + Utils.new_line_from_service + Utils.getMsgLowHeight(price_at_binance, dto_10d);
 
-            if (btc_is_uptrend_today) {
+            if (btc_4h_is_uptrend_today) {
                 msg += " Uptrend... " + " BTC: " + Utils.removeLastZero(String.valueOf(price_at_binance)) + "$";
                 if (Utils.isGoodPriceLong(price_at_binance, dto_1h.getLow_price_h(), dto_1h.getHight_price_h())) {
                     msg += " (Good)";
@@ -3254,7 +3266,7 @@ public class BinanceServiceImpl implements BinanceService {
             } else {
 
                 // pump dump performance
-                if (btc_is_uptrend_today && longshort.contains("Long")) {
+                if (btc_4h_is_uptrend_today && longshort.contains("Long")) {
                     if (Utils.hasPumpCandle(list_15m, true)) {
                         BigDecimal entry = (price_at_binance.compareTo(min_low) < 0) ? price_at_binance : min_low;
                         String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_" + entry;
@@ -3279,7 +3291,7 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 } // long
 
-                if (!btc_is_uptrend_today && longshort.contains("Short")) {
+                if (!btc_4h_is_uptrend_today && longshort.contains("Short")) {
                     BigDecimal entry = (price_at_binance.compareTo(max_Hig) > 0) ? price_at_binance : max_Hig;
                     String EVENT_ID_4 = EVENT_DUMP + "_" + Utils.getCurrentHH() + "_" + symbol + "_" + entry;
 
@@ -3308,8 +3320,10 @@ public class BinanceServiceImpl implements BinanceService {
 
             }
 
-            String btcCandle = btc_is_uptrend_today ? "BTC: Uptrend" : "BTC: Dowtrend";
-            if (longshort.contains("Long")) {
+            // ------------------------------------------------------------------------------------------
+
+            String btcCandle = btc_4h_is_uptrend_today ? "BTC: Uptrend" : "BTC: Dowtrend";
+            if (btc_1d_is_uptrend_today && longshort.contains("Long")) {
                 if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
                     String msg = note.trim().replace("Fibo", time + " (" + btcCandle + ") Min3d: " + " " + symbol + " "
                             + Utils.removeLastZero(price_at_binance));
