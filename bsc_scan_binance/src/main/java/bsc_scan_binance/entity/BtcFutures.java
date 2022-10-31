@@ -131,6 +131,26 @@ public class BtcFutures {
         return false;
     }
 
+    public boolean isBtcShortLongCandle() {
+        BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(hight_price, low_price, 2)).abs();
+
+        if (uptrend && percent.compareTo(BigDecimal.valueOf(0.65)) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isBtcKillShortCandle() {
+        BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(hight_price, low_price, 2)).abs();
+
+        if (!uptrend && percent.compareTo(BigDecimal.valueOf(0.65)) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public BigDecimal getCandleHeight() {
         BigDecimal change = (Utils.getBigDecimal(price_open_candle).subtract(price_close_candle)).abs();
 

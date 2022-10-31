@@ -3239,9 +3239,8 @@ public class BinanceServiceImpl implements BinanceService {
                 list_15m = Utils.loadData(symbol, "15m", 16); // 16h15=4h
             }
 
-            if (Objects.equals("BTC", symbol) && Utils.isNotBlank(longshort)) {
+            if (Objects.equals("BTC", symbol)) {
                 if (Utils.isNotBlank(longshort)) {
-
                     String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentHH();
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
@@ -3264,6 +3263,7 @@ public class BinanceServiceImpl implements BinanceService {
                         return " Fibo " + longshort.trim();
                     }
                 }
+//TODO:
             } else {
 
                 // pump dump performance
