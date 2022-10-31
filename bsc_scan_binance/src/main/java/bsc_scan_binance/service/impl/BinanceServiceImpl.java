@@ -3269,9 +3269,10 @@ public class BinanceServiceImpl implements BinanceService {
                 }
                 BtcFutures curr_btc_15m = list_15m.get(0);
 
-                if (curr_btc_15m.isBtcKillShortCandle() || curr_btc_15m.isBtcKillLongCandle()) {
+                if (curr_btc_15m.isBtcKillLongCandle() || curr_btc_15m.isBtcKillShortCandle()) {
 
-                    String EVENT_ID5 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentHH();
+                    String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentHH() + "_"
+                            + Utils.getBlog10Minutes();
 
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
                         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID5, gecko_id, symbol, note, true));
