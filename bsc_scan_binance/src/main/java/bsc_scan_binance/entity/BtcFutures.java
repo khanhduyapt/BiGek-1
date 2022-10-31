@@ -131,7 +131,7 @@ public class BtcFutures {
         return false;
     }
 
-    public boolean isBtcShortLongCandle() {
+    public boolean isBtcKillLongCandle() {
         BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(hight_price, low_price, 2)).abs();
 
         if (uptrend && percent.compareTo(BigDecimal.valueOf(0.65)) > 0) {

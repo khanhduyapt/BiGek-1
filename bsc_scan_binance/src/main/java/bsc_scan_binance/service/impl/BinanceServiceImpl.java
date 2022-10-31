@@ -3263,7 +3263,32 @@ public class BinanceServiceImpl implements BinanceService {
                         return " Fibo " + longshort.trim();
                     }
                 }
-//TODO:
+
+                if (Utils.isBlank(longshort)) {
+                    list_15m = Utils.loadData(symbol, "15m", 1);
+                }
+                BtcFutures curr_btc_15m = list_15m.get(0);
+
+                if (curr_btc_15m.isBtcKillShortCandle() || curr_btc_15m.isBtcKillLongCandle()) {
+
+                    String EVENT_ID5 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentHH();
+
+                    if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
+                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID5, gecko_id, symbol, note, true));
+
+                        String msg = time + " 💔 Btc 15m kill Long.";
+
+                        if (curr_btc_15m.isBtcKillShortCandle()) {
+                            msg = time + " 💔 Btc 15m kill Short.";
+                        }
+
+                        Utils.sendToTelegram(msg);
+
+                        return "";
+                    }
+
+                }
+
             } else {
 
                 // pump dump performance
