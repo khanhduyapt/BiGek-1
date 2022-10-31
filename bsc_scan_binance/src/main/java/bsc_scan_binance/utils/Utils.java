@@ -674,6 +674,11 @@ public class Utils {
         return mm;
     }
 
+    public static String getBlog10Minutes() {
+        int mm = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+        return String.valueOf(mm).substring(0, 1);
+    }
+
     public static Integer getCurrentSeconds() {
         int ss = Utils.getIntValue(Utils.convertDateToString("ss", Calendar.getInstance().getTime()));
         return ss;
