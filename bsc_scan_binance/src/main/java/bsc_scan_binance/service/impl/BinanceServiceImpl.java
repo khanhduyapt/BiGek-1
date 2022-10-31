@@ -3352,8 +3352,10 @@ public class BinanceServiceImpl implements BinanceService {
             String btcCandle = btc_4h_is_uptrend_today ? "BTC: Uptrend" : "BTC: Dowtrend";
             if (btc_1d_is_uptrend_today && longshort.contains("Long")) {
                 if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
-                    String msg = note.trim().replace("Fibo", time + " (" + btcCandle + ") Min3d: " + " " + symbol + " "
-                            + Utils.removeLastZero(price_at_binance));
+
+                    String msg = time + " (" + btcCandle + ") " + " " + symbol + " "
+                            + Utils.removeLastZero(price_at_binance) + "(now)" + ", Min3d: "
+                            + Utils.getPercentToEntry(price_at_binance, min_low, true);
 
                     String EVENT_ID = EVENT_DUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_" + min_low;
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID)) {
