@@ -80,7 +80,7 @@ p {
     <div style="margin-top: 0.5rem; margin-left: 0.5rem;">
       <span style="padding-left: 0rem; font-size: 1rem !important;" >Binance:</span><a style="padding-left: 0.5rem; font-size: 1rem !important;" class="font-weight-bold" th:target="_blank" th:href="${'https://www.binance.com/en/futures/' + symbol + 'USDT'}" th:text="${symbol}"></a>
       <a style="padding-left: 1.5rem;" th:target="_blank" th:href="${'http://localhost:8090/'}">Home</a>
-      <a style="padding-left: 1.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
+      <a style="padding-left: 1.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDTPERP'}">
         <span class="font-weight-bold" >Trading View</span>
       </a>
 
@@ -91,8 +91,8 @@ p {
       <a th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=VANTAGE%3ASP500'}">S&P 500</a>
       <span th:text="${sp500}" th:classappend="${#strings.contains(sp500, '-') ? 'text-danger' : 'text-primary'}"></span>
       <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3ATOTAL'}">Total</a>
-      <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D'}">Usdt.D</a>
       <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=CRYPTOCAP%3ABTC.D'}">Btc.D</a>
+      <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D'}">Usdt.D</a>
     </div>
 
     <div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important;">

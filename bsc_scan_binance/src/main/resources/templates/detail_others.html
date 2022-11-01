@@ -77,7 +77,7 @@ p {
 
       <a style="padding-left: 1.5rem;" th:target="_blank" th:href="${'http://localhost:8090/BTC'}">BTC</a>
 
-      <a style="padding-left: 1.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDT'}">
+      <a style="padding-left: 1.5rem;" th:target="_blank" th:href="${'https://vn.tradingview.com/chart/?symbol=BINANCE%3A' + symbol + 'USDTPERP'}">
         <span class="font-weight-bold" >Trading View</span>
       </a>
 
@@ -94,7 +94,7 @@ p {
           </tr>
         </thead>
         <tbody>
-          <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.val_million_dolas >= 100 ? 'bg-warning text-primary font-weight-bold' : ''}" >
+          <tr class="table_row" th:each="token,iter: ${data_list_1}" th:classappend="${token.val_million_dolas >= 500 ? 'bg-warning text-primary font-weight-bold' : ''}" >
             <!-- # -->
             <td class="" style="text-align: left; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}" > <!-- ${#lists.size(data_list_1) - iter.index} -->
             <!-- Sell -->
@@ -114,7 +114,7 @@ p {
           </tr>
         </thead>
         <tbody>
-          <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.val_million_dolas >= 100 ? 'bg-warning text-primary font-weight-bold' : ''}" >
+          <tr class="table_row" th:each="token,iter: ${data_list_2}" th:classappend="${token.val_million_dolas >= 500 ? 'bg-warning text-primary font-weight-bold' : ''}" >
             <!-- # -->
             <td class="" style="text-align: left; min-width: 50px !important; max-width: 50px !important;" th:text="${token.percent}"  > <!-- ${#lists.size(data_list_1) + iter.index + 1} -->
             <!-- Sell -->
