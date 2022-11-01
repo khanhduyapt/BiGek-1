@@ -3343,8 +3343,8 @@ public class BinanceServiceImpl implements BinanceService {
                                 fundingHistoryRepository
                                         .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
 
-                                String msg = time + " Pump:" + symbol + " " + Utils.removeLastZero(price_at_binance)
-                                        + "(now), High3d: " + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
+                                String msg = time + " Pump:" + symbol + Utils.removeLastZero(price_at_binance)
+                                        + "(now), High3d:" + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
 
                                 PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
                                 if (!Objects.equals(null, coin2)) {
