@@ -2191,7 +2191,7 @@ public class BinanceServiceImpl implements BinanceService {
                         List<Double> bids = new ArrayList<>((Collection<Double>) obj);
                         curr_price = Utils.getBigDecimalValue(String.valueOf(bids.get(0)));
                     }
-                    BigDecimal MIN_PRICE = curr_price.multiply(BigDecimal.valueOf(0.8));
+                    BigDecimal MIN_PRICE = curr_price.multiply(BigDecimal.valueOf(0.5));
 
                     List<DepthBids> saveList = new ArrayList<DepthBids>();
                     BigInteger rowidx = BigInteger.ZERO;
@@ -2235,7 +2235,7 @@ public class BinanceServiceImpl implements BinanceService {
                         List<Double> ask = new ArrayList<>((Collection<Double>) obj);
                         curr_price = Utils.getBigDecimalValue(String.valueOf(ask.get(0)));
                     }
-                    BigDecimal MAX_PRICE = curr_price.multiply(BigDecimal.valueOf(1.2));
+                    BigDecimal MAX_PRICE = curr_price.multiply(BigDecimal.valueOf(2));
 
                     List<DepthAsks> saveList = new ArrayList<DepthAsks>();
                     BigInteger rowidx = BigInteger.ZERO;
@@ -3300,37 +3300,37 @@ public class BinanceServiceImpl implements BinanceService {
 
             } else {
 
-                // pump dump performance
-                if (longshort.contains("Long")) {
-                    if (Utils.hasPumpCandle(list_15m, true)) {
-                        if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
-
-                            BigDecimal entry = (price_at_binance.compareTo(min_low) < 0) ? price_at_binance : min_low;
-                            String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_"
-                                    + entry;
-
-                            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
-
-                                fundingHistoryRepository
-                                        .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
-
-                                String msg = time + " 💹  Dump: " + symbol + " "
-                                        + Utils.removeLastZero(price_at_binance)
-                                        + "(now), Min3d: " + Utils.removeLastZero(entry) + " ("
-                                        + Utils.getPercentStr(entry, price_at_binance) + ")";
-
-                                PriorityCoin coin = priorityCoinRepository.findById(gecko_id).orElse(null);
-                                if (!Objects.equals(null, coin)) {
-                                    msg += Utils.new_line_from_service + Utils.getStringValue(coin.getNote());
-                                }
-                                Utils.sendToTelegram(msg);
-
-                                return " Fibo(Long) Volx4";
-                            }
-
-                        }
-                    }
-                } // long
+                //                // pump dump performance
+                //                if (longshort.contains("Long")) {
+                //                    if (Utils.hasPumpCandle(list_15m, true) && list_15m.get(0).isUptrend()) {
+                //                        if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
+                //
+                //                            BigDecimal entry = (price_at_binance.compareTo(min_low) < 0) ? price_at_binance : min_low;
+                //                            String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_"
+                //                                    + entry;
+                //
+                //                            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
+                //
+                //                                fundingHistoryRepository
+                //                                        .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
+                //
+                //                                String msg = time + " 💹  Dump:" + symbol + " "
+                //                                        + Utils.removeLastZero(price_at_binance)
+                //                                        + "(now),Min3d:" + Utils.removeLastZero(entry) + " ("
+                //                                        + Utils.getPercentStr(entry, price_at_binance) + ")";
+                //
+                //                                PriorityCoin coin = priorityCoinRepository.findById(gecko_id).orElse(null);
+                //                                if (!Objects.equals(null, coin)) {
+                //                                    msg += Utils.new_line_from_service + Utils.getStringValue(coin.getNote());
+                //                                }
+                //                                Utils.sendToTelegram(msg);
+                //
+                //                                return " Fibo(Long) Volx4";
+                //                            }
+                //
+                //                        }
+                //                    }
+                //                } // long
 
                 if (!btc_4h_is_uptrend_today && longshort.contains("Short")) {
                     BigDecimal entry = (price_at_binance.compareTo(max_Hig) > 0) ? price_at_binance : max_Hig;
@@ -3343,8 +3343,8 @@ public class BinanceServiceImpl implements BinanceService {
                                 fundingHistoryRepository
                                         .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
 
-                                String msg = time + " Pump:" + symbol + Utils.removeLastZero(price_at_binance)
-                                        + "(now), High3d:" + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
+                                String msg = time + " 📉 (Short):" + symbol + ", High3d:"
+                                        + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
 
                                 PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
                                 if (!Objects.equals(null, coin2)) {
@@ -3361,36 +3361,13 @@ public class BinanceServiceImpl implements BinanceService {
 
             }
 
-            // ------------------------------------------------------------------------------------------
-            //String btcCandle = btc_4h_is_uptrend_today ? "BTC: Uptrend" : "BTC: Dowtrend";
-            //if (btc_1d_is_uptrend_today && longshort.contains("Long")) {
-            //                if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
-            //
-            //                    String msg = time + " (" + btcCandle + ") " + " " + symbol + " "
-            //                            + Utils.removeLastZero(price_at_binance) + "(now)" + ", Min3d: "
-            //                            + Utils.getPercentToEntry(price_at_binance, min_low, true);
-            //
-            //                    String EVENT_ID = EVENT_DUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_" + min_low;
-            //                    if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID)) {
-            //                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, true));
-            //
-            //                        PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
-            //                        if (!Objects.equals(null, coin2)) {
-            //                            msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
-            //                        }
-            //
-            //                        Utils.sendToMyTelegram(msg);
-            //                    }
-            //                }
-            //}
-
             if (longshort.contains("Short")) {
                 // Pumping = Short
                 if (Utils.isPumpingCandle(list_15m)) {
                     if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
 
-                        String msg = time + " Pumping: " + symbol + " " + Utils.removeLastZero(price_at_binance);
-                        msg += ", Highest: " + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
+                        String msg = time + " 📉 (Short):" + symbol;
+                        msg += ", E: " + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
 
                         String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_" + min_low
                                 + "_" + max_Hig;
@@ -3404,7 +3381,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
                             }
 
-                            Utils.sendToMyTelegram(msg);
+                            Utils.sendToTelegram(msg);
                         }
                     }
 
