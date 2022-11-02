@@ -3366,8 +3366,8 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Utils.isPumpingCandle(list_15m)) {
                     if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
 
-                        String msg = time + " 📉 (Short):" + symbol;
-                        msg += ", E: " + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
+                        String msg = time + " 💹📉 (Short):" + symbol;
+                        msg += ", Start: " + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
 
                         String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_" + min_low
                                 + "_" + max_Hig;
