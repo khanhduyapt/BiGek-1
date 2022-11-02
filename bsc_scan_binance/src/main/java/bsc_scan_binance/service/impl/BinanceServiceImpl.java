@@ -448,7 +448,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if ((market_cap.compareTo(BigDecimal.valueOf(36000001)) < 0)
                         && (market_cap.compareTo(BigDecimal.valueOf(1000000)) > 0)) {
-                    css.setMarket_cap_css("highlight");
+                    css.setMarket_cap_css("highlight rounded-lg px-1");
+                } else if (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0) {
+                    css.setMarket_cap_css("bg-warning rounded-lg px-1");
                 }
 
                 BigDecimal volumn_binance_div_marketcap = BigDecimal.ZERO;
@@ -1930,13 +1932,13 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal total_trans = number_of_trades1.add(number_of_trades2);
 
                     if (idx == limit - 1) {
-                        //if ("BTC".contains(symbol.toUpperCase())) {
-                        //    boolean uptrend = false;
-                        //    if (price_open_candle.compareTo(price_close_candle) < 0) {
-                        //        uptrend = true;
-                        //    }
-                        //    btc_is_uptrend_today = uptrend;
-                        //}
+                        // if ("BTC".contains(symbol.toUpperCase())) {
+                        // boolean uptrend = false;
+                        // if (price_open_candle.compareTo(price_close_candle) < 0) {
+                        // uptrend = true;
+                        // }
+                        // btc_is_uptrend_today = uptrend;
+                        // }
                         String point = calcPointCompressedChart(gecko_id, symbol);
                         Calendar calendar = Calendar.getInstance();
 
@@ -2148,6 +2150,10 @@ public class BinanceServiceImpl implements BinanceService {
     @SuppressWarnings({ "unchecked" })
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
+        if (1 == 1) {
+            return;
+        }
+
         try {
             // https://binance-docs.github.io/apidocs/spot/en/#websocket-blvt-info-streams
 
@@ -3300,37 +3306,39 @@ public class BinanceServiceImpl implements BinanceService {
 
             } else {
 
-                //                // pump dump performance
-                //                if (longshort.contains("Long")) {
-                //                    if (Utils.hasPumpCandle(list_15m, true) && list_15m.get(0).isUptrend()) {
-                //                        if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
+                // // pump dump performance
+                // if (longshort.contains("Long")) {
+                // if (Utils.hasPumpCandle(list_15m, true) && list_15m.get(0).isUptrend()) {
+                // if (candidateCoinRepository.checkConditionsForLong(gecko_id)) {
                 //
-                //                            BigDecimal entry = (price_at_binance.compareTo(min_low) < 0) ? price_at_binance : min_low;
-                //                            String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_"
-                //                                    + entry;
+                // BigDecimal entry = (price_at_binance.compareTo(min_low) < 0) ?
+                // price_at_binance : min_low;
+                // String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" +
+                // symbol + "_"
+                // + entry;
                 //
-                //                            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
+                // if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
                 //
-                //                                fundingHistoryRepository
-                //                                        .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
+                // fundingHistoryRepository
+                // .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
                 //
-                //                                String msg = time + " 💹  Dump:" + symbol + " "
-                //                                        + Utils.removeLastZero(price_at_binance)
-                //                                        + "(now),Min3d:" + Utils.removeLastZero(entry) + " ("
-                //                                        + Utils.getPercentStr(entry, price_at_binance) + ")";
+                // String msg = time + " 💹 Dump:" + symbol + " "
+                // + Utils.removeLastZero(price_at_binance)
+                // + "(now),Min3d:" + Utils.removeLastZero(entry) + " ("
+                // + Utils.getPercentStr(entry, price_at_binance) + ")";
                 //
-                //                                PriorityCoin coin = priorityCoinRepository.findById(gecko_id).orElse(null);
-                //                                if (!Objects.equals(null, coin)) {
-                //                                    msg += Utils.new_line_from_service + Utils.getStringValue(coin.getNote());
-                //                                }
-                //                                Utils.sendToTelegram(msg);
+                // PriorityCoin coin = priorityCoinRepository.findById(gecko_id).orElse(null);
+                // if (!Objects.equals(null, coin)) {
+                // msg += Utils.new_line_from_service + Utils.getStringValue(coin.getNote());
+                // }
+                // Utils.sendToTelegram(msg);
                 //
-                //                                return " Fibo(Long) Volx4";
-                //                            }
+                // return " Fibo(Long) Volx4";
+                // }
                 //
-                //                        }
-                //                    }
-                //                } // long
+                // }
+                // }
+                // } // long
 
                 if (!btc_4h_is_uptrend_today && longshort.contains("Short")) {
                     BigDecimal entry = (price_at_binance.compareTo(max_Hig) > 0) ? price_at_binance : max_Hig;
