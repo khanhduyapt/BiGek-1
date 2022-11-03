@@ -2150,9 +2150,6 @@ public class BinanceServiceImpl implements BinanceService {
     @SuppressWarnings({ "unchecked" })
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
-        if (1 == 1) {
-            return;
-        }
 
         try {
             // https://binance-docs.github.io/apidocs/spot/en/#websocket-blvt-info-streams
