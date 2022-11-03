@@ -2037,10 +2037,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            if ("BTC".contains(symbol.toUpperCase())) {
-                saveDepthData(gecko_id, symbol);
-            }
-
         } catch (Exception e) {
             log.info("Error loadBinanceData  ----->");
             e.printStackTrace();
@@ -2150,7 +2146,6 @@ public class BinanceServiceImpl implements BinanceService {
     @SuppressWarnings({ "unchecked" })
     @Transactional
     private void saveDepthData(String gecko_id, String symbol) {
-
         try {
             // https://binance-docs.github.io/apidocs/spot/en/#websocket-blvt-info-streams
 
@@ -3256,18 +3251,7 @@ public class BinanceServiceImpl implements BinanceService {
                     String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentHH();
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
-                        saveDepthData(gecko_id, symbol.toUpperCase());
-                        String mySL = "";
-                        if (longshort.contains("Long")) {
-                            List<DepthResponse> list = getBids(gecko_id, price_at_binance);
-                            mySL = getSL(list, price_at_binance, true);
-                        } else {
-                            List<DepthResponse> list = getAsks(gecko_id, price_at_binance);
-                            mySL = getSL(list, price_at_binance, false);
-                        }
-
-                        String msg = time + longshort + symbol + " , E: " + Utils.removeLastZero(price_at_binance)
-                                + ", " + mySL;
+                        String msg = time + longshort + symbol + " , E: " + Utils.removeLastZero(price_at_binance);
                         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
                         Utils.sendToTelegram(msg);
