@@ -3323,7 +3323,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (!btc_4h_is_uptrend_today && longshort.contains("Short")) {
                     BigDecimal entry = (price_at_binance.compareTo(max_Hig) > 0) ? price_at_binance : max_Hig;
-                    String EVENT_ID_4 = EVENT_DUMP + "_" + Utils.getCurrentHH() + "_" + symbol + "_" + entry;
+                    String EVENT_ID_4 = EVENT_DUMP + "_" + symbol + "_" + entry;
 
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
                         if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
@@ -3358,8 +3358,7 @@ public class BinanceServiceImpl implements BinanceService {
                         String msg = time + " 💹📉 (Short):" + symbol;
                         msg += ", Start: " + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
 
-                        String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol + "_" + min_low
-                                + "_" + max_Hig;
+                        String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol;
 
                         if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
                             fundingHistoryRepository
