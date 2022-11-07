@@ -3261,13 +3261,13 @@ public class BinanceServiceImpl implements BinanceService {
 
                 longshort = " 💹 (Long) ";
                 note = " Fibo(Long) E: " + Utils.removeLastZero(min_low) + " ("
-                        + Utils.getPercentStr(min_low, price_at_binance) + ")";
+                        + Utils.getPercentStr(min_low, price_at_binance) + ")" + type;
 
             } else if (Utils.isGoodPriceShort(price_at_binance, min_low, max_Hig)) {
 
                 longshort = " 📉 (Short) ";
                 note = " Fibo(Short) E: " + Utils.removeLastZero(max_Hig) + " ("
-                        + Utils.getPercentStr(price_at_binance, max_Hig) + ")";
+                        + Utils.getPercentStr(price_at_binance, max_Hig) + ")" + type;
 
             }
 
@@ -3399,7 +3399,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             String EVENT_ID = EVENT_FIBO_LONG_SHORT + "_" + symbol;
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note + type, false));
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, false));
 
             return note;
 
