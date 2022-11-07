@@ -33,7 +33,6 @@ import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
-import bsc_scan_binance.entity.BitcoinBalancesOnExchanges;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
@@ -59,7 +58,6 @@ import bsc_scan_binance.repository.FundingHistoryRepository;
 import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.PriorityCoinRepository;
-import bsc_scan_binance.response.BitcoinBalancesOnExchangesResponse;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
@@ -70,7 +68,6 @@ import bsc_scan_binance.response.FundingResponse;
 import bsc_scan_binance.response.GeckoVolumeUpPre4hResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
-import bsc_scan_binance.utils.GoinglassUtils;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -408,9 +405,10 @@ public class BinanceServiceImpl implements BinanceService {
                     + (isBynaceUrl
                             ? "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 then false else true end) \n"
                             : "")
-                    + ((BscScanBinanceApplication.app_flag != Utils.const_app_flag_all_coin)
-                            ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
-                            : "")
+                    + (!(((BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_coin)
+                            || (BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_and_msg)))
+                                    ? "   AND can.gecko_id IN (SELECT gecko_id FROM binance_futures) \n"
+                                    : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
@@ -1855,25 +1853,29 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
-    public String loadBinanceData(String gecko_id, String symbol) {
+    public String loadBinanceData(String gecko_id, String symbol, boolean isStartUp) {
         // debug
         // scalping(gecko_id, symbol);
         loadFundingHistory(gecko_id, symbol);
 
         try {
-            final Integer limit = 14;
+            Integer LIMIT = 60;
+            if (!isStartUp) {
+                LIMIT = 3;
+            }
+
             final String url_usdt = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "USDT" + "&interval="
-                    + TIME_1d + "&limit=" + String.valueOf(limit);
+                    + TIME_1d + "&limit=" + String.valueOf(LIMIT);
 
             final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD" + "&interval="
-                    + TIME_1d + "&limit=" + String.valueOf(limit);
+                    + TIME_1d + "&limit=" + String.valueOf(LIMIT);
 
             BigDecimal price_at_binance = Utils.getBinancePrice(symbol);
             if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
                 return "";
             }
-            List<Object> result_usdt = Utils.getBinanceData(url_usdt, limit);
-            List<Object> result_busd = Utils.getBinanceData(url_busd, limit);
+            List<Object> result_usdt = Utils.getBinanceData(url_usdt, LIMIT);
+            List<Object> result_busd = Utils.getBinanceData(url_busd, LIMIT);
 
             List<BinanceVolumnWeek> list_week = new ArrayList<BinanceVolumnWeek>();
             List<BigDecimal> list_price_close_candle = new ArrayList<BigDecimal>();
@@ -1881,7 +1883,7 @@ public class BinanceServiceImpl implements BinanceService {
             String sql_pump_dump = "";
             BinanceVolumnDay day = new BinanceVolumnDay();
             int day_index = 0;
-            for (int idx = limit - 1; idx >= 0; idx--) {
+            for (int idx = LIMIT - 1; idx >= 0; idx--) {
                 Object obj_usdt = result_usdt.get(idx);
                 Object obj_busd = result_busd.get(idx);
 
@@ -1914,13 +1916,15 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal quote_asset_volume1 = Utils.getBigDecimal(arr_usdt.get(7));
                     BigDecimal number_of_trades1 = Utils.getBigDecimal(arr_usdt.get(8));
 
-                    BigDecimal quote_asset_volume2 = Utils.getBigDecimal(arr_busd.get(7));
-                    BigDecimal number_of_trades2 = Utils.getBigDecimal(arr_busd.get(8));
+                    BigDecimal quote_asset_volume2 = arr_busd.size() > 7 ? Utils.getBigDecimal(arr_busd.get(7))
+                            : BigDecimal.ZERO;
+                    BigDecimal number_of_trades2 = arr_busd.size() > 8 ? Utils.getBigDecimal(arr_busd.get(8))
+                            : BigDecimal.ZERO;
 
                     BigDecimal total_volume = quote_asset_volume1.add(quote_asset_volume2);
                     BigDecimal total_trans = number_of_trades1.add(number_of_trades2);
 
-                    if (idx == limit - 1) {
+                    if (idx == LIMIT - 1) {
                         String point = calcPointCompressedChart(gecko_id, symbol);
                         Calendar calendar = Calendar.getInstance();
 
@@ -1948,40 +1952,40 @@ public class BinanceServiceImpl implements BinanceService {
                             binanceVolumeDateTimeRepository.save(ddhh);
                         }
 
-//                        // pump/dump
-//                        {
-//                            calendar.add(Calendar.HOUR_OF_DAY, -2);
-//                            BinanceVolumnDay pre2h = binanceVolumnDayRepository
-//                                    .findById(new BinanceVolumnDayKey(gecko_id, symbol,
-//                                            Utils.convertDateToString("HH", calendar.getTime())))
-//                                    .orElse(null);
-//
-//                            if (!Objects.equals(null, pre2h) && (Utils.getBigDecimal(pre2h.getPriceAtBinance())
-//                                    .compareTo(BigDecimal.ZERO) > 0)) {
-//
-//                                String str_pump_dump = "";
-//                                if (price_at_binance
-//                                        .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
-//
-//                                    str_pump_dump = " total_pump = total_pump + 1 ";
-//
-//                                } else if (price_at_binance
-//                                        .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(0.9))) < 0) {
-//
-//                                    str_pump_dump = " total_dump = total_dump + 1 ";
-//                                }
-//
-//                                if (!Objects.equals("", str_pump_dump)) {
-//                                    sql_pump_dump = " WITH UPD AS (UPDATE binance_pumping_history SET " + str_pump_dump
-//                                            + " WHERE gecko_id='" + gecko_id + "' AND symbol='" + symbol
-//                                            + "' AND HH=TO_CHAR(NOW(), 'HH24') \n"
-//                                            + " RETURNING gecko_id, symbol, hh), \n" + " INS AS (SELECT '" + gecko_id
-//                                            + "', '" + symbol
-//                                            + "', TO_CHAR(NOW(), 'HH24'), 1, 1 WHERE NOT EXISTS (SELECT * FROM UPD)) \n"
-//                                            + " INSERT INTO binance_pumping_history(gecko_id, symbol, hh, total_pump, total_dump) SELECT * FROM INS; \n";
-//                                }
-//                            }
-//                        }
+                        //                        // pump/dump
+                        //                        {
+                        //                            calendar.add(Calendar.HOUR_OF_DAY, -2);
+                        //                            BinanceVolumnDay pre2h = binanceVolumnDayRepository
+                        //                                    .findById(new BinanceVolumnDayKey(gecko_id, symbol,
+                        //                                            Utils.convertDateToString("HH", calendar.getTime())))
+                        //                                    .orElse(null);
+                        //
+                        //                            if (!Objects.equals(null, pre2h) && (Utils.getBigDecimal(pre2h.getPriceAtBinance())
+                        //                                    .compareTo(BigDecimal.ZERO) > 0)) {
+                        //
+                        //                                String str_pump_dump = "";
+                        //                                if (price_at_binance
+                        //                                        .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
+                        //
+                        //                                    str_pump_dump = " total_pump = total_pump + 1 ";
+                        //
+                        //                                } else if (price_at_binance
+                        //                                        .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(0.9))) < 0) {
+                        //
+                        //                                    str_pump_dump = " total_dump = total_dump + 1 ";
+                        //                                }
+                        //
+                        //                                if (!Objects.equals("", str_pump_dump)) {
+                        //                                    sql_pump_dump = " WITH UPD AS (UPDATE binance_pumping_history SET " + str_pump_dump
+                        //                                            + " WHERE gecko_id='" + gecko_id + "' AND symbol='" + symbol
+                        //                                            + "' AND HH=TO_CHAR(NOW(), 'HH24') \n"
+                        //                                            + " RETURNING gecko_id, symbol, hh), \n" + " INS AS (SELECT '" + gecko_id
+                        //                                            + "', '" + symbol
+                        //                                            + "', TO_CHAR(NOW(), 'HH24'), 1, 1 WHERE NOT EXISTS (SELECT * FROM UPD)) \n"
+                        //                                            + " INSERT INTO binance_pumping_history(gecko_id, symbol, hh, total_pump, total_dump) SELECT * FROM INS; \n";
+                        //                                }
+                        //                            }
+                        //                        }
 
                     }
 
@@ -2767,59 +2771,59 @@ public class BinanceServiceImpl implements BinanceService {
     @SuppressWarnings({ "unchecked" })
     @Transactional
     private String monitorBitcoinBalancesOnExchanges() {
-        try {
-            String event = EVENT_BTC_ON_EXCHANGES + "_" + Utils.getCurrentHH();
-
-            if (fundingHistoryRepository.existsPumDump("bitcoin", event)) {
-                return "";
-            }
-
-            FundingHistory his = new FundingHistory();
-            FundingHistoryKey id = new FundingHistoryKey(event, "bitcoin");
-            his.setId(id);
-            his.setPumpdump(true);
-
-            log.info("Start monitorBitcoinBalancesOnExchanges ---->");
-            try {
-                List<BitcoinBalancesOnExchanges> entities = GoinglassUtils.getBtcExchangeBalance();
-                if (entities.size() > 0) {
-                    bitcoinBalancesOnExchangesRepository.saveAll(entities);
-                }
-
-                String sql = " SELECT                                                                                   \n"
-                        + "  fun_btc_price_now()                                              as price_now              \n"
-                        + ", sum(balance_change)                                              as change_24h             \n"
-                        + ", round(sum(balance_change) * fun_btc_price_now() / 1000000, 0)    as change_24h_val_million \n"
-                        + ", sum(d7_balance_change)                                           as change_7d              \n"
-                        + ", round(sum(d7_balance_change) * fun_btc_price_now() / 1000000, 0) as change_7d_val_million  \n"
-                        + " FROM bitcoin_balances_on_exchanges                                                          \n"
-                        + " WHERE                                                                                       \n"
-                        + " yyyymmdd='" + Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime()) + "'";
-
-                Query query = entityManager.createNativeQuery(sql, "BitcoinBalancesOnExchangesResponse");
-
-                List<BitcoinBalancesOnExchangesResponse> vol_list = query.getResultList();
-                if (CollectionUtils.isEmpty(vol_list)) {
-                    return "";
-                }
-
-                BitcoinBalancesOnExchangesResponse dto = vol_list.get(0);
-
-                String msg = "BTC 24h: " + dto.getChange_24h() + "btc(" + dto.getChange_24h_val_million() + "m$)"
-                        + Utils.new_line_from_service;
-
-                msg += " 07d: " + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)";
-
-                return msg;
-
-            } catch (Exception e) {
-                his.setNote(e.getMessage());
-                log.info("Error monitorBitcoinBalancesOnExchanges ---->" + e.getMessage());
-            }
-            fundingHistoryRepository.save(his);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
+        //        try {
+        //            String event = EVENT_BTC_ON_EXCHANGES + "_" + Utils.getCurrentHH();
+        //
+        //            if (fundingHistoryRepository.existsPumDump("bitcoin", event)) {
+        //                return "";
+        //            }
+        //
+        //            FundingHistory his = new FundingHistory();
+        //            FundingHistoryKey id = new FundingHistoryKey(event, "bitcoin");
+        //            his.setId(id);
+        //            his.setPumpdump(true);
+        //
+        //            log.info("Start monitorBitcoinBalancesOnExchanges ---->");
+        //            try {
+        //                List<BitcoinBalancesOnExchanges> entities = GoinglassUtils.getBtcExchangeBalance();
+        //                if (entities.size() > 0) {
+        //                    bitcoinBalancesOnExchangesRepository.saveAll(entities);
+        //                }
+        //
+        //                String sql = " SELECT                                                                                   \n"
+        //                        + "  fun_btc_price_now()                                              as price_now              \n"
+        //                        + ", sum(balance_change)                                              as change_24h             \n"
+        //                        + ", round(sum(balance_change) * fun_btc_price_now() / 1000000, 0)    as change_24h_val_million \n"
+        //                        + ", sum(d7_balance_change)                                           as change_7d              \n"
+        //                        + ", round(sum(d7_balance_change) * fun_btc_price_now() / 1000000, 0) as change_7d_val_million  \n"
+        //                        + " FROM bitcoin_balances_on_exchanges                                                          \n"
+        //                        + " WHERE                                                                                       \n"
+        //                        + " yyyymmdd='" + Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime()) + "'";
+        //
+        //                Query query = entityManager.createNativeQuery(sql, "BitcoinBalancesOnExchangesResponse");
+        //
+        //                List<BitcoinBalancesOnExchangesResponse> vol_list = query.getResultList();
+        //                if (CollectionUtils.isEmpty(vol_list)) {
+        //                    return "";
+        //                }
+        //
+        //                BitcoinBalancesOnExchangesResponse dto = vol_list.get(0);
+        //
+        //                String msg = "BTC 24h: " + dto.getChange_24h() + "btc(" + dto.getChange_24h_val_million() + "m$)"
+        //                        + Utils.new_line_from_service;
+        //
+        //                msg += " 07d: " + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)";
+        //
+        //                return msg;
+        //
+        //            } catch (Exception e) {
+        //                his.setNote(e.getMessage());
+        //                log.info("Error monitorBitcoinBalancesOnExchanges ---->" + e.getMessage());
+        //            }
+        //            fundingHistoryRepository.save(his);
+        //        } catch (Exception e) {
+        //            // TODO: handle exception
+        //        }
 
         return "";
     }

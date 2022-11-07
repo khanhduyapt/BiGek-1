@@ -42,7 +42,7 @@ public class BscScanBinanceApplication {
 
             // Debug
             // app_flag = Utils.const_app_flag_msg_on;
-            app_flag = Utils.const_app_flag_all_coin;
+            app_flag = Utils.const_app_flag_all_and_msg;
 
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -51,7 +51,7 @@ public class BscScanBinanceApplication {
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
             // binance_service.loadDataBtcVolumeDay("bitcoin", "BTC");
 
-            if (app_flag == Utils.const_app_flag_msg_on) {
+            if (app_flag == Utils.const_app_flag_msg_on || app_flag == Utils.const_app_flag_all_and_msg) {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
 
                 try {
@@ -80,6 +80,7 @@ public class BscScanBinanceApplication {
 
                 int size = list.size();
                 int idx = 0;
+                boolean startup = true;
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
@@ -95,13 +96,13 @@ public class BscScanBinanceApplication {
                         }
 
                         if (idx % 10 == 0) {
-                            binance_service.loadBinanceData("bitcoin", "BTC");
+                            binance_service.loadBinanceData("bitcoin", "BTC", startup);
                             binance_service.loadDataVolumeHour("bitcoin", "BTC");
                             binance_service.monitorBtcPrice();
                             wait(1500);
                         }
 
-                        binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase());
+                        binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol().toUpperCase());
 
                         log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
@@ -111,9 +112,7 @@ public class BscScanBinanceApplication {
                         log.error("dkd error LoadData:" + e.getMessage());
                     }
 
-                    // if (BscScanBinanceApplication.app_flag != Utils.const_app_flag_msg_on) {
                     // wait(1800);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
-                    // }
                     wait(1500);
 
                     if (Objects.equals(idx, size - 1)) {
@@ -133,6 +132,8 @@ public class BscScanBinanceApplication {
                         list.clear();
                         list = gecko_service.getList(callFormBinance);
                         size = list.size();
+
+                        startup = false;
                     } else {
                         idx += 1;
                     }

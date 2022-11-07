@@ -11,7 +11,7 @@ public interface BinanceService {
 
     List<CandidateTokenCssResponse> getList(Boolean isOrderByBynaceVolume);
 
-    public String loadBinanceData(String gecko_id, String symbol);
+    public String loadBinanceData(String gecko_id, String symbol, boolean isStartUp);
 
     public void loadDataVolumeHour(String gecko_id, String symbol);
 

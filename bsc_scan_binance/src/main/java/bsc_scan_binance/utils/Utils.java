@@ -56,6 +56,7 @@ public class Utils {
     public static final int const_app_flag_msg_off = 2;
     public static final int const_app_flag_webonly = 3;
     public static final int const_app_flag_all_coin = 4;
+    public static final int const_app_flag_all_and_msg = 5;
 
     public static final String PREPARE_ORDERS_DATA_TYPE_BOT = "1";
     public static final String PREPARE_ORDERS_DATA_TYPE_BINANCE_VOL_UP = "2";
@@ -472,26 +473,25 @@ public class Utils {
     }
 
     public static void sendToMyTelegram(String text) {
-        if ((BscScanBinanceApplication.app_flag != const_app_flag_msg_on)
-                || (BscScanBinanceApplication.app_flag != const_app_flag_all_coin)) {
-            return;
+        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on) ||
+                (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
+
+            sendToChatId(Utils.chatId_duydk, text + " (only)");
         }
 
-        sendToChatId(Utils.chatId_duydk, text + " (only)");
     }
 
     public static void sendToTelegram(String text) {
-        if ((BscScanBinanceApplication.app_flag != const_app_flag_msg_on)
-                || (BscScanBinanceApplication.app_flag != const_app_flag_all_coin)) {
-            return;
-        }
+        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on) ||
+                (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
 
-        if (!isBusinessTime()) {
-            return;
-        }
+            if (!isBusinessTime()) {
+                return;
+            }
 
-        sendToChatId(Utils.chatId_duydk, text);
-        sendToChatId(Utils.chatId_linkdk, text);
+            sendToChatId(Utils.chatId_duydk, text);
+            sendToChatId(Utils.chatId_linkdk, text);
+        }
     }
 
     public static boolean isBusinessTime() {

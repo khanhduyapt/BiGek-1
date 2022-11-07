@@ -53,10 +53,15 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Override
     public List<CandidateCoin> getList(String formBinance) {
 
-        if (BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_coin) {
+        if ((BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_coin)
+                || (BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_and_msg)) {
+
             return candidateCoinRepository.findAllByOrderByVolumnDivMarketcapDesc();
+
         } else {
+
             return candidateCoinRepository.findCandidateCoinInBinanceFutures();
+
         }
     }
 
