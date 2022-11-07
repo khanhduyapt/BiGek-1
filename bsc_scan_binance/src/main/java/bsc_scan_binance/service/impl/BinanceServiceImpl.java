@@ -995,8 +995,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
 
-                                    String msg = Utils.getTimeHHmm() + " Check BTC " + Utils.removeLastZero(price_now)
-                                            + "(now)";
+                                    String msg = Utils.getTimeHHmm() + " (GoodPrice 24h) BTC "
+                                            + Utils.removeLastZero(price_now) + "(now)";
 
                                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, dto.getGecko_id(),
                                             dto.getSymbol(), "", true));
@@ -1952,40 +1952,45 @@ public class BinanceServiceImpl implements BinanceService {
                             binanceVolumeDateTimeRepository.save(ddhh);
                         }
 
-                        //                        // pump/dump
-                        //                        {
-                        //                            calendar.add(Calendar.HOUR_OF_DAY, -2);
-                        //                            BinanceVolumnDay pre2h = binanceVolumnDayRepository
-                        //                                    .findById(new BinanceVolumnDayKey(gecko_id, symbol,
-                        //                                            Utils.convertDateToString("HH", calendar.getTime())))
-                        //                                    .orElse(null);
+                        // // pump/dump
+                        // {
+                        // calendar.add(Calendar.HOUR_OF_DAY, -2);
+                        // BinanceVolumnDay pre2h = binanceVolumnDayRepository
+                        // .findById(new BinanceVolumnDayKey(gecko_id, symbol,
+                        // Utils.convertDateToString("HH", calendar.getTime())))
+                        // .orElse(null);
                         //
-                        //                            if (!Objects.equals(null, pre2h) && (Utils.getBigDecimal(pre2h.getPriceAtBinance())
-                        //                                    .compareTo(BigDecimal.ZERO) > 0)) {
+                        // if (!Objects.equals(null, pre2h) &&
+                        // (Utils.getBigDecimal(pre2h.getPriceAtBinance())
+                        // .compareTo(BigDecimal.ZERO) > 0)) {
                         //
-                        //                                String str_pump_dump = "";
-                        //                                if (price_at_binance
-                        //                                        .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0) {
+                        // String str_pump_dump = "";
+                        // if (price_at_binance
+                        // .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0)
+                        // {
                         //
-                        //                                    str_pump_dump = " total_pump = total_pump + 1 ";
+                        // str_pump_dump = " total_pump = total_pump + 1 ";
                         //
-                        //                                } else if (price_at_binance
-                        //                                        .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(0.9))) < 0) {
+                        // } else if (price_at_binance
+                        // .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(0.9))) < 0)
+                        // {
                         //
-                        //                                    str_pump_dump = " total_dump = total_dump + 1 ";
-                        //                                }
+                        // str_pump_dump = " total_dump = total_dump + 1 ";
+                        // }
                         //
-                        //                                if (!Objects.equals("", str_pump_dump)) {
-                        //                                    sql_pump_dump = " WITH UPD AS (UPDATE binance_pumping_history SET " + str_pump_dump
-                        //                                            + " WHERE gecko_id='" + gecko_id + "' AND symbol='" + symbol
-                        //                                            + "' AND HH=TO_CHAR(NOW(), 'HH24') \n"
-                        //                                            + " RETURNING gecko_id, symbol, hh), \n" + " INS AS (SELECT '" + gecko_id
-                        //                                            + "', '" + symbol
-                        //                                            + "', TO_CHAR(NOW(), 'HH24'), 1, 1 WHERE NOT EXISTS (SELECT * FROM UPD)) \n"
-                        //                                            + " INSERT INTO binance_pumping_history(gecko_id, symbol, hh, total_pump, total_dump) SELECT * FROM INS; \n";
-                        //                                }
-                        //                            }
-                        //                        }
+                        // if (!Objects.equals("", str_pump_dump)) {
+                        // sql_pump_dump = " WITH UPD AS (UPDATE binance_pumping_history SET " +
+                        // str_pump_dump
+                        // + " WHERE gecko_id='" + gecko_id + "' AND symbol='" + symbol
+                        // + "' AND HH=TO_CHAR(NOW(), 'HH24') \n"
+                        // + " RETURNING gecko_id, symbol, hh), \n" + " INS AS (SELECT '" + gecko_id
+                        // + "', '" + symbol
+                        // + "', TO_CHAR(NOW(), 'HH24'), 1, 1 WHERE NOT EXISTS (SELECT * FROM UPD)) \n"
+                        // + " INSERT INTO binance_pumping_history(gecko_id, symbol, hh, total_pump,
+                        // total_dump) SELECT * FROM INS; \n";
+                        // }
+                        // }
+                        // }
 
                     }
 
@@ -2771,59 +2776,66 @@ public class BinanceServiceImpl implements BinanceService {
     @SuppressWarnings({ "unchecked" })
     @Transactional
     private String monitorBitcoinBalancesOnExchanges() {
-        //        try {
-        //            String event = EVENT_BTC_ON_EXCHANGES + "_" + Utils.getCurrentHH();
+        // try {
+        // String event = EVENT_BTC_ON_EXCHANGES + "_" + Utils.getCurrentHH();
         //
-        //            if (fundingHistoryRepository.existsPumDump("bitcoin", event)) {
-        //                return "";
-        //            }
+        // if (fundingHistoryRepository.existsPumDump("bitcoin", event)) {
+        // return "";
+        // }
         //
-        //            FundingHistory his = new FundingHistory();
-        //            FundingHistoryKey id = new FundingHistoryKey(event, "bitcoin");
-        //            his.setId(id);
-        //            his.setPumpdump(true);
+        // FundingHistory his = new FundingHistory();
+        // FundingHistoryKey id = new FundingHistoryKey(event, "bitcoin");
+        // his.setId(id);
+        // his.setPumpdump(true);
         //
-        //            log.info("Start monitorBitcoinBalancesOnExchanges ---->");
-        //            try {
-        //                List<BitcoinBalancesOnExchanges> entities = GoinglassUtils.getBtcExchangeBalance();
-        //                if (entities.size() > 0) {
-        //                    bitcoinBalancesOnExchangesRepository.saveAll(entities);
-        //                }
+        // log.info("Start monitorBitcoinBalancesOnExchanges ---->");
+        // try {
+        // List<BitcoinBalancesOnExchanges> entities =
+        // GoinglassUtils.getBtcExchangeBalance();
+        // if (entities.size() > 0) {
+        // bitcoinBalancesOnExchangesRepository.saveAll(entities);
+        // }
         //
-        //                String sql = " SELECT                                                                                   \n"
-        //                        + "  fun_btc_price_now()                                              as price_now              \n"
-        //                        + ", sum(balance_change)                                              as change_24h             \n"
-        //                        + ", round(sum(balance_change) * fun_btc_price_now() / 1000000, 0)    as change_24h_val_million \n"
-        //                        + ", sum(d7_balance_change)                                           as change_7d              \n"
-        //                        + ", round(sum(d7_balance_change) * fun_btc_price_now() / 1000000, 0) as change_7d_val_million  \n"
-        //                        + " FROM bitcoin_balances_on_exchanges                                                          \n"
-        //                        + " WHERE                                                                                       \n"
-        //                        + " yyyymmdd='" + Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime()) + "'";
+        // String sql = " SELECT \n"
+        // + " fun_btc_price_now() as price_now \n"
+        // + ", sum(balance_change) as change_24h \n"
+        // + ", round(sum(balance_change) * fun_btc_price_now() / 1000000, 0) as
+        // change_24h_val_million \n"
+        // + ", sum(d7_balance_change) as change_7d \n"
+        // + ", round(sum(d7_balance_change) * fun_btc_price_now() / 1000000, 0) as
+        // change_7d_val_million \n"
+        // + " FROM bitcoin_balances_on_exchanges \n"
+        // + " WHERE \n"
+        // + " yyyymmdd='" + Utils.convertDateToString("yyyyMMdd",
+        // Calendar.getInstance().getTime()) + "'";
         //
-        //                Query query = entityManager.createNativeQuery(sql, "BitcoinBalancesOnExchangesResponse");
+        // Query query = entityManager.createNativeQuery(sql,
+        // "BitcoinBalancesOnExchangesResponse");
         //
-        //                List<BitcoinBalancesOnExchangesResponse> vol_list = query.getResultList();
-        //                if (CollectionUtils.isEmpty(vol_list)) {
-        //                    return "";
-        //                }
+        // List<BitcoinBalancesOnExchangesResponse> vol_list = query.getResultList();
+        // if (CollectionUtils.isEmpty(vol_list)) {
+        // return "";
+        // }
         //
-        //                BitcoinBalancesOnExchangesResponse dto = vol_list.get(0);
+        // BitcoinBalancesOnExchangesResponse dto = vol_list.get(0);
         //
-        //                String msg = "BTC 24h: " + dto.getChange_24h() + "btc(" + dto.getChange_24h_val_million() + "m$)"
-        //                        + Utils.new_line_from_service;
+        // String msg = "BTC 24h: " + dto.getChange_24h() + "btc(" +
+        // dto.getChange_24h_val_million() + "m$)"
+        // + Utils.new_line_from_service;
         //
-        //                msg += " 07d: " + dto.getChange_7d() + "btc(" + dto.getChange_7d_val_million() + "m$)";
+        // msg += " 07d: " + dto.getChange_7d() + "btc(" +
+        // dto.getChange_7d_val_million() + "m$)";
         //
-        //                return msg;
+        // return msg;
         //
-        //            } catch (Exception e) {
-        //                his.setNote(e.getMessage());
-        //                log.info("Error monitorBitcoinBalancesOnExchanges ---->" + e.getMessage());
-        //            }
-        //            fundingHistoryRepository.save(his);
-        //        } catch (Exception e) {
-        //            // TODO: handle exception
-        //        }
+        // } catch (Exception e) {
+        // his.setNote(e.getMessage());
+        // log.info("Error monitorBitcoinBalancesOnExchanges ---->" + e.getMessage());
+        // }
+        // fundingHistoryRepository.save(his);
+        // } catch (Exception e) {
+        // // TODO: handle exception
+        // }
 
         return "";
     }
