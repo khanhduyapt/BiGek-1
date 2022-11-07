@@ -3193,13 +3193,20 @@ public class BinanceServiceImpl implements BinanceService {
         if (23 <= pre_HH || pre_HH <= 8) {
             // return "";
         }
-        if (!binanceFuturesRepository.existsById(gecko_id)) {
-            return "";
-        }
+
         String note = "";
         // Utils.sendToMyTelegram(" 💹 Long: 📉 💚 💔");
         try {
-            List<BtcFutures> list_3days = Utils.loadData(symbol, TIME_1h, 72);
+            List<BtcFutures> list_3days;
+            String type = "";
+            if (binanceFuturesRepository.existsById(gecko_id)) {
+                type = " (Futures)";
+                list_3days = Utils.loadData(symbol, TIME_1h, 72);
+            } else {
+                type = " (Spot)";
+                list_3days = Utils.loadData(symbol, TIME_1d, 14);
+            }
+
             if (CollectionUtils.isEmpty(list_3days)) {
                 return "";
             }
@@ -3279,7 +3286,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         Utils.sendToTelegram(msg);
 
-                        return " Fibo " + longshort.trim();
+                        return " Fibo " + longshort.trim() + type;
                     }
                 }
 
@@ -3304,7 +3311,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         Utils.sendToTelegram(msg);
 
-                        return " Fibo " + msg_btc_24h;
+                        return " Fibo " + msg_btc_24h + type;
                     }
                 }
 
@@ -3357,7 +3364,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 Utils.sendToTelegram(msg);
 
-                                return " Fibo(Short) Volx4";
+                                return " Fibo(Short) Volx4" + type;
                             }
                         }
                     }
@@ -3392,7 +3399,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             String EVENT_ID = EVENT_FIBO_LONG_SHORT + "_" + symbol;
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, false));
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note + type, false));
 
             return note;
 
