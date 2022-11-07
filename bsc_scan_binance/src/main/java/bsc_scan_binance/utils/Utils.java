@@ -472,7 +472,8 @@ public class Utils {
     }
 
     public static void sendToMyTelegram(String text) {
-        if (BscScanBinanceApplication.app_flag != const_app_flag_msg_on) {
+        if ((BscScanBinanceApplication.app_flag != const_app_flag_msg_on)
+                || (BscScanBinanceApplication.app_flag != const_app_flag_all_coin)) {
             return;
         }
 
@@ -480,7 +481,8 @@ public class Utils {
     }
 
     public static void sendToTelegram(String text) {
-        if (BscScanBinanceApplication.app_flag != const_app_flag_msg_on) {
+        if ((BscScanBinanceApplication.app_flag != const_app_flag_msg_on)
+                || (BscScanBinanceApplication.app_flag != const_app_flag_all_coin)) {
             return;
         }
 
@@ -657,6 +659,10 @@ public class Utils {
         String result = Utils.convertDateToString("yyyyMMdd", calendar.getTime()) + "_07";
 
         return result;
+    }
+
+    public static String getTimeHHmm() {
+        return Utils.convertDateToString("(HH:mm)", Calendar.getInstance().getTime());
     }
 
     public static String getToday_YyyyMMdd() {
