@@ -212,24 +212,24 @@ p {
           <!-- OCO -->
           <td class="oco_css" th:classappend="${token.oco_css}"
             style="text-align: left; padding-left: 0.5rem !important; min-width: 450px !important; max-width: 500px !important;">
-            <div th:classappend="${token.min_14d_css}">
+            <div style="font-size: 0.9rem !important;" th:classappend="${token.min_14d_css}">
               <span th:text="${token.oco_tp_price}"></span><span
                 th:classappend="${token.oco_tp_price_hight_css}"
                 th:text="${token.oco_tp_price_hight}"></span>
             </div>
-            <div style="font-size: 0.85rem !important;">
+            <div style="font-size: 0.8rem !important;">
               <span th:text="${token.oco_stop_limit}"></span><span
                 th:classappend="${token.oco_stop_limit_low_css}"
                 th:text="${token.oco_stop_limit_low}"></span>
             </div>
-            <div style="font-size: 0.85rem !important;">
+            <div style="font-size: 0.8rem !important;">
               <span th:text="${token.avg_history}"></span>
               <span th:text="${token.min28day}" th:classappend="${token.min28day_css}" ></span>
             </div>
 
-            <p style="font-size: 0.85rem !important;" class="text-primary"
+            <p style="font-size: 0.8rem !important;" class="text-primary"
               th:text="${token.oco_opportunity}">
-            <div style="font-size: 0.85rem !important;">
+            <div style="font-size: 0.8rem !important;">
                 <span th:classappend="${token.rate1h_css}">1h: <span th:text="${token.rate1h}"></span>% </span>
                 <span th:classappend="${token.rate2h_css}">2h: <span th:text="${token.rate2h}"></span>% </span>
                 <span th:classappend="${token.rate4h_css}">4h: <span th:text="${token.rate4h}"></span>% </span>
@@ -404,13 +404,14 @@ p {
               th:text="${token.day_7_ema}"></td>
           <td class="fix_width" style="text-align: right;">
             <div>
+                <span
+                  style="font-size: 0.6rem !important;"
+                  th:classappend="${token.day_8_gecko_vol_css}"
+                  th:text="${token.day_8_gecko_vol}"></span>
+                <span th:classappend="${token.day_8_vol_css}"
+                  th:text="${token.day_8_vol}"></span>
             </div>
-            <p
-              style="font-size: 0.6rem !important;"
-              th:classappend="${token.day_8_gecko_vol_css}"
-              th:text="${token.day_8_gecko_vol}">
-            <p th:classappend="${token.day_8_vol_css}"
-              th:text="${token.day_8_vol}">
+            
             <p th:classappend="${token.day_8_price_css}"
               th:text="${token.day_8_price}">
             <p style="font-size: 0.6rem !important;"
@@ -479,8 +480,11 @@ p {
         </tr>
       </tbody>
     </table>
+    <p>(1) Chờ tín hiệu của BTC & dựa vào boll mới được mua.</p>
+    <p>(2) Đánh trong thời gian: 9h30-11h, 2h-4h, 19h-22h, hết giờ cắt sạch, không để qua đêm.</p>
+    <p>(3) Từ 20~30 bơm thổi mạnh, 30~10 giá giảm từ từ, 14~19 hàng tháng thị trường sập về giá cũ.</p>
+    <br>
   </div>
-  <br><br><br>
-  <p>(1) Chờ tín hiệu của BTC mới được mua. (2) Đánh trời gian ngắn 9h30-11h, 2h-4h, 19h-22h, hết giờ cắt sạch, không để qua đêm.(3) Từ 14~19 hàng tháng thị trường sập về giá cũ.</p>
+
 </body>
 </html>
