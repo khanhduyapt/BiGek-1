@@ -72,8 +72,6 @@ p {
 </style>
 <script type="text/javascript">
   $(function() {
-  $('[data-toggle="tooltip"]').tooltip();
-
     $(document).on("click", ".table_row", function() {
       $(this).addClass('highlight').siblings().removeClass('highlight');
     });
@@ -177,8 +175,7 @@ p {
           </td>
           <!-- Range -->
           <td style="text-align: right; min-width: 338.8px !important; max-width: 338.8px !important;">
-            <p style="font-size: 0.95rem !important;" th:classappend="${token.futures_css}" th:text="${token.futures}" 
-            	data-toggle="tooltip" data-placement="right" title="(1) Chờ tín hiệu của BTC mới được mua, không đặt lệnh chờ làm lộ bài.&#013;(2) Đánh trời gian ngắn 9h30-11h, 2h-4h, 19h-22h, hết giờ cắt sạch, không để qua đêm.&#013;(3) Chỉ mua coin đang được bơm. Từ 17~19 hàng tháng thị trường sập về giá cũ.">
+            <p style="font-size: 0.95rem !important;" th:classappend="${token.futures_css}" th:text="${token.futures}">
 
             <div style="font-size: 0.75rem !important;">
               <span th:classappend="${token.str_entry_price_css}" th:text="${token.str_entry_price}"></span>
@@ -483,5 +480,7 @@ p {
       </tbody>
     </table>
   </div>
+  <br><br><br>
+  <p>(1) Chờ tín hiệu của BTC mới được mua. (2) Đánh trời gian ngắn 9h30-11h, 2h-4h, 19h-22h, hết giờ cắt sạch, không để qua đêm.(3) Từ 14~19 hàng tháng thị trường sập về giá cũ.</p>
 </body>
 </html>

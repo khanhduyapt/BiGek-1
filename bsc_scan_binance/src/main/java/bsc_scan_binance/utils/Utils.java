@@ -751,6 +751,26 @@ public class Utils {
         return percent;
     }
 
+    public static String getPercentVol2Mc(String volume, String mc) {
+        if (Utils.getBigDecimal(mc).equals(BigDecimal.ZERO)) {
+            return "";
+        }
+
+        BigDecimal percent = (getBigDecimal(volume.replace(",", "")).multiply(BigDecimal.valueOf(1000000)))
+                .divide(getBigDecimal(mc), 4, RoundingMode.CEILING)
+                .multiply(BigDecimal.valueOf(100));
+
+        String mySL = "v/mc ("
+                + removeLastZero(percent)
+                + "%)";
+
+        if (percent.compareTo(BigDecimal.valueOf(30)) < 0) {
+            return "";
+        }
+
+        return mySL.replace("-", "");
+    }
+
     public static String getPercentToEntry(BigDecimal curr_price, BigDecimal entry, boolean isLong) {
         String mySL = Utils.removeLastZero(entry) + "("
                 + (isLong ? Utils.getPercentStr(curr_price, entry) : Utils.getPercentStr(entry, curr_price)) + ")";

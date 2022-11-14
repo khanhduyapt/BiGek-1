@@ -411,6 +411,7 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
+                    + "   , (case when can.volumn_div_marketcap > 0.3 then 1 else 0 end) DESC                     \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -534,17 +535,19 @@ public class BinanceServiceImpl implements BinanceService {
 
                 css.setToday_gecko_vol(
                         temp.get(6) + " (Vol4h: " + Utils.getBigDecimal(dto.getVol_up_rate()).toString() + ")");
-                String today_ema = "";
-                if (temp.get(4).contains("-")) {
-                    today_ema = "(" + (7 - Utils.getIntValue(dto.getCount_up())) + "Down, " + dto.getCount_up()
-                            + "Up )";
-                } else {
-                    today_ema = "(" + dto.getCount_up() + "Up" + ", " + (7 - Utils.getIntValue(dto.getCount_up()))
-                            + "Down) ";
 
-                }
-                today_ema += temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)";
-                css.setToday_ema(today_ema);
+                //String today_ema = "";
+                //if (temp.get(4).contains("-")) {
+                //    today_ema = "(" + (7 - Utils.getIntValue(dto.getCount_up())) + "Down, " + dto.getCount_up()
+                //            + "Up )";
+                //} else {
+                //    today_ema = "(" + dto.getCount_up() + "Up" + ", " + (7 - Utils.getIntValue(dto.getCount_up()))
+                //            + "Down) ";
+                //
+                //}
+                //today_ema += temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)";
+                //css.setToday_ema(today_ema);
+                css.setToday_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
 
                 volList.add("");
                 avgPriceList.add(temp.get(1));
@@ -563,7 +566,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_0());
                 css.setDay_0_vol(temp.get(0));
                 css.setDay_0_price(temp.get(1));
-                css.setDay_0_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                //css.setDay_0_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_0_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_0_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -582,7 +586,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_1());
                 css.setDay_1_vol(temp.get(0));
                 css.setDay_1_price(temp.get(1));
-                css.setDay_1_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_1_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_1_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_1_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -593,7 +598,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_2());
                 css.setDay_2_vol(temp.get(0));
                 css.setDay_2_price(temp.get(1));
-                css.setDay_2_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_2_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_2_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_2_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -604,7 +610,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_3());
                 css.setDay_3_vol(temp.get(0));
                 css.setDay_3_price(temp.get(1));
-                css.setDay_3_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_3_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_3_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_3_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -615,7 +622,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_4());
                 css.setDay_4_vol(temp.get(0));
                 css.setDay_4_price(temp.get(1));
-                css.setDay_4_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_4_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_4_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_4_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -626,7 +634,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_5());
                 css.setDay_5_vol(temp.get(0));
                 css.setDay_5_price(temp.get(1));
-                css.setDay_5_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_5_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_5_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_5_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -637,7 +646,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_6());
                 css.setDay_6_vol(temp.get(0));
                 css.setDay_6_price(temp.get(1));
-                css.setDay_6_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_6_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_6_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_6_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -648,7 +658,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_7());
                 css.setDay_7_vol(temp.get(0));
                 css.setDay_7_price(temp.get(1));
-                css.setDay_7_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_7_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_7_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_7_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -659,7 +670,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_8());
                 css.setDay_8_vol(temp.get(0));
                 css.setDay_8_price(temp.get(1));
-                css.setDay_8_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_8_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_8_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_8_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -670,7 +682,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_9());
                 css.setDay_9_vol(temp.get(0));
                 css.setDay_9_price(temp.get(1));
-                css.setDay_9_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_9_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_9_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_9_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -681,7 +694,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_10());
                 css.setDay_10_vol(temp.get(0));
                 css.setDay_10_price(temp.get(1));
-                css.setDay_10_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_10_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_10_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_10_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -692,7 +706,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_11());
                 css.setDay_11_vol(temp.get(0));
                 css.setDay_11_price(temp.get(1));
-                css.setDay_11_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_11_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_11_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_11_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -703,7 +718,8 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_12());
                 css.setDay_12_vol(temp.get(0));
                 css.setDay_12_price(temp.get(1));
-                css.setDay_12_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_12_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                css.setDay_12_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_12_gecko_vol(temp.get(6));
 
                 volList.add(temp.get(0));
@@ -1272,12 +1288,8 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void setEmaCss(CandidateTokenCssResponse css) {
-        if (!css.getToday_ema().contains("-") && css.getDay_0_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getToday_ema())) {
             css.setToday_ema_css("text-primary font-weight-bold");
-        } else if (css.getToday_ema().contains("-")) {
-            css.setToday_ema_css("text-danger");
-        } else {
-            css.setToday_ema_css("text-primary");
         }
 
         if (!css.getDay_0_ema().contains("-")) {
