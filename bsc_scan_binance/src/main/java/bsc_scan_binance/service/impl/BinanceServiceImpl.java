@@ -400,10 +400,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
                     // + " AND (case when can.symbol <> 'BTC' and rate1d0h < -20 then false else
                     // true end) \n"
-                    + (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump)  \n"
-                            : "")
+                    //+ (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump)  \n" : "")
                     + (isBynaceUrl
-                            ? "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.1 then false else true end) \n"
+                            ? "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.25 then false else true end) \n"
                             : "")
                     + (!(((BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_coin)
                             || (BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_and_msg)))
@@ -482,7 +481,13 @@ public class BinanceServiceImpl implements BinanceService {
                 css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap_str);
                 css.setPumping_history(dto.getPumping_history().replace("Pump:h", "").replace("Dump:h", ""));
 
-                css.setBinance_trade("https://www.binance.com/en/futures/" + dto.getSymbol().toUpperCase() + "USDT");
+                if (css.getName().contains("Futures")) {
+                    css.setBinance_trade(
+                            "https://www.binance.com/en/futures/" + dto.getSymbol().toUpperCase() + "USDT");
+                } else {
+                    css.setBinance_trade("https://www.binance.com/en/trade/" + dto.getSymbol().toUpperCase() + "USDT");
+                }
+
                 // Price
                 String pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"
                         + Utils.removeLastZero(dto.getPrice_pre_1h()) + "←"
@@ -971,9 +976,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                         String textDepth = getTextDepthData();
                         css.setOco_depth(textDepth);
-
-                        // css.setBinance_trade("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3AUSDT.D");
-                        // css.setCoin_gecko_link("https://www.tradingview.com/chart/?symbol=CRYPTOCAP%3ATOTAL");
 
                         BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h))
                                 .divide(price_can_buy_24h, 3, RoundingMode.CEILING));
