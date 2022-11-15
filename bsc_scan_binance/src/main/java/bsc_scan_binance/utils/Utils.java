@@ -400,7 +400,7 @@ public class Utils {
         if (Objects.equals(null, value) || Objects.equals("", value)) {
             return true;
         }
-        return true;
+        return false;
     }
 
     public static String appendSpace(String value, int length) {

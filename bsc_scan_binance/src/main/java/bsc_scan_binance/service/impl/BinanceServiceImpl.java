@@ -390,7 +390,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + " ) gecko_week                                                                              \n"
                     + "                                                                                           \n"
                     + " WHERE                                                                                     \n"
-                    + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
+                    + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 15 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                     + "   AND can.gecko_id = cur.gecko_id                                                         \n"
                     + "   AND can.gecko_id = vbvr.gecko_id                                                        \n"
                     + "   AND can.symbol = cur.symbol                                                             \n"
@@ -536,17 +536,6 @@ public class BinanceServiceImpl implements BinanceService {
                 css.setToday_gecko_vol(
                         temp.get(6) + " (Vol4h: " + Utils.getBigDecimal(dto.getVol_up_rate()).toString() + ")");
 
-                //String today_ema = "";
-                //if (temp.get(4).contains("-")) {
-                //    today_ema = "(" + (7 - Utils.getIntValue(dto.getCount_up())) + "Down, " + dto.getCount_up()
-                //            + "Up )";
-                //} else {
-                //    today_ema = "(" + dto.getCount_up() + "Up" + ", " + (7 - Utils.getIntValue(dto.getCount_up()))
-                //            + "Down) ";
-                //
-                //}
-                //today_ema += temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)";
-                //css.setToday_ema(today_ema);
                 css.setToday_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
 
                 volList.add("");
@@ -1290,78 +1279,52 @@ public class BinanceServiceImpl implements BinanceService {
     private void setEmaCss(CandidateTokenCssResponse css) {
         if (Utils.isNotBlank(css.getToday_ema())) {
             css.setToday_ema_css("text-primary font-weight-bold");
+
+            if (Utils.isBlank(css.getDay_0_ema())) {
+                css.setStar(css.getStar() + "Pump");
+            } else {
+                if (Utils.isBlank(css.getDay_1_ema()) && Utils.isBlank(css.getDay_2_ema())
+                        && Utils.isBlank(css.getDay_3_ema())) {
+                    css.setStar(css.getStar() + "Pump");
+                }
+            }
         }
 
-        if (!css.getDay_0_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_0_ema())) {
             css.setDay_0_ema_css("text-primary");
-        } else if (css.getDay_0_ema().contains("-")) {
-            css.setDay_0_ema_css("text-danger");
         }
-
-        if (!css.getDay_1_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_1_ema())) {
             css.setDay_1_ema_css("text-primary");
-        } else if (css.getDay_1_ema().contains("-")) {
-            css.setDay_1_ema_css("text-danger");
         }
-
-        if (!css.getDay_2_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_2_ema())) {
             css.setDay_2_ema_css("text-primary");
-        } else if (css.getDay_2_ema().contains("-")) {
-            css.setDay_2_ema_css("text-danger");
         }
-
-        if (!css.getDay_3_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_3_ema())) {
             css.setDay_3_ema_css("text-primary");
-        } else if (css.getDay_3_ema().contains("-")) {
-            css.setDay_3_ema_css("text-danger");
         }
-
-        if (!css.getDay_4_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_4_ema())) {
             css.setDay_4_ema_css("text-primary");
-        } else if (css.getDay_4_ema().contains("-")) {
-            css.setDay_4_ema_css("text-danger");
         }
-
-        if (!css.getDay_5_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_5_ema())) {
             css.setDay_5_ema_css("text-primary");
-        } else if (css.getDay_5_ema().contains("-")) {
-            css.setDay_5_ema_css("text-danger");
         }
-
-        if (!css.getDay_6_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_6_ema())) {
             css.setDay_6_ema_css("text-primary");
-        } else if (css.getDay_6_ema().contains("-")) {
-            css.setDay_6_ema_css("text-danger");
         }
-
-        if (!css.getDay_7_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_7_ema())) {
             css.setDay_7_ema_css("text-primary");
-        } else if (css.getDay_7_ema().contains("-")) {
-            css.setDay_7_ema_css("text-danger");
         }
-
-        if (!css.getDay_8_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_8_ema())) {
             css.setDay_8_ema_css("text-primary");
-        } else if (css.getDay_8_ema().contains("-")) {
-            css.setDay_8_ema_css("text-danger");
         }
-
-        if (!css.getDay_9_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_9_ema())) {
             css.setDay_9_ema_css("text-primary");
-        } else if (css.getDay_9_ema().contains("-")) {
-            css.setDay_9_ema_css("text-danger");
         }
-
-        if (!css.getDay_10_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_10_ema())) {
             css.setDay_10_ema_css("text-primary");
-        } else if (css.getDay_10_ema().contains("-")) {
-            css.setDay_10_ema_css("text-danger");
         }
-
-        if (!css.getDay_11_ema().contains("-")) {
+        if (Utils.isNotBlank(css.getDay_11_ema())) {
             css.setDay_11_ema_css("text-primary");
-        } else if (css.getDay_11_ema().contains("-")) {
-            css.setDay_11_ema_css("text-danger");
         }
 
     }
@@ -1643,7 +1606,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '4 hours', 'HH24') and TO_CHAR(NOW() - interval  '1 hours', 'HH24')) as price_pre4h,   \n"
                         + "               (select ROUND(AVG(COALESCE(h.avg_price, 0)), 5) from btc_volumn_day h where h.gecko_id = d.gecko_id and h.hh between TO_CHAR(NOW() - interval  '8 hours', 'HH24') and TO_CHAR(NOW() - interval  '5 hours', 'HH24')) as price_pre8h    \n"
                         + "           from  \n" + "               btc_volumn_day d \n"
-                        + "           where d.hh = (case when EXTRACT(MINUTE FROM NOW()) < 3 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
+                        + "           where d.hh = (case when EXTRACT(MINUTE FROM NOW()) < 15 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
                         + "           ) as tmp                                                                     \n"
                         + "   ) as pre                                                                             \n"
                         + " ) vector                                                                               \n"
@@ -2785,7 +2748,6 @@ public class BinanceServiceImpl implements BinanceService {
         return results;
     }
 
-    @SuppressWarnings({ "unchecked" })
     @Transactional
     private String monitorBitcoinBalancesOnExchanges() {
         // try {
