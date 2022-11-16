@@ -1283,11 +1283,11 @@ public class BinanceServiceImpl implements BinanceService {
             css.setToday_ema_css("text-primary font-weight-bold");
 
             if (Utils.isBlank(css.getDay_0_ema())) {
-                css.setStar(css.getStar() + "Pump");
+                css.setStar(css.getStar() + " ★");
             } else {
                 if (Utils.isBlank(css.getDay_1_ema()) && Utils.isBlank(css.getDay_2_ema())
                         && Utils.isBlank(css.getDay_3_ema())) {
-                    css.setStar(css.getStar() + "Pump");
+                    css.setStar(css.getStar() + " ★");
                 }
             }
         }
@@ -3180,7 +3180,7 @@ public class BinanceServiceImpl implements BinanceService {
                 list_3days = Utils.loadData(symbol, TIME_1h, 72);
             } else {
                 type = " (Spot)";
-                list_3days = Utils.loadData(symbol, TIME_1d, 14);
+                list_3days = Utils.loadData(symbol, TIME_4h, 36);
             }
 
             if (CollectionUtils.isEmpty(list_3days)) {
@@ -3236,13 +3236,13 @@ public class BinanceServiceImpl implements BinanceService {
             if (Utils.isGoodPriceLong(price_at_binance, min_low, max_Hig)) {
 
                 longshort = " 💹 (Long) ";
-                note = " Fibo(Long) E: " + Utils.removeLastZero(min_low) + " ("
+                note = " (Long) E: " + Utils.removeLastZero(min_low) + " ("
                         + Utils.getPercentStr(min_low, price_at_binance) + ")" + type;
 
             } else if (Utils.isGoodPriceShort(price_at_binance, min_low, max_Hig)) {
 
                 longshort = " 📉 (Short) ";
-                note = " Fibo(Short) E: " + Utils.removeLastZero(max_Hig) + " ("
+                note = " (Short) E: " + Utils.removeLastZero(max_Hig) + " ("
                         + Utils.getPercentStr(price_at_binance, max_Hig) + ")" + type;
 
             }
@@ -3262,7 +3262,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         Utils.sendToTelegram(msg);
 
-                        return " Fibo " + longshort.trim() + type;
+                        return " " + longshort.trim() + type;
                     }
                 }
 
@@ -3287,7 +3287,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         Utils.sendToTelegram(msg);
 
-                        return " Fibo " + msg_btc_24h + type;
+                        return " " + msg_btc_24h + type;
                     }
                 }
 
@@ -3340,7 +3340,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 Utils.sendToTelegram(msg);
 
-                                return " Fibo(Short) Volx4" + type;
+                                return " (Short) Volx4" + type;
                             }
                         }
                     }

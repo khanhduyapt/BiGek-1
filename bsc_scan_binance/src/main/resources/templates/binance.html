@@ -133,8 +133,7 @@ p {
       <tbody>
         <tr class="table_row" th:each="token,iter: ${data_list}">
 
-          <td class="" style="text-align: center;"
-            th:text="${iter.index + 1}">
+          <td style="text-align: center;" th:text="${iter.index + 1}" th:classappend="${#strings.contains(token.name, 'Futures') ? 'highlight rounded-lg px-1' : ''}">
           <!-- Symbol -->
           <td class="" style="max-width: 80px !important;">
             <a
@@ -144,8 +143,9 @@ p {
             <a th:target="_blank" th:href="${token.coin_gecko_link}">
               <span style="font-size: 0.7rem !important;" th:text="${token.trend}"></span>
             </a>
-            </td>
-          <!-- Name -->
+          </td>
+
+          <!-- Name highlight rounded-lg px-1 -->
           <td style="font-size: 0.9rem !important; min-width: 180px !important; max-width: 180px !important;">
             <a th:target="_blank" th:href="${token.trading_view}">
               <span th:text="${token.name}"></span>
@@ -155,9 +155,8 @@ p {
             <p style="font-size: 0.7rem !important;" th:text="${token.pumping_history}"></p>
           </td>
           <!-- MC/Vol -->
-          <td style="font-size: 0.9rem !important; text-align: right; max-width: 220px !important;"><span
-            th:classappend="${token.market_cap_css}"
-            th:text="${#numbers.formatDecimal(token.market_cap, 0, 'COMMA', 0, 'POINT') + '$'}"></span>
+          <td style="font-size: 0.9rem !important; text-align: right; max-width: 220px !important;">
+            <span th:classappend="${token.market_cap_css}" th:text="${#numbers.formatDecimal(token.market_cap, 0, 'COMMA', 0, 'POINT') + '$'}"></span>
             <p style="font-size: 0.9rem !important;"
               th:text="${#numbers.formatDecimal(token.gecko_total_volume, 0, 'COMMA', 0, 'POINT') + '$'}">
             <p style="font-size: 0.7rem !important;"
@@ -268,7 +267,7 @@ p {
             </a>
           </td>
 
-          <td class="fix_width2" style="text-align: right;">
+          <td class="fix_width2" style="text-align: right;" th:classappend="${#strings.contains(token.today_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span style="font-size: 0.6rem !important;"
                   th:classappend="${token.today_gecko_vol_css}"
@@ -283,7 +282,7 @@ p {
               th:text="${token.today_ema}">
           </td>
 
-          <td class="fix_width" style="text-align: right;">
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_0_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span style="font-size: 0.6rem !important;"
                   th:classappend="${token.day_0_gecko_vol_css}"
@@ -297,7 +296,8 @@ p {
               th:classappend="${token.day_0_ema_css}"
               th:text="${token.day_0_ema}">
           </td>
-          <td class="fix_width" style="text-align: right;">
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_1_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -311,8 +311,10 @@ p {
               th:text="${token.day_1_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_1_ema_css}"
-              th:text="${token.day_1_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_1_ema}">
+          </td>
+          
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_2_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -326,8 +328,10 @@ p {
               th:text="${token.day_2_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_2_ema_css}"
-              th:text="${token.day_2_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_2_ema}">
+          </td>
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_3_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -341,8 +345,10 @@ p {
               th:text="${token.day_3_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_3_ema_css}"
-              th:text="${token.day_3_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_3_ema}">
+          </td>
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_4_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -356,8 +362,10 @@ p {
               th:text="${token.day_4_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_4_ema_css}"
-              th:text="${token.day_4_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_4_ema}">
+          </td>
+          
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_5_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -371,8 +379,10 @@ p {
               th:text="${token.day_5_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_5_ema_css}"
-              th:text="${token.day_5_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_5_ema}">
+          </td>
+          
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_6_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -386,8 +396,10 @@ p {
               th:text="${token.day_6_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_6_ema_css}"
-              th:text="${token.day_6_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_6_ema}">
+          </td>
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_7_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -401,8 +413,10 @@ p {
               th:text="${token.day_7_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_7_ema_css}"
-              th:text="${token.day_7_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_7_ema}">
+          </td>
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_8_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -416,8 +430,10 @@ p {
               th:text="${token.day_8_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_8_ema_css}"
-              th:text="${token.day_8_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_8_ema}">
+          </td>
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_9_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -431,8 +447,10 @@ p {
               th:text="${token.day_9_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_9_ema_css}"
-              th:text="${token.day_9_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_9_ema}">
+          </td>
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_10_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -446,8 +464,10 @@ p {
               th:text="${token.day_10_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_10_ema_css}"
-              th:text="${token.day_10_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_10_ema}">
+          </td>
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_11_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -461,8 +481,10 @@ p {
               th:text="${token.day_11_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_11_ema_css}"
-              th:text="${token.day_11_ema}"></td>
-          <td class="fix_width" style="text-align: right;">
+              th:text="${token.day_11_ema}">
+          </td>
+
+          <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_11_ema, 'v/mc') ? '' : 'bg-light'}">
             <div>
                 <span
                   style="font-size: 0.6rem !important;"
@@ -476,7 +498,8 @@ p {
               th:text="${token.day_12_price}">
             <p style="font-size: 0.6rem !important;"
               th:classappend="${token.day_12_ema_css}"
-              th:text="${token.day_12_ema}"></td>
+              th:text="${token.day_12_ema}">
+          </td>
         </tr>
       </tbody>
     </table>
