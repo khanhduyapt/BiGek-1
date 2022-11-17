@@ -3192,7 +3192,7 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal min_low = BigDecimal.valueOf(1000000);
             BigDecimal max_Hig = BigDecimal.ZERO;
 
-            int index = 0;
+            int index_btc = 0;
             BigDecimal min24h = BigDecimal.valueOf(1000000);
             BigDecimal max24h = BigDecimal.ZERO;
 
@@ -3217,7 +3217,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 // ----------------------------------
 
-                if (Objects.equals("BTC", symbol) && (index < 24)) {
+                if (Objects.equals("BTC", symbol) && (index_btc < 25)) {
                     if (min24h.compareTo(dto.getLow_price()) > 0) {
                         min24h = dto.getLow_price();
                     }
@@ -3225,7 +3225,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (max24h.compareTo(dto.getHight_price()) < 0) {
                         max24h = dto.getHight_price();
                     }
-                    index += 1;
+                    index_btc += 1;
                 }
             }
 
@@ -3271,11 +3271,15 @@ public class BinanceServiceImpl implements BinanceService {
                 // 24h
                 String msg_btc_24h = "";
                 if (Utils.isGoodPriceLong(price_at_binance, min24h, max24h)) {
+
                     msg_btc_24h = " (24h) Btc: " + Utils.removeLastZero(price_at_binance) + "(now), min24h: "
                             + Utils.removeLastZero(min24h) + " (" + Utils.getPercentStr(min24h, price_at_binance) + ")";
+
                 } else if (Utils.isGoodPriceShort(price_at_binance, min24h, max24h)) {
+
                     msg_btc_24h = " (24h) Btc: " + Utils.removeLastZero(price_at_binance) + "(now), max24h: "
                             + Utils.removeLastZero(max24h) + " (" + Utils.getPercentStr(price_at_binance, max24h) + ")";
+
                 }
 
                 if (Utils.isNotBlank(msg_btc_24h)) {
