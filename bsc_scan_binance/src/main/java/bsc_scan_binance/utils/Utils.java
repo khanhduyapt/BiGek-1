@@ -1171,6 +1171,25 @@ public class Utils {
         return false;
     }
 
+    public static Boolean hasPumpingCandle(List<BtcFutures> list_15m) {
+        if (CollectionUtils.isEmpty(list_15m)) {
+            return false;
+        }
+
+        int count_x4_vol = 0;
+        for (BtcFutures dto : list_15m) {
+            if (dto.is15mPumpingCandle()) {
+                count_x4_vol += 1;
+            }
+        }
+
+        if (count_x4_vol > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static Boolean hasPumpCandle(List<BtcFutures> list_15m, boolean isLong) {
         if (CollectionUtils.isEmpty(list_15m)) {
             return false;

@@ -3250,6 +3250,8 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = new ArrayList<BtcFutures>();
             if (Utils.isNotBlank(longshort)) {
                 list_15m = Utils.loadData(symbol, "15m", 16); // 16h15=4h
+            } else {
+                list_15m = Utils.loadData(symbol, "15m", 4);
             }
 
             if (Objects.equals("BTC", symbol)) {
@@ -3297,9 +3299,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                 // --------------------------------------------------------
 
-                if (Utils.isBlank(longshort)) {
-                    list_15m = Utils.loadData(symbol, "15m", 1);
-                }
                 BtcFutures curr_btc_15m = list_15m.get(0);
 
                 if (curr_btc_15m.isBtcKillLongCandle() || curr_btc_15m.isBtcKillShortCandle()) {
@@ -3375,6 +3374,21 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
+                }
+            }
+
+            if (Utils.isBlank(longshort)) {
+                if (Utils.hasPumpingCandle(list_15m)) {
+
+                    String EVENT_ID_4 = EVENT_DUMP + "_" + symbol + "_" + Utils.getToday_YyyyMMdd() + "_"
+                            + Utils.getCurrentHH();
+
+                    if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
+                        note = " (Long_15m)" + type;
+                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
+
+                        return note;
+                    }
                 }
             }
 

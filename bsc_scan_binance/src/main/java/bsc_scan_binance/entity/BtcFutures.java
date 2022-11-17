@@ -151,6 +151,16 @@ public class BtcFutures {
         return false;
     }
 
+    public boolean is15mPumpingCandle() {
+        BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(price_open_candle, price_close_candle, 2)).abs();
+
+        if (uptrend && percent.compareTo(BigDecimal.valueOf(2)) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public BigDecimal getCandleHeight() {
         BigDecimal change = (Utils.getBigDecimal(price_open_candle).subtract(price_close_candle)).abs();
 
