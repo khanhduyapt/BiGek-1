@@ -992,27 +992,40 @@ public class BinanceServiceImpl implements BinanceService {
                         // take_profit_percent > 3% ?
                         if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0) && check_L_H) {
 
+                            String longshort = "";
                             if (Utils.isGoodPriceLong(price_now, price_can_buy_24h, price_can_sell_24h)) {
 
                                 css.setBtc_warning_css("bg-success rounded-lg");
                                 // (Good time to buy)
+                                longshort = "(Long 24h)";
 
+                            } else if (Utils.isGoodPriceShort(price_now, price_can_buy_24h, price_can_sell_24h)) {
+
+                                longshort = "(Short 24h)";
+
+                            } else {
+                                btc_is_good_price_for_long = false;
+                            }
+
+                            if (Utils.isNotBlank(longshort)) {
                                 String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_BTC_" + Utils.getToday_YyyyMMdd() + "_"
                                         + Utils.getCurrentHH();
 
                                 if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
 
-                                    String msg = Utils.getTimeHHmm() + " (GoodPrice 24h) BTC "
-                                            + Utils.removeLastZero(price_now) + "(now)";
-
                                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, dto.getGecko_id(),
                                             dto.getSymbol(), "", true));
 
+                                    String msg = Utils.getTimeHHmm() + " " + longshort + " BTC "
+                                            + Utils.removeLastZero(price_now) + "(now), E: "
+                                            + Utils.getPercentToEntry(price_now, price_can_buy_24h,
+                                                    true)
+                                            + ", TP: "
+                                            + Utils.getPercentToEntry(price_now, price_can_sell_24h, true).replace("-",
+                                                    "");
+
                                     Utils.sendToMyTelegram(msg);
                                 }
-
-                            } else {
-                                btc_is_good_price_for_long = false;
                             }
 
                             if ((price_now.multiply(BigDecimal.valueOf(1.005)).compareTo(highest_price_today) > 0)) {
