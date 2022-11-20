@@ -473,8 +473,8 @@ public class Utils {
     }
 
     public static void sendToMyTelegram(String text) {
-        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on) ||
-                (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
+        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
+                || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
 
             sendToChatId(Utils.chatId_duydk, text + " (only)");
         }
@@ -482,8 +482,8 @@ public class Utils {
     }
 
     public static void sendToTelegram(String text) {
-        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on) ||
-                (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
+        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
+                || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
 
             if (!isBusinessTime()) {
                 return;
@@ -670,6 +670,16 @@ public class Utils {
         return Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime());
     }
 
+    public static String getToday_dd() {
+        return Utils.convertDateToString("dd", Calendar.getInstance().getTime());
+    }
+
+    public static String getDdFromToday(int dateadd) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, dateadd);
+        return Utils.convertDateToString("dd", calendar.getTime());
+    }
+
     public static Integer getCurrentHH() {
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         return HH;
@@ -757,12 +767,9 @@ public class Utils {
         }
 
         BigDecimal percent = (getBigDecimal(volume.replace(",", "")).multiply(BigDecimal.valueOf(1000000)))
-                .divide(getBigDecimal(mc), 4, RoundingMode.CEILING)
-                .multiply(BigDecimal.valueOf(100));
+                .divide(getBigDecimal(mc), 4, RoundingMode.CEILING).multiply(BigDecimal.valueOf(100));
 
-        String mySL = "v/mc ("
-                + removeLastZero(percent)
-                + "%)";
+        String mySL = "v/mc (" + removeLastZero(percent) + "%)";
 
         if (percent.compareTo(BigDecimal.valueOf(30)) < 0) {
             return "";

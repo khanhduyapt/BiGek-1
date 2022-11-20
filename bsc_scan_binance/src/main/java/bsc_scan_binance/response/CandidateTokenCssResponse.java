@@ -23,6 +23,7 @@ public class CandidateTokenCssResponse {
     private String str_entry_price_css = "";
 
     private String pumping_history = "";
+    private String pumping_history_css = "";
 
     private String volumn_div_marketcap = "";
     private String volumn_div_marketcap_css = "";

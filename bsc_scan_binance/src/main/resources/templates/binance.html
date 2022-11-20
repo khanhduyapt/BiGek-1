@@ -85,7 +85,7 @@ p {
         <tr>
           <th class="text-center" scope="col">#</th>
           <th class="text-center" scope="col">Symbol</th>
-          <th class="text-center" scope="col">Name</th>
+          <th class="text-center" scope="col">Name/Pump</th>
           <th class="text-center" scope="col">MC/Vol</th>
 
           <th class="text-center text-primary" scope="col">v/mc</th>
@@ -152,7 +152,7 @@ p {
             </a>
 
             <p style="font-size: 0.7rem !important;" th:text="${token.note}"></p>
-            <p style="font-size: 0.7rem !important;" th:text="${token.pumping_history}"></p>
+            <span style="font-size: 0.7rem !important;" th:text="${token.pumping_history}" th:classappend="${token.pumping_history_css}"></span>
           </td>
           <!-- MC/Vol -->
           <td style="font-size: 0.9rem !important; text-align: right; max-width: 220px !important;">

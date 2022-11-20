@@ -221,9 +221,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    0 as profit,                                                                           \n"
                     + "                                                                                           \n"
                     + "    (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as count_up, "
-                    + "    concat('Pump:', coalesce((select string_agg(his1.hh, '<') from (select * from binance_pumping_history his1 where his1.gecko_id = can.gecko_id and his1.symbol = can.symbol and his1.total_pump > 3 order by his1.total_pump desc limit 5) as his1), ''), 'h', ' ', \n"
-                    + "           'Dump:', coalesce((select string_agg(his2.hh, '<') from (select * from binance_pumping_history his2 where his2.gecko_id = can.gecko_id and his2.symbol = can.symbol and his2.total_dump > 3 order by his2.total_dump desc limit 5) as his2), ''), 'h' \n"
-                    + "          ) as pumping_history,                                                            \n"
+
+                    + "   vol.pumping_history,                                                                     \n "
 
                     + "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n"
                     + "                                                                                           \n"
@@ -290,7 +289,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   vol.vol0d,                                                                              \n"
                     + "   vol.vol1d,                                                                              \n"
                     + "   vol.vol7d                                                                               \n"
-                    + "   , gecko_week.vol_gecko_increate                                                         \n"
+                    + "   , 0 vol_gecko_increate                                                         \n"
                     + "   , cur.point AS opportunity                                                              \n"
                     + "                                                                                           \n"
                     + "   , concat('1h: ', rate1h, '%, 2h: ', rate2h, '%, 4h: ', rate4h, '%, 1d0h: ', rate1d0h, '%, 1d4h: ', rate1d4h, '%') as binance_vol_rate \n"
@@ -324,7 +323,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "          select                                                                           \n"
                     + "              can.gecko_id,                                                                \n"
                     + "              can.symbol,                                                                  \n"
-                    + "              can.name,                                                                    \n"
                     + "             (select COALESCE(w.min_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd')) as price_today,      \n"
                     + "             (select COALESCE(w.min_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd')) as price_pre_07d,  \n"
                     + "             (select COALESCE(w.min_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd')) as price_pre_14d,  \n"
@@ -343,6 +341,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "     select                                                                                \n"
                     + "        gecko_id,                                                                          \n"
                     + "        symbol,                                                                            \n"
+                    + "        pumping_history,                                                                   \n"
                     + "        ROUND((COALESCE(volume_today  , 0))/1000000, 1) as vol0d, \n"
                     + "        ROUND((COALESCE(volume_pre_01d, 0))/1000000, 1) as vol1d, \n"
                     + "        ROUND((COALESCE(volume_pre_07d, 0))/1000000, 1) as vol7d  \n"
@@ -351,7 +350,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "           select                                                                          \n"
                     + "               can.gecko_id,                                                               \n"
                     + "               can.symbol,                                                                 \n"
-                    + "               can.name,                                                                   \n"
+                    + "              concat('day: ', coalesce((select string_agg(dd, ', ') from (SELECT * FROM public.gecko_volume_month  where gecko_id = can.gecko_id and total_volume > (SELECT avg(total_volume)*1.5 FROM public.gecko_volume_month where gecko_id = can.gecko_id) order by dd) pump), '')) as pumping_history,                                                                    \n"
                     + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW(), 'dd'))                      as volume_today,  \n"
                     + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '1 days', 'dd')) as volume_pre_01d, \n"
                     + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '6 days', 'dd')) as volume_pre_07d  \n"
@@ -360,34 +359,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "     ) tmp                                                                                 \n"
                     + ") vol                                                                                      \n"
                     + ", " + Utils.sql_boll_2_body
-                    + ", (                                                                                        \n"
-                    + "     SELECT                                                                                \n"
-                    + "           gecko_id                                                                        \n"
-                    + "         , symbol                                                                          \n"
-                    + "         , vol_today                                                                       \n"
-                    + "         , vol_avg_07d                                                                     \n"
-                    + "         , (case when vol_today > vol_avg_07d then true else false end) as vol_up          \n"
-                    + "         , ROUND((case when vol_avg_07d > 0 and vol_today/vol_avg_07d > 1.5 then vol_today/vol_avg_07d else 0 end), 1) as vol_gecko_increate \n"
-                    + "     from                                                                                  \n"
-                    + "     (                                                                                     \n"
-                    + "         SELECT                                                                            \n"
-                    + "             gecko_id                                                                      \n"
-                    + "             , symbol                                                                      \n"
-                    + "             , (select ROUND(COALESCE(w.total_volume, 0), 0) from gecko_volume_month w where w.gecko_id = mon.gecko_id and w.symbol = mon.symbol and w.dd = TO_CHAR(NOW(), 'dd')) as vol_today \n"
-                    + "             , (select ROUND(AVG(COALESCE(w.total_volume, 0)), 0) from gecko_volume_month w where w.gecko_id = mon.gecko_id and w.symbol = mon.symbol  \n"
-                    + "              and w.dd in (  TO_CHAR(NOW() - interval  '6 days', 'dd')                     \n"
-                    + "                           , TO_CHAR(NOW() - interval  '5 days', 'dd')                     \n"
-                    + "                           , TO_CHAR(NOW() - interval  '4 days', 'dd')                     \n"
-                    + "                           , TO_CHAR(NOW() - interval  '3 days', 'dd')                     \n"
-                    + "                           , TO_CHAR(NOW() - interval  '2 days', 'dd')                     \n"
-                    + "                           , TO_CHAR(NOW() - interval  '1 days', 'dd')                     \n"
-                    + "                           , TO_CHAR(NOW(), 'dd')                                          \n"
-                    + "                           )                                                               \n"
-                    + "             ) as vol_avg_07d                                                              \n"
-                    + "         FROM public.gecko_volume_month mon                                                \n"
-                    + "         where mon.dd = TO_CHAR(NOW(), 'dd')                                               \n"
-                    + "     )tmp                                                                                  \n"
-                    + " ) gecko_week                                                                              \n"
                     + "                                                                                           \n"
                     + " WHERE                                                                                     \n"
                     + "       cur.hh = (case when EXTRACT(MINUTE FROM NOW()) < 15 then TO_CHAR(NOW() - interval '1 hours', 'HH24') else TO_CHAR(NOW(), 'HH24') end) \n"
@@ -397,10 +368,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = macd.gecko_id                                                        \n"
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
-                    + "   AND can.gecko_id = gecko_week.gecko_id                                                  \n"
-                    // + " AND (case when can.symbol <> 'BTC' and rate1d0h < -20 then false else
-                    // true end) \n"
-                    //+ (isBynaceUrl ? " AND can.gecko_id IN (SELECT gecko_id FROM funding_history WHERE pumpdump)  \n" : "")
                     + (isBynaceUrl
                             ? "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.25 then false else true end) \n"
                             : "")
@@ -410,7 +377,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
-                    + "   , (case when can.volumn_div_marketcap > 1.2 then 3 when can.volumn_div_marketcap > 0.6 then 2 when can.volumn_div_marketcap > 0.3 then 1 else 0 end) DESC                     \n"
+                    + "   , (case when (vol.pumping_history like '%' || TO_CHAR(NOW(), 'dd') || '%') then 1 when (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '1 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '2 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '3 days', 'dd') || '%') then 2 else 3 end) ASC \n"
+                    + "   , (case when can.volumn_div_marketcap > 1.2 then 3 when can.volumn_div_marketcap > 0.6 then 2 when can.volumn_div_marketcap > 0.3 then 1 else 0 end) DESC \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -423,6 +391,9 @@ public class BinanceServiceImpl implements BinanceService {
             ModelMapper mapper = new ModelMapper();
             Integer index = 1;
             String sql_update_ema = "";
+            String dd = Utils.getToday_dd();
+            String ddAdd1 = Utils.getDdFromToday(1);
+            String ddAdd2 = Utils.getDdFromToday(2);
 
             Boolean this_token_is_good_price = false;
             List<PriorityCoin> listPriorityCoin = priorityCoinRepository.findAll();
@@ -479,7 +450,11 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 css.setVolumn_binance_div_marketcap(volumn_binance_div_marketcap_str);
-                css.setPumping_history(dto.getPumping_history().replace("Pump:h", "").replace("Dump:h", ""));
+                if (css.getPumping_history().contains(dd)) {
+                    css.setPumping_history_css("text-white bg-success rounded-lg");
+                } else if (css.getPumping_history().contains(ddAdd1) || css.getPumping_history().contains(ddAdd2)) {
+                    css.setPumping_history_css("bg-warning rounded-lg");
+                }
 
                 if (css.getName().contains("Futures")) {
                     css.setBinance_trade(
@@ -560,7 +535,7 @@ public class BinanceServiceImpl implements BinanceService {
                 temp = splitVolAndPrice(css.getDay_0());
                 css.setDay_0_vol(temp.get(0));
                 css.setDay_0_price(temp.get(1));
-                //css.setDay_0_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
+                // css.setDay_0_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_0_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_0_gecko_vol(temp.get(6));
 
@@ -992,40 +967,27 @@ public class BinanceServiceImpl implements BinanceService {
                         // take_profit_percent > 3% ?
                         if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0) && check_L_H) {
 
-                            String longshort = "";
                             if (Utils.isGoodPriceLong(price_now, price_can_buy_24h, price_can_sell_24h)) {
 
                                 css.setBtc_warning_css("bg-success rounded-lg");
                                 // (Good time to buy)
-                                longshort = "(Long 24h)";
 
-                            } else if (Utils.isGoodPriceShort(price_now, price_can_buy_24h, price_can_sell_24h)) {
-
-                                longshort = "(Short 24h)";
-
-                            } else {
-                                btc_is_good_price_for_long = false;
-                            }
-
-                            if (Utils.isNotBlank(longshort)) {
                                 String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_BTC_" + Utils.getToday_YyyyMMdd() + "_"
                                         + Utils.getCurrentHH();
 
                                 if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
 
+                                    String msg = Utils.getTimeHHmm() + " (GoodPrice 24h) BTC "
+                                            + Utils.removeLastZero(price_now) + "(now)";
+
                                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, dto.getGecko_id(),
                                             dto.getSymbol(), "", true));
 
-                                    String msg = Utils.getTimeHHmm() + " " + longshort + " BTC "
-                                            + Utils.removeLastZero(price_now) + "(now), E: "
-                                            + Utils.getPercentToEntry(price_now, price_can_buy_24h,
-                                                    true)
-                                            + ", TP: "
-                                            + Utils.getPercentToEntry(price_now, price_can_sell_24h, true).replace("-",
-                                                    "");
-
                                     Utils.sendToMyTelegram(msg);
                                 }
+
+                            } else {
+                                btc_is_good_price_for_long = false;
                             }
 
                             if ((price_now.multiply(BigDecimal.valueOf(1.005)).compareTo(highest_price_today) > 0)) {
@@ -1080,8 +1042,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                     wallToday();
                     css.setNote("");
-                    String btcOnEx = getBtcBalancesOnExchanges().replaceAll(Utils.new_line_from_service, " ");
-                    css.setPumping_history(btcOnEx);
 
                     css.setStar(sp500);
                     css.setStar_css("display-tity text-left");
@@ -1296,11 +1256,11 @@ public class BinanceServiceImpl implements BinanceService {
             css.setToday_ema_css("text-primary font-weight-bold");
 
             if (Utils.isBlank(css.getDay_0_ema())) {
-                css.setStar(css.getStar() + " ★");
+                css.setStar(css.getStar() + "Pump");
             } else {
                 if (Utils.isBlank(css.getDay_1_ema()) && Utils.isBlank(css.getDay_2_ema())
                         && Utils.isBlank(css.getDay_3_ema())) {
-                    css.setStar(css.getStar() + " ★");
+                    css.setStar(css.getStar() + "Pump");
                 }
             }
         }
@@ -2823,7 +2783,6 @@ public class BinanceServiceImpl implements BinanceService {
         // }
         // fundingHistoryRepository.save(his);
         // } catch (Exception e) {
-        // // TODO: handle exception
         // }
 
         return "";
@@ -3193,7 +3152,7 @@ public class BinanceServiceImpl implements BinanceService {
                 list_3days = Utils.loadData(symbol, TIME_1h, 72);
             } else {
                 type = " (Spot)";
-                list_3days = Utils.loadData(symbol, TIME_4h, 36);
+                list_3days = Utils.loadData(symbol, TIME_1d, 14);
             }
 
             if (CollectionUtils.isEmpty(list_3days)) {
@@ -3205,7 +3164,7 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal min_low = BigDecimal.valueOf(1000000);
             BigDecimal max_Hig = BigDecimal.ZERO;
 
-            int index_btc = 0;
+            int index = 0;
             BigDecimal min24h = BigDecimal.valueOf(1000000);
             BigDecimal max24h = BigDecimal.ZERO;
 
@@ -3230,7 +3189,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 // ----------------------------------
 
-                if (Objects.equals("BTC", symbol) && (index_btc < 25)) {
+                if (Objects.equals("BTC", symbol) && (index < 24)) {
                     if (min24h.compareTo(dto.getLow_price()) > 0) {
                         min24h = dto.getLow_price();
                     }
@@ -3238,7 +3197,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (max24h.compareTo(dto.getHight_price()) < 0) {
                         max24h = dto.getHight_price();
                     }
-                    index_btc += 1;
+                    index += 1;
                 }
             }
 
@@ -3249,13 +3208,13 @@ public class BinanceServiceImpl implements BinanceService {
             if (Utils.isGoodPriceLong(price_at_binance, min_low, max_Hig)) {
 
                 longshort = " 💹 (Long) ";
-                note = " (Long) E: " + Utils.removeLastZero(min_low) + " ("
+                note = " Fibo(Long) E: " + Utils.removeLastZero(min_low) + " ("
                         + Utils.getPercentStr(min_low, price_at_binance) + ")" + type;
 
             } else if (Utils.isGoodPriceShort(price_at_binance, min_low, max_Hig)) {
 
                 longshort = " 📉 (Short) ";
-                note = " (Short) E: " + Utils.removeLastZero(max_Hig) + " ("
+                note = " Fibo(Short) E: " + Utils.removeLastZero(max_Hig) + " ("
                         + Utils.getPercentStr(price_at_binance, max_Hig) + ")" + type;
 
             }
@@ -3263,8 +3222,6 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = new ArrayList<BtcFutures>();
             if (Utils.isNotBlank(longshort)) {
                 list_15m = Utils.loadData(symbol, "15m", 16); // 16h15=4h
-            } else {
-                list_15m = Utils.loadData(symbol, "15m", 4);
             }
 
             if (Objects.equals("BTC", symbol)) {
@@ -3277,7 +3234,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         Utils.sendToTelegram(msg);
 
-                        return " " + longshort.trim() + type;
+                        return " Fibo " + longshort.trim() + type;
                     }
                 }
 
@@ -3286,15 +3243,11 @@ public class BinanceServiceImpl implements BinanceService {
                 // 24h
                 String msg_btc_24h = "";
                 if (Utils.isGoodPriceLong(price_at_binance, min24h, max24h)) {
-
                     msg_btc_24h = " (24h) Btc: " + Utils.removeLastZero(price_at_binance) + "(now), min24h: "
                             + Utils.removeLastZero(min24h) + " (" + Utils.getPercentStr(min24h, price_at_binance) + ")";
-
                 } else if (Utils.isGoodPriceShort(price_at_binance, min24h, max24h)) {
-
                     msg_btc_24h = " (24h) Btc: " + Utils.removeLastZero(price_at_binance) + "(now), max24h: "
                             + Utils.removeLastZero(max24h) + " (" + Utils.getPercentStr(price_at_binance, max24h) + ")";
-
                 }
 
                 if (Utils.isNotBlank(msg_btc_24h)) {
@@ -3306,12 +3259,15 @@ public class BinanceServiceImpl implements BinanceService {
 
                         Utils.sendToTelegram(msg);
 
-                        return " " + msg_btc_24h + type;
+                        return " Fibo " + msg_btc_24h + type;
                     }
                 }
 
                 // --------------------------------------------------------
 
+                if (Utils.isBlank(longshort)) {
+                    list_15m = Utils.loadData(symbol, "15m", 1);
+                }
                 BtcFutures curr_btc_15m = list_15m.get(0);
 
                 if (curr_btc_15m.isBtcKillLongCandle() || curr_btc_15m.isBtcKillShortCandle()) {
@@ -3356,7 +3312,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 Utils.sendToTelegram(msg);
 
-                                return " (Short) Volx4" + type;
+                                return " Fibo(Short) Volx4" + type;
                             }
                         }
                     }
@@ -3387,21 +3343,6 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
-                }
-            }
-
-            if (Utils.isBlank(longshort)) {
-                if (Utils.hasPumpingCandle(list_15m)) {
-
-                    String EVENT_ID_4 = EVENT_DUMP + "_" + symbol + "_" + Utils.getToday_YyyyMMdd() + "_"
-                            + Utils.getCurrentHH();
-
-                    if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
-                        note = " (Long_15m)" + type;
-                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
-
-                        return note;
-                    }
                 }
             }
 
