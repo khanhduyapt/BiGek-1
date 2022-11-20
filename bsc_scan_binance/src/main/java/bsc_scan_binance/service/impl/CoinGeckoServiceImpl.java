@@ -255,7 +255,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             coin.setBacker(backer);
         }
 
-        candidateCoinRepository.save(coin);
+        //candidateCoinRepository.save(coin);
 
         return coin;
     }
@@ -503,7 +503,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             list.add(new CandidateCoin("threshold-network-token", "T", "Threshold Network"));
             list.add(new CandidateCoin("tycoon-global", "TCT", "Tycoon Global"));
 
-            candidateCoinRepository.saveAll(list);
+            //candidateCoinRepository.saveAll(list);
             log.info("end CoinGeckoServiceImpl.initCandidateCoin success -->");
 
             return list;
@@ -522,7 +522,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             log.info("Start add  --->");
 
             CandidateCoin entity = new CandidateCoin(request.getId(), request.getSymbol(), request.getName());
-            candidateCoinRepository.save(entity);
+            //candidateCoinRepository.save(entity);
 
             List<BinanceVolumnDay> days = new ArrayList<BinanceVolumnDay>();
             for (int index = 1; index < 24; index++) {

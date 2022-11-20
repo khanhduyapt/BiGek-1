@@ -26,12 +26,10 @@ import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.OrderKey;
 import bsc_scan_binance.entity.Orders;
-import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.entity.TakeProfit;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.OrdersRepository;
-import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
 import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
@@ -44,9 +42,6 @@ import lombok.RequiredArgsConstructor;
 public class WandaBot extends TelegramLongPollingBot {
     @Autowired
     private final BinanceService binance_service;
-
-    @Autowired
-    private PriorityCoinRepository priorityCoinRepository;
 
     @Autowired
     private BinanceVolumnWeekRepository binanceVolumnWeekRepository;
@@ -203,12 +198,6 @@ public class WandaBot extends TelegramLongPollingBot {
                 if (Objects.equal(null, entity)) {
                     entity = new Orders();
                     entity.setId(key);
-
-                    PriorityCoin pc = priorityCoinRepository.findById(dto.getId().getGeckoid()).orElse(null);
-                    if (!Objects.equal(null, pc)) {
-                        note = pc.getNote();
-                    }
-                    entity.setNote(note);
                 }
 
                 BigDecimal amount1 = Utils.getBigDecimal(entity.getAmount());
@@ -446,20 +435,20 @@ public class WandaBot extends TelegramLongPollingBot {
     }
 
     private void checkCommand(SendMessage message, String token) throws TelegramApiException {
-        String SYMBOL = token.toUpperCase();
-        // binance_service.getList(false);
-        List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(SYMBOL);
-        if (CollectionUtils.isEmpty(list)) {
-            message.setText("Empty");
-            execute(message);
-            return;
-        }
-
-        String msg = Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot);
-        msg += Utils.new_line_from_bot + Utils.new_line_from_bot + createBidsAsks(SYMBOL);
-
-        message.setText(msg);
-        execute(message);
+//        String SYMBOL = token.toUpperCase();
+//        // binance_service.getList(false);
+//        List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(SYMBOL);
+//        if (CollectionUtils.isEmpty(list)) {
+//            message.setText("Empty");
+//            execute(message);
+//            return;
+//        }
+//
+//        String msg = Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot);
+//        msg += Utils.new_line_from_bot + Utils.new_line_from_bot + createBidsAsks(SYMBOL);
+//
+//        message.setText(msg);
+//        execute(message);
     }
 
     private String createBidsAsks(String SYMBOL) {

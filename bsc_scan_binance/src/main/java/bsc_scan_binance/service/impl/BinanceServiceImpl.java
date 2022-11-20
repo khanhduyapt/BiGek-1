@@ -40,9 +40,10 @@ import bsc_scan_binance.entity.DepthAsks;
 import bsc_scan_binance.entity.DepthBids;
 import bsc_scan_binance.entity.FundingHistory;
 import bsc_scan_binance.entity.FundingHistoryKey;
+import bsc_scan_binance.entity.GeckoVolumeMonth;
+import bsc_scan_binance.entity.GeckoVolumeMonthKey;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
-import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.repository.BinanceFuturesRepository;
 import bsc_scan_binance.repository.BinanceVolumeDateTimeRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
@@ -55,9 +56,9 @@ import bsc_scan_binance.repository.CandidateCoinRepository;
 import bsc_scan_binance.repository.DepthAsksRepository;
 import bsc_scan_binance.repository.DepthBidsRepository;
 import bsc_scan_binance.repository.FundingHistoryRepository;
+import bsc_scan_binance.repository.GeckoVolumeMonthRepository;
 import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
-import bsc_scan_binance.repository.PriorityCoinRepository;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
@@ -83,13 +84,13 @@ public class BinanceServiceImpl implements BinanceService {
     private BinanceVolumnDayRepository binanceVolumnDayRepository;
 
     @Autowired
+    private GeckoVolumeMonthRepository geckoVolumeMonthRepository;
+
+    @Autowired
     private BinanceVolumeDateTimeRepository binanceVolumeDateTimeRepository;
 
     @Autowired
     private BinanceVolumnWeekRepository binanceVolumnWeekRepository;
-
-    @Autowired
-    private PriorityCoinRepository priorityCoinRepository;
 
     @Autowired
     private BtcVolumeDayRepository btcVolumeDayRepository;
@@ -350,10 +351,19 @@ public class BinanceServiceImpl implements BinanceService {
                     + "           select                                                                          \n"
                     + "               can.gecko_id,                                                               \n"
                     + "               can.symbol,                                                                 \n"
-                    + "              concat('day: ', coalesce((select string_agg(dd, ', ') from (SELECT * FROM public.gecko_volume_month  where gecko_id = can.gecko_id and total_volume > (SELECT avg(total_volume)*1.5 FROM public.gecko_volume_month where gecko_id = can.gecko_id) order by dd) pump), '')) as pumping_history,                                                                    \n"
-                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW(), 'dd'))                      as volume_today,  \n"
-                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '1 days', 'dd')) as volume_pre_01d, \n"
-                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and dd = TO_CHAR(NOW() - interval  '6 days', 'dd')) as volume_pre_07d  \n"
+                    //+ "              concat('day: ', coalesce((select string_agg(dd, ', ') from (SELECT dd FROM public.gecko_volume_month WHERE gecko_id = can.gecko_id and symbol = 'GECKO' and total_volume > (SELECT avg(total_volume)*1.5 FROM public.gecko_volume_month where gecko_id = can.gecko_id and symbol = 'GECKO') order by dd) pump), '')) as pumping_history, \n"
+
+                    + "               concat('day: '                                                                    \n"
+                    + "                 , coalesce((select string_agg(dd, ', ') from (SELECT distinct dd FROM (     \n"
+                    + "                     select dd from gecko_volume_month where gecko_id = can.gecko_id and symbol = 'GECKO'   and total_volume > (SELECT avg(total_volume)*1.5 FROM public.gecko_volume_month where gecko_id = can.gecko_id and symbol = 'GECKO')      \n"
+                    + "                     union                                                                   \n"
+                    + "                     select dd from gecko_volume_month where gecko_id = can.gecko_id and symbol = 'BINANCE' and total_volume > (SELECT avg(total_volume)*1.5 FROM public.gecko_volume_month where gecko_id = can.gecko_id and symbol = 'BINANCE')    \n"
+                    + "                 ) uni_dd order by dd) pump), '')                                                \n"
+                    + "               ) as pumping_history,                                                              \n"
+
+                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = 'GECKO' and dd = TO_CHAR(NOW(), 'dd'))                      as volume_today,  \n"
+                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = 'GECKO' and dd = TO_CHAR(NOW() - interval  '1 days', 'dd')) as volume_pre_01d, \n"
+                    + "              (select COALESCE(w.total_volume, 0) from gecko_volume_month w where w.gecko_id = can.gecko_id and w.symbol = 'GECKO' and dd = TO_CHAR(NOW() - interval  '6 days', 'dd')) as volume_pre_07d  \n"
                     + "           from                                                                            \n"
                     + "               candidate_coin can                                                          \n"
                     + "     ) tmp                                                                                 \n"
@@ -377,7 +387,7 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
-                    + "   , (case when (vol.pumping_history like '%' || TO_CHAR(NOW(), 'dd') || '%') then 1 when (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '1 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '2 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '3 days', 'dd') || '%') then 2 else 3 end) ASC \n"
+                    + "   , (case when (can.volumn_div_marketcap < 0.25) then 3 when (vol.pumping_history like '%' || TO_CHAR(NOW(), 'dd') || '%') then 1 when (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '1 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '2 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '3 days', 'dd') || '%') then 2 else 3 end) ASC \n"
                     + "   , (case when can.volumn_div_marketcap > 1.2 then 3 when can.volumn_div_marketcap > 0.6 then 2 when can.volumn_div_marketcap > 0.3 then 1 else 0 end) DESC \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
@@ -396,17 +406,9 @@ public class BinanceServiceImpl implements BinanceService {
             String ddAdd2 = Utils.getDdFromToday(2);
 
             Boolean this_token_is_good_price = false;
-            List<PriorityCoin> listPriorityCoin = priorityCoinRepository.findAll();
 
             // monitorTokenSales(results);
             for (CandidateTokenResponse dto : results) {
-
-                PriorityCoin priorityCoin = listPriorityCoin.stream()
-                        .filter(item -> Objects.equals(item.getGeckoid(), dto.getGecko_id())).findFirst()
-                        .orElse(new PriorityCoin());
-
-                priorityCoin.setGeckoid(dto.getGecko_id());
-
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
                 mapper.map(dto, css);
 
@@ -752,8 +754,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                 this_token_is_good_price = Utils.isGoodPriceLong(price_now, lowest_price_today, highest_price_today);
 
-                priorityCoin.setCurrent_price(price_now);
-
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
                     BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(avg_price, price_now, 1));
@@ -795,9 +795,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                     BigDecimal price_min = Utils.getBigDecimal(avgPriceList.get(idx_price_min));
                     BigDecimal price_max = Utils.getBigDecimal(avgPriceList.get(idx_price_max));
-
-                    priorityCoin.setMin_price_14d(price_min);
-                    priorityCoin.setMax_price_14d(price_max);
 
                     BigDecimal min_14d_per = Utils.getBigDecimalValue(Utils.toPercent(dto.getMin14d(), price_now));
                     String min_14d = "Min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "(" + min_14d_per
@@ -854,15 +851,6 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setMin28day(min28day);
                 }
 
-                priorityCoin.setTarget_price(Utils.getBigDecimalValue(css.getAvg_price()));
-                priorityCoin.setVmc(Utils.getIntValue(css.getVolumn_div_marketcap()));
-                priorityCoin.setLow_price(lowest_price_today);
-                priorityCoin.setHeight_price(highest_price_today);
-                priorityCoin.setIndex(index);
-                priorityCoin.setSymbol(css.getSymbol());
-                priorityCoin.setName(css.getName());
-                priorityCoin.setEma(dto.getEma07d());
-
                 Boolean is_candidate = false;
                 Boolean predict = false;
                 if (!Objects.equals(null, dto.getPrice_can_buy()) && !Objects.equals(null, dto.getPrice_can_sell())
@@ -889,8 +877,6 @@ public class BinanceServiceImpl implements BinanceService {
                         }
 
                     }
-
-                    priorityCoin.setTarget_percent(Utils.getIntValue(take_profit_percent.toBigInteger()));
 
                     css.setAvg_boll_min("Buy: " + Utils.removeLastZero(price_can_buy_24h.toString()) + "("
                             + price_can_buy_24h_percent + "%)");
@@ -1051,9 +1037,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
                 // ---------------------------------------------------
 
-                priorityCoin.setPredict(predict);
-                priorityCoin.setCandidate(is_candidate);
-
                 String note = "";
                 // note += "Can" + css.getAvg_boll_min() + "~" + "Can" + css.getAvg_boll_max() +
                 // "~";
@@ -1100,16 +1083,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                 note += css.getOco_tp_price() + css.getOco_tp_price_hight();
 
-                priorityCoin.setNote(note);
-
-                priorityCoin.setGoodPrice(false);
-                if (this_token_is_good_price || btc_is_good_price_for_long) {
-                    priorityCoin.setGoodPrice(true);
-                }
-
-                index += 1;
-                priorityCoinRepository.save(priorityCoin);
-
                 sql_update_ema += String.format(
                         " update binance_volumn_week set ema='%s', price_change_24h='%s', gecko_volume='%s', min_price_14d='%s', max_price_14d='%s' ",
                         dto.getEma07d(), dto.getPrice_change_percentage_24h(), dto.getVol0d(),
@@ -1121,6 +1094,7 @@ public class BinanceServiceImpl implements BinanceService {
                         dto.getGecko_id(), dto.getSymbol());
 
                 list.add(css);
+                index += 1;
             }
 
             query = entityManager.createNativeQuery(sql_update_ema);
@@ -1827,11 +1801,12 @@ public class BinanceServiceImpl implements BinanceService {
             List<Object> result_usdt = Utils.getBinanceData(url_usdt, LIMIT);
             List<Object> result_busd = Utils.getBinanceData(url_busd, LIMIT);
 
+            List<GeckoVolumeMonth> list_binance_vol = new ArrayList<GeckoVolumeMonth>();
             List<BinanceVolumnWeek> list_week = new ArrayList<BinanceVolumnWeek>();
             List<BigDecimal> list_price_close_candle = new ArrayList<BigDecimal>();
 
-            String sql_pump_dump = "";
             BinanceVolumnDay day = new BinanceVolumnDay();
+
             int day_index = 0;
             for (int idx = LIMIT - 1; idx >= 0; idx--) {
                 Object obj_usdt = result_usdt.get(idx);
@@ -1901,47 +1876,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                             binanceVolumeDateTimeRepository.save(ddhh);
                         }
-
-                        // // pump/dump
-                        // {
-                        // calendar.add(Calendar.HOUR_OF_DAY, -2);
-                        // BinanceVolumnDay pre2h = binanceVolumnDayRepository
-                        // .findById(new BinanceVolumnDayKey(gecko_id, symbol,
-                        // Utils.convertDateToString("HH", calendar.getTime())))
-                        // .orElse(null);
-                        //
-                        // if (!Objects.equals(null, pre2h) &&
-                        // (Utils.getBigDecimal(pre2h.getPriceAtBinance())
-                        // .compareTo(BigDecimal.ZERO) > 0)) {
-                        //
-                        // String str_pump_dump = "";
-                        // if (price_at_binance
-                        // .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(1.1))) > 0)
-                        // {
-                        //
-                        // str_pump_dump = " total_pump = total_pump + 1 ";
-                        //
-                        // } else if (price_at_binance
-                        // .compareTo(pre2h.getPriceAtBinance().multiply(BigDecimal.valueOf(0.9))) < 0)
-                        // {
-                        //
-                        // str_pump_dump = " total_dump = total_dump + 1 ";
-                        // }
-                        //
-                        // if (!Objects.equals("", str_pump_dump)) {
-                        // sql_pump_dump = " WITH UPD AS (UPDATE binance_pumping_history SET " +
-                        // str_pump_dump
-                        // + " WHERE gecko_id='" + gecko_id + "' AND symbol='" + symbol
-                        // + "' AND HH=TO_CHAR(NOW(), 'HH24') \n"
-                        // + " RETURNING gecko_id, symbol, hh), \n" + " INS AS (SELECT '" + gecko_id
-                        // + "', '" + symbol
-                        // + "', TO_CHAR(NOW(), 'HH24'), 1, 1 WHERE NOT EXISTS (SELECT * FROM UPD)) \n"
-                        // + " INSERT INTO binance_pumping_history(gecko_id, symbol, hh, total_pump,
-                        // total_dump) SELECT * FROM INS; \n";
-                        // }
-                        // }
-                        // }
-
                     }
 
                     BinanceVolumnWeek entity = new BinanceVolumnWeek();
@@ -1958,6 +1892,11 @@ public class BinanceServiceImpl implements BinanceService {
                     list_week.add(entity);
 
                     list_price_close_candle.add(avgPrice);
+
+                    GeckoVolumeMonth month = new GeckoVolumeMonth();
+                    month.setId(new GeckoVolumeMonthKey(gecko_id, "BINANCE", Utils.getToday_dd()));
+                    month.setTotalVolume(total_volume);
+                    list_binance_vol.add(month);
                 }
                 day_index += 1;
             }
@@ -1968,14 +1907,7 @@ public class BinanceServiceImpl implements BinanceService {
             if (size > 0) {
                 binanceVolumnDayRepository.save(day);
                 binanceVolumnWeekRepository.saveAll(list_week);
-                if (!Objects.equals("", sql_pump_dump)) {
-                    // ERROR: numeric field overflow
-                    // Detail: A field with precision 5, scale 5 must round to an absolute value
-                    // less than 1.
-
-                    Query query = entityManager.createNativeQuery(sql_pump_dump);
-                    query.executeUpdate();
-                }
+                geckoVolumeMonthRepository.saveAll(list_binance_vol);
             }
 
         } catch (Exception e) {
@@ -3305,11 +3237,6 @@ public class BinanceServiceImpl implements BinanceService {
                                 String msg = time + " 💹 (ATH3d):" + symbol + ", High3d:"
                                         + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
 
-                                PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
-                                if (!Objects.equals(null, coin2)) {
-                                    msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
-                                }
-
                                 Utils.sendToTelegram(msg);
 
                                 return " Fibo(Short) Volx4" + type;
@@ -3333,11 +3260,6 @@ public class BinanceServiceImpl implements BinanceService {
                         if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
                             fundingHistoryRepository
                                     .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
-
-                            PriorityCoin coin2 = priorityCoinRepository.findById(gecko_id).orElse(null);
-                            if (!Objects.equals(null, coin2)) {
-                                msg += Utils.new_line_from_service + Utils.getStringValue(coin2.getNote());
-                            }
 
                             Utils.sendToTelegram(msg);
                         }

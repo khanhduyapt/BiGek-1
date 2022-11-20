@@ -30,7 +30,7 @@ public class BscScanGeckkoApplication {
                 }
             }
             if (app_flag == 0) {
-                app_flag = Utils.const_app_flag_msg_off;
+                app_flag = 4;
             }
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
 

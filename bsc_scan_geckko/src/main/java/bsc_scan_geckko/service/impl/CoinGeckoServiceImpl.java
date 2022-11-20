@@ -93,8 +93,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         Object priceChangePercentage30d = Utils.getLinkedHashMapValue(result,
                 Arrays.asList("market_data", "price_change_percentage_30d"));
 
-        Object ath_date = Utils.getLinkedHashMapValue(result,
-                Arrays.asList("market_data", "ath_date"));
+        Object ath_date = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "ath_date"));
 
         coin.setMarketCap(market_cap);
         coin.setTotalVolume(total_volume);
@@ -132,7 +131,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
         geckoVolumnDayRepository.save(geckoDay);
 
         GeckoVolumeMonth month = new GeckoVolumeMonth();
-        month.setId(new GeckoVolumeMonthKey(String.valueOf(id).toLowerCase(), String.valueOf(symbol).toUpperCase(),
+        month.setId(new GeckoVolumeMonthKey(String.valueOf(id).toLowerCase(), "GECKO",
                 Utils.convertDateToString("dd", calendar.getTime())));
         month.setTotalVolume(total_volume);
         geckoVolumeMonthRepository.save(month);
@@ -149,21 +148,16 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 @SuppressWarnings("unchecked")
                 List<Object> ct = (List<Object>) categories;
                 for (Object obj : ct) {
+
                     String str_obj = String.valueOf(obj);
-
-                    if (String.valueOf(str_obj).toLowerCase().indexOf("fungible") > 0) {
-                        if (!Objects.equals("", str_categories)) {
-                            str_categories += "; ";
-                        }
-                        str_categories += "NFT";
-                    } else if (String.valueOf(str_obj).toLowerCase().indexOf("ecosystem") < 0
-                            && !Objects.equals("null", str_obj)) {
-
-                        if (!Objects.equals("", str_categories)) {
-                            str_categories += "; ";
-                        }
-                        str_categories += str_obj;
+                    if (str_obj.toLowerCase().contains("ecosystem")) {
+                        continue;
                     }
+
+                    if (!Objects.equals("", str_categories)) {
+                        str_categories += "; ";
+                    }
+                    str_categories += str_obj;
                 }
             }
 
@@ -182,7 +176,9 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             }
 
             coin.setCategory(str_categories);
-
+            if (symbol.equals("juv")) {
+                boolean a = true;
+            }
             // DeFi
             // Fan Token
             // L/B
@@ -190,40 +186,43 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             // Game
             // Web3
             String trend = "";
-            if (String.valueOf(str_categories).toLowerCase().indexOf("gaming") > 0) {
+            String str_categories_low = String.valueOf(str_categories).toLowerCase();
+            if (str_categories_low.contains("gaming")) {
                 trend = "Game";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("earn") > 0) {
+            } else if (str_categories_low.contains("earn")) {
                 trend = "Earn";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("nft") > 0) {
+            } else if (str_categories_low.contains("nft")) {
                 trend = "NFT";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("fan") > 0) {
-                trend = "Fan Token";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("lending") > 0) {
+            } else if (str_categories_low.contains("fan")) {
+                trend = "Fan";
+            } else if (str_categories_low.contains("sports")) {
+                trend = "Fan";
+            } else if (str_categories_low.contains("lending")) {
                 trend = "L/B";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("borrowing") > 0) {
+            } else if (str_categories_low.contains("borrowing")) {
                 trend = "L/B";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("defi") > 0) {
+            } else if (str_categories_low.contains("defi")) {
                 trend = "DeFi";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("dex") > 0) {
+            } else if (str_categories_low.contains("dex")) {
                 trend = "DeFi";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("finance") > 0) {
+            } else if (str_categories_low.contains("finance")) {
                 trend = "DeFi";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("network") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("platform") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("infrastructure") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("oracle") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("storage") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("protocol") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("web3") > 0) {
+            } else if (str_categories_low.contains("network")) {
+                // trend = "Platform";
+            } else if (str_categories_low.contains("platform")) {
+                // trend = "Platform";
+            } else if (str_categories_low.contains("infrastructure")) {
+                // trend = "Platform";
+            } else if (str_categories_low.contains("oracle")) {
+                trend = "DB";
+            } else if (str_categories_low.contains("storage")) {
+                trend = "DB";
+            } else if (str_categories_low.contains("protocol")) {
+                // trend = "Platform";
+            } else if (str_categories_low.contains("web3")) {
                 trend = "Web3";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("metaverse") > 0) {
-                trend = "Metaverse";
+            } else if (str_categories_low.contains("metaverse")) {
+                // trend = "Metaverse";
             }
 
             String backer = "";

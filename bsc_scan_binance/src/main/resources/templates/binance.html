@@ -128,6 +128,8 @@ p {
             th:text="${#dates.format( #dates.create(#dates.year(#dates.createNow()), #dates.month(#dates.createNow()), #dates.day(#dates.createNow()) - 12), 'dd/MM')}">
           <th class="text-center" scope="col"
             th:text="${#dates.format( #dates.create(#dates.year(#dates.createNow()), #dates.month(#dates.createNow()), #dates.day(#dates.createNow()) - 13), 'dd/MM')}">
+          
+          <th class="text-center" scope="col">Category</th>
         </tr>
       </thead>
       <tbody>
@@ -500,13 +502,17 @@ p {
               th:classappend="${token.day_12_ema_css}"
               th:text="${token.day_12_ema}">
           </td>
+          
+          <!-- Name highlight rounded-lg px-1 -->
+          <td style="font-size: 0.8rem !important; min-width: 400px !important; max-width: 400px !important;" th:text="${token.category}"></td>
+
         </tr>
       </tbody>
     </table>
     <a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://sslecal2.forexprostools.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_centralBanks,_confidenceIndex,_balance&features=datepicker,timezone,timeselector,filters&countries=5&importance=3&calType=week&timeZone=27&lang=52'}">Investing.com</a>
     <br>
-    <p>(1) Chờ tín hiệu của BTC & dựa vào boll mới được mua.</p>
-    <p>(2) Đánh trong thời gian: 8:30~11:30, 13:30~16:30, 18:30~22:30, hết giờ cắt sạch, không để qua đêm.</p>
+    <p>(1) Chờ tín hiệu của BTC & dựa vào boll(89) mới được mua.</p>
+    <p>(2) Đánh trong thời gian: 8:30~11:30, 13:30~16:30 hết giờ cắt sạch. Hạn chế phiên Mỹ (18:30~22:30).</p>
     <p>(3) Từ ngày 20~30 bơm thổi mạnh, 30~10 giá giảm từ từ, 14~19 hàng tháng thị trường sập về giá cũ.</p>
     <br>
   </div>
