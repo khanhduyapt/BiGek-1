@@ -680,6 +680,10 @@ public class Utils {
         return Utils.convertDateToString("dd", calendar.getTime());
     }
 
+    public static String getCurrentYyyyMmDdHH() {
+        return Utils.convertDateToString("yyyyMMdd_HH", Calendar.getInstance().getTime());
+    }
+
     public static Integer getCurrentHH() {
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         return HH;
