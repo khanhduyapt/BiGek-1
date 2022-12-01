@@ -3199,7 +3199,7 @@ public class BinanceServiceImpl implements BinanceService {
                     String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
-                        String msg = time + longshort + symbol + " , E: " + Utils.removeLastZero(price_at_binance);
+                        String msg = time + symbol + " " + Utils.removeLastZero(price_at_binance);
                         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
                         Utils.sendToTelegram(msg);
