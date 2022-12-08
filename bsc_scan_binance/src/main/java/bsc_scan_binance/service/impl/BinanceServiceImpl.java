@@ -183,22 +183,12 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> btc4hs = Utils.loadData("BTC", TIME_4h, 1);
             BtcFutures candle4h = btc4hs.get(0);
 
-            //            String chart = " 📉 ".trim();
-            //            if (candle4h.isUptrend()) {
-            //                chart = " 💹 ".trim();
-            //            }
-
             if (btc_4h_is_uptrend_today != candle4h.isUptrend()) {
                 btc_4h_is_uptrend_today = candle4h.isUptrend();
 
                 btc_1d_is_uptrend_today = Utils.loadData("BTC", TIME_1d, 1).get(0).isUptrend();
 
-                //                if (!candle4h.isZeroPercentCandle() && Utils.isNotBlank(chart)) {
-                //                    CHART_BTC_4H = chart + (btc_4h_is_uptrend_today ? " Btc 4h: Uptrend" : " Btc 4h: Downtrend");
-                //                    Utils.sendToTelegram(CHART_BTC_4H);
-                //                }
             }
-
         }
 
     }
@@ -351,12 +341,6 @@ public class BinanceServiceImpl implements BinanceService {
                     + "           select                                                                          \n"
                     + "               can.gecko_id,                                                               \n"
                     + "               can.symbol,                                                                 \n"
-                    // + " concat('day: ', coalesce((select string_agg(dd, ', ') from (SELECT dd
-                    // FROM public.gecko_volume_month WHERE gecko_id = can.gecko_id and symbol =
-                    // 'GECKO' and total_volume > (SELECT avg(total_volume)*1.5 FROM
-                    // public.gecko_volume_month where gecko_id = can.gecko_id and symbol = 'GECKO')
-                    // order by dd) pump), '')) as pumping_history, \n"
-
                     + "               concat('day: '                                                                    \n"
                     + "                 , coalesce((select string_agg(dd, ', ') from (SELECT distinct dd FROM (     \n"
                     + "                     select dd from gecko_volume_month where gecko_id = can.gecko_id and symbol = 'GECKO'   and total_volume > (SELECT avg(total_volume)*1.5 FROM public.gecko_volume_month where gecko_id = can.gecko_id and symbol = 'GECKO')      \n"
@@ -393,7 +377,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
                     //+ "   , (CASE WHEN cur.point LIKE '%Shark%' THEN 1  ELSE 2 END) ASC "
                     //+ "   , (case when (can.volumn_div_marketcap < 0.25) then 3 when (vol.pumping_history like '%' || TO_CHAR(NOW(), 'dd') || '%') then 1 when (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '1 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '2 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '3 days', 'dd') || '%') then 2 else 3 end) ASC \n"
-                    + "   , (case when can.volumn_div_marketcap > 1.2 then 3 when can.volumn_div_marketcap > 0.6 then 2 when can.volumn_div_marketcap > 0.3 then 1 else 0 end) DESC \n"
+                    //+ "   , (case when can.volumn_div_marketcap > 1.2 then 3 when can.volumn_div_marketcap > 0.6 then 2 when can.volumn_div_marketcap > 0.3 then 1 when can.volumn_div_marketcap >= 0.2 then 0 else -1 end) DESC \n"
+                    + "   , (case when can.volumn_div_marketcap >= 0.2 then 0 else -1 end) DESC \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
@@ -420,6 +405,14 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal market_cap = Utils.getBigDecimal(dto.getMarket_cap());
                 BigDecimal gecko_total_volume = Utils.getBigDecimal(dto.getGecko_total_volume());
 
+                if (css.getName().toUpperCase().contains("FUTURES")) {
+                    css.setTrading_view("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
+                            + dto.getSymbol().toUpperCase() + "USDTPERP");
+                } else {
+                    css.setTrading_view("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
+                            + dto.getSymbol().toUpperCase() + "USDT");
+                }
+
                 if ((market_cap.compareTo(BigDecimal.valueOf(36000001)) < 0)
                         && (market_cap.compareTo(BigDecimal.valueOf(1000000)) > 0)) {
                     css.setMarket_cap_css("highlight rounded-lg px-1");
@@ -439,10 +432,17 @@ public class BinanceServiceImpl implements BinanceService {
                             RoundingMode.CEILING);
                 }
 
+                if (getValue(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
+                    css.setVolumn_div_marketcap_css("text-primary highlight rounded-lg");
+                } else if (getValue(css.getVolumn_div_marketcap()) >= Long.valueOf(20)) {
+                    css.setVolumn_div_marketcap_css("highlight rounded-lg");
+                } else {
+                    css.setVolumn_div_marketcap_css("text-danger bg-light");
+                }
+
                 if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(30)) > 0) {
                     volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
-                    css.setVolumn_binance_div_marketcap_css("font-weight-bold");
-
+                    css.setVolumn_div_marketcap_css("highlight rounded-lg");
                 } else if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(20)) > 0) {
                     volumn_binance_div_marketcap_str = "B:" + volumn_binance_div_marketcap.toString();
                     css.setVolumn_binance_div_marketcap_css("text-primary");
@@ -480,12 +480,6 @@ public class BinanceServiceImpl implements BinanceService {
                             + Utils.removeLastZero(dto.getPrice_pre_2h());
                 }
                 css.setPre_price_history(pre_price_history);
-
-                if (getValue(css.getVolumn_div_marketcap()) > Long.valueOf(100)) {
-                    css.setVolumn_div_marketcap_css("text-primary");
-                } else if (getValue(css.getVolumn_div_marketcap()) < Long.valueOf(20)) {
-                    css.setVolumn_div_marketcap_css("font-weight-bold text-danger");
-                }
 
                 css.setCurrent_price(Utils.removeLastZero(dto.getCurrent_price()));
                 css.setPrice_change_24h_css(Utils.getTextCss(css.getPrice_change_percentage_24h()));
@@ -807,9 +801,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setRate4h_css("text-danger");
                     }
 
-                    BigDecimal price_min = Utils.getBigDecimal(avgPriceList.get(idx_price_min));
                     BigDecimal price_max = Utils.getBigDecimal(avgPriceList.get(idx_price_max));
-
                     BigDecimal min_14d_per = Utils.getBigDecimalValue(Utils.toPercent(dto.getMin14d(), price_now));
                     String min_14d = "Min14d: " + Utils.removeLastZero(dto.getMin14d().toString()) + "(" + min_14d_per
                             + "%) Max14d: ";
@@ -948,14 +940,6 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                     css.setFutures(futu);
 
-                    if (css.getName().toUpperCase().contains("FUTURES")) {
-                        css.setTrading_view("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
-                                + dto.getSymbol().toUpperCase() + "USDTPERP");
-                    } else {
-                        css.setTrading_view("https://vn.tradingview.com/chart/?symbol=BINANCE%3A"
-                                + dto.getSymbol().toUpperCase() + "USDT");
-                    }
-
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
@@ -1032,7 +1016,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap()).compareTo(BigDecimal.valueOf(20)) < 0)
                         && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(10)) < 0)) {
-                    css.setVolumn_binance_div_marketcap_css("font-weight-bold text-danger");
+                    css.setVolumn_binance_div_marketcap_css("text-danger");
                 }
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
@@ -1264,7 +1248,8 @@ public class BinanceServiceImpl implements BinanceService {
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, css.getGecko_id(), css.getSymbol(),
                             Utils.getToday_YyyyMMdd() + " Pumping", true));
 
-                    Utils.sendToMyTelegram(Utils.getTimeHHmm() + css.getSymbol() + ":Pump!!!");
+                    Utils.sendToMyTelegram(Utils.getTimeHHmm() + css.getSymbol() + ":Pump!!!"
+                            + Utils.new_line_from_service + css.getTrading_view());
                 }
 
             }
@@ -3214,7 +3199,9 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (Objects.equals("BTC", symbol)) {
                 if (Utils.isNotBlank(longshort)) {
-                    String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+                    String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd()
+                            + "_" + min24h;
+
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
                         String msg = time + symbol + ":" + Utils.removeLastZero(price_at_binance) + "(now), ATL3d:"
@@ -3241,7 +3228,8 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 if (Utils.isNotBlank(msg_btc_24h)) {
-                    String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_24h_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+                    String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_24h_" + symbol + "_" + Utils.getToday_YyyyMMdd()
+                            + "_" + min24h;
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
                         String msg = time + msg_btc_24h;
@@ -3273,7 +3261,7 @@ public class BinanceServiceImpl implements BinanceService {
                             msg = time + " 💔 Btc 15m kill Short.";
                         }
 
-                        Utils.sendToTelegram(msg + Utils.new_line_from_service + wallToday());
+                        Utils.sendToTelegram(msg);
 
                         return shark;
                     }
