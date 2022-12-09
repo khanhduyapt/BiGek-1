@@ -394,6 +394,7 @@ public class BinanceServiceImpl implements BinanceService {
             String dd = Utils.getToday_dd();
             String ddAdd1 = Utils.getDdFromToday(1);
             String ddAdd2 = Utils.getDdFromToday(2);
+            String pumps = "";
 
             // monitorTokenSales(results);
             for (CandidateTokenResponse dto : results) {
@@ -700,7 +701,10 @@ public class BinanceServiceImpl implements BinanceService {
                 int idx_vol_min = getIndexMin(volList);
                 int idx_price_min = getIndexMin(avgPriceList);
 
-                setEmaCss(css);
+                String pumping = setEmaCss(css);
+                if (Utils.isNotBlank(pumping)) {
+                    pumps += pumping;
+                }
 
                 String str_down = "";
                 if (Utils.getBigDecimal(avgPriceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
@@ -763,16 +767,15 @@ public class BinanceServiceImpl implements BinanceService {
                     if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(1000)) > 0)
                             || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.valueOf(1000)) > 0)) {
 
-                        if (getValue(css.getVolumn_div_marketcap()) > Long.valueOf(20)) {
-                            css.setRate1d0h_css("text-primary font-weight-bold");
-                            css.setStar(css.getStar() + "Volx10");
-                        }
+                        css.setRate1d0h_css("text-primary font-weight-bold");
+                        css.setStar(css.getStar() + "Volx10");
+
                     } else if ((Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(500)) > 0)
                             || (Utils.getBigDecimal(dto.getRate1d4h()).compareTo(BigDecimal.valueOf(500)) > 0)) {
-                        if (getValue(css.getVolumn_div_marketcap()) > Long.valueOf(20)) {
-                            css.setRate1d0h_css("text-primary font-weight-bold");
-                            css.setStar(css.getStar() + "Volx5");
-                        }
+
+                        css.setRate1d0h_css("text-primary font-weight-bold");
+                        css.setStar(css.getStar() + "Volx5");
+
                     } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(30)) > 0) {
                         css.setRate1d0h_css("text-primary font-weight-bold");
                     } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(0)) > 0) {
@@ -1109,6 +1112,12 @@ public class BinanceServiceImpl implements BinanceService {
                 // monitorTokenSales(list);
             }
             // monitorTokenSales(list); //debug
+
+            if (Utils.isNotBlank(pumps)) {
+                Utils.sendToMyTelegram(
+                        "(" + Utils.getCurrentYyyyMmDdHH() + ") Pumping:" + Utils.new_line_from_service + pumps);
+            }
+
             return list;
 
         } catch (Exception e) {
@@ -1230,7 +1239,8 @@ public class BinanceServiceImpl implements BinanceService {
         return "";
     }
 
-    private void setEmaCss(CandidateTokenCssResponse css) {
+    private String setEmaCss(CandidateTokenCssResponse css) {
+        String value = "";
         if (Utils.isNotBlank(css.getToday_ema())) {
             css.setToday_ema_css("text-primary font-weight-bold");
 
@@ -1248,8 +1258,8 @@ public class BinanceServiceImpl implements BinanceService {
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, css.getGecko_id(), css.getSymbol(),
                             Utils.getToday_YyyyMMdd() + " Pumping", true));
 
-                    Utils.sendToMyTelegram(Utils.getTimeHHmm() + css.getSymbol() + ":Pump!!!"
-                            + Utils.new_line_from_service + css.getTrading_view());
+                    value = css.getSymbol() + ":" + Utils.removeLastZero(css.getCurrent_price())
+                            + Utils.new_line_from_service;
                 }
 
             }
@@ -1292,6 +1302,7 @@ public class BinanceServiceImpl implements BinanceService {
             css.setDay_11_ema_css("text-primary");
         }
 
+        return value;
     }
 
     private Long getValue(String value) {
