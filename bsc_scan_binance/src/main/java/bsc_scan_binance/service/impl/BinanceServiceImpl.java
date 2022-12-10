@@ -945,6 +945,8 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setFutures_css("highlight rounded-lg font-weight-bold");
                     } else if (futu.contains("W↑D↑")) {
                         css.setFutures_css("highlight rounded-lg");
+                    } else if (futu.contains("W↓D↓H4↓")) {
+                        css.setFutures_css("text-danger highlight rounded-lg");
                     }
 
                     // btc_warning_css
@@ -3117,8 +3119,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String note = W1 + D1 + H4 + H1;
 
-        if (list_weeks.get(0).isUptrend()
-                || (list_days.get(0).isUptrend() && list_h4.get(0).isUptrend() && list_h1.get(0).isUptrend())) {
+        if (note.contains("W↑D↑H4↑") || note.contains("D↑H4↑H1↑") || note.contains("W↓D↓H4↓")) {
 
             if (list_days.get(0).isUptrend()) {
                 BigDecimal min_low = BigDecimal.valueOf(1000000);
