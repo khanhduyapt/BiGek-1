@@ -23,7 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 public class BscScanBinanceApplication {
-    public static int app_flag = Utils.const_app_flag_all_coin; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin; 5: all_and_msg
+    public static int app_flag = Utils.const_app_flag_all_coin; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin; 5:
+                                                                // all_and_msg
     public static String callFormBinance = "";
 
     public static void main(String[] args) {
@@ -99,7 +100,7 @@ public class BscScanBinanceApplication {
                             binance_service.loadBinanceData("bitcoin", "BTC", startup);
                             binance_service.loadDataVolumeHour("bitcoin", "BTC");
                             binance_service.monitorBtcPrice();
-                            wait(1800);
+                            wait(2400);
                         }
 
                         binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
@@ -113,7 +114,7 @@ public class BscScanBinanceApplication {
                     }
 
                     // wait(1800);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
-                    wait(1800);
+                    wait(2400);
 
                     if (Objects.equals(idx, size - 1)) {
 

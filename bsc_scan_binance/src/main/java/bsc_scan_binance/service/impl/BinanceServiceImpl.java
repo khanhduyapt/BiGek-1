@@ -132,6 +132,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String TIME_1h = "1h";
     private static final String TIME_4h = "4h";
     private static final String TIME_1d = "1d";
+    private static final String TIME_1w = "1w";
 
     @SuppressWarnings("unused")
     private static final int LIMIT_DATA_15m = 48;
@@ -143,6 +144,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_BTC_RANGE = "BTC_RANGE";
     private static final String EVENT_BTC_ON_EXCHANGES = "BTC_EXCHANGES";
     private static final String EVENT_FIBO_LONG_SHORT = "FIBO";
+    private static final String EVENT_TREND_1W1D = "1W1D";
     private static final String EVENT_COMPRESSED_CHART = "Compressed";
     private static final String EVENT_DUMP = "Dump_1";
     private static final String EVENT_PUMP = "Pump_1";
@@ -201,7 +203,7 @@ public class BinanceServiceImpl implements BinanceService {
             String sql = " select                                                                                 \n"
                     + "   can.gecko_id,                                                                           \n"
                     + "   can.symbol,                                                                             \n"
-                    + "   concat (can.name, (case when (select gecko_id from binance_futures where gecko_id=can.gecko_id) is not null then ' (Futures)' else '' end)) as name,  \n"
+                    + "   concat (can.name, (case when (select gecko_id from binance_futures where gecko_id=can.gecko_id) is not null then ' (Futures)' else '' end) ) as name,  \n"
 
                     + "    boll.low_price   as low_price_24h,                                                     \n"
                     + "    boll.hight_price as hight_price_24h,                                                   \n"
@@ -290,7 +292,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , rate1d0h                                                                              \n"
                     + "   , rate1d4h                                                                              \n"
                     + "   , cur.rsi                                                                               \n"
-                    + "   , concat(can.symbol, case when can.market_cap < 400000000 and cur.point LIKE '%Short%' then '' else cur.point end) as futures                                              \n"
+                    + "   , concat(can.symbol, case when can.market_cap < 400000000 and cur.point LIKE '%Short%' then '' else cur.point end, ' ' , (SELECT note FROM public.funding_history where event_time like '%1W1D%' and pumpdump and gecko_id=can.gecko_id)) as futures                                              \n"
                     + "   , (CASE WHEN cur.point LIKE '%Long%' THEN 'text-primary' WHEN cur.point LIKE '%Short%' THEN 'text-danger' ELSE '' END) as futures_css                                                                     \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
@@ -375,9 +377,16 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                  \n"
                     + "     coalesce(can.priority, 3) ASC                                                         \n"
-                    //+ "   , (CASE WHEN cur.point LIKE '%Shark%' THEN 1  ELSE 2 END) ASC "
-                    //+ "   , (case when (can.volumn_div_marketcap < 0.25) then 3 when (vol.pumping_history like '%' || TO_CHAR(NOW(), 'dd') || '%') then 1 when (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '1 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '2 days', 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval  '3 days', 'dd') || '%') then 2 else 3 end) ASC \n"
-                    //+ "   , (case when can.volumn_div_marketcap > 1.2 then 3 when can.volumn_div_marketcap > 0.6 then 2 when can.volumn_div_marketcap > 0.3 then 1 when can.volumn_div_marketcap >= 0.2 then 0 else -1 end) DESC \n"
+                    // + " , (CASE WHEN cur.point LIKE '%Shark%' THEN 1 ELSE 2 END) ASC "
+                    // + " , (case when (can.volumn_div_marketcap < 0.25) then 3 when
+                    // (vol.pumping_history like '%' || TO_CHAR(NOW(), 'dd') || '%') then 1 when
+                    // (vol.pumping_history like '%' || TO_CHAR(NOW() + interval '1 days', 'dd') ||
+                    // '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval '2 days',
+                    // 'dd') || '%') OR (vol.pumping_history like '%' || TO_CHAR(NOW() + interval '3
+                    // days', 'dd') || '%') then 2 else 3 end) ASC \n"
+                    // + " , (case when can.volumn_div_marketcap > 1.2 then 3 when
+                    // can.volumn_div_marketcap > 0.6 then 2 when can.volumn_div_marketcap > 0.3
+                    // then 1 when can.volumn_div_marketcap >= 0.2 then 0 else -1 end) DESC \n"
                     + "   , (case when can.volumn_div_marketcap >= 0.2 then 0 else -1 end) DESC \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                  \n";
 
@@ -530,12 +539,9 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal taget_percent_profit_today = Utils
                         .getBigDecimalValue(Utils.toPercent(highest_price_today, price_now, 1));
 
-                BigDecimal vol_today = Utils.getBigDecimal(temp.get(0).replace(",", ""));
-
                 temp = splitVolAndPrice(css.getDay_0());
                 css.setDay_0_vol(temp.get(0));
                 css.setDay_0_price(temp.get(1));
-                // css.setDay_0_ema(temp.get(4) + " (" + temp.get(5).replace("-", "↓") + "%)");
                 css.setDay_0_ema(Utils.getPercentVol2Mc(temp.get(6), dto.getMarket_cap()));
                 css.setDay_0_gecko_vol(temp.get(6));
 
@@ -543,15 +549,7 @@ public class BinanceServiceImpl implements BinanceService {
                 avgPriceList.add(temp.get(1));
                 lowPriceList.add(temp.get(2));
                 hightPriceList.add(temp.get(3));
-                BigDecimal vol_yesterday = Utils.getBigDecimal(temp.get(0).replace(",", ""));
 
-                //                if (vol_yesterday.compareTo(BigDecimal.ZERO) > 0) {
-                //                    BigDecimal vol_up = vol_today.divide(vol_yesterday, 1, RoundingMode.CEILING);
-                //                    if (vol_up.compareTo(BigDecimal.valueOf(2)) > 0) {
-                //                        css.setStar("BUp: " + String.valueOf(vol_up));
-                //                        css.setStar_css("text-primary");
-                //                    }
-                //                }
                 temp = splitVolAndPrice(css.getDay_1());
                 css.setDay_1_vol(temp.get(0));
                 css.setDay_1_price(temp.get(1));
@@ -811,7 +809,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     if (min_14d_per.compareTo(BigDecimal.valueOf(-0.8)) > 0) {
                         css.setStar("m14d" + css.getStar());
-                        //css.setStar_css("text-white rounded-lg bg-info");
+                        // css.setStar_css("text-white rounded-lg bg-info");
 
                         css.setMin_14d_css("text-primary");
 
@@ -943,6 +941,12 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                     css.setFutures(futu);
 
+                    if (futu.contains("W↑D↑H4↑H1↑")) {
+                        css.setFutures_css("highlight rounded-lg font-weight-bold");
+                    } else if (futu.contains("W↑D↑")) {
+                        css.setFutures_css("highlight rounded-lg");
+                    }
+
                     // btc_warning_css
                     if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
 
@@ -1046,7 +1050,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
                 // ---------------------------------------------------
 
-                //String note = "";
+                // String note = "";
                 // note += "Can" + css.getAvg_boll_min() + "~" + "Can" + css.getAvg_boll_max() +
                 // "~";
                 // note += "v/mc:"
@@ -1089,7 +1093,7 @@ public class BinanceServiceImpl implements BinanceService {
                 // ? "~" + Utils.getStringValue(css.getPumping_history())
                 // : "")
                 // + "~" + ;
-                //note += css.getOco_tp_price() + css.getOco_tp_price_hight();
+                // note += css.getOco_tp_price() + css.getOco_tp_price_hight();
 
                 sql_update_ema += String.format(
                         " update binance_volumn_week set ema='%s', price_change_24h='%s', gecko_volume='%s', min_price_14d='%s', max_price_14d='%s' ",
@@ -1878,6 +1882,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     if (idx == LIMIT - 1) {
                         String point = calcPointCompressedChart(gecko_id, symbol);
+                        checkWDtrend(gecko_id, symbol);
                         Calendar calendar = Calendar.getInstance();
 
                         day.setId(new BinanceVolumnDayKey(gecko_id, symbol,
@@ -3096,6 +3101,69 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
+    public void checkWDtrend(String gecko_id, String symbol) {
+
+        List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 1);
+        List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 2);
+        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 1);
+        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 1);
+
+        String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
+
+        String W1 = list_weeks.get(0).isUptrend() ? "W↑" : "W↓";
+        String D1 = list_days.get(0).isUptrend() ? "D↑" : "D↓";
+        String H4 = list_h4.get(0).isUptrend() ? "H4↑" : "H4↓";
+        String H1 = list_h1.get(0).isUptrend() ? "H1↑" : "H1↓";
+
+        String note = W1 + D1 + H4 + H1;
+
+        if (list_weeks.get(0).isUptrend()
+                || (list_days.get(0).isUptrend() && list_h4.get(0).isUptrend() && list_h1.get(0).isUptrend())) {
+
+            if (list_days.get(0).isUptrend()) {
+                BigDecimal min_low = BigDecimal.valueOf(1000000);
+                BigDecimal max_Hig = BigDecimal.ZERO;
+
+                for (BtcFutures dto : list_days) {
+                    if (min_low.compareTo(dto.getLow_price()) > 0) {
+                        min_low = dto.getLow_price();
+                    }
+
+                    if (max_Hig.compareTo(dto.getHight_price()) < 0) {
+                        max_Hig = dto.getHight_price();
+                    }
+                }
+
+                if (Utils.isGoodPriceLong(list_days.get(0).getCurrPrice(), min_low, max_Hig)) {
+                    note += "+GoodPrice";
+
+                    String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd() + "_"
+                            + min_low;
+
+                    if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
+
+                        String msg = Utils.getTimeHHmm() + symbol + ":"
+                                + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + "(" + note + ")";
+
+                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
+
+                        Utils.sendToMyTelegram(msg);
+                    }
+
+                }
+            }
+
+            // W↑D↑H4↑H1↑
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, "(" + note + ")", true));
+
+        } else {
+
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, "", false));
+
+        }
+
+    }
+
     public String calcPointCompressedChart(String gecko_id, String symbol) {
         if (23 <= pre_HH || pre_HH <= 8) {
             // return "";
@@ -3210,8 +3278,8 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (Objects.equals("BTC", symbol)) {
                 if (Utils.isNotBlank(longshort)) {
-                    String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd()
-                            + "_" + min24h;
+                    String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd() + "_"
+                            + min24h;
 
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
