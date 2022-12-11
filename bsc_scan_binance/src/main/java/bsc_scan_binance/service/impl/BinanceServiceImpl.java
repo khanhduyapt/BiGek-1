@@ -3300,10 +3300,10 @@ public class BinanceServiceImpl implements BinanceService {
         return note;
     }
 
-    public void checkWDtrend(String gecko_id, String symbol) {
+    public String checkWDtrend(String gecko_id, String symbol) {
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 6);
         if (CollectionUtils.isEmpty(list_weeks)) {
-            return;
+            return "";
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 1);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 1);
@@ -3375,6 +3375,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         }
 
+        return note;
     }
 
 }
