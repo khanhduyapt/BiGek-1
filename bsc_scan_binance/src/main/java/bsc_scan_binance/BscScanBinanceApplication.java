@@ -42,8 +42,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            // app_flag = Utils.const_app_flag_msg_on;
-            // app_flag = Utils.const_app_flag_all_coin;
+            app_flag = Utils.const_app_flag_all_and_msg;
 
             log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -64,20 +63,9 @@ public class BscScanBinanceApplication {
             }
 
             // --------------------Debug--------------------
-            // binance_service.loadDataVolumeHour("unlend-finance", "UFT");
-            // binance_service.loadData("unlend-finance", "UFT");
-            // binance_service.getList(false);
-            // binance_service.monitorBollingerBandwidth(false);
-            // binance_service.monitorProfit();
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-                // CandidateCoin btc = new CandidateCoin();
-                // if (!CollectionUtils.isEmpty(list)) {
-                // btc = list.stream().filter(item -> Objects.equals("BTC",
-                // item.getSymbol())).findFirst()
-                // .orElse(new CandidateCoin());
-                // }
 
                 int size = list.size();
                 int idx = 0;

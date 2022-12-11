@@ -164,6 +164,10 @@ public class Utils {
                 // ]
                 // ]
 
+                if (arr_usdt.size() < 10) {
+                    break;
+                }
+
                 BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
                 BigDecimal hight_price = Utils.getBigDecimal(arr_usdt.get(2));
                 BigDecimal low_price = Utils.getBigDecimal(arr_usdt.get(3));
@@ -1238,10 +1242,53 @@ public class Utils {
         return false;
     }
 
+    public static List<BigDecimal> getLowHeight(List<BtcFutures> list) {
+        List<BigDecimal> result = new ArrayList<BigDecimal>();
+
+        BigDecimal min_low = BigDecimal.valueOf(1000000);
+        BigDecimal max_Hig = BigDecimal.ZERO;
+
+        for (BtcFutures dto : list) {
+            if (dto.isUptrend()) {
+                if (min_low.compareTo(dto.getPrice_open_candle()) > 0) {
+                    min_low = dto.getPrice_open_candle();
+                }
+
+                if (max_Hig.compareTo(dto.getPrice_open_candle()) < 0) {
+                    max_Hig = dto.getPrice_open_candle();
+                }
+            } else {
+                if (min_low.compareTo(dto.getPrice_close_candle()) > 0) {
+                    min_low = dto.getPrice_close_candle();
+                }
+
+                if (max_Hig.compareTo(dto.getPrice_close_candle()) < 0) {
+                    max_Hig = dto.getPrice_close_candle();
+                }
+            }
+
+        }
+
+        result.add(min_low);
+        result.add(max_Hig);
+
+        return result;
+    }
+
     public static Boolean isGoodPriceLong(BigDecimal cur_price, BigDecimal lo_price, BigDecimal hi_price) {
         BigDecimal curr_price = Utils.getBigDecimal(cur_price);
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
+
+        BigDecimal sl = Utils.getPercent(curr_price, low_price);
+        BigDecimal tp = Utils.getPercent(hight_price, curr_price);
+
+        if (sl.compareTo(BigDecimal.valueOf(5)) > 0) {
+            return false;
+        }
+        if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
+            return false;
+        }
 
         BigDecimal good_price = getGoodPriceLong(low_price, hight_price);
 
@@ -1255,6 +1302,16 @@ public class Utils {
         BigDecimal curr_price = Utils.getBigDecimal(cur_price);
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
+
+        BigDecimal sl = Utils.getPercent(hight_price, curr_price);
+        BigDecimal tp = Utils.getPercent(curr_price, low_price);
+
+        if (sl.compareTo(BigDecimal.valueOf(1.9)) > 0) {
+            return false;
+        }
+        if (tp.compareTo(BigDecimal.valueOf(4)) < 0) {
+            return false;
+        }
 
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(8), 5, RoundingMode.CEILING);
