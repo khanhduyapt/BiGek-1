@@ -276,7 +276,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , cur.rsi                                                                               \n"
                     // + " , concat(macd.futures, case when can.market_cap < 400000000 and cur.point
                     // LIKE '%Short%' then '' else cur.point end) as futures \n"
-                    + "   , concat(macd.futures, case when cur.point LIKE '%Futures%' then ' (Futures)' else '' end) as futures             \n"
+                    + "   , macd.futures as futures             \n"
                     + "   , (CASE WHEN cur.point LIKE '%Long%' THEN 'text-primary' WHEN cur.point LIKE '%Short%' THEN 'text-danger' ELSE '' END) as futures_css       \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
