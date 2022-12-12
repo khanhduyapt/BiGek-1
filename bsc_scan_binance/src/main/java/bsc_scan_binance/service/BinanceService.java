@@ -40,4 +40,6 @@ public interface BinanceService {
     public String wallToday();
 
     public String getBitfinexLongShortBtc();
+
+    public String getChartWD(String gecko_id, String symbol);
 }

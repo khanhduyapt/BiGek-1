@@ -24,11 +24,13 @@ import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.BinanceVolumnWeek;
 import bsc_scan_binance.entity.BinanceVolumnWeekKey;
+import bsc_scan_binance.entity.CandidateCoin;
 import bsc_scan_binance.entity.OrderKey;
 import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.entity.TakeProfit;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
+import bsc_scan_binance.repository.CandidateCoinRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
 import bsc_scan_binance.response.DepthResponse;
@@ -54,6 +56,9 @@ public class WandaBot extends TelegramLongPollingBot {
 
     @Autowired
     private TakeProfitRepository takeProfitRepository;
+
+    @Autowired
+    private CandidateCoinRepository candidateCoinRepository;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -435,20 +440,19 @@ public class WandaBot extends TelegramLongPollingBot {
     }
 
     private void checkCommand(SendMessage message, String token) throws TelegramApiException {
-//        String SYMBOL = token.toUpperCase();
-//        // binance_service.getList(false);
-//        List<PriorityCoin> list = priorityCoinRepository.searchBySymbol(SYMBOL);
-//        if (CollectionUtils.isEmpty(list)) {
-//            message.setText("Empty");
-//            execute(message);
-//            return;
-//        }
-//
-//        String msg = Utils.createMsgPriorityToken(list.get(0), Utils.new_line_from_bot);
-//        msg += Utils.new_line_from_bot + Utils.new_line_from_bot + createBidsAsks(SYMBOL);
-//
-//        message.setText(msg);
-//        execute(message);
+        String SYMBOL = token.toUpperCase();
+
+        List<CandidateCoin> list = candidateCoinRepository.searchBySymbol(SYMBOL);
+        if (CollectionUtils.isEmpty(list)) {
+            message.setText("Empty");
+            execute(message);
+            return;
+        }
+
+        String msg = binance_service.getChartWD(list.get(0).getGeckoid(), list.get(0).getSymbol().toUpperCase());
+
+        message.setText(msg);
+        execute(message);
     }
 
     private String createBidsAsks(String SYMBOL) {

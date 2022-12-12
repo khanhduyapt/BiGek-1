@@ -2954,6 +2954,14 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
+    @Override
+    @Transactional
+    public String getChartWD(String gecko_id, String symbol) {
+        String result = symbol.toUpperCase() + " " + checkWDtrend(gecko_id, symbol.toUpperCase());
+
+        return result;
+    }
+
     public String checkWDtrend(String gecko_id, String symbol) {
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 
@@ -3095,10 +3103,24 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String result = ma + note + type;
-
         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
 
-        return result;
+        //-------------------------------------------------------------
+
+        result = Utils.getTimeHHmm() + " " + symbol.toUpperCase() + " " + Utils.removeLastZero(current_price);
+
+        result += Utils.new_line_from_bot;
+        result += ma + W1 + D1 + H4 + H1 + Utils.new_line_from_bot;
+
+        result += "L7d:" + Utils.getPercentToEntry(current_price, min_7day, true);
+        result += " H7d:" + Utils.getPercentToEntry(current_price, max_7day, false);
+
+        result += Utils.new_line_from_bot;
+
+        result += "L6w:" + Utils.getPercentToEntry(current_price, min_week, true);
+        result += " H6w:" + Utils.getPercentToEntry(current_price, max_week, false);
+
+        return result.replaceAll("↑", "^").replaceAll("↓", "v");
     }
 
 }
