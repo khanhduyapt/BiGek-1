@@ -274,9 +274,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   , rate1d0h                                                                              \n"
                     + "   , rate1d4h                                                                              \n"
                     + "   , cur.rsi                                                                               \n"
-                    // + " , concat(macd.futures, case when can.market_cap < 400000000 and cur.point
-                    // LIKE '%Short%' then '' else cur.point end) as futures \n"
-                    + "   , macd.futures as futures             \n"
+                    + "   , macd.futures as futures                                                               \n"
                     + "   , (CASE WHEN cur.point LIKE '%Long%' THEN 'text-primary' WHEN cur.point LIKE '%Short%' THEN 'text-danger' ELSE '' END) as futures_css       \n"
                     + "                                                                                           \n"
                     + " from                                                                                      \n"
@@ -286,7 +284,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + " (                                                                                         \n"
                     + "    select                                                                                 \n"
                     + "       xyz.gecko_id,                                                                       \n"
-                    + "       concat((SELECT note FROM public.funding_history where event_time like '%1W1D%' and pumpdump and gecko_id=xyz.gecko_id), ' ', xyz.symbol) as futures, \n"
+                    + "       concat(xyz.note, ' ', xyz.symbol) as futures,                                       \n"
                     + "       COALESCE(price_today   - price_pre_07d*1.05, -99) as ema07d,                        \n"
                     + "       COALESCE(price_pre_07d - price_pre_14d, -99) as ema14d,                             \n"
                     + "       COALESCE(price_pre_14d - price_pre_21d, -99) as ema21d,                             \n"
@@ -298,13 +296,14 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    from                                                                                   \n"
                     + "      (                                                                                    \n"
                     + "          select                                                                           \n"
-                    + "              can.gecko_id,                                                                \n"
-                    + "              can.symbol,                                                                  \n"
-                    + "             (select COALESCE(w.min_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd')) as price_today,      \n"
-                    + "             (select COALESCE(w.min_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd')) as price_pre_07d,  \n"
-                    + "             (select COALESCE(w.min_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '13 days', 'yyyyMMdd')) as price_pre_14d,  \n"
-                    + "             (select COALESCE(w.min_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '20 days', 'yyyyMMdd')) as price_pre_21d,  \n"
-                    + "             (select COALESCE(w.min_price, 0) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW() - interval '28 days', 'yyyyMMdd')) as price_pre_28d,  \n"
+                    + "             can.gecko_id,                                                                 \n"
+                    + "             can.symbol,                                                                   \n"
+                    + "             his.note,                                                                     \n"
+                    + "             0 as price_today,                                                             \n"
+                    + "             0 as price_pre_07d,                                                           \n"
+                    + "             0 as price_pre_14d,                                                           \n"
+                    + "             0 as price_pre_21d,                                                           \n"
+                    + "             0 as price_pre_28d,                                                           \n"
                     + "             ROUND((select MIN(COALESCE(w.min_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '60 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as min60d, \n" // min60d
                     + "             ROUND((select MAX(COALESCE(w.max_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '30 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as max28d, \n" // max28d
                     + "             ROUND((select MIN(COALESCE(w.min_price, 1000000)) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval '14 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')), 5) as min14d, \n" // min14d
@@ -312,6 +311,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "                                                                                           \n"
                     + "          from                                                                             \n"
                     + "              candidate_coin can                                                           \n"
+                    + "          left join funding_history his on  his.event_time like '%1W1D%' and his.pumpdump and his.gecko_id = can.gecko_id  \n"
                     + "    ) xyz                                                                                  \n"
                     + " ) macd                                                                                    \n"
                     + " , ("
@@ -2430,10 +2430,13 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public List<String> monitorBtcPrice() {
         checkWDtrend("bitcoin", "BTC");
+        List<String> results = new ArrayList<String>();
+        boolean exit = true;
+        if (exit) {
+            return results;
+        }
 
         String time = Utils.convertDateToString("(hh:mm)", Calendar.getInstance().getTime());
-
-        List<String> results = new ArrayList<String>();
         monitorBtcPrice_results = new ArrayList<String>();
 
         String curr_time_of_btc = Utils.convertDateToString("MMdd_HHmm", Calendar.getInstance().getTime());
