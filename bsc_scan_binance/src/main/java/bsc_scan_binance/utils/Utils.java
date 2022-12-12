@@ -210,10 +210,14 @@ public class Utils {
                 day.setTaker_qty(taker_qty);
                 day.setTaker_volume(taker_volume);
 
+                BigDecimal candle_heigh = hight_price.subtract(low_price).abs();
+                BigDecimal range = candle_heigh.divide(BigDecimal.valueOf(10), 5, RoundingMode.CEILING);
+
+                day.setUptrend(false);
                 if (price_open_candle.compareTo(price_close_candle) < 0) {
-                    day.setUptrend(true);
-                } else {
-                    day.setUptrend(false);
+                    if ((price_open_candle.add(range)).compareTo(price_close_candle) < 0) {
+                        day.setUptrend(true);
+                    }
                 }
 
                 list_entity.add(day);
@@ -477,15 +481,21 @@ public class Utils {
     }
 
     public static void sendToMyTelegram(String text) {
+        String msg = text.replaceAll("↑", "^").replaceAll("↓", "v");
+        System.out.println(msg);
+
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
                 || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
 
-            sendToChatId(Utils.chatId_duydk, text + " (only)");
+            sendToChatId(Utils.chatId_duydk, msg + " (only)");
         }
 
     }
 
     public static void sendToTelegram(String text) {
+        String msg = text.replaceAll("↑", "^").replaceAll("↓", "v");
+        System.out.println(msg);
+
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
                 || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
 
@@ -493,8 +503,8 @@ public class Utils {
                 return;
             }
 
-            sendToChatId(Utils.chatId_duydk, text);
-            sendToChatId(Utils.chatId_linkdk, text);
+            sendToChatId(Utils.chatId_duydk, msg);
+            sendToChatId(Utils.chatId_linkdk, msg);
         }
     }
 
@@ -1242,7 +1252,29 @@ public class Utils {
         return false;
     }
 
-    public static List<BigDecimal> getLowHeight(List<BtcFutures> list) {
+    public static List<BigDecimal> getLowHeightCandle(List<BtcFutures> list) {
+        List<BigDecimal> result = new ArrayList<BigDecimal>();
+
+        BigDecimal min_low = BigDecimal.valueOf(1000000);
+        BigDecimal max_Hig = BigDecimal.ZERO;
+
+        for (BtcFutures dto : list) {
+            if (min_low.compareTo(dto.getLow_price()) > 0) {
+                min_low = dto.getLow_price();
+            }
+
+            if (max_Hig.compareTo(dto.getHight_price()) < 0) {
+                max_Hig = dto.getHight_price();
+            }
+        }
+
+        result.add(min_low);
+        result.add(max_Hig);
+
+        return result;
+    }
+
+    public static List<BigDecimal> getOpenCloseCandle(List<BtcFutures> list) {
         List<BigDecimal> result = new ArrayList<BigDecimal>();
 
         BigDecimal min_low = BigDecimal.valueOf(1000000);
@@ -1281,14 +1313,14 @@ public class Utils {
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
         BigDecimal sl = Utils.getPercent(curr_price, low_price);
-        BigDecimal tp = Utils.getPercent(hight_price, curr_price);
+        //BigDecimal tp = Utils.getPercent(hight_price, curr_price);
 
-        if (sl.compareTo(BigDecimal.valueOf(5)) > 0) {
+        if (sl.compareTo(BigDecimal.valueOf(10)) > 0) {
             return false;
         }
-        if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
-            return false;
-        }
+        //if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
+        //    return false;
+        //}
 
         BigDecimal good_price = getGoodPriceLong(low_price, hight_price);
 
@@ -1304,14 +1336,14 @@ public class Utils {
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
         BigDecimal sl = Utils.getPercent(hight_price, curr_price);
-        BigDecimal tp = Utils.getPercent(curr_price, low_price);
+        //BigDecimal tp = Utils.getPercent(curr_price, low_price);
 
-        if (sl.compareTo(BigDecimal.valueOf(1.9)) > 0) {
+        if (sl.compareTo(BigDecimal.valueOf(5)) > 0) {
             return false;
         }
-        if (tp.compareTo(BigDecimal.valueOf(4)) < 0) {
-            return false;
-        }
+        //if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
+        //    return false;
+        //}
 
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(8), 5, RoundingMode.CEILING);
@@ -1574,3 +1606,249 @@ public class Utils {
         return dto;
     }
 }
+
+//
+//public String calcPointCompressedChart(String gecko_id, String symbol) {
+//  boolean exit = true;
+//  if (exit) {
+//      return "";
+//  }
+//  if (23 <= pre_HH || pre_HH <= 8) {
+//      // return "";
+//  }
+//
+//  String note = "";
+//  // Utils.sendToMyTelegram(" 💹 Long: 📉 💚 💔");
+//  try {
+//      List<BtcFutures> list_3days;
+//      String type = "";
+//
+//      if (binanceFuturesRepository.existsById(gecko_id)) {
+//          type = " (Futures)";
+//          // list_3days = Utils.loadData(symbol, TIME_1h, 72);
+//      } else {
+//          type = " (Spot)";
+//          // list_3days = Utils.loadData(symbol, TIME_1d, 14);
+//      }
+//      list_3days = Utils.loadData(symbol, TIME_1h, 72);
+//
+//      if (CollectionUtils.isEmpty(list_3days)) {
+//          return "";
+//      }
+//      BtcFutures cur_1h = list_3days.get(0);
+//
+//      BigDecimal min_open = BigDecimal.valueOf(1000000);
+//      BigDecimal min_low = BigDecimal.valueOf(1000000);
+//      BigDecimal max_Hig = BigDecimal.ZERO;
+//
+//      BigDecimal min24h = BigDecimal.valueOf(1000000);
+//      BigDecimal max24h = BigDecimal.ZERO;
+//
+//      BigDecimal max_vol_4h = BigDecimal.ZERO;
+//
+//      BigDecimal sum_vol_68h = BigDecimal.ZERO;
+//      BigDecimal avg_vol_68h = BigDecimal.ZERO;
+//
+//      for (int index = 0; index < list_3days.size(); index++) {
+//          BtcFutures dto = list_3days.get(index);
+//
+//          if (min_low.compareTo(dto.getLow_price()) > 0) {
+//              min_low = dto.getLow_price();
+//          }
+//
+//          if (max_Hig.compareTo(dto.getHight_price()) < 0) {
+//              max_Hig = dto.getHight_price();
+//          }
+//
+//          if (dto.isUptrend()) {
+//              if (min_open.compareTo(dto.getPrice_open_candle()) > 0) {
+//                  min_open = dto.getPrice_open_candle();
+//              }
+//          } else {
+//              if (min_open.compareTo(dto.getPrice_close_candle()) > 0) {
+//                  min_open = dto.getPrice_close_candle();
+//              }
+//          }
+//
+//          // ----------------------------------
+//
+//          if (Objects.equals("BTC", symbol) && (index < 24)) {
+//              if (min24h.compareTo(dto.getLow_price()) > 0) {
+//                  min24h = dto.getLow_price();
+//              }
+//
+//              if (max24h.compareTo(dto.getHight_price()) < 0) {
+//                  max24h = dto.getHight_price();
+//              }
+//          }
+//
+//          // ----------------------------------
+//          // if (type.contains("Futures")) {
+//          if (index < 4) {
+//              if (max_vol_4h.compareTo(dto.getTrading_qty()) < 0) {
+//                  max_vol_4h = dto.getTrading_qty();
+//              }
+//          } else {
+//              sum_vol_68h = sum_vol_68h.add(Utils.getBigDecimal(dto.getTrading_qty()));
+//          }
+//          // }
+//      }
+//
+//      String shark = "";
+//      // if (type.contains("Futures")) {
+//      avg_vol_68h = sum_vol_68h.divide(BigDecimal.valueOf(list_3days.size() - 4), 1, RoundingMode.CEILING);
+//      if (max_vol_4h.compareTo(avg_vol_68h.multiply(BigDecimal.valueOf(3))) > 0) {
+//          shark = " (Shark)";
+//          type = shark;
+//      }
+//      // }
+//
+//      String longshort = "";
+//      BigDecimal price_at_binance = cur_1h.getCurrPrice();
+//      String time = Utils.convertDateToString("(HH:mm)", Calendar.getInstance().getTime());
+//
+//      if (Utils.isGoodPriceLong(price_at_binance, min_low, max_Hig)) {
+//          longshort = " 💹 (Long) ";
+//          note = " Fibo(Long) E: " + Utils.removeLastZero(min_low) + " ("
+//                  + Utils.getPercentStr(min_low, price_at_binance) + ")" + type;
+//
+//      } else if (Utils.isGoodPriceShort(price_at_binance, min_low, max_Hig)) {
+//          longshort = " 📉 (Short) ";
+//          note = " Fibo(Short) E: " + Utils.removeLastZero(max_Hig) + " ("
+//                  + Utils.getPercentStr(price_at_binance, max_Hig) + ")" + type;
+//
+//      }
+//
+//      List<BtcFutures> list_15m = new ArrayList<BtcFutures>();
+//      if (Utils.isNotBlank(longshort)) {
+//          list_15m = Utils.loadData(symbol, "15m", 16); // 16h15=4h
+//      }
+//
+//      if (Objects.equals("BTC", symbol)) {
+//          if (Utils.isNotBlank(longshort)) {
+//              String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd() + "_"
+//                      + min24h;
+//
+//              if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
+//
+//                  String msg = time + symbol + ":" + Utils.removeLastZero(price_at_binance) + "(now), ATL3d:"
+//                          + Utils.removeLastZero(min_low) + "(" + Utils.toPercent(price_at_binance, min_low, 2)
+//                          + ")";
+//                  fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
+//
+//                  Utils.sendToTelegram(msg);
+//
+//                  return " Fibo " + longshort.trim() + type;
+//              }
+//          }
+//
+//          // --------------------------------------------------------
+//
+//          // 24h
+//          String msg_btc_24h = "";
+//          if (Utils.isGoodPriceLong(price_at_binance, min24h, max24h)) {
+//              msg_btc_24h = " (24h) Btc: " + Utils.removeLastZero(price_at_binance) + "(now), min24h: "
+//                      + Utils.removeLastZero(min24h) + " (" + Utils.getPercentStr(min24h, price_at_binance) + ")";
+//          } else if (Utils.isGoodPriceShort(price_at_binance, min24h, max24h)) {
+//              msg_btc_24h = " (24h) Btc: " + Utils.removeLastZero(price_at_binance) + "(now), max24h: "
+//                      + Utils.removeLastZero(max24h) + " (" + Utils.getPercentStr(price_at_binance, max24h) + ")";
+//          }
+//
+//          if (Utils.isNotBlank(msg_btc_24h)) {
+//              String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_24h_" + symbol + "_" + Utils.getToday_YyyyMMdd()
+//                      + "_" + min24h;
+//              if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
+//
+//                  String msg = time + msg_btc_24h;
+//                  fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
+//
+//                  Utils.sendToTelegram(msg);
+//
+//                  return " Fibo " + msg_btc_24h + type;
+//              }
+//          }
+//
+//          // --------------------------------------------------------
+//
+//          if (Utils.isBlank(longshort)) {
+//              list_15m = Utils.loadData(symbol, "15m", 1);
+//          }
+//          BtcFutures curr_btc_15m = list_15m.get(0);
+//
+//          if (curr_btc_15m.isBtcKillLongCandle() || curr_btc_15m.isBtcKillShortCandle()) {
+//
+//              String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+//
+//              if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
+//                  fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID5, gecko_id, symbol, note, true));
+//
+//                  String msg = time + " 💔 Btc 15m kill Long.";
+//
+//                  if (curr_btc_15m.isBtcKillShortCandle()) {
+//                      msg = time + " 💔 Btc 15m kill Short.";
+//                  }
+//
+//                  Utils.sendToTelegram(msg);
+//
+//                  return shark;
+//              }
+//          }
+//
+//      } else {
+//
+//          if (!btc_is_uptrend_today && longshort.contains("Short")) {
+//              String EVENT_ID_4 = EVENT_DUMP + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+//
+//              if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
+//                  if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
+//                      if (Utils.hasPumpCandle(list_15m, false)) {
+//
+//                          fundingHistoryRepository
+//                                  .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
+//
+//                          String msg = time + " 💹 (ATH3d):" + symbol + ", High3d:"
+//                                  + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
+//
+//                          Utils.sendToTelegram(msg);
+//
+//                          return " Fibo(Short) Volx4" + type;
+//                      }
+//                  }
+//              }
+//          } // short
+//
+//      }
+//
+//      if (longshort.contains("Short")) {
+//          // Pumping = Short
+//          if (Utils.isPumpingCandle(list_15m)) {
+//              if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
+//
+//                  String msg = time + " 💹 (ATH3d):" + symbol;
+//                  msg += " " + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
+//
+//                  String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol;
+//
+//                  if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
+//                      fundingHistoryRepository
+//                              .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
+//
+//                      Utils.sendToTelegram(msg);
+//                  }
+//              }
+//
+//          }
+//      }
+//
+//      String EVENT_ID = EVENT_FIBO_LONG_SHORT + "_" + symbol;
+//      fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, false));
+//
+//      return note;
+//
+//  } catch (Exception e) {
+//      log.info("Error calcPoint  ----->");
+//      e.printStackTrace();
+//  }
+//
+//  return note;
+//}
