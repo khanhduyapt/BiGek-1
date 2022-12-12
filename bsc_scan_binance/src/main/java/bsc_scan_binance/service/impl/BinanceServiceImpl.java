@@ -364,10 +364,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                     + "   , (case when macd.futures LIKE '%_Position%' then 2 when macd.futures LIKE '%(W%' then 1 else 0 end) DESC  \n"
 
-                    + "   , (case when macd.futures LIKE '%Futures%' then 1 else 0 end) DESC                         \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 1 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑%') then 2 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 3  when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 4  when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then  5 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then  6 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓%' then  7 \n"
 
-                    + "   , (case when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑H1↑%' then 1 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%' then 2 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↓%' then 3 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓%' then 4 \n"
-                    + "           when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑H1↑%' then 5 when  macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%' then 6 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↓%' then 7 when  macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓%' then 8 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 8 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑%') then 9 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 10 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 11 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 12 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 13 when  macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓%' then 14 \n"
+
                     + "       else 100 end) ASC \n"
 
                     + "   , (case when can.volumn_div_marketcap >= 0.2 then 1 else 0 end) DESC                      \n"
@@ -2952,6 +2952,8 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     public String checkWDtrend(String gecko_id, String symbol) {
+        String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
+
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures)";
@@ -2963,6 +2965,7 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_weeks)) {
             return type;
         }
+
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 7);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 1);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 1);
@@ -2976,7 +2979,6 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal min_7day = min_max_day.get(0);
         BigDecimal max_7day = min_max_day.get(1);
 
-        String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
         String W1 = list_weeks.get(0).isUptrend() ? "W↑" : "W↓";
         String D1 = list_days.get(0).isUptrend() ? "D↑" : "D↓";
         String H4 = list_h4.get(0).isUptrend() ? "H4↑" : "H4↓";
@@ -3046,7 +3048,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Utils.isGoodPriceLong(current_price, min_7day, max_7day)) {
                     note += "_Long";
 
-                    send_msg = note + type;
+                    send_msg = note;
                 }
             }
 
@@ -3056,7 +3058,7 @@ public class BinanceServiceImpl implements BinanceService {
                     note += " H7d:" + Utils.getPercentToEntry(current_price, max_7day, false);
                     note += " H6w:" + Utils.getPercentToEntry(current_price, max_week, true);
 
-                    send_msg = note + type;
+                    send_msg = note;
                 }
             }
 
@@ -3065,7 +3067,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
                     String msg = Utils.getTimeHHmm() + symbol + ": " + Utils.removeLastZero(current_price);
-                    msg += Utils.new_line_from_service + send_msg;
+                    msg += Utils.new_line_from_service + send_msg + type;
 
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
