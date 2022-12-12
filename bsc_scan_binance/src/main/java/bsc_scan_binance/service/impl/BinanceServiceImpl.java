@@ -3040,17 +3040,21 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
+        boolean chartWMovingToMa7 = Utils.movingToMa7(list_weeks, current_price);
         boolean chartDMovingToMa7 = Utils.movingToMa7(list_days, current_price);
 
-        if (note.contains("W↑D↑") || chartDMovingToMa7) {
+        if (note.contains("W↑D↑") || chartWMovingToMa7 || chartDMovingToMa7) {
             if (Utils.isGoodPriceLong(current_price, min_week, max_week)) {
                 if (Utils.isGoodPriceLong(current_price, min_7day, max_7day)) {
                     note += "_Position_Gp";
                 }
             }
-
-            if (chartDMovingToMa7) {
-                note += "_Position_Ma7d";
+            if (chartWMovingToMa7 && chartDMovingToMa7) {
+                note += "_Position_wd";
+            } else if (chartWMovingToMa7) {
+                note += "_Position_w";
+            } else if (chartDMovingToMa7) {
+                note += "_Position_d";
             }
 
             if (note.contains("_Position")) {
@@ -3059,7 +3063,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
                     String msg = Utils.getTimeHHmm() + symbol + ": "
-                            + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + " " + ma + note + type;
+                            + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + " " + ma + type;
 
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
