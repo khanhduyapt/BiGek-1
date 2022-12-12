@@ -362,7 +362,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
 
-                    + "   , (case when macd.futures LIKE '%_Position%' then 2 when macd.futures LIKE '%(W%' then 1 else 0 end) DESC  \n"
+                    + "   , (case when macd.futures LIKE '%_Position%' then 1 else 0 end) DESC                      \n"
 
                     + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 1 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑%') then 2 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 3  when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 4  when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then  5 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then  6 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓%' then  7 \n"
 
@@ -838,11 +838,14 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal price_can_buy_24h = dto.getPrice_can_buy();
 
                     BigDecimal stop_loss_precent = Utils
-                            .getBigDecimalValue(Utils.toPercent(stop_loss, price_can_buy_24h));
+                            .getBigDecimalValue(Utils.toPercent(price_can_buy_24h, stop_loss));
 
                     BigDecimal price_can_sell_24h = dto.getPrice_can_sell();
 
                     css.setStop_loss("SL: " + Utils.removeLastZero(stop_loss) + "(" + stop_loss_precent + "%)");
+                    if (stop_loss_precent.compareTo(BigDecimal.valueOf(1.5)) < 0) {
+                        // css.setStop_loss_css("text-white bg-success rounded-lg");
+                    }
 
                     BigDecimal temp_prire_24h = Utils
                             .formatPrice(dto.getLow_price_24h().multiply(BigDecimal.valueOf(1.008)), 5);
@@ -885,12 +888,10 @@ public class BinanceServiceImpl implements BinanceService {
                     } else if (futu.contains("W↓D↓H4↓")) {
 
                         css.setFutures_css("text-danger");
-                        css.setStr_entry_price_css("");
 
                     } else if (futu.contains("W↓D↓")) {
 
                         css.setFutures_css("text-danger");
-                        css.setStr_entry_price_css("");
 
                     } else {
                         css.setFutures_css("");
@@ -3039,22 +3040,30 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
+        boolean chartDMovingToMa7 = Utils.movingToMa7(list_days, current_price);
 
-        if (note.contains("W↑D↑")) {
+        if (note.contains("W↑D↑") || chartDMovingToMa7) {
             if (Utils.isGoodPriceLong(current_price, min_week, max_week)) {
                 if (Utils.isGoodPriceLong(current_price, min_7day, max_7day)) {
-                    note += "_Position";
-                    String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
+                    note += "_Position_Gp";
+                }
+            }
 
-                    if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
+            if (chartDMovingToMa7) {
+                note += "_Position_Ma7d";
+            }
 
-                        String msg = Utils.getTimeHHmm() + symbol + ": "
-                                + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + " " + ma + note + type;
+            if (note.contains("_Position")) {
+                String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
 
-                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
+                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
-                        Utils.sendToMyTelegram(msg);
-                    }
+                    String msg = Utils.getTimeHHmm() + symbol + ": "
+                            + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + " " + ma + note + type;
+
+                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
+
+                    Utils.sendToMyTelegram(msg);
                 }
             }
         }

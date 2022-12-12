@@ -1262,6 +1262,16 @@ public class Utils {
         return false;
     }
 
+    public static boolean movingToMa7(List<BtcFutures> list, BigDecimal curr_price) {
+        BigDecimal ma7d = calcMA7d(list);
+        BigDecimal preCloseCandlePrice = list.get(1).getPrice_close_candle();
+
+        if ((curr_price.compareTo(ma7d) > 0) && (preCloseCandlePrice.compareTo(ma7d) < 0)) {
+            return true;
+        }
+        return false;
+    }
+
     public static String percentToMa7(List<BtcFutures> list, BigDecimal curr_price) {
         BigDecimal ma7d = calcMA7d(list);
 
