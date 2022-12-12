@@ -883,8 +883,12 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                     css.setFutures(futu);
 
-                    if (futu.contains("Position") && futu.contains("W↑D↑H4↑H1↑")) {
-                        css.setFutures_css("highlight rounded-lg text-primary");
+                    if (futu.contains("Position")) {
+                        css.setFutures_css("text-white bg-success rounded-lg px-1");
+
+                    } else if (futu.contains("_Long") || futu.contains("_Short")) {
+
+                        css.setFutures_css("bg-warning rounded-lg px-1");
 
                     } else if (futu.contains("W↑D↑H4↑H1↑")) {
                         css.setFutures_css("text-primary");
@@ -1442,7 +1446,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public void monitorBollingerBandwidth(Boolean isCallFormBot) {
         try {
-            log.info("Start monitorToken ---->");
+            log.info("Start monitorBollingerBandwidth ---->");
             {
                 String sql = "" + " select                                                              \n"
                         + "     boll.gecko_id,                                                          \n"
@@ -1552,7 +1556,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("monitorToken error ------->");
+            log.info("monitorBollingerBandwidth error ------->");
             log.error(e.getMessage());
         }
     }

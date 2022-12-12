@@ -135,7 +135,7 @@ p {
       <tbody>
         <tr class="table_row" th:each="token,iter: ${data_list}">
 
-          <td style="text-align: center;" th:text="${iter.index + 1}" th:classappend="${#strings.contains(token.name, 'Futures') ? 'highlight rounded-lg px-1' : ''}">
+          <td style="text-align: center;" th:text="${iter.index + 1}" th:classappend="${#strings.contains(token.name, 'Futures') ? 'bg-success rounded-lg px-1' : 'bg-info rounded-lg px-1'}">
           <!-- Symbol -->
           <td class="" style="max-width: 80px !important;">
             <a
