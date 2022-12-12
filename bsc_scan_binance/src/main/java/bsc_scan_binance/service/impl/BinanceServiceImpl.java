@@ -2970,10 +2970,25 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 7);
-        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 1);
-        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 1);
+        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 7);
+        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 7);
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
+        Boolean isUptrendByMa6w = Utils.isUptrendByMA7d(list_weeks, current_price);
+        Boolean isUptrendByMa7d = Utils.isUptrendByMA7d(list_days, current_price);
+        Boolean isUptrendByMa7h4 = Utils.isUptrendByMA7d(list_h4, current_price);
+        Boolean isUptrendByMa7h1 = Utils.isUptrendByMA7d(list_h1, current_price);
+
+        String ma = "";
+        if (isUptrendByMa6w || isUptrendByMa7d || isUptrendByMa7h4 || isUptrendByMa7h1) {
+            ma += "ma7(";
+            ma += (isUptrendByMa6w ? "w " : "");
+            ma += (isUptrendByMa7d ? "d " : "");
+            ma += (isUptrendByMa7h4 ? "h4 " : "");
+            ma += (isUptrendByMa7h1 ? "h1 " : "");
+            ma = ma.trim() + ") ";
+        }
+
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
         BigDecimal min_week = min_max_week.get(0);
         BigDecimal max_week = min_max_week.get(1);
@@ -3018,8 +3033,8 @@ public class BinanceServiceImpl implements BinanceService {
 
         } else if (note.contains("W↑D↓") || note.contains("W↓D↑")) {
 
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, type, true));
-            return type;
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, ma + type, true));
+            return ma + type;
 
         }
 
@@ -3034,7 +3049,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
                         String msg = Utils.getTimeHHmm() + symbol + ": "
-                                + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + " " + note + type;
+                                + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + " " + ma + note + type;
 
                         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
@@ -3051,7 +3066,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Utils.isGoodPriceLong(current_price, min_7day, max_7day)) {
                     note += "_Long";
 
-                    send_msg = note;
+                    send_msg = ma + note;
                 }
             }
 
@@ -3061,7 +3076,7 @@ public class BinanceServiceImpl implements BinanceService {
                     note += " H7d:" + Utils.getPercentToEntry(current_price, max_7day, false);
                     note += " H6w:" + Utils.getPercentToEntry(current_price, max_week, true);
 
-                    send_msg = note;
+                    send_msg = ma + note;
                 }
             }
 
@@ -3079,9 +3094,11 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note + type, true));
+        String result = ma + note + type;
 
-        return note + type;
+        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
+
+        return result;
     }
 
 }

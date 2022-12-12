@@ -1252,6 +1252,29 @@ public class Utils {
         return false;
     }
 
+    public static Boolean isUptrendByMA7d(List<BtcFutures> list, BigDecimal curr_price) {
+        BigDecimal ma7d = calcMA7d(list);
+
+        if (curr_price.compareTo(ma7d) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static BigDecimal calcMA7d(List<BtcFutures> list) {
+
+        BigDecimal sum = BigDecimal.ZERO;
+
+        for (BtcFutures dto : list) {
+            sum = sum.add(dto.getPrice_close_candle());
+        }
+
+        sum = sum.divide(BigDecimal.valueOf(list.size()), 5, RoundingMode.CEILING);
+
+        return sum;
+    }
+
     public static List<BigDecimal> getLowHeightCandle(List<BtcFutures> list) {
         List<BigDecimal> result = new ArrayList<BigDecimal>();
 
