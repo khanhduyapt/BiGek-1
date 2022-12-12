@@ -174,16 +174,14 @@ p {
             <span style="font-size: 0.85rem !important;" th:classappend="${token.futures_css}" th:text="${token.futures}"></span>
 
             <div style="font-size: 0.75rem !important;">
+              <span th:classappend="${token.stop_loss_css}"       th:text="${token.stop_loss}"></span>
               <span th:classappend="${token.str_entry_price_css}" th:text="${token.str_entry_price}"></span>
               <span th:classappend="${token.low_price_css}"       th:text="${token.low_price}"></span>
               <span th:classappend="${token.hight_price_css}"     th:text="${token.hight_price}"></span>
+              <span th:classappend="${token.avg_boll_max_css}"    th:text="${token.avg_boll_max}"></span>
             </div>
             <div style="font-size: 0.75rem !important;">
-              <span th:classappend="${token.stop_loss_css}" th:text="${token.stop_loss}"></span>
-              <span th:classappend="${token.avg_boll_min_css}"
-                th:text="${token.avg_boll_min}"></span>
-              <span th:classappend="${token.avg_boll_max_css}"
-                th:text="${token.avg_boll_max}"></span>
+              <span th:text="${token.oco_opportunity}">
             </div>
 
             <div style="font-size: 0.75rem !important;">
@@ -223,8 +221,6 @@ p {
               <span th:text="${token.min28day}" th:classappend="${token.min28day_css}" ></span>
             </div>
 
-            <p style="font-size: 0.8rem !important;" class="text-primary"
-              th:text="${token.oco_opportunity}">
             <div style="font-size: 0.8rem !important;">
                 <span th:classappend="${token.rate1h_css}">1h: <span th:text="${token.rate1h}"></span>% </span>
                 <span th:classappend="${token.rate2h_css}">2h: <span th:text="${token.rate2h}"></span>% </span>

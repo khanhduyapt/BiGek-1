@@ -750,30 +750,30 @@ public class Utils {
         return "1000$/" + Utils.removeLastZero(String.valueOf(loss)) + "$";
     }
 
-    public static String toPercent(BigDecimal value, BigDecimal compareToValue) {
-        return toPercent(value, compareToValue, 1);
+    public static String toPercent(BigDecimal target, BigDecimal current_price) {
+        return toPercent(target, current_price, 1);
     }
 
-    public static String toPercent(BigDecimal value, BigDecimal compareToValue, int scale) {
-        if (Objects.equals("", getStringValue(compareToValue))) {
+    public static String toPercent(BigDecimal target, BigDecimal current_price, int scale) {
+        if (Objects.equals("", getStringValue(current_price))) {
             return "0";
         }
 
-        if (compareToValue.compareTo(BigDecimal.ZERO) == 0) {
+        if (current_price.compareTo(BigDecimal.ZERO) == 0) {
             return "[dvz]";
         }
-        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, 2 + scale, RoundingMode.CEILING)
+        BigDecimal percent = (target.subtract(current_price)).divide(current_price, 2 + scale, RoundingMode.CEILING)
                 .multiply(BigDecimal.valueOf(100));
 
         return removeLastZero(percent.toString());
     }
 
-    public static BigDecimal getPercent(BigDecimal value, BigDecimal compareToValue) {
-        if (Utils.getBigDecimal(compareToValue).equals(BigDecimal.ZERO)) {
+    public static BigDecimal getPercent(BigDecimal value, BigDecimal curr_price) {
+        if (Utils.getBigDecimal(curr_price).equals(BigDecimal.ZERO)) {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal percent = (value.subtract(compareToValue)).divide(compareToValue, 4, RoundingMode.CEILING)
+        BigDecimal percent = (value.subtract(curr_price)).divide(curr_price, 4, RoundingMode.CEILING)
                 .multiply(BigDecimal.valueOf(100));
 
         return percent;
@@ -1262,6 +1262,16 @@ public class Utils {
         return false;
     }
 
+    public static String percentToMa7(List<BtcFutures> list, BigDecimal curr_price) {
+        BigDecimal ma7d = calcMA7d(list);
+
+        String percent = toPercent(ma7d, curr_price);
+
+        String value = removeLastZero(formatPriceLike(ma7d, BigDecimal.valueOf(0.0001))) + "(" + percent + "%)";
+
+        return value;
+    }
+
     public static BigDecimal calcMA7d(List<BtcFutures> list) {
 
         BigDecimal sum = BigDecimal.ZERO;
@@ -1336,14 +1346,14 @@ public class Utils {
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
         BigDecimal sl = Utils.getPercent(curr_price, low_price);
-        //BigDecimal tp = Utils.getPercent(hight_price, curr_price);
+        // BigDecimal tp = Utils.getPercent(hight_price, curr_price);
 
         if (sl.compareTo(BigDecimal.valueOf(10)) > 0) {
             return false;
         }
-        //if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
-        //    return false;
-        //}
+        // if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
+        // return false;
+        // }
 
         BigDecimal good_price = getGoodPriceLong(low_price, hight_price);
 
@@ -1359,14 +1369,14 @@ public class Utils {
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
         BigDecimal sl = Utils.getPercent(hight_price, curr_price);
-        //BigDecimal tp = Utils.getPercent(curr_price, low_price);
+        // BigDecimal tp = Utils.getPercent(curr_price, low_price);
 
         if (sl.compareTo(BigDecimal.valueOf(5)) > 0) {
             return false;
         }
-        //if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
-        //    return false;
-        //}
+        // if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
+        // return false;
+        // }
 
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(8), 5, RoundingMode.CEILING);
