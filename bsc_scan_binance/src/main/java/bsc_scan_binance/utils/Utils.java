@@ -799,7 +799,7 @@ public class Utils {
     public static String getPercentToEntry(BigDecimal curr_price, BigDecimal entry, boolean isLong) {
         String mySL = Utils.removeLastZero(entry) + "("
                 + (isLong ? Utils.getPercentStr(curr_price, entry) : Utils.getPercentStr(entry, curr_price)) + ")";
-        return mySL;
+        return mySL.replace("-", "");
     }
 
     public static String getPercentStr(BigDecimal value, BigDecimal compareToValue) {
@@ -1301,14 +1301,22 @@ public class Utils {
 
         String result = " SL" + "(" + byChart + "): none, E: none";
         BigDecimal ma7d = calcMA7d(list);
+        List<BigDecimal> low_heigh = getLowHeightCandle(list);
+        BigDecimal SL = BigDecimal.ZERO;
 
         if (current_price.compareTo(ma7d) > 0) {
-            List<BigDecimal> low_heigh = getLowHeightCandle(list);
-            BigDecimal SL = low_heigh.get(0);
+
+            SL = low_heigh.get(0);
 
             result = " SL" + "(" + byChart + ")" + ": " + getPercentToEntry(ma7d, SL, true) + ", E" + "(" + byChart
                     + ")"
-                    + ": " + getPercentToEntry(SL, ma7d, false);
+                    + ": " + getPercentToEntry(current_price, ma7d, false);
+        } else {
+            SL = low_heigh.get(1);
+
+            result = " SL" + "(" + byChart + ")" + ": " + getPercentToEntry(ma7d, SL, false) + ", E" + "(" + byChart
+                    + ")"
+                    + ": " + getPercentToEntry(current_price, ma7d, true);
         }
 
         return result;
