@@ -878,7 +878,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (futu.contains("ma7") && futu.contains("~")) {
                         String ma7 = futu.substring(0, futu.indexOf("~"));
                         futu = futu.substring(futu.indexOf("~") + 1, futu.length());
-                        css.setOco_opportunity(ma7);
+                        css.setOco_opportunity(ma7.replace("ma7", "Ma10"));
                     }
 
                     if (futu.contains("m2ma") && futu.contains("}")) {
@@ -2986,29 +2986,29 @@ public class BinanceServiceImpl implements BinanceService {
             return type;
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 7);
-        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 7);
-        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 7);
+        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 10);
+        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 10);
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
-        Boolean isUptrendByMa6w = Utils.isUptrendByMA7d(list_weeks, current_price);
-        Boolean isUptrendByMa7d = Utils.isUptrendByMA7d(list_days, current_price);
-        Boolean isUptrendByMa7h4 = Utils.isUptrendByMA7d(list_h4, current_price);
-        Boolean isUptrendByMa7h1 = Utils.isUptrendByMA7d(list_h1, current_price);
+        Boolean isUptrendW = Utils.isUptrendByMA(list_weeks, current_price);
+        Boolean isUptrendD = Utils.isUptrendByMA(list_days, current_price);
+        Boolean isUptrendH4 = Utils.isUptrendByMA(list_h4, current_price);
+        Boolean isUptrendH1 = Utils.isUptrendByMA(list_h1, current_price);
 
         String ma = "";
-        ma += (isUptrendByMa6w ? " W" : "");
-        ma += (isUptrendByMa7d ? " D" : "");
-        ma += (isUptrendByMa7h4 ? " H4" : "");
-        ma += (isUptrendByMa7h1 ? " H1" : "");
+        ma += (isUptrendW ? " W" : "");
+        ma += (isUptrendD ? " D" : "");
+        ma += (isUptrendH4 ? " H4" : "");
+        ma += (isUptrendH1 ? " H1" : "");
         if (Utils.isBlank(ma)) {
             ma = "ma7(none)";
         } else {
             ma = "ma7(" + ma.trim() + ")";
         }
-        ma += " W: " + Utils.percentToMa7(list_weeks, current_price);
-        ma += ", D: " + Utils.percentToMa7(list_days, current_price);
-        ma += ", H4: " + Utils.percentToMa7(list_h4, current_price);
-        ma += ", H1: " + Utils.percentToMa7(list_h1, current_price);
+        ma += " W: " + Utils.percentToMa(list_weeks, current_price);
+        ma += ", D: " + Utils.percentToMa(list_days, current_price);
+        ma += ", H4: " + Utils.percentToMa(list_h4, current_price);
+        ma += ", H1: " + Utils.percentToMa(list_h1, current_price);
         ma += "~";
 
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
@@ -3016,8 +3016,8 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal max_week = min_max_week.get(1);
 
         List<BigDecimal> min_max_day = Utils.getLowHeightCandle(list_days);
-        BigDecimal min_7day = min_max_day.get(0);
-        BigDecimal max_7day = min_max_day.get(1);
+        BigDecimal min_days = min_max_day.get(0);
+        BigDecimal max_days = min_max_day.get(1);
 
         String W1 = list_weeks.get(0).isUptrend() ? "W↑" : "W↓";
         String D1 = list_days.get(0).isUptrend() ? "D↑" : "D↓";
@@ -3025,7 +3025,7 @@ public class BinanceServiceImpl implements BinanceService {
         String H1 = list_h1.get(0).isUptrend() ? "H1↑" : "H1↓";
 
         String note = W1 + D1 + H4 + H1;
-        note += ", L7d: " + Utils.getPercentToEntry(current_price, min_7day, true);
+        note += ", L7d: " + Utils.getPercentToEntry(current_price, min_days, true);
         note += ", L7w: " + Utils.getPercentToEntry(current_price, min_week, true);
 
         // ---------------------------------------------------------
@@ -3061,33 +3061,38 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
-        boolean chartWMovingToMa7 = Utils.cutUpMa7(list_weeks, current_price);
-        boolean chartDMovingToMa7 = Utils.cutUpMa7(list_days, current_price);
-        boolean chartH4MovingToMa7 = Utils.cutUpMa7(list_h4, current_price);
-        boolean chartH1MovingToMa7 = Utils.cutUpMa7(list_h1, current_price);
+        boolean chartWMoving = Utils.cutUpMa(list_weeks, current_price);
+        boolean chartDMoving = Utils.cutUpMa(list_days, current_price);
+        boolean chartH4Moving = Utils.cutUpMa(list_h4, current_price);
+        boolean chartH1Moving = Utils.cutUpMa(list_h1, current_price);
 
         String mUpMa = "";
-        mUpMa += (chartWMovingToMa7 ? "W " : "");
-        mUpMa += (chartDMovingToMa7 ? "D " : "");
-        mUpMa += (chartH4MovingToMa7 ? "H4 " : "");
-        mUpMa += (chartH1MovingToMa7 ? "H1 " : "");
+        mUpMa += (chartWMoving ? "W " : "");
+        mUpMa += (chartDMoving ? "D " : "");
+        mUpMa += (chartH4Moving ? "H4 " : "");
+        mUpMa += (chartH1Moving ? "H1 " : "");
         if (Utils.isNotBlank(mUpMa)) {
-            mUpMa = " move↑: " + mUpMa.trim();
+            mUpMa = " move ↑: " + mUpMa.trim();
         }
 
         String mDownMa = "";
-        mDownMa += Utils.cutDownMa7(list_weeks, current_price) ? "W " : "";
-        mDownMa += Utils.cutDownMa7(list_days, current_price) ? "D " : "";
-        mDownMa += Utils.cutDownMa7(list_h4, current_price) ? "H4 " : "";
-        mDownMa += Utils.cutDownMa7(list_h1, current_price) ? "H1 " : "";
+        mDownMa += Utils.cutDownMa(list_weeks, current_price) ? "W " : "";
+        mDownMa += Utils.cutDownMa(list_days, current_price) ? "D " : "";
+        mDownMa += Utils.cutDownMa(list_h4, current_price) ? "H4 " : "";
+        mDownMa += Utils.cutDownMa(list_h1, current_price) ? "H1 " : "";
+
         if (Utils.isNotBlank(mDownMa)) {
-            mDownMa = " move↓: " + mDownMa.trim();
+            if (Utils.isNotBlank(mUpMa)) {
+                mDownMa = ". ↓: " + mDownMa.trim();
+            } else {
+                mDownMa = "move ↓: " + mDownMa.trim();
+            }
         }
 
         String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}";
 
         //sl2ma
-        String entry = " sl2ma{" + Utils.getSLByMa7(list_h4, "H4") + "}";
+        String entry = " sl2ma{" + Utils.getSLByMa(list_h4, "H4") + "}";
 
         if (Utils.isNotBlank(entry)) {
             // boolean a = true;
@@ -3095,7 +3100,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (note.contains("W↑D↑")) {
             if (Utils.isGoodPriceLong(current_price, min_week, max_week)) {
-                if (Utils.isGoodPriceLong(current_price, min_7day, max_7day)) {
+                if (Utils.isGoodPriceLong(current_price, min_days, max_days)) {
                     note += "_Position";
 
                 }
@@ -3117,7 +3122,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (note.contains("D↓") && type.contains("Futures")) {
-            if (Utils.isGoodPriceShort(current_price, min_7day, max_7day)) {
+            if (Utils.isGoodPriceShort(current_price, min_days, max_days)) {
                 note += "_Short";
             }
         }
@@ -3126,7 +3131,7 @@ public class BinanceServiceImpl implements BinanceService {
             String send_msg = "";
 
             if (note.contains("W↑D↑")) {
-                if (Utils.isGoodPriceLong(current_price, min_7day, max_7day)) {
+                if (Utils.isGoodPriceLong(current_price, min_days, max_days)) {
                     note += "_Long";
 
                     send_msg = ma + note;
@@ -3157,13 +3162,13 @@ public class BinanceServiceImpl implements BinanceService {
         result += Utils.new_line_from_bot;
         result += ma + W1 + D1 + H4 + H1 + Utils.new_line_from_bot;
 
-        result += "L7d:" + Utils.getPercentToEntry(current_price, min_7day, true);
-        result += ", H7d:" + Utils.getPercentToEntry(current_price, max_7day, false);
+        result += "L7d:" + Utils.getPercentToEntry(current_price, min_days, true);
+        result += ", H7d:" + Utils.getPercentToEntry(current_price, max_days, false);
 
         result += Utils.new_line_from_bot;
 
-        result += "L6w:" + Utils.getPercentToEntry(current_price, min_week, true);
-        result += ", H6w:" + Utils.getPercentToEntry(current_price, max_week, false);
+        result += "L7w:" + Utils.getPercentToEntry(current_price, min_week, true);
+        result += ", H7w:" + Utils.getPercentToEntry(current_price, max_week, false);
 
         return result.replaceAll("↑", "^").replaceAll("↓", "v");
     }
