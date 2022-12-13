@@ -1262,14 +1262,56 @@ public class Utils {
         return false;
     }
 
-    public static boolean movingToMa7(List<BtcFutures> list, BigDecimal curr_price) {
+    public static boolean cutUpMa7(List<BtcFutures> list, BigDecimal curr_price) {
         BigDecimal ma7d = calcMA7d(list);
-        BigDecimal preCloseCandlePrice = list.get(1).getPrice_close_candle();
 
-        if ((curr_price.compareTo(ma7d) > 0) && (preCloseCandlePrice.compareTo(ma7d) < 0)) {
+        boolean hasCandleUnderMa = false;
+        for (int index = 1; index < list.size() / 2; index++) {
+            BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
+            if ((preCloseCandlePrice.compareTo(ma7d) < 0)) {
+                hasCandleUnderMa = true;
+            }
+        }
+
+        if ((curr_price.compareTo(ma7d) > 0) && hasCandleUnderMa) {
             return true;
         }
         return false;
+    }
+
+    public static boolean cutDownMa7(List<BtcFutures> list, BigDecimal curr_price) {
+        BigDecimal ma7d = calcMA7d(list);
+
+        boolean hasCandleUpperMa = false;
+        for (int index = 1; index < list.size() / 2; index++) {
+            BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
+            if ((preCloseCandlePrice.compareTo(ma7d) > 0)) {
+                hasCandleUpperMa = true;
+            }
+        }
+
+        if ((curr_price.compareTo(ma7d) < 0) && hasCandleUpperMa) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String getSLByMa7(List<BtcFutures> list, String byChart) {
+        BigDecimal current_price = list.get(0).getCurrPrice();
+
+        String result = " SL" + "(" + byChart + "): none, E: none";
+        BigDecimal ma7d = calcMA7d(list);
+
+        if (current_price.compareTo(ma7d) > 0) {
+            List<BigDecimal> low_heigh = getLowHeightCandle(list);
+            BigDecimal SL = low_heigh.get(0);
+
+            result = " SL" + "(" + byChart + ")" + ": " + getPercentToEntry(ma7d, SL, true) + ", E" + "(" + byChart
+                    + ")"
+                    + ": " + getPercentToEntry(SL, ma7d, false);
+        }
+
+        return result;
     }
 
     public static String percentToMa7(List<BtcFutures> list, BigDecimal curr_price) {

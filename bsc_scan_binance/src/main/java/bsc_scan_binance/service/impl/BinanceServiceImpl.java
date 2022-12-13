@@ -362,11 +362,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
 
-                    + "   , (case when macd.futures LIKE '%_Position%' then 1 else 0 end) DESC                      \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 12 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑%') then 13 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 14  when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 15 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 16 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 17 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓%' then 18 \n"
 
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 1 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑%') then 2 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 3  when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 4  when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then  5 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then  6 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓%' then  7 \n"
-
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 8 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑%') then 9 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 10 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 11 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 12 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 13 when  macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓%' then 14 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 32 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑%') then 33 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 34 when (macd.futures LIKE '%Spot%'     AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 35 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 36 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 37 when  macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓%' then 38 \n"
 
                     + "       else 100 end) ASC \n"
 
@@ -377,6 +375,18 @@ public class BinanceServiceImpl implements BinanceService {
             Query query = entityManager.createNativeQuery(sql, "CandidateTokenResponse");
             @SuppressWarnings("unchecked")
             List<CandidateTokenResponse> results = query.getResultList();
+
+            int dayUp = 0;
+            for (CandidateTokenResponse dto : results) {
+                if (dto.getFutures().contains("D↑")) {
+                    dayUp += 1;
+                }
+            }
+            String totalMarket = " TotalD↑:" + dayUp + "("
+                    + Utils.getPercentStr(BigDecimal.valueOf(results.size() - dayUp),
+                            BigDecimal.valueOf(results.size())).replace("-",
+                                    "")
+                    + ")";
 
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
 
@@ -833,19 +843,19 @@ public class BinanceServiceImpl implements BinanceService {
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_buy()) != 0
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_sell()) != 0) {
 
-                    BigDecimal stop_loss = (dto.getLow_price_24h().multiply(BigDecimal.valueOf(0.999)))
-                            .setScale(Utils.getDecimalNumber(dto.getLow_price_24h()), BigDecimal.ROUND_DOWN);
+                    //BigDecimal stop_loss = (dto.getLow_price_24h().multiply(BigDecimal.valueOf(0.999)))
+                    //        .setScale(Utils.getDecimalNumber(dto.getLow_price_24h()), BigDecimal.ROUND_DOWN);
                     BigDecimal price_can_buy_24h = dto.getPrice_can_buy();
 
-                    BigDecimal stop_loss_precent = Utils
-                            .getBigDecimalValue(Utils.toPercent(price_can_buy_24h, stop_loss));
+                    //BigDecimal stop_loss_precent = Utils
+                    //        .getBigDecimalValue(Utils.toPercent(price_can_buy_24h, stop_loss));
 
                     BigDecimal price_can_sell_24h = dto.getPrice_can_sell();
 
-                    css.setStop_loss("SL: " + Utils.removeLastZero(stop_loss) + "(" + stop_loss_precent + "%)");
-                    if (stop_loss_precent.compareTo(BigDecimal.valueOf(1.5)) < 0) {
-                        // css.setStop_loss_css("text-white bg-success rounded-lg");
-                    }
+                    //css.setStop_loss("SL: " + Utils.removeLastZero(stop_loss) + "(" + stop_loss_precent + "%)");
+                    //if (stop_loss_precent.compareTo(BigDecimal.valueOf(1.5)) < 0) {
+                    // css.setStop_loss_css("text-white bg-success rounded-lg");
+                    //}
 
                     BigDecimal temp_prire_24h = Utils
                             .formatPrice(dto.getLow_price_24h().multiply(BigDecimal.valueOf(1.008)), 5);
@@ -853,22 +863,39 @@ public class BinanceServiceImpl implements BinanceService {
                         temp_prire_24h = dto.getPrice_can_buy();
                     }
                     temp_prire_24h = Utils.formatPriceLike(temp_prire_24h, price_now);
-                    BigDecimal temp_prire_24h_percent = Utils
-                            .getBigDecimalValue(Utils.toPercent(price_now, temp_prire_24h));
+                    //BigDecimal temp_prire_24h_percent = Utils
+                    //        .getBigDecimalValue(Utils.toPercent(price_now, temp_prire_24h));
                     css.setEntry_price(temp_prire_24h);
-                    css.setStr_entry_price("E:" + Utils.removeLastZero(temp_prire_24h.toString()) + "("
-                            + Utils.removeLastZero(temp_prire_24h_percent.toString()) + "%)");
 
-                    if (temp_prire_24h_percent.compareTo(BigDecimal.valueOf(1.5)) < 0) {
-                        css.setStr_entry_price_css("text-white bg-success rounded-lg");
-                    }
+                    //css.setStr_entry_price("E:" + Utils.removeLastZero(temp_prire_24h.toString()) + "("
+                    //        + Utils.removeLastZero(temp_prire_24h_percent.toString()) + "%)");
+
+                    //if (temp_prire_24h_percent.compareTo(BigDecimal.valueOf(1.5)) < 0) {
+                    //    css.setStr_entry_price_css("text-white bg-success rounded-lg");
+                    //}
 
                     String futu = css.getFutures();
-                    if (futu.toLowerCase().contains("ma7") && futu.contains("~")) {
+                    if (futu.contains("ma7") && futu.contains("~")) {
                         String ma7 = futu.substring(0, futu.indexOf("~"));
                         futu = futu.substring(futu.indexOf("~") + 1, futu.length());
                         css.setOco_opportunity(ma7);
                     }
+
+                    if (futu.contains("m2ma") && futu.contains("}")) {
+                        String m2ma = futu.substring(futu.indexOf("m2ma"), futu.indexOf("}") + 1);
+                        futu = futu.replace(m2ma, "");
+
+                        css.setStop_loss(m2ma.replace("m2ma", "").replace("{", "").replace("}", ""));
+                        css.setStop_loss_css("text-white bg-success rounded-lg");
+                    }
+
+                    if (futu.contains("sl2ma") && futu.contains("}")) {
+                        String sl2ma = futu.substring(futu.indexOf("sl2ma"), futu.indexOf("}") + 1);
+                        futu = futu.replace(sl2ma, "");
+
+                        css.setStr_entry_price(sl2ma.replace("sl2ma", "").replace("{", "").replace("}", ""));
+                    }
+
                     css.setFutures(futu);
 
                     if (futu.contains("Position")) {
@@ -885,11 +912,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                         css.setFutures_css("text-primary");
 
-                    } else if (futu.contains("W↓D↓H4↓")) {
-
-                        css.setFutures_css("text-danger");
-
-                    } else if (futu.contains("W↓D↓")) {
+                    } else if (futu.contains("D↓")) {
 
                         css.setFutures_css("text-danger");
 
@@ -992,7 +1015,7 @@ public class BinanceServiceImpl implements BinanceService {
                     wallToday();
                     css.setNote("");
 
-                    css.setStar(sp500);
+                    css.setStar(sp500 + totalMarket);
                     css.setStar_css("display-tity text-left");
                     if (sp500.contains("-")) {
                         css.setStar_css("bg-danger rounded-lg display-tity text-left text-white");
@@ -2962,7 +2985,6 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_weeks)) {
             return type;
         }
-
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 7);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 7);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 7);
@@ -2983,7 +3005,6 @@ public class BinanceServiceImpl implements BinanceService {
         } else {
             ma = "ma7(" + ma.trim() + ")";
         }
-
         ma += " W: " + Utils.percentToMa7(list_weeks, current_price);
         ma += ", D: " + Utils.percentToMa7(list_days, current_price);
         ma += ", H4: " + Utils.percentToMa7(list_h4, current_price);
@@ -3034,27 +3055,50 @@ public class BinanceServiceImpl implements BinanceService {
 
         } else if (note.contains("W↑D↓") || note.contains("W↓D↑")) {
 
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, ma + type, true));
-            return ma + type;
+            //fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, ma + type, true));
+            //return ma + type;
 
         }
 
         // ---------------------------------------------------------
-        boolean chartWMovingToMa7 = Utils.movingToMa7(list_weeks, current_price);
-        boolean chartDMovingToMa7 = Utils.movingToMa7(list_days, current_price);
+        boolean chartWMovingToMa7 = Utils.cutUpMa7(list_weeks, current_price);
+        boolean chartDMovingToMa7 = Utils.cutUpMa7(list_days, current_price);
+        boolean chartH4MovingToMa7 = Utils.cutUpMa7(list_h4, current_price);
+        boolean chartH1MovingToMa7 = Utils.cutUpMa7(list_h1, current_price);
 
-        if (note.contains("W↑D↑") || chartWMovingToMa7 || chartDMovingToMa7) {
+        String mUpMa = "";
+        mUpMa += (chartWMovingToMa7 ? "W " : "");
+        mUpMa += (chartDMovingToMa7 ? "D " : "");
+        mUpMa += (chartH4MovingToMa7 ? "H4 " : "");
+        mUpMa += (chartH1MovingToMa7 ? "H1 " : "");
+        if (Utils.isNotBlank(mUpMa)) {
+            mUpMa = " move↑: " + mUpMa.trim();
+        }
+
+        String mDownMa = "";
+        mDownMa += Utils.cutDownMa7(list_weeks, current_price) ? "W " : "";
+        mDownMa += Utils.cutDownMa7(list_days, current_price) ? "D " : "";
+        mDownMa += Utils.cutDownMa7(list_h4, current_price) ? "H4 " : "";
+        mDownMa += Utils.cutDownMa7(list_h1, current_price) ? "H1 " : "";
+        if (Utils.isNotBlank(mDownMa)) {
+            mDownMa = " move↓: " + mDownMa.trim();
+        }
+
+        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}";
+
+        //sl2ma
+        String entry = " sl2ma{" + Utils.getSLByMa7(list_h4, "H4") + "}";
+
+        if (Utils.isNotBlank(entry)) {
+            // boolean a = true;
+        }
+
+        if (note.contains("W↑D↑")) {
             if (Utils.isGoodPriceLong(current_price, min_week, max_week)) {
                 if (Utils.isGoodPriceLong(current_price, min_7day, max_7day)) {
-                    note += "_Position_Gp";
+                    note += "_Position";
+
                 }
-            }
-            if (chartWMovingToMa7 && chartDMovingToMa7) {
-                note += "_Position_wd";
-            } else if (chartWMovingToMa7) {
-                note += "_Position_w";
-            } else if (chartDMovingToMa7) {
-                note += "_Position_d";
             }
 
             if (note.contains("_Position")) {
@@ -3063,12 +3107,18 @@ public class BinanceServiceImpl implements BinanceService {
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
                     String msg = Utils.getTimeHHmm() + symbol + ": "
-                            + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + " " + ma + type;
+                            + Utils.removeLastZero(list_days.get(0).getCurrPrice()) + " " + ma + type + m2ma;
 
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
                     Utils.sendToMyTelegram(msg);
                 }
+            }
+        }
+
+        if (note.contains("D↓") && type.contains("Futures")) {
+            if (Utils.isGoodPriceShort(current_price, min_7day, max_7day)) {
+                note += "_Short";
             }
         }
 
@@ -3082,17 +3132,6 @@ public class BinanceServiceImpl implements BinanceService {
                     send_msg = ma + note;
                 }
             }
-
-            if (note.contains("W↓D↓") && type.contains("Futures")) {
-                if (Utils.isGoodPriceShort(current_price, min_7day, max_7day)) {
-                    note += "_Short";
-                    note += " Hd:" + Utils.getPercentToEntry(current_price, max_7day, false);
-                    note += " Hw:" + Utils.getPercentToEntry(current_price, max_week, true);
-
-                    send_msg = ma + note;
-                }
-            }
-
             if (Utils.isNotBlank(send_msg)) {
                 String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
@@ -3107,12 +3146,13 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        String result = ma + note + type;
+        String result = ma + note + type + m2ma + entry;
         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
 
         // -------------------------------------------------------------
 
-        result = Utils.getTimeHHmm() + " " + symbol.toUpperCase() + " " + Utils.removeLastZero(current_price);
+        result = Utils.getTimeHHmm() + " " + symbol.toUpperCase() + " " + Utils.removeLastZero(current_price) + m2ma
+                + entry;
 
         result += Utils.new_line_from_bot;
         result += ma + W1 + D1 + H4 + H1 + Utils.new_line_from_bot;
