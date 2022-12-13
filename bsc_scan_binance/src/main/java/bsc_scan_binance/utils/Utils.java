@@ -1296,28 +1296,27 @@ public class Utils {
         return false;
     }
 
-    public static String getSLByMa(List<BtcFutures> list, String byChart) {
+    public static String getSLByMa(List<BtcFutures> list, String byChart, boolean isLong) {
         BigDecimal current_price = list.get(0).getCurrPrice();
 
         String result = " SL" + "(" + byChart + "): none, E: none";
+
         BigDecimal ma7d = calcMA7d(list);
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
+        BigDecimal low = low_heigh.get(0);
+        BigDecimal heigh = low_heigh.get(1);
+
         BigDecimal SL = BigDecimal.ZERO;
-
-        if (current_price.compareTo(ma7d) > 0) {
-
-            SL = low_heigh.get(0);
-
-            result = " Long SL" + "(" + byChart + ")" + ": " + getPercentToEntry(ma7d, SL, true) + ", E" + "(" + byChart
-                    + ")"
-                    + ": " + getPercentToEntry(current_price, ma7d, false);
+        if (isLong) {
+            SL = low;
+            result = " SL (" + byChart + "): " + getPercentToEntry(ma7d, SL, true);
+            result += ", E: " + getPercentToEntry(current_price, ma7d, false);
+            result += ", TP: " + getPercentToEntry(ma7d, heigh, true) + ",";
         } else {
-            SL = low_heigh.get(1);
-
-            result = " Short SL" + "(" + byChart + ")" + ": " + getPercentToEntry(ma7d, SL, false) + ", E" + "("
-                    + byChart
-                    + ")"
-                    + ": " + getPercentToEntry(current_price, ma7d, true);
+            SL = heigh;
+            result = " SL (" + byChart + "): " + getPercentToEntry(ma7d, SL, false);
+            result += ", E: " + getPercentToEntry(current_price, ma7d, true);
+            result += ", TP: " + getPercentToEntry(ma7d, low, false) + ",";
         }
 
         return result;
@@ -1401,18 +1400,24 @@ public class Utils {
         return result;
     }
 
+    public static Boolean isGoodPrice4Posision(BigDecimal cur_price, BigDecimal lo_price, int percent_maxpain) {
+        BigDecimal curr_price = Utils.getBigDecimal(cur_price);
+        BigDecimal low_price = Utils.getBigDecimal(lo_price);
+
+        BigDecimal sl = Utils.getPercent(curr_price, low_price);
+        if (sl.compareTo(BigDecimal.valueOf(percent_maxpain)) > 0) {
+            return false;
+        }
+        return true;
+    }
+
     public static Boolean isGoodPriceLong(BigDecimal cur_price, BigDecimal lo_price, BigDecimal hi_price) {
         BigDecimal curr_price = Utils.getBigDecimal(cur_price);
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
-        BigDecimal sl = Utils.getPercent(curr_price, low_price);
-        // BigDecimal tp = Utils.getPercent(hight_price, curr_price);
-
-        if (sl.compareTo(BigDecimal.valueOf(10)) > 0) {
-            return false;
-        }
-        // if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
+        // BigDecimal sl = Utils.getPercent(curr_price, low_price);
+        // if (sl.compareTo(BigDecimal.valueOf(10)) > 0) {
         // return false;
         // }
 
@@ -1429,18 +1434,13 @@ public class Utils {
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
-        BigDecimal sl = Utils.getPercent(hight_price, curr_price);
-        // BigDecimal tp = Utils.getPercent(curr_price, low_price);
-
-        if (sl.compareTo(BigDecimal.valueOf(5)) > 0) {
-            return false;
-        }
-        // if (tp.compareTo(BigDecimal.valueOf(5)) < 0) {
+        // BigDecimal sl = Utils.getPercent(hight_price, curr_price);
+        // if (sl.compareTo(BigDecimal.valueOf(5)) > 0) {
         // return false;
         // }
 
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(8), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
 
         BigDecimal mid_price = hight_price.subtract(range);
 
