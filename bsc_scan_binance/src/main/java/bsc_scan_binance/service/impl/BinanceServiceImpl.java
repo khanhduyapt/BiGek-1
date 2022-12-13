@@ -733,11 +733,13 @@ public class BinanceServiceImpl implements BinanceService {
                             + taget_percent_lost_today + "%)_H:" + Utils.removeLastZero(highest_price_today.toString())
                             + "(" + taget_percent_profit_today.toString().replace(".0", "") + "%)";
 
-                    css.setLow_to_hight_price(low_to_hight_price);
-
-                    css.setLow_price(low_to_hight_price.substring(0, low_to_hight_price.indexOf("_")));
-                    css.setHight_price(low_to_hight_price.substring(low_to_hight_price.indexOf("_") + 1));
-
+                    // css.setLow_to_hight_price(low_to_hight_price);
+                    // css.setLow_price(low_to_hight_price.substring(0,
+                    // low_to_hight_price.indexOf("_")));
+                    // css.setHight_price(low_to_hight_price.substring(low_to_hight_price.indexOf("_")
+                    // + 1));
+                    css.setLow_price("");
+                    css.setHight_price("");
                 }
 
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
@@ -3100,7 +3102,8 @@ public class BinanceServiceImpl implements BinanceService {
             String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
-                String msg = Utils.getTimeHHmm() + " (Position) " + symbol + ": " + Utils.removeLastZero(current_price);
+                String msg = Utils.getTimeHHmm() + type + " (Position) " + symbol + ": "
+                        + Utils.removeLastZero(current_price);
 
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
