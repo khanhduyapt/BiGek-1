@@ -362,9 +362,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
 
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 12 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑%') then 13 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 14  when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 15 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 16 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 17 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓%' then 18 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 12 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑%') then 13 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 14 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↓%') then 15 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 16 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 17 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 18 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓%' then 19 \n"
 
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 32 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑%') then 33 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 34 when (macd.futures LIKE '%Spot%'     AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 35 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 36 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 37 when  macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓%' then 38 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 32 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑%') then 33 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 34 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↓%') then 35 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 36 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 37 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 38 when  macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓%' then 39 \n"
 
                     + "       else 100 end) ASC \n"
 
@@ -878,7 +878,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (futu.contains("ma7") && futu.contains("~")) {
                         String ma7 = futu.substring(0, futu.indexOf("~"));
                         futu = futu.substring(futu.indexOf("~") + 1, futu.length());
-                        css.setOco_opportunity(ma7.replace("ma7", "Ma10"));
+                        css.setOco_opportunity(ma7.replace("ma7", "Ma7"));
                     }
 
                     if (futu.contains("m2ma") && futu.contains("}")) {
@@ -886,7 +886,16 @@ public class BinanceServiceImpl implements BinanceService {
                         futu = futu.replace(m2ma, "");
 
                         css.setStop_loss(m2ma.replace("m2ma", "").replace("{", "").replace("}", ""));
-                        css.setStop_loss_css("text-white bg-success rounded-lg");
+                        if (m2ma.contains("move ↑")) {
+
+                            css.setStop_loss_css("text-white bg-info rounded-lg");
+
+                        } else if (m2ma.contains("move ↓")) {
+
+                            css.setStop_loss_css("bg-warning rounded-lg");
+
+                        }
+
                     }
 
                     if (futu.contains("sl2ma") && futu.contains("}")) {
@@ -2986,7 +2995,7 @@ public class BinanceServiceImpl implements BinanceService {
             return type;
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 7);
-        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 10);
+        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 7);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 10);
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
