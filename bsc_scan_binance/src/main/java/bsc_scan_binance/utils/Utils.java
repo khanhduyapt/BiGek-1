@@ -1309,12 +1309,12 @@ public class Utils {
         BigDecimal SL = BigDecimal.ZERO;
         if (isLong) {
             SL = low;
-            result = " SL (" + byChart + "): " + getPercentToEntry(ma7d, SL, true);
+            result = " SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, true);
             result += ", E: " + getPercentToEntry(current_price, ma7d, false);
             result += ", TP: " + getPercentToEntry(ma7d, heigh, true) + ",";
         } else {
             SL = heigh;
-            result = " SL (" + byChart + "): " + getPercentToEntry(ma7d, SL, false);
+            result = " SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, false);
             result += ", E: " + getPercentToEntry(current_price, ma7d, true);
             result += ", TP: " + getPercentToEntry(ma7d, low, false) + ",";
         }
