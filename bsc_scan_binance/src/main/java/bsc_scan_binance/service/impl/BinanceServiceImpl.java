@@ -3092,7 +3092,7 @@ public class BinanceServiceImpl implements BinanceService {
         String result = ma + note + type + m2ma + entry;
         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
 
-        if (chartDMovingUp && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)
+        if (isUptrendD && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)
                 && Utils.isGoodPrice4Posision(current_price, min_days, percent_maxpain)) {
 
             note += "_Position";
@@ -3100,7 +3100,7 @@ public class BinanceServiceImpl implements BinanceService {
             String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
-                String msg = Utils.getTimeHHmm() + " (Long?) " + symbol + ": " + Utils.removeLastZero(current_price);
+                String msg = Utils.getTimeHHmm() + " (Position) " + symbol + ": " + Utils.removeLastZero(current_price);
 
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
