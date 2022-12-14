@@ -164,7 +164,7 @@ public class Utils {
                 // ]
                 // ]
 
-                if (arr_usdt.size() < 10) {
+                if (arr_usdt.size() <= 10) {
                     break;
                 }
 

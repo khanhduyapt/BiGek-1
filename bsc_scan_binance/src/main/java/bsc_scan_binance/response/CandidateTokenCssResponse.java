@@ -109,6 +109,8 @@ public class CandidateTokenCssResponse {
     private String low_to_hight_price = "";
     private String low_to_hight_price_css = "";
 
+    private String dt_range_css = "";
+
     private String oco_opportunity = "";
     private String range_position = "";
     private String range_move = "";
