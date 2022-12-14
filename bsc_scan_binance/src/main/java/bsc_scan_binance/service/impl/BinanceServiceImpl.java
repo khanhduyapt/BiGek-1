@@ -3103,14 +3103,14 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
 
         String mUpMa = "";
-        boolean chartDMovingUp = Utils.cutUpMa(list_days, current_price);
+        boolean chartDMovingUp = Utils.cutUpMa(list_days);
         mUpMa += (chartDMovingUp ? "D " : "");
         if (Utils.isNotBlank(mUpMa)) {
             mUpMa = " move↑" + mUpMa.trim();
         }
 
         String mDownMa = "";
-        boolean chartDMovingDown = Utils.cutDownMa(list_days, current_price);
+        boolean chartDMovingDown = Utils.cutDownMa(list_days);
         mDownMa += chartDMovingDown ? "D " : "";
 
         if (Utils.isNotBlank(mDownMa)) {

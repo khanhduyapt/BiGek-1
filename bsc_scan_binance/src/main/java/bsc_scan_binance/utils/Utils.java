@@ -1262,35 +1262,36 @@ public class Utils {
         return false;
     }
 
-    public static boolean cutUpMa(List<BtcFutures> list, BigDecimal curr_price) {
+    public static boolean cutUpMa(List<BtcFutures> list) {
         BigDecimal ma7d = calcMA7d(list);
 
         boolean hasCandleUnderMa = false;
-        for (int index = 1; index < list.size() / 2; index++) {
+        for (int index = 2; index < list.size() / 2; index++) {
             BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
             if ((preCloseCandlePrice.compareTo(ma7d) < 0)) {
                 hasCandleUnderMa = true;
             }
         }
 
-        if ((curr_price.compareTo(ma7d) > 0) && hasCandleUnderMa) {
+        if ((list.get(1).getPrice_close_candle().compareTo(ma7d) > 0) && hasCandleUnderMa) {
             return true;
         }
+
         return false;
     }
 
-    public static boolean cutDownMa(List<BtcFutures> list, BigDecimal curr_price) {
+    public static boolean cutDownMa(List<BtcFutures> list) {
         BigDecimal ma7d = calcMA7d(list);
 
         boolean hasCandleUpperMa = false;
-        for (int index = 1; index < list.size() / 2; index++) {
+        for (int index = 2; index < list.size() / 2; index++) {
             BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
             if ((preCloseCandlePrice.compareTo(ma7d) > 0)) {
                 hasCandleUpperMa = true;
             }
         }
 
-        if ((curr_price.compareTo(ma7d) < 0) && hasCandleUpperMa) {
+        if ((list.get(1).getPrice_close_candle().compareTo(ma7d) < 0) && hasCandleUpperMa) {
             return true;
         }
         return false;
