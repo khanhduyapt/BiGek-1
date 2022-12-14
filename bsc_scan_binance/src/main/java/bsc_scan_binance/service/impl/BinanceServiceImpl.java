@@ -150,7 +150,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_PUMP = "Pump_1";
     private static final String EVENT_LONG_SHORT_5DAYS = "BTC_5DAYS_LONG_SHORT";
 
-    private static final String CSS_PRICE_WARNING = "border border-warning rounded px-2";
+    private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-2";
     private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-2";
     private static final String CSS_PRICE_FOCUS = "border-bottom border-dark";
     private static final String CSS_PRICE_DANGER = "border-bottom border-danger";
@@ -909,7 +909,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
 
-                        css.setDt_range_css("bg-light"); //highlight
+                        css.setDt_range_css("highlight rounded-lg px-1"); //highlight bg-light
                     }
 
                     if (futu.contains("_Long") || futu.contains("_Short")) {

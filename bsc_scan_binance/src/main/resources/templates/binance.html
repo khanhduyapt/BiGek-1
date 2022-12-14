@@ -170,7 +170,7 @@ p {
               <p th:classappend="${token.volumn_binance_div_marketcap_css}" th:text="${token.volumn_binance_div_marketcap}">
           </td>
           <!-- Range -->
-          <td style="text-align: right; min-width: 525px !important; max-width: 525px !important;" th:classappend="${token.dt_range_css}">
+          <td style="text-align: right; min-width: 525px !important; max-width: 525px !important;">
             <div style="font-size: 0.85rem !important;" th:classappend="${token.futures_css}">
               <span th:classappend="${token.range_position_css}"       th:text="${token.range_position}" style="margin-right: 0.2rem;"></span>
               <span th:classappend="${token.range_wdh_css}"            th:text="${token.range_wdh}"></span>
@@ -188,7 +188,7 @@ p {
             </div>
 
             <div style="font-size: 0.75rem !important;">
-              <span th:text="${token.oco_opportunity}">
+              <span th:text="${token.oco_opportunity}" th:classappend="${token.dt_range_css}">
             </div>
           </td>
           <!-- Price -->
