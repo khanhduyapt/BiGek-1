@@ -1034,11 +1034,13 @@ public class BinanceServiceImpl implements BinanceService {
                             }
                         }
 
+                        css.setRange_wdh_css("");
                         if (btc_is_uptrend_today) {
-                            css.setFutures_css("text-white bg-success rounded-lg");
+                            css.setFutures_css("text-white bg-success rounded-lg px-2");
                         } else {
-                            css.setFutures_css("text-white bg-danger rounded-lg");
+                            css.setFutures_css("text-white bg-danger rounded-lg px-2");
                         }
+
                     }
 
                 }
