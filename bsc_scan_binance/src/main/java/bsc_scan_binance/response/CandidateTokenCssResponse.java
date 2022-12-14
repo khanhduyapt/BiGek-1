@@ -70,7 +70,6 @@ public class CandidateTokenCssResponse {
     private String avg_history;
     private String min28day;
     private String min28day_css;
-    private String oco_opportunity;
     private String binance_vol_rate;
     private String binance_vol_rate_css = "";
 
@@ -110,6 +109,21 @@ public class CandidateTokenCssResponse {
     private String hight_price_css = "";
     private String low_to_hight_price = "";
     private String low_to_hight_price_css = "";
+
+    private String oco_opportunity = "";
+    private String range_position = "";
+    private String range_move = "";
+    private String range_stoploss = "";
+    private String range_entry = "";
+    private String range_take_profit = "";
+    private String range_volume = "";
+
+    private String range_position_css = "";
+    private String range_move_css = "";
+    private String range_stoploss_css = "";
+    private String range_entry_css = "";
+    private String range_take_profit_css = "";
+    private String range_volume_css = "";
 
     private String today = "";
     private String day_0 = "";
@@ -259,6 +273,5 @@ public class CandidateTokenCssResponse {
     private String rate1d0h_css;
     private String rate1d4h_css;
     private String rsi_css;
-
 
 }

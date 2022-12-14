@@ -91,7 +91,7 @@ p {
           <th class="text-center text-primary" scope="col">v/mc</th>
           <th class="text-center text-primary" scope="col">Range</th>
           <th class="text-center" scope="col">Price</th>
-          <th class="text-center text-primary" scope="col">OCO</th>
+          <th class="text-center text-primary" scope="col">History</th>
           <th class="text-center" scope="col">%24h</th>
           <th class="text-center" scope="col">%7d</th>
           <th class="text-center" scope="col">%14d</th>
@@ -170,17 +170,18 @@ p {
               <p th:classappend="${token.volumn_binance_div_marketcap_css}" th:text="${token.volumn_binance_div_marketcap}">
           </td>
           <!-- Range -->
-          <td style="text-align: right; min-width: 500px !important; max-width: 500px !important;">
+          <td style="text-align: right; min-width: 525px !important; max-width: 525px !important;">
+            <span style="font-size: 0.65rem !important;" th:classappend="${token.range_position_css}" th:text="${token.range_position}"></span>
             <span style="font-size: 0.85rem !important;" th:classappend="${token.futures_css}" th:text="${token.futures}"></span>
 
-            <div style="font-size: 0.85rem !important;">
-              <span th:classappend="${token.stop_loss_css}"       th:text="${token.stop_loss}"></span>
-              <span th:classappend="${token.str_entry_price_css}" th:text="${token.str_entry_price}"></span>
-              <span th:classappend="${token.low_price_css}"       th:text="${token.low_price}"></span>
-              <span th:classappend="${token.hight_price_css}"     th:text="${token.hight_price}"></span>
-              <span th:classappend="${token.avg_boll_max_css}"    th:text="${token.avg_boll_max}"></span>
+            <div style="font-size: 0.75rem !important;">
+              <span th:classappend="${token.range_move_css}"           th:text="${token.range_move}"></span>
+              <span th:classappend="${token.range_stoploss_css}"       th:text="${token.range_stoploss}"></span>
+              E: <span th:classappend="${token.range_entry_css}"       th:text="${token.range_entry}"></span>
+              <span th:classappend="${token.range_take_profit_css}"    th:text="${token.range_take_profit}"></span>
+              Vol: <span th:classappend="${token.range_volume_css}"    th:text="${token.range_volume}"></span>/10$
             </div>
-            <div style="font-size: 0.85rem !important;">
+            <div style="font-size: 0.75rem !important;">
               <span th:text="${token.oco_opportunity}">
             </div>
           </td>

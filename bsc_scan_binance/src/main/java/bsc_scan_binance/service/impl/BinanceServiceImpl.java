@@ -832,7 +832,7 @@ public class BinanceServiceImpl implements BinanceService {
                     String min28day = Utils.removeLastZero(dto.getMin28d().toString()) + "(" + min28d_percent + "%)";
 
                     if (min28d_percent.compareTo(BigDecimal.valueOf(-10)) > 0) {
-                        css.setMin28day_css("text-white rounded-lg bg-info");
+                        css.setMin28day_css("text-white rounded-lg bg-info px-1");
                     }
 
                     css.setAvg_history(avg_history);
@@ -843,22 +843,8 @@ public class BinanceServiceImpl implements BinanceService {
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_buy()) != 0
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_sell()) != 0) {
 
-                    // BigDecimal stop_loss =
-                    // (dto.getLow_price_24h().multiply(BigDecimal.valueOf(0.999)))
-                    // .setScale(Utils.getDecimalNumber(dto.getLow_price_24h()),
-                    // BigDecimal.ROUND_DOWN);
                     BigDecimal price_can_buy_24h = dto.getPrice_can_buy();
-
-                    // BigDecimal stop_loss_precent = Utils
-                    // .getBigDecimalValue(Utils.toPercent(price_can_buy_24h, stop_loss));
-
                     BigDecimal price_can_sell_24h = dto.getPrice_can_sell();
-
-                    // css.setStop_loss("SL: " + Utils.removeLastZero(stop_loss) + "(" +
-                    // stop_loss_precent + "%)");
-                    // if (stop_loss_precent.compareTo(BigDecimal.valueOf(1.5)) < 0) {
-                    // css.setStop_loss_css("text-white bg-success rounded-lg");
-                    // }
 
                     BigDecimal temp_prire_24h = Utils
                             .formatPrice(dto.getLow_price_24h().multiply(BigDecimal.valueOf(1.008)), 5);
@@ -866,17 +852,7 @@ public class BinanceServiceImpl implements BinanceService {
                         temp_prire_24h = dto.getPrice_can_buy();
                     }
                     temp_prire_24h = Utils.formatPriceLike(temp_prire_24h, price_now);
-                    // BigDecimal temp_prire_24h_percent = Utils
-                    // .getBigDecimalValue(Utils.toPercent(price_now, temp_prire_24h));
                     css.setEntry_price(temp_prire_24h);
-
-                    // css.setStr_entry_price("E:" + Utils.removeLastZero(temp_prire_24h.toString())
-                    // + "("
-                    // + Utils.removeLastZero(temp_prire_24h_percent.toString()) + "%)");
-
-                    // if (temp_prire_24h_percent.compareTo(BigDecimal.valueOf(1.5)) < 0) {
-                    // css.setStr_entry_price_css("text-white bg-success rounded-lg");
-                    // }
 
                     String futu = css.getFutures();
                     if (futu.contains("ma7") && futu.contains("~")) {
@@ -889,32 +865,52 @@ public class BinanceServiceImpl implements BinanceService {
                         String m2ma = futu.substring(futu.indexOf("m2ma"), futu.indexOf("}") + 1);
                         futu = futu.replace(m2ma, "");
 
-                        css.setStop_loss(m2ma.replace("m2ma", "").replace("{", "").replace("}", ""));
+                        css.setRange_move(m2ma.replace("m2ma", "").replace("{", "").replace("}", ""));
                         if (m2ma.contains("move↑")) {
-
-                            css.setStop_loss_css("text-white bg-info rounded-lg");
-
+                            css.setRange_move_css("text-white bg-info rounded-lg px-1");
                         } else if (m2ma.contains("move↓")) {
-
-                            css.setStop_loss_css("bg-warning rounded-lg");
-
+                            css.setRange_move_css("bg-warning rounded-lg px-1");
                         }
-
                     }
 
                     if (futu.contains("sl2ma") && futu.contains("}")) {
                         String sl2ma = futu.substring(futu.indexOf("sl2ma"), futu.indexOf("}") + 1);
                         futu = futu.replace(sl2ma, "");
+                        sl2ma = sl2ma.replace("sl2ma", "").replace("{", "").replace("}", "");
+                        css.setStr_entry_price(sl2ma);
 
-                        css.setStr_entry_price(sl2ma.replace("sl2ma", "").replace("{", "").replace("}", ""));
+                        String[] sl_tp = sl2ma.split(",");
+                        if (sl_tp.length >= 4) {
+                            css.setRange_stoploss(sl_tp[0]);
+
+                            css.setRange_entry(sl_tp[1].replace("E: ", ""));
+                            css.setRange_entry_css("font-weight-bold");
+
+                            css.setRange_take_profit(sl_tp[2]);
+
+                            css.setRange_volume(sl_tp[3].replace("Vol:", "").replace("$/10$", ""));
+                            css.setRange_volume_css("font-weight-bold");
+
+                            BigDecimal entryPercent = Utils.getPercentFromStringPercent(sl_tp[1]);
+                            if (entryPercent.compareTo(BigDecimal.valueOf(1.1)) < 0) {
+                                css.setRange_entry_css("text-white bg-success rounded-lg px-1");
+                            }
+                        }
+                    }
+
+                    if (futu.contains("_Position")) {
+                        futu = futu.replace("_Position", "");
+
+                        css.setRange_position("★");
+                        css.setRange_position_css("text-white bg-success rounded-lg px-1");
+
+                        css.setFutures_css("text-primary");
+                        css.setStop_loss_css("text-white bg-success rounded-lg px-1");
                     }
 
                     css.setFutures(futu);
 
-                    if (futu.contains("Position")) {
-                        css.setFutures_css("text-white bg-success rounded-lg px-1");
-
-                    } else if (futu.contains("_Long") || futu.contains("_Short")) {
+                    if (futu.contains("_Long") || futu.contains("_Short")) {
 
                         css.setFutures_css("bg-warning rounded-lg px-1");
 
@@ -3068,7 +3064,9 @@ public class BinanceServiceImpl implements BinanceService {
 
         String mUpMa = "";
         boolean chartDMovingUp = Utils.cutUpMa(list_days, current_price);
+        boolean chartH4MovingUp = Utils.cutUpMa(list_h4, current_price);
         mUpMa += (chartDMovingUp ? "D " : "");
+        mUpMa += (chartH4MovingUp ? "H4 " : "");
         if (Utils.isNotBlank(mUpMa)) {
             mUpMa = " move↑" + mUpMa.trim();
         }
@@ -3079,7 +3077,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Utils.isNotBlank(mDownMa)) {
             if (Utils.isNotBlank(mUpMa)) {
-                mDownMa = ". ↓" + mDownMa.trim();
+                mDownMa = " ↓" + mDownMa.trim();
             } else {
                 mDownMa = "move↓" + mDownMa.trim();
             }
@@ -3087,12 +3085,16 @@ public class BinanceServiceImpl implements BinanceService {
         String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}";
 
         // sl2ma
-        String entry = " sl2ma{" + Utils.getSLByMa(list_h4, "H4", !chartDMovingDown) + "}";
+        String entry = "";
+        if (chartDMovingUp) {
+            entry = " sl2ma{" + Utils.getSLByMaH4_Long(list_h4, "H4") + "}";
+        } else if (chartDMovingDown) {
+            entry = " sl2ma{" + Utils.getSLByMaD_Short(list_days, "D") + "}";
+        } else {
+            entry = " sl2ma{" + Utils.getSLByMaH4_Long(list_h4, "H4") + "}";
+        }
 
         // ---------------------------------------------------------
-
-        String result = ma + note + type + m2ma + entry;
-        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
 
         if (isUptrendD && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)
                 && Utils.isGoodPrice4Posision(current_price, min_days, percent_maxpain)) {
@@ -3111,6 +3113,8 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
+        String result = ma + note + type + m2ma + entry;
+        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
         // -------------------------------------------------------------
 
         result = Utils.getTimeHHmm() + " " + symbol.toUpperCase() + " " + Utils.removeLastZero(current_price) + m2ma
