@@ -750,6 +750,14 @@ public class Utils {
         return "1000$/" + Utils.removeLastZero(String.valueOf(loss)) + "$";
     }
 
+    public static BigDecimal getPercentFromStringPercent(String value) {
+        if (value.contains("(") && value.contains("%")) {
+            String result = value.substring(value.indexOf("(") + 1, value.indexOf("%")).trim();
+            return getBigDecimal(result);
+        }
+        return BigDecimal.valueOf(100);
+    }
+
     public static String toPercent(BigDecimal target, BigDecimal current_price) {
         return toPercent(target, current_price, 1);
     }
@@ -1252,10 +1260,10 @@ public class Utils {
         return false;
     }
 
-    public static Boolean isUptrendByMA(List<BtcFutures> list, BigDecimal curr_price) {
-        BigDecimal ma7d = calcMA7d(list);
+    public static Boolean isUptrendByMA(List<BtcFutures> list) {
+        BigDecimal ma7d = calcMA10d(list, 1);
 
-        if (curr_price.compareTo(ma7d) > 0) {
+        if (list.get(1).getPrice_close_candle().compareTo(ma7d) > 0) {
             return true;
         }
 
@@ -1263,10 +1271,10 @@ public class Utils {
     }
 
     public static boolean cutUpMa(List<BtcFutures> list) {
-        BigDecimal ma7d = calcMA7d(list);
+        BigDecimal ma7d = calcMA10d(list, 1);
 
         boolean hasCandleUnderMa = false;
-        for (int index = 2; index < list.size() / 2; index++) {
+        for (int index = 2; index < 7; index++) {
             BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
             if ((preCloseCandlePrice.compareTo(ma7d) < 0)) {
                 hasCandleUnderMa = true;
@@ -1281,10 +1289,10 @@ public class Utils {
     }
 
     public static boolean cutDownMa(List<BtcFutures> list) {
-        BigDecimal ma7d = calcMA7d(list);
+        BigDecimal ma7d = calcMA10d(list, 1);
 
         boolean hasCandleUpperMa = false;
-        for (int index = 2; index < list.size() / 2; index++) {
+        for (int index = 2; index < 7; index++) {
             BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
             if ((preCloseCandlePrice.compareTo(ma7d) > 0)) {
                 hasCandleUpperMa = true;
@@ -1302,7 +1310,7 @@ public class Utils {
 
         String result = " SL" + "(" + byChart + "): none, E: none";
 
-        BigDecimal ma7d = calcMA7d(list);
+        BigDecimal ma7d = calcMA10d(list, 0);
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
         BigDecimal low = low_heigh.get(0);
         BigDecimal heigh = low_heigh.get(1);
@@ -1319,20 +1327,12 @@ public class Utils {
         return result;
     }
 
-    public static BigDecimal getPercentFromStringPercent(String value) {
-        if (value.contains("(") && value.contains("%")) {
-            String result = value.substring(value.indexOf("(") + 1, value.indexOf("%")).trim();
-            return getBigDecimal(result);
-        }
-        return BigDecimal.valueOf(100);
-    }
-
     public static String getSLByMaH4_Long(List<BtcFutures> list, String byChart) {
         BigDecimal current_price = list.get(0).getCurrPrice();
 
         String result = " SL" + "(" + byChart + "): none, E: none";
 
-        BigDecimal ma7d = calcMA7d(list);
+        BigDecimal ma7d = calcMA10d(list, 0);
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
         BigDecimal low = low_heigh.get(0);
         BigDecimal heigh = low_heigh.get(1);
@@ -1350,7 +1350,7 @@ public class Utils {
     }
 
     public static String percentToMa(List<BtcFutures> list, BigDecimal curr_price) {
-        BigDecimal ma7d = calcMA7d(list);
+        BigDecimal ma7d = calcMA10d(list, 0);
 
         String percent = toPercent(ma7d, curr_price);
 
@@ -1359,15 +1359,20 @@ public class Utils {
         return value;
     }
 
-    public static BigDecimal calcMA7d(List<BtcFutures> list) {
-
+    public static BigDecimal calcMA10d(List<BtcFutures> list, int ofIndex) {
         BigDecimal sum = BigDecimal.ZERO;
 
-        for (BtcFutures dto : list) {
-            sum = sum.add(dto.getPrice_close_candle());
+        int count = 0;
+        for (int index = ofIndex; index < 10 + ofIndex; index++) {
+            if (index < list.size()) {
+                count += 1;
+                BtcFutures dto = list.get(index);
+                sum = sum.add(dto.getPrice_close_candle());
+            }
         }
-
-        sum = sum.divide(BigDecimal.valueOf(list.size()), 5, RoundingMode.CEILING);
+        if (count > 0) {
+            sum = sum.divide(BigDecimal.valueOf(count), 5, RoundingMode.CEILING);
+        }
 
         return sum;
     }

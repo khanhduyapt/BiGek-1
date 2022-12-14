@@ -3032,16 +3032,16 @@ public class BinanceServiceImpl implements BinanceService {
             type = " (Spot)";
         }
 
-        List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
+        List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 11);
         if (CollectionUtils.isEmpty(list_weeks)) {
             return type;
         }
-        List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 10);
+        List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 11);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 10);
 
-        BigDecimal current_price = list_days.get(0).getCurrPrice();
-        Boolean isUptrendW = Utils.isUptrendByMA(list_weeks, current_price);
-        Boolean isUptrendD = Utils.isUptrendByMA(list_days, current_price);
+        BigDecimal current_price = list_h4.get(0).getCurrPrice();
+        Boolean isUptrendW = Utils.isUptrendByMA(list_weeks);
+        Boolean isUptrendD = Utils.isUptrendByMA(list_days);
 
         String ma = "";
         ma += (isUptrendW ? " W" : "");
