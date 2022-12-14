@@ -847,7 +847,7 @@ public class BinanceServiceImpl implements BinanceService {
                     temp_prire_24h = Utils.formatPriceLike(temp_prire_24h, price_now);
                     css.setEntry_price(temp_prire_24h);
 
-                    String futu = dto.getFutures();
+                    String futu = dto.getFutures().replace("(Futures) ", "");
                     if (futu.contains("ma7") && futu.contains("~")) {
                         String ma7 = futu.substring(0, futu.indexOf("~"));
                         futu = futu.substring(futu.indexOf("~") + 1, futu.length());
