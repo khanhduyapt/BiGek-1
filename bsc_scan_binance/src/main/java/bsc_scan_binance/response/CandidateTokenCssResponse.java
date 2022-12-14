@@ -123,6 +123,8 @@ public class CandidateTokenCssResponse {
     private String range_wdh_css = "";
     private String range_L10d = "";
     private String range_L10d_css = "";
+    private String range_H10d = "";
+    private String range_H10d_css = "";
     private String range_L6w = "";
     private String range_L6w_css = "";
     private String range_type = "";

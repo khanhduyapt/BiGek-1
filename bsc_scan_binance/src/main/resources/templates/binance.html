@@ -170,13 +170,14 @@ p {
               <p th:classappend="${token.volumn_binance_div_marketcap_css}" th:text="${token.volumn_binance_div_marketcap}">
           </td>
           <!-- Range -->
-          <td style="text-align: right; min-width: 525px !important; max-width: 525px !important;">
-            <div style="font-size: 0.85rem !important;" th:classappend="${token.futures_css}">
+          <td style="text-align: right; min-width: 550px !important; max-width: 550px !important;">
+            <div style="font-size: 0.75rem !important;" th:classappend="${token.futures_css}">
               <span th:classappend="${token.range_position_css}"       th:text="${token.range_position}" style="margin-right: 0.2rem;"></span>
               <span th:classappend="${token.range_wdh_css}"            th:text="${token.range_wdh}"></span>
               <span th:classappend="${token.range_L10d_css}"           th:text="${token.range_L10d}"></span>
+              <span th:classappend="${token.range_H10d_css}"           th:text="${token.range_H10d}"></span>
               <span th:classappend="${token.range_L6w_css}"            th:text="${token.range_L6w}"></span>
-              <span th:classappend="${token.range_type_css}"           th:text="${token.range_type}"></span>
+              <span th:classappend="${token.range_type_css}"           th:text="${token.range_type}" style="font-size: 0.85rem !important;" ></span>
             </div>
 
             <div style="font-size: 0.75rem !important;">

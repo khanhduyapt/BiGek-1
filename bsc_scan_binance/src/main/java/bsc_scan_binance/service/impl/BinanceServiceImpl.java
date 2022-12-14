@@ -909,7 +909,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
 
-                        css.setDt_range_css("highlight rounded-lg px-1"); //highlight bg-light
+                        css.setDt_range_css("highlight rounded-lg px-1"); // highlight bg-light
                     }
 
                     if (futu.contains("_Long") || futu.contains("_Short")) {
@@ -932,12 +932,13 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     String[] wdh = futu.split(",");
-                    if (wdh.length >= 4) {
+                    if (wdh.length >= 5) {
 
                         css.setRange_wdh(wdh[0]);
                         css.setRange_L10d(wdh[1]);
-                        css.setRange_L6w(wdh[2]);
-                        css.setRange_type(wdh[3]);
+                        css.setRange_H10d(wdh[2]);
+                        css.setRange_L6w(wdh[3]);
+                        css.setRange_type(wdh[4]);
 
                         BigDecimal range_L10d = Utils.getPercentFromStringPercent(wdh[1]);
                         BigDecimal range_L10w = Utils.getPercentFromStringPercent(wdh[2]);
@@ -3070,6 +3071,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String note = W1 + D1 + H4;
         note += ", L10d: " + Utils.getPercentToEntry(current_price, min_days, true);
+        note += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
         note += ", L10w: " + Utils.getPercentToEntry(current_price, min_week, true) + ",";
 
         // ---------------------------------------------------------
