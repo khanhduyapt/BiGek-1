@@ -171,8 +171,12 @@ p {
           </td>
           <!-- Range -->
           <td style="text-align: right; min-width: 525px !important; max-width: 525px !important;">
-            <span style="font-size: 0.65rem !important;" th:classappend="${token.range_position_css}" th:text="${token.range_position}"></span>
-            <span style="font-size: 0.85rem !important;" th:classappend="${token.futures_css}" th:text="${token.futures}"></span>
+            <div style="font-size: 0.85rem !important;" th:classappend="${token.futures_css}">
+              <span th:classappend="${token.range_wdh_css}"            th:text="${token.range_wdh}"></span>
+              <span th:classappend="${token.range_L10d_css}"           th:text="${token.range_L10d}"></span>
+              <span th:classappend="${token.range_L6w_css}"            th:text="${token.range_L6w}"></span>
+              <span th:classappend="${token.range_type_css}"           th:text="${token.range_type}"></span>
+            </div>
 
             <div style="font-size: 0.75rem !important;">
               <span th:classappend="${token.range_move_css}"           th:text="${token.range_move}"></span>
@@ -181,7 +185,9 @@ p {
               <span th:classappend="${token.range_take_profit_css}"    th:text="${token.range_take_profit}"></span>
               Vol: <span th:classappend="${token.range_volume_css}"    th:text="${token.range_volume}"></span>/10$
             </div>
+
             <div style="font-size: 0.75rem !important;">
+              <span style="font-size: 0.5rem !important;" th:classappend="${token.range_position_css}" th:text="${token.range_position}"></span>
               <span th:text="${token.oco_opportunity}">
             </div>
           </td>

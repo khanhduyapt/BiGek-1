@@ -37,7 +37,6 @@ public class CandidateTokenCssResponse {
     private String price_target = "";
     private String btc_warning_css = "";
 
-    private String futures = "";
     private String futures_css = "";
     private String avg_percent = "";
     private String avg_price = "";
@@ -117,6 +116,15 @@ public class CandidateTokenCssResponse {
     private String range_entry = "";
     private String range_take_profit = "";
     private String range_volume = "";
+
+    private String range_wdh = "";
+    private String range_wdh_css = "";
+    private String range_L10d = "";
+    private String range_L10d_css = "";
+    private String range_L6w = "";
+    private String range_L6w_css = "";
+    private String range_type = "";
+    private String range_type_css = "";
 
     private String range_position_css = "";
     private String range_move_css = "";

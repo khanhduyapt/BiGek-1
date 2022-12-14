@@ -854,7 +854,7 @@ public class BinanceServiceImpl implements BinanceService {
                     temp_prire_24h = Utils.formatPriceLike(temp_prire_24h, price_now);
                     css.setEntry_price(temp_prire_24h);
 
-                    String futu = css.getFutures();
+                    String futu = dto.getFutures();
                     if (futu.contains("ma7") && futu.contains("~")) {
                         String ma7 = futu.substring(0, futu.indexOf("~"));
                         futu = futu.substring(futu.indexOf("~") + 1, futu.length());
@@ -901,32 +901,74 @@ public class BinanceServiceImpl implements BinanceService {
                     if (futu.contains("_Position")) {
                         futu = futu.replace("_Position", "");
 
-                        css.setRange_position("★");
+                        css.setRange_position("Position");
                         css.setRange_position_css("text-white bg-success rounded-lg px-1");
 
-                        css.setFutures_css("text-primary");
+                        css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
                     }
 
-                    css.setFutures(futu);
-
                     if (futu.contains("_Long") || futu.contains("_Short")) {
 
-                        css.setFutures_css("bg-warning rounded-lg px-1");
+                        css.setRange_wdh_css("bg-warning rounded-lg px-1");
 
                     } else if (futu.contains("W↑D↑H4↑H1↑")) {
-                        css.setFutures_css("text-primary");
+                        css.setRange_wdh_css("text-primary");
 
                     } else if (futu.contains("W↑D↑H4↑")) {
 
-                        css.setFutures_css("text-primary");
+                        css.setRange_wdh_css("text-primary");
 
                     } else if (futu.contains("D↓")) {
 
-                        css.setFutures_css("text-danger");
+                        css.setRange_wdh_css("text-danger font-weight-bold");
 
                     } else {
-                        css.setFutures_css("");
+                        css.setRange_wdh_css("");
+                    }
+
+                    String[] wdh_L10d = futu.split(",");
+                    if (wdh_L10d.length >= 4) {
+
+                        css.setRange_wdh(wdh_L10d[0]);
+                        css.setRange_L10d(wdh_L10d[1]);
+                        css.setRange_L6w(wdh_L10d[2]);
+                        css.setRange_type(wdh_L10d[3]);
+
+                        BigDecimal range_L10d = Utils.getPercentFromStringPercent(wdh_L10d[1]);
+                        BigDecimal range_L6w = Utils.getPercentFromStringPercent(wdh_L10d[2]);
+
+                        if ((range_L10d.compareTo(BigDecimal.valueOf(10)) < 0)
+                                && (range_L6w.compareTo(BigDecimal.valueOf(10)) < 0)) {
+
+                            css.setRange_L10d_css("border border-primary rounded");
+                            css.setRange_L6w_css("border border-primary rounded");
+
+                        } else {
+
+                            if (range_L10d.compareTo(BigDecimal.valueOf(10)) < 0) {
+
+                                css.setRange_L10d_css("border-bottom border-primary");
+
+                            } else if (range_L10d.compareTo(BigDecimal.valueOf(20)) > 0) {
+
+                                css.setRange_L10d_css("border border-danger rounded");
+
+                            }
+
+                            if (range_L6w.compareTo(BigDecimal.valueOf(10)) < 0) {
+
+                                css.setRange_L6w_css("border-bottom border-primary");
+
+                            } else if (range_L6w.compareTo(BigDecimal.valueOf(20)) > 0) {
+
+                                css.setRange_L6w_css("border border-danger rounded");
+
+                            }
+                        }
+
+                    } else {
+                        css.setRange_wdh(futu);
                     }
 
                     // btc_warning_css
@@ -993,10 +1035,8 @@ public class BinanceServiceImpl implements BinanceService {
                         }
 
                         if (btc_is_uptrend_today) {
-                            css.setFutures(css.getFutures());
                             css.setFutures_css("bg-success rounded-lg");
                         } else {
-                            css.setFutures(css.getFutures());
                             css.setFutures_css("bg-danger rounded-lg");
                         }
                     }
@@ -3030,7 +3070,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String note = W1 + D1 + H4;
         note += ", L10d: " + Utils.getPercentToEntry(current_price, min_days, true);
-        note += ", L6w: " + Utils.getPercentToEntry(current_price, min_week, true);
+        note += ", L6w: " + Utils.getPercentToEntry(current_price, min_week, true) + ",";
 
         // ---------------------------------------------------------
         int percent_maxpain = 15;
