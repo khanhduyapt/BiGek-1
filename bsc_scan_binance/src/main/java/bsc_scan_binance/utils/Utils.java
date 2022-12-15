@@ -1319,10 +1319,10 @@ public class Utils {
         BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(current_price).abs(), 0);
 
-        result = " SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, false);
-        result += ", E: " + getPercentToEntry(current_price, ma7d, true);
-        result += ", TP: " + getPercentToEntry(ma7d, low, false);
-        result += ", Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
+        result = "SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, false);
+        result += ",E: " + getPercentToEntry(current_price, ma7d, true);
+        result += ",TP: " + getPercentToEntry(ma7d, low, false);
+        result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
         return result;
     }
@@ -1341,10 +1341,10 @@ public class Utils {
         BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(current_price).abs(), 0);
 
-        result = " SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, true);
-        result += ", E: " + getPercentToEntry(current_price, ma7d, false);
-        result += ", TP: " + getPercentToEntry(ma7d, heigh, true);
-        result += ", Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
+        result = "SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, true);
+        result += ",E: " + getPercentToEntry(current_price, ma7d, false);
+        result += ",TP: " + getPercentToEntry(ma7d, heigh, true);
+        result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
         return result;
     }

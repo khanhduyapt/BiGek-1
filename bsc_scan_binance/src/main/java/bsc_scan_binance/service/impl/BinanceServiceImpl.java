@@ -389,8 +389,11 @@ public class BinanceServiceImpl implements BinanceService {
                     weekUp += 1;
                 }
             }
-            String totalMarket = " Total_W_↑_" + weekUp + "(" + Utils
+            String totalMarket = " Total W↑=" + weekUp + "(" + Utils
                     .getPercentStr(BigDecimal.valueOf(results.size() - weekUp), BigDecimal.valueOf(results.size()))
+                    .replace("-", "") + ")";
+            totalMarket += " W↓=" + (results.size() - weekUp) + "(" + Utils
+                    .getPercentStr(BigDecimal.valueOf(weekUp), BigDecimal.valueOf(results.size()))
                     .replace("-", "") + ")";
 
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
@@ -1042,7 +1045,6 @@ public class BinanceServiceImpl implements BinanceService {
                         } else {
                             css.setFutures_css("text-white bg-danger rounded-lg px-2");
                         }
-
                     }
 
                 }
@@ -1068,7 +1070,14 @@ public class BinanceServiceImpl implements BinanceService {
                     wallToday();
                     css.setNote("");
 
-                    css.setStar(sp500 + totalMarket);
+                    css.setRange_total_w(totalMarket);
+                    if (weekUp < (results.size() / 3)) {
+                        css.setRange_total_w_css("text-white bg-danger rounded-lg px-2");
+                    } else if (weekUp > (2 * results.size() / 3)) {
+                        css.setRange_total_w_css("text-white bg-success rounded-lg px-2");
+                    }
+
+                    css.setStar(sp500);
                     css.setStar_css("display-tity text-left");
                     if (sp500.contains("-")) {
                         css.setStar_css("bg-danger rounded-lg display-tity text-left text-white");
@@ -3071,9 +3080,9 @@ public class BinanceServiceImpl implements BinanceService {
         String H4 = list_h4.get(0).isUptrend() ? "H4↑" : "H4↓";
 
         String note = W1 + D1 + H4;
-        note += ", L10d: " + Utils.getPercentToEntry(current_price, min_days, true);
-        note += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
-        note += ", L10w: " + Utils.getPercentToEntry(current_price, min_week, true) + ",";
+        note += ",L10d: " + Utils.getPercentToEntry(current_price, min_days, true);
+        note += ",H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
+        note += ",L10w: " + Utils.getPercentToEntry(current_price, min_week, true) + ",";
 
         // ---------------------------------------------------------
         int percent_maxpain = 15;
@@ -3159,6 +3168,9 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String result = ma + note + type + m2ma + entry;
+        if (result.length() > 255) {
+            result = result.substring(0, 250) + "...";
+        }
         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
         // -------------------------------------------------------------
 

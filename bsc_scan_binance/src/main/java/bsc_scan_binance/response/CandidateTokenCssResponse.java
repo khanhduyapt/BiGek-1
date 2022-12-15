@@ -136,6 +136,8 @@ public class CandidateTokenCssResponse {
     private String range_entry_css = "";
     private String range_take_profit_css = "";
     private String range_volume_css = "";
+    private String range_total_w = "";
+    private String range_total_w_css = "";
 
     private String today = "";
     private String day_0 = "";
