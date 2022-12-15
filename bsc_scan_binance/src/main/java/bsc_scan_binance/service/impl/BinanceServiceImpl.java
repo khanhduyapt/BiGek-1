@@ -150,8 +150,8 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_PUMP = "Pump_1";
     private static final String EVENT_LONG_SHORT_5DAYS = "BTC_5DAYS_LONG_SHORT";
 
-    private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-2";
-    private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-2";
+    private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
+    private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-1";
     private static final String CSS_PRICE_FOCUS = "border-bottom border-dark";
     private static final String CSS_PRICE_DANGER = "border-bottom border-danger";
     private static final String CSS_PRICE_WHITE = "text-white bg-info rounded-lg px-1";
@@ -369,9 +369,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
 
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%XXX%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 14 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↓%') then 15 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓%' then 19 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑D%' AND macd.futures LIKE '%W↑%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 14 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↓%') then 15 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓%' then 19 \n"
 
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%XXX%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 34 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↓%') then 35 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓%' then 39 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑D%' AND macd.futures LIKE '%W↑%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 34 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↓%') then 35 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓%' then 39 \n"
 
                     + "       else 100 end) ASC \n"
 
@@ -871,7 +871,6 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
-                    boolean allow_focus = false;
                     if (futu.contains("sl2ma") && futu.contains("}")) {
                         String sl2ma = futu.substring(futu.indexOf("sl2ma"), futu.indexOf("}") + 1);
                         futu = futu.replace(sl2ma, "");
@@ -887,8 +886,7 @@ public class BinanceServiceImpl implements BinanceService {
                             css.setRange_volume(sl_e_tp[3]);
 
                             BigDecimal entryPercent = Utils.getPercentFromStringPercent(sl_e_tp[1]);
-                            if ((entryPercent.compareTo(BigDecimal.valueOf(2)) < 0) && m2ma.contains("↑D")) {
-                                allow_focus = true;
+                            if ((entryPercent.compareTo(BigDecimal.valueOf(1.1)) < 0) && m2ma.contains("↑D")) {
 
                                 css.setRange_entry_css(CSS_PRICE_WHITE);
                                 css.setRange_volume_css(CSS_PRICE_FOCUS);
@@ -945,31 +943,27 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setRange_type(wdh[4]);
 
                         BigDecimal range_L10d = Utils.getPercentFromStringPercent(wdh[1]);
-                        BigDecimal range_L10w = Utils.getPercentFromStringPercent(wdh[2]);
+                        BigDecimal range_L10w = Utils.getPercentFromStringPercent(wdh[3]);
 
                         if ((range_L10d.compareTo(BigDecimal.valueOf(10)) < 0)
                                 && (range_L10w.compareTo(BigDecimal.valueOf(10)) < 0)) {
 
                             css.setRange_L10d_css(CSS_PRICE_SUCCESS); // "border border-primary rounded"
                             css.setRange_L6w_css(CSS_PRICE_SUCCESS);
+                        }
 
-                        } else if (allow_focus) {
+                        if (range_L10d.compareTo(BigDecimal.valueOf(15)) > 0) {
+                            css.setRange_L10d_css(CSS_PRICE_DANGER);
 
-                            if (range_L10d.compareTo(BigDecimal.valueOf(8)) < 0) {
+                            css.setRange_entry_css("");
+                            css.setRange_volume_css("");
+                        }
 
-                                css.setRange_L10d_css(CSS_PRICE_SUCCESS);
+                        if (range_L10w.compareTo(BigDecimal.valueOf(20)) > 0) {
+                            css.setRange_L6w_css(CSS_PRICE_DANGER);
 
-                            } else if (allow_focus & range_L10d.compareTo(BigDecimal.valueOf(20)) > 0) {
-
-                                css.setRange_L10d_css(CSS_PRICE_DANGER);
-
-                            }
-
-                            if (range_L10w.compareTo(BigDecimal.valueOf(20)) > 0) {
-
-                                css.setRange_L6w_css(CSS_PRICE_DANGER);
-
-                            }
+                            css.setRange_entry_css("");
+                            css.setRange_volume_css("");
                         }
 
                     } else {
@@ -3062,9 +3056,9 @@ public class BinanceServiceImpl implements BinanceService {
         } else {
             ma = "ma7(" + ma.trim() + ")";
         }
-        ma += " W: " + Utils.percentToMa(list_weeks, current_price);
-        ma += ", D: " + Utils.percentToMa(list_days, current_price);
-        ma += ", H4: " + Utils.percentToMa(list_h4, current_price);
+        ma += " W:" + Utils.percentToMa(list_weeks, current_price);
+        ma += ",D:" + Utils.percentToMa(list_days, current_price);
+        ma += ",H4:" + Utils.percentToMa(list_h4, current_price);
         ma += "~";
 
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
@@ -3080,9 +3074,9 @@ public class BinanceServiceImpl implements BinanceService {
         String H4 = list_h4.get(0).isUptrend() ? "H4↑" : "H4↓";
 
         String note = W1 + D1 + H4;
-        note += ",L10d: " + Utils.getPercentToEntry(current_price, min_days, true);
+        note += ",L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
         note += ",H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
-        note += ",L10w: " + Utils.getPercentToEntry(current_price, min_week, true) + ",";
+        note += ",L10w:" + Utils.getPercentToEntry(current_price, min_week, true) + ",";
 
         // ---------------------------------------------------------
         int percent_maxpain = 15;
@@ -3116,14 +3110,14 @@ public class BinanceServiceImpl implements BinanceService {
 
         String mUpMa = "";
         boolean chartDMovingUp = Utils.cutUpMa(list_days);
-        mUpMa += (chartDMovingUp ? "D " : "");
+        mUpMa += (chartDMovingUp ? "D" : "");
         if (Utils.isNotBlank(mUpMa)) {
             mUpMa = " move↑" + mUpMa.trim();
         }
 
         String mDownMa = "";
         boolean chartDMovingDown = Utils.cutDownMa(list_days);
-        mDownMa += chartDMovingDown ? "D " : "";
+        mDownMa += chartDMovingDown ? "D" : "";
 
         if (Utils.isNotBlank(mDownMa)) {
             if (Utils.isNotBlank(mUpMa)) {
@@ -3158,7 +3152,7 @@ public class BinanceServiceImpl implements BinanceService {
             String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 
-                String msg = Utils.getTimeHHmm() + type + " (Position) " + symbol + ": "
+                String msg = Utils.getTimeHHmm() + type + " (Position) " + symbol + ":"
                         + Utils.removeLastZero(current_price);
 
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
