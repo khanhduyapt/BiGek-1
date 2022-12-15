@@ -123,6 +123,8 @@ public class BscScanBinanceApplication {
                         size = list.size();
 
                         startup = false;
+
+                        wait(600000);//10minute
                     } else {
                         idx += 1;
                     }
@@ -140,6 +142,7 @@ public class BscScanBinanceApplication {
 
     public static void wait(int ms) {
         try {
+            //360000ms=6minute
             java.lang.Thread.sleep(ms);
         } catch (InterruptedException ex) {
             java.lang.Thread.currentThread().interrupt();

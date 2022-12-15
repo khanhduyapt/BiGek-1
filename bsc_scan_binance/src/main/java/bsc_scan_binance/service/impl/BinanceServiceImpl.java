@@ -369,9 +369,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
 
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%XXX%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 12 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑H4↑%') then 13 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 14 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↓%') then 15 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 16 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 17 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 18 when  macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓D↓%' then 19 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%XXX%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 14 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↓%') then 15 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓%' then 19 \n"
 
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%XXX%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑H1↑%') then 32 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑H4↑%') then 33 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 34 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↓%') then 35 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↑H1↑%') then 36 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↑%') then 37 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓H4↓H1↓%') then 38 when  macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓D↓%' then 39 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%XXX%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 34 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↓%') then 35 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓%' then 39 \n"
 
                     + "       else 100 end) ASC \n"
 
@@ -383,14 +383,14 @@ public class BinanceServiceImpl implements BinanceService {
             @SuppressWarnings("unchecked")
             List<CandidateTokenResponse> results = query.getResultList();
 
-            int dayUp = 0;
+            int weekUp = 0;
             for (CandidateTokenResponse dto : results) {
-                if (dto.getFutures().contains("D↑")) {
-                    dayUp += 1;
+                if (dto.getFutures().contains("W↑")) {
+                    weekUp += 1;
                 }
             }
-            String totalMarket = " TotalD↑:" + dayUp + "(" + Utils
-                    .getPercentStr(BigDecimal.valueOf(results.size() - dayUp), BigDecimal.valueOf(results.size()))
+            String totalMarket = " Total_W_↑_" + weekUp + "(" + Utils
+                    .getPercentStr(BigDecimal.valueOf(results.size() - weekUp), BigDecimal.valueOf(results.size()))
                     .replace("-", "") + ")";
 
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
@@ -912,18 +912,19 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setDt_range_css("highlight rounded-lg px-1"); // highlight bg-light
                     }
 
-                    if (futu.contains("_Long") || futu.contains("_Short")) {
+                    if (futu.contains("W↑D↑")) {
 
-                        css.setRange_wdh_css("bg-warning rounded-lg px-1");
+                        css.setRange_wdh_css("text-primary font-weight-bold");
 
-                    } else if (futu.contains("W↑D↑H4↑H1↑")) {
-                        css.setRange_wdh_css("text-primary");
-
-                    } else if (futu.contains("W↑D↑H4↑")) {
+                    } else if (futu.contains("W↑ font-weight-bold")) {
 
                         css.setRange_wdh_css("text-primary");
 
-                    } else if (futu.contains("D↓")) {
+                    } else if (futu.contains("W↓D↓")) {
+
+                        css.setRange_wdh_css("text-danger font-weight-bold");
+
+                    } else if (futu.contains("W↓")) {
 
                         css.setRange_wdh_css("text-danger");
 

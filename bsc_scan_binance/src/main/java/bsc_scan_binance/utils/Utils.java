@@ -1316,7 +1316,7 @@ public class Utils {
         BigDecimal heigh = low_heigh.get(1);
         BigDecimal SL = heigh;
 
-        BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 5, RoundingMode.CEILING);
+        BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(current_price).abs(), 0);
 
         result = " SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, false);
@@ -1338,7 +1338,7 @@ public class Utils {
         BigDecimal heigh = low_heigh.get(1);
         BigDecimal SL = low;
 
-        BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 5, RoundingMode.CEILING);
+        BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(current_price).abs(), 0);
 
         result = " SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, true);
