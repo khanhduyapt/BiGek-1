@@ -369,9 +369,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
 
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑D%' AND macd.futures LIKE '%W↑%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↑%') then 14 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑D↓%') then 15 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓%' then 19 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑%') then 15 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓%' then 19 \n"
 
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑D%' AND macd.futures LIKE '%W↑%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↑%') then 34 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑D↓%') then 35 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓%' then 39 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑%') then 35 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓%' then 39 \n"
 
                     + "       else 100 end) ASC \n"
 
@@ -910,7 +910,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
 
-                        css.setDt_range_css("highlight rounded-lg px-1"); // highlight bg-light
+                        //css.setDt_range_css("highlight rounded-lg px-1"); // highlight bg-light
                     }
 
                     if (futu.contains("W↑D↑")) {
@@ -3041,6 +3041,8 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_weeks)) {
             return type;
         }
+
+        List<BtcFutures> list_42d = list_weeks.subList(0, 6);
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 11);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 10);
 
@@ -3090,10 +3092,10 @@ public class BinanceServiceImpl implements BinanceService {
             BtcFutures curr_btc_15m = list_15m.get(0);
 
             if (curr_btc_15m.isBtcKillLongCandle() || curr_btc_15m.isBtcKillShortCandle()) {
-                String msg = Utils.getTimeHHmm() + " 💔 Btc 15m kill Long.";
+                String msg = Utils.getTimeHHmm() + " 💔 Btc 15m kill Long." + Utils.removeLastZero(current_price);
 
                 if (curr_btc_15m.isBtcKillShortCandle()) {
-                    msg = Utils.getTimeHHmm() + " 💔 Btc 15m kill Short.";
+                    msg = Utils.getTimeHHmm() + " 💔 Btc 15m kill Short." + Utils.removeLastZero(current_price);
                 }
 
                 String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
@@ -3130,25 +3132,18 @@ public class BinanceServiceImpl implements BinanceService {
 
         // sl2ma
         String entry = "";
-        if (chartDMovingUp) {
-            entry = " sl2ma{" + Utils.getSLByMaH4_Long(list_h4, "H4") + "}";
-        } else if (chartDMovingDown) {
-            entry = " sl2ma{" + Utils.getSLByMaD_Short(list_days, "D") + "}";
+        if (chartDMovingDown) {
+            entry = " sl2ma{" + Utils.getSLByMa_Short(list_h4, list_days) + "}";
         } else {
-            entry = " sl2ma{" + Utils.getSLByMaH4_Long(list_h4, "H4") + "}";
+            entry = " sl2ma{" + Utils.getSLByMa_Long(list_h4, list_days) + "}";
         }
 
         // ---------------------------------------------------------
-
-        if (Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)
-                && Utils.isGoodPrice4Posision(current_price, min_days, percent_maxpain)) {
-            note += "_GoodPrice";
+        if ((isUptrendD || isUptrendW) && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)) {
+            note += "_Position";
         }
 
-        if ((isUptrendD || isUptrendW) && note.contains("_GoodPrice")) {
-
-            note += "_Position";
-
+        if (note.contains("_Position")) {
             String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
 

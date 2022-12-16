@@ -1305,35 +1305,49 @@ public class Utils {
         return false;
     }
 
-    public static String getSLByMaD_Short(List<BtcFutures> list, String byChart) {
-        BigDecimal current_price = list.get(0).getCurrPrice();
+    public static String getSLByMa_Short(List<BtcFutures> list_h4, List<BtcFutures> list_10d) {
+        BigDecimal current_price = list_h4.get(0).getCurrPrice();
 
-        String result = " SL" + "(" + byChart + "): none, E: none";
+        BigDecimal ma10d = calcMA10d(list_h4, 0);
+        BigDecimal maH4 = calcMA10d(list_10d, 0);
 
-        BigDecimal ma7d = calcMA10d(list, 0);
-        List<BigDecimal> low_heigh = getLowHeightCandle(list);
+        String entryByChart = "D";
+        BigDecimal ma = ma10d;
+        if (maH4.compareTo(ma10d) < 0) {
+            ma = maH4;
+            entryByChart = "H4";
+        }
+
+        List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
         BigDecimal low = low_heigh.get(0);
         BigDecimal heigh = low_heigh.get(1);
         BigDecimal SL = heigh;
 
-        BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 10, RoundingMode.CEILING);
+        BigDecimal vol = BigDecimal.valueOf(10).divide(ma.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(current_price).abs(), 0);
 
-        result = "SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, false);
-        result += ",E: " + getPercentToEntry(current_price, ma7d, true);
-        result += ",TP: " + getPercentToEntry(ma7d, low, false);
+        String result = "SL(D):" + getPercentToEntry(ma, SL, false);
+        result += ",E(" + entryByChart + "):" + getPercentToEntry(current_price, ma, true);
+        result += ",TP:" + getPercentToEntry(ma, low, false);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
         return result;
     }
 
-    public static String getSLByMaH4_Long(List<BtcFutures> list, String byChart) {
-        BigDecimal current_price = list.get(0).getCurrPrice();
+    public static String getSLByMa_Long(List<BtcFutures> list_h4, List<BtcFutures> list_10d) {
+        BigDecimal current_price = list_h4.get(0).getCurrPrice();
 
-        String result = " SL" + "(" + byChart + "): none, E: none";
+        BigDecimal ma10d = calcMA10d(list_h4, 0);
+        BigDecimal maH4 = calcMA10d(list_10d, 0);
 
-        BigDecimal ma7d = calcMA10d(list, 0);
-        List<BigDecimal> low_heigh = getLowHeightCandle(list);
+        String entryByChart = "D";
+        BigDecimal ma7d = ma10d;
+        if (maH4.compareTo(ma10d) > 0) {
+            ma7d = maH4;
+            entryByChart = "H4";
+        }
+
+        List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
         BigDecimal low = low_heigh.get(0);
         BigDecimal heigh = low_heigh.get(1);
         BigDecimal SL = low;
@@ -1341,9 +1355,9 @@ public class Utils {
         BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(current_price).abs(), 0);
 
-        result = "SL(" + byChart + "): " + getPercentToEntry(ma7d, SL, true);
-        result += ",E: " + getPercentToEntry(current_price, ma7d, false);
-        result += ",TP: " + getPercentToEntry(ma7d, heigh, true);
+        String result = "SL(D):" + getPercentToEntry(ma7d, SL, true);
+        result += ",E(" + entryByChart + "):" + getPercentToEntry(current_price, ma7d, false);
+        result += ",TP:" + getPercentToEntry(ma7d, heigh, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
         return result;
@@ -1448,10 +1462,10 @@ public class Utils {
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
-        // BigDecimal sl = Utils.getPercent(curr_price, low_price);
-        // if (sl.compareTo(BigDecimal.valueOf(10)) > 0) {
-        // return false;
-        // }
+        BigDecimal sl = Utils.getPercent(curr_price, low_price);
+        if (sl.compareTo(BigDecimal.valueOf(10)) > 0) {
+            return false;
+        }
 
         BigDecimal good_price = getGoodPriceLong(low_price, hight_price);
 
@@ -1466,10 +1480,10 @@ public class Utils {
         BigDecimal low_price = Utils.getBigDecimal(lo_price);
         BigDecimal hight_price = Utils.getBigDecimal(hi_price);
 
-        // BigDecimal sl = Utils.getPercent(hight_price, curr_price);
-        // if (sl.compareTo(BigDecimal.valueOf(5)) > 0) {
-        // return false;
-        // }
+        BigDecimal sl = Utils.getPercent(hight_price, curr_price);
+        if (sl.compareTo(BigDecimal.valueOf(10)) > 0) {
+            return false;
+        }
 
         BigDecimal range = (hight_price.subtract(low_price));
         range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
