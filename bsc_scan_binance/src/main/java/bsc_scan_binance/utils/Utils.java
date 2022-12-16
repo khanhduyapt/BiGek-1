@@ -1312,23 +1312,27 @@ public class Utils {
         BigDecimal maH4 = calcMA10d(list_10d, 0);
 
         String entryByChart = "D";
-        BigDecimal ma = ma10d;
+        BigDecimal entry = ma10d;
         if (maH4.compareTo(ma10d) < 0) {
-            ma = maH4;
+            entry = maH4;
             entryByChart = "H4";
         }
 
-        List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
-        BigDecimal low = low_heigh.get(0);
-        BigDecimal heigh = low_heigh.get(1);
-        BigDecimal SL = heigh;
+        entryByChart = "now";
+        entry = current_price;
 
-        BigDecimal vol = BigDecimal.valueOf(10).divide(ma.subtract(SL), 10, RoundingMode.CEILING);
+        List<BigDecimal> low_heigh = getLowHeightCandle(list_h4);
+        BigDecimal SL = low_heigh.get(1);
+
+        List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_10d);
+        BigDecimal tp = low_heigh_tp.get(0);
+
+        BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(current_price).abs(), 0);
 
-        String result = "SL(D):" + getPercentToEntry(ma, SL, false);
-        result += ",E(" + entryByChart + "):" + getPercentToEntry(current_price, ma, true);
-        result += ",TP:" + getPercentToEntry(ma, low, false);
+        String result = "SL(H4):" + getPercentToEntry(entry, SL, false);
+        result += ",E(" + entryByChart + "):" + removeLastZero(entry); // getPercentToEntry(current_price, entry, true);
+        result += ",TP(D):" + getPercentToEntry(entry, tp, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
         return result;
@@ -1341,23 +1345,27 @@ public class Utils {
         BigDecimal maH4 = calcMA10d(list_10d, 0);
 
         String entryByChart = "D";
-        BigDecimal ma7d = ma10d;
+        BigDecimal entry = ma10d;
         if (maH4.compareTo(ma10d) > 0) {
-            ma7d = maH4;
+            entry = maH4;
             entryByChart = "H4";
         }
 
-        List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
-        BigDecimal low = low_heigh.get(0);
-        BigDecimal heigh = low_heigh.get(1);
-        BigDecimal SL = low;
+        entryByChart = "now";
+        entry = current_price;
 
-        BigDecimal vol = BigDecimal.valueOf(10).divide(ma7d.subtract(SL), 10, RoundingMode.CEILING);
+        List<BigDecimal> low_heigh = getLowHeightCandle(list_h4);
+        BigDecimal SL = low_heigh.get(0);
+
+        List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_10d);
+        BigDecimal tp = low_heigh_tp.get(1);
+
+        BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(current_price).abs(), 0);
 
-        String result = "SL(D):" + getPercentToEntry(ma7d, SL, true);
-        result += ",E(" + entryByChart + "):" + getPercentToEntry(current_price, ma7d, false);
-        result += ",TP:" + getPercentToEntry(ma7d, heigh, true);
+        String result = "SL(H4):" + getPercentToEntry(entry, SL, true);
+        result += ",E(" + entryByChart + "):" + removeLastZero(entry); // getPercentToEntry(current_price, entry, false);
+        result += ",TP(D):" + getPercentToEntry(entry, tp, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
         return result;
