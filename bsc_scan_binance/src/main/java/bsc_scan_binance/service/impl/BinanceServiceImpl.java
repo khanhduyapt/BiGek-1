@@ -393,8 +393,8 @@ public class BinanceServiceImpl implements BinanceService {
                     .getPercentStr(BigDecimal.valueOf(results.size() - weekUp), BigDecimal.valueOf(results.size()))
                     .replace("-", "") + ")";
             totalMarket += " W↓=" + (results.size() - weekUp) + "(" + Utils
-                    .getPercentStr(BigDecimal.valueOf(weekUp), BigDecimal.valueOf(results.size()))
-                    .replace("-", "") + ")";
+                    .getPercentStr(BigDecimal.valueOf(weekUp), BigDecimal.valueOf(results.size())).replace("-", "")
+                    + ")";
 
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
 
@@ -910,7 +910,7 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
 
-                        //css.setDt_range_css("highlight rounded-lg px-1"); // highlight bg-light
+                        // css.setDt_range_css("highlight rounded-lg px-1"); // highlight bg-light
                     }
 
                     if (futu.contains("W↑D↑")) {
@@ -3042,7 +3042,6 @@ public class BinanceServiceImpl implements BinanceService {
             return type;
         }
 
-        List<BtcFutures> list_42d = list_weeks.subList(0, 6);
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 11);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 10);
 
@@ -3132,12 +3131,12 @@ public class BinanceServiceImpl implements BinanceService {
 
         // sl2ma
         String entry = "";
-        if (chartDMovingDown) {
-            entry = " sl2ma{" + Utils.getSLByMa_Short(list_h4, list_days) + "}";
-        } else {
-            entry = " sl2ma{" + Utils.getSLByMa_Long(list_h4, list_days) + "}";
-        }
-
+//        if (chartDMovingDown) {
+//            entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "D") + "}";
+//        } else {
+//            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "D") + "}";
+//        }
+        entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "D") + "}";
         // ---------------------------------------------------------
         if ((isUptrendD || isUptrendW) && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)) {
             note += "_Position";

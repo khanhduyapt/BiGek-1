@@ -1305,67 +1305,37 @@ public class Utils {
         return false;
     }
 
-    public static String getSLByMa_Short(List<BtcFutures> list_h4, List<BtcFutures> list_10d) {
-        BigDecimal current_price = list_h4.get(0).getCurrPrice();
+    public static String getSLByMa_Short(List<BtcFutures> list_10d, String entryByChart) {
+        BigDecimal entry = list_10d.get(0).getCurrPrice();
 
-        BigDecimal ma10d = calcMA10d(list_h4, 0);
-        BigDecimal maH4 = calcMA10d(list_10d, 0);
-
-        String entryByChart = "D";
-        BigDecimal entry = ma10d;
-        if (maH4.compareTo(ma10d) < 0) {
-            entry = maH4;
-            entryByChart = "H4";
-        }
-
-        entryByChart = "now";
-        entry = current_price;
-
-        List<BigDecimal> low_heigh = getLowHeightCandle(list_h4);
+        List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
         BigDecimal SL = low_heigh.get(1);
-
-        List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_10d);
-        BigDecimal tp = low_heigh_tp.get(0);
+        BigDecimal tp = low_heigh.get(0);
 
         BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-        vol = formatPrice(vol.multiply(current_price).abs(), 0);
+        vol = formatPrice(vol.multiply(entry).abs(), 0);
 
-        String result = "SL(H4):" + getPercentToEntry(entry, SL, false);
-        result += ",E(" + entryByChart + "):" + removeLastZero(entry); // getPercentToEntry(current_price, entry, true);
-        result += ",TP(D):" + getPercentToEntry(entry, tp, true);
+        String result = "SL(" + entryByChart + "):" + getPercentToEntry(entry, SL, false);
+        result += ",E(now):" + removeLastZero(entry);
+        result += ",TP:" + getPercentToEntry(entry, tp, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
         return result;
     }
 
-    public static String getSLByMa_Long(List<BtcFutures> list_h4, List<BtcFutures> list_10d) {
-        BigDecimal current_price = list_h4.get(0).getCurrPrice();
+    public static String getSLByMa_Long(List<BtcFutures> list_10d, String entryByChart) {
+        BigDecimal entry = list_10d.get(0).getCurrPrice();
 
-        BigDecimal ma10d = calcMA10d(list_h4, 0);
-        BigDecimal maH4 = calcMA10d(list_10d, 0);
-
-        String entryByChart = "D";
-        BigDecimal entry = ma10d;
-        if (maH4.compareTo(ma10d) > 0) {
-            entry = maH4;
-            entryByChart = "H4";
-        }
-
-        entryByChart = "now";
-        entry = current_price;
-
-        List<BigDecimal> low_heigh = getLowHeightCandle(list_h4);
+        List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
         BigDecimal SL = low_heigh.get(0);
-
-        List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_10d);
-        BigDecimal tp = low_heigh_tp.get(1);
+        BigDecimal tp = low_heigh.get(1);
 
         BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-        vol = formatPrice(vol.multiply(current_price).abs(), 0);
+        vol = formatPrice(vol.multiply(entry).abs(), 0);
 
-        String result = "SL(H4):" + getPercentToEntry(entry, SL, true);
-        result += ",E(" + entryByChart + "):" + removeLastZero(entry); // getPercentToEntry(current_price, entry, false);
-        result += ",TP(D):" + getPercentToEntry(entry, tp, true);
+        String result = "SL(" + entryByChart + "):" + getPercentToEntry(entry, SL, true);
+        result += ",E(now):" + removeLastZero(entry);
+        result += ",TP:" + getPercentToEntry(entry, tp, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
         return result;
