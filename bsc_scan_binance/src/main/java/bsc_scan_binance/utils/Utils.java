@@ -1023,10 +1023,21 @@ public class Utils {
     }
 
     public static BigDecimal getGoodPriceLong(BigDecimal low_price, BigDecimal hight_price) {
-        BigDecimal good_price = (hight_price.subtract(low_price));
+        BigDecimal range = (hight_price.subtract(low_price));
 
-        good_price = good_price.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
-        good_price = low_price.add(good_price);
+        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+
+        BigDecimal good_price = low_price.add(range);
+
+        return good_price;
+    }
+
+    public static BigDecimal getGoodPriceShort(BigDecimal low_price, BigDecimal hight_price) {
+        BigDecimal range = (hight_price.subtract(low_price));
+
+        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+
+        BigDecimal good_price = hight_price.subtract(range);
 
         return good_price;
     }
@@ -1306,7 +1317,7 @@ public class Utils {
     }
 
     public static String getSLByMa_Short(List<BtcFutures> list_10d, String entryByChart) {
-        BigDecimal entry = list_10d.get(0).getCurrPrice();
+        BigDecimal entry = list_10d.get(1).getPrice_close_candle();
 
         List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
         BigDecimal SL = low_heigh.get(1);
@@ -1316,7 +1327,7 @@ public class Utils {
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
         String result = "SL(" + entryByChart + "):" + getPercentToEntry(entry, SL, false);
-        result += ",E(now):" + removeLastZero(entry);
+        result += ",E(atc):" + removeLastZero(entry);
         result += ",TP:" + getPercentToEntry(entry, tp, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
@@ -1324,7 +1335,7 @@ public class Utils {
     }
 
     public static String getSLByMa_Long(List<BtcFutures> list_10d, String entryByChart) {
-        BigDecimal entry = list_10d.get(0).getCurrPrice();
+        BigDecimal entry = list_10d.get(1).getPrice_close_candle();
 
         List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
         BigDecimal SL = low_heigh.get(0);
@@ -1334,7 +1345,7 @@ public class Utils {
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
         String result = "SL(" + entryByChart + "):" + getPercentToEntry(entry, SL, true);
-        result += ",E(now):" + removeLastZero(entry);
+        result += ",E(atc):" + removeLastZero(entry);
         result += ",TP:" + getPercentToEntry(entry, tp, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/10$";
 
@@ -1420,6 +1431,29 @@ public class Utils {
 
         result.add(min_low);
         result.add(max_Hig);
+
+        return result;
+    }
+
+    public static String getTypeLongOrShort(List<BtcFutures> list) {
+        String result = "0:Sideway";
+
+        BigDecimal curr_price = list.get(0).getPrice_close_candle();
+
+        List<BigDecimal> low_heigh = getLowHeightCandle(list);
+
+        BigDecimal price_long = getGoodPriceLong(low_heigh.get(0), low_heigh.get(1));
+        BigDecimal price_short = getGoodPriceShort(low_heigh.get(0), low_heigh.get(1));
+
+        if (curr_price.compareTo(price_long) < 0) {
+
+            return "1:Long";
+
+        } else if (curr_price.compareTo(price_short) > 0) {
+
+            return "2:Short";
+
+        }
 
         return result;
     }

@@ -3042,6 +3042,8 @@ public class BinanceServiceImpl implements BinanceService {
             return type;
         }
 
+        List<BtcFutures> list_42days = list_weeks.subList(0, 6);
+
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 11);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 10);
 
@@ -3131,14 +3133,23 @@ public class BinanceServiceImpl implements BinanceService {
 
         // sl2ma
         String entry = "";
-//        if (chartDMovingDown) {
-//            entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "D") + "}";
-//        } else {
-//            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "D") + "}";
-//        }
-        entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "D") + "}";
+        String typeLongOrShort = Utils.getTypeLongOrShort(list_42days);
+
+        if (chartDMovingDown && typeLongOrShort.contains("2")) {
+
+            entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
+
+        } else if (chartDMovingUp && typeLongOrShort.contains("1")) {
+
+            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
+
+        } else {
+
+            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "SW") + "}";
+        }
+
         // ---------------------------------------------------------
-        if ((isUptrendD || isUptrendW) && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)) {
+        if ((isUptrendD) && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)) {
             note += "_Position";
         }
 
