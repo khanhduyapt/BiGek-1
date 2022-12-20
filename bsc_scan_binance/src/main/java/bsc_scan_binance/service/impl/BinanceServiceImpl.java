@@ -359,8 +359,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = macd.gecko_id                                                        \n"
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
-                    + (isBynaceUrl
-                            ? "   AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.25 then false else true end) \n"
+                    + (isBynaceUrl ? // " AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.25 then
+                                     // false else true end) \n"
+                            " AND macd.futures LIKE '%move↑%'                                                            \n"
                             : "")
                     + (!(((BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_coin)
                             || (BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_and_msg)))
@@ -757,9 +758,9 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setRate1d0h_css("text-primary font-weight-bold");
                         css.setStar(css.getStar() + " Volx5");
 
-                    } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(30)) > 0) {
+                    } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(200)) > 0) {
                         css.setRate1d0h_css("text-primary font-weight-bold");
-                    } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(0)) > 0) {
+                    } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(100)) > 0) {
                         css.setRate1d0h_css("text-primary");
                     } else if (Utils.getBigDecimal(dto.getRate1d0h()).compareTo(BigDecimal.valueOf(-30)) < 0) {
                         css.setRate1d0h_css("text-danger font-weight-bold");
@@ -805,8 +806,6 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setOco_tp_price_hight(price_max.toString() + "(" + max_14d_percent + "%)");
 
                     if (Utils.getBigDecimalValue(max_14d_percent).compareTo(BigDecimal.valueOf(20)) > 0) {
-                        css.setOco_tp_price_hight_css("text-primary font-weight-bold");
-                    } else if (Utils.getBigDecimalValue(max_14d_percent).compareTo(BigDecimal.valueOf(10)) > 0) {
                         css.setOco_tp_price_hight_css("text-primary");
                     } else {
                         css.setOco_tp_price_hight_css("text-danger");
@@ -3139,7 +3138,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
 
-        } else if (chartDMovingUp) {
+        } else {
 
             entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "D") + "}";
 
