@@ -3139,9 +3139,10 @@ public class BinanceServiceImpl implements BinanceService {
 
             entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
 
-        } else {
+        } else if (chartDMovingUp) {
 
-            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "SW") + "}";
+            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "D") + "}";
+
         }
 
         // ---------------------------------------------------------
