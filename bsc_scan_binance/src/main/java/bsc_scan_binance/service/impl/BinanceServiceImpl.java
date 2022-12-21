@@ -71,10 +71,8 @@ import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class BinanceServiceImpl implements BinanceService {
     @PersistenceContext
@@ -188,7 +186,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public List<CandidateTokenCssResponse> getList(Boolean isBynaceUrl) {
         try {
-            log.info("Start getList ---->");
+            System.out.println("Start getList ---->");
             String sql = " select                                                                                 \n"
                     + "   can.gecko_id,                                                                           \n"
                     + "   can.symbol,                                                                             \n"
@@ -360,7 +358,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + (isBynaceUrl ? // " AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.25 then
-                                     // false else true end) \n"
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      // false else true end) \n"
                             " AND macd.futures LIKE '%move↑%'                                                            \n"
                             : "")
                     + (!(((BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_coin)
@@ -1091,8 +1089,8 @@ public class BinanceServiceImpl implements BinanceService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("Get list Inquiry Consigned Delivery error ------->");
-            log.error(e.getMessage());
+            System.out.println("Get list Inquiry Consigned Delivery error ------->");
+            System.out.println(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
     }
@@ -1453,7 +1451,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public void monitorProfit() {
         try {
-            log.info("Start monitorProfit ---->");
+            System.out.println("Start monitorProfit ---->");
 
             Query query = entityManager.createNativeQuery(Utils.sql_OrdersProfitResponse, "OrdersProfitResponse");
 
@@ -1497,8 +1495,8 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("monitorProfit error ------->");
-            log.error(e.getMessage());
+            System.out.println("monitorProfit error ------->");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -1506,7 +1504,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public void monitorBollingerBandwidth(Boolean isCallFormBot) {
         try {
-            log.info("Start monitorBollingerBandwidth ---->");
+            System.out.println("Start monitorBollingerBandwidth ---->");
             {
                 String sql = "" + " select                                                              \n"
                         + "     boll.gecko_id,                                                          \n"
@@ -1616,8 +1614,8 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("monitorBollingerBandwidth error ------->");
-            log.error(e.getMessage());
+            System.out.println("monitorBollingerBandwidth error ------->");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -1698,9 +1696,9 @@ public class BinanceServiceImpl implements BinanceService {
             }
             return sp500;
         } catch (Exception e) {
-            log.info("BinanceServiceImpl.loadPremarket error --->");
+            System.out.println("BinanceServiceImpl.loadPremarket error --->");
             // e.printStackTrace();
-            log.error(e.getMessage());
+            System.out.println(e.getMessage());
         }
         return "S&P 500 xxx (xxx%), Futures yyy (yyy%)";
     }
@@ -1764,7 +1762,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
             btcVolumeDayRepository.saveAll(list_day);
         } catch (Exception e) {
-            log.info("Error loadDataVolumeHour  ----->");
+            System.out.println("Error loadDataVolumeHour  ----->");
             e.printStackTrace();
         }
     }
@@ -1905,7 +1903,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
         } catch (Exception e) {
-            log.info("Error loadBinanceData  ----->");
+            System.out.println("Error loadBinanceData  ----->");
             e.printStackTrace();
         }
         return "";
@@ -2003,7 +2001,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } catch (Exception e) {
-            log.info("Error getBitfinexLongShortBtc ---->" + e.getMessage());
+            System.out.println("Error getBitfinexLongShortBtc ---->" + e.getMessage());
             e.printStackTrace();
         }
 
@@ -2132,7 +2130,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } catch (Exception e) {
-            log.info("Error saveDepthData  ----->");
+            System.out.println("Error saveDepthData  ----->");
             e.printStackTrace();
         }
     }
@@ -2174,7 +2172,7 @@ public class BinanceServiceImpl implements BinanceService {
             return list;
 
         } catch (Exception e) {
-            log.info("Error getDepthDataBtc  ----->");
+            System.out.println("Error getDepthDataBtc  ----->");
             e.printStackTrace();
         }
 
@@ -2265,7 +2263,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             return result;
         } catch (Exception e) {
-            log.info("Error getListDepthData  ----->");
+            System.out.println("Error getListDepthData  ----->");
             e.printStackTrace();
         }
 
@@ -2504,7 +2502,7 @@ public class BinanceServiceImpl implements BinanceService {
         String curr_time_of_btc_pre10m = String.valueOf(curr_time_of_btc);
 
         try {
-            log.info(time + " Start monitorBtcPrice ---->");
+            System.out.println(time + " Start monitorBtcPrice ---->");
             List<BtcFutures> btc1hs = Utils.loadData("BTC", TIME_1h, LIMIT_DATA_1h);
             if (CollectionUtils.isEmpty(btc1hs)) {
                 return results;
@@ -2593,7 +2591,7 @@ public class BinanceServiceImpl implements BinanceService {
             return results;
 
         } catch (Exception e) {
-            log.info("ERROR monitorBtcPrice ----->");
+            System.out.println("ERROR monitorBtcPrice ----->");
             e.printStackTrace();
         }
 
@@ -2614,7 +2612,7 @@ public class BinanceServiceImpl implements BinanceService {
         // his.setId(id);
         // his.setPumpdump(true);
         //
-        // log.info("Start monitorBitcoinBalancesOnExchanges ---->");
+        // System.out.println("Start monitorBitcoinBalancesOnExchanges ---->");
         // try {
         // List<BitcoinBalancesOnExchanges> entities =
         // GoinglassUtils.getBtcExchangeBalance();
@@ -2656,7 +2654,7 @@ public class BinanceServiceImpl implements BinanceService {
         //
         // } catch (Exception e) {
         // his.setNote(e.getMessage());
-        // log.info("Error monitorBitcoinBalancesOnExchanges ---->" + e.getMessage());
+        // System.out.println("Error monitorBitcoinBalancesOnExchanges ---->" + e.getMessage());
         // }
         // fundingHistoryRepository.save(his);
         // } catch (Exception e) {
@@ -2728,7 +2726,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } catch (Exception e) {
-            log.info("Error findAllScalpingToday ---->");
+            System.out.println("Error findAllScalpingToday ---->");
             e.printStackTrace();
         }
 
@@ -2849,7 +2847,7 @@ public class BinanceServiceImpl implements BinanceService {
         } catch (
 
         Exception e) {
-            log.info("Error monitorBtcFundingRate ---->");
+            System.out.println("Error monitorBtcFundingRate ---->");
             e.printStackTrace();
         }
     }
@@ -2892,7 +2890,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             fundingHistoryRepository.save(entity);
         } catch (Exception e) {
-            log.info("Error loadFundingHistory ---->");
+            System.out.println("Error loadFundingHistory ---->");
             e.printStackTrace();
         }
 
@@ -3107,8 +3105,9 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
 
         String mUpMa = "";
-        boolean chartDMovingUp = Utils.cutUpMa(list_days);
-        mUpMa += (chartDMovingUp ? "D" : "");
+        boolean chartDMovingUp = Utils.cutUpMa(list_days, 1);
+        boolean chartDTodayCutMa = Utils.cutUpMa(list_days, 0);
+        mUpMa += (chartDMovingUp ? "D" : chartDTodayCutMa ? "td" : "");
         if (Utils.isNotBlank(mUpMa)) {
             mUpMa = " move↑" + mUpMa.trim();
         }

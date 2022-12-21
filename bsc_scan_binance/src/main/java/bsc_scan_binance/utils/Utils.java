@@ -1281,8 +1281,8 @@ public class Utils {
         return false;
     }
 
-    public static boolean cutUpMa(List<BtcFutures> list) {
-        BigDecimal ma7d = calcMA10d(list, 1);
+    public static boolean cutUpMa(List<BtcFutures> list, int candleIndex) {
+        BigDecimal ma7d = calcMA10d(list, candleIndex);
 
         boolean hasCandleUnderMa = false;
         for (int index = 2; index < 7; index++) {
@@ -1998,7 +1998,6 @@ public class Utils {
 //      return note;
 //
 //  } catch (Exception e) {
-//      log.info("Error calcPoint  ----->");
 //      e.printStackTrace();
 //  }
 //

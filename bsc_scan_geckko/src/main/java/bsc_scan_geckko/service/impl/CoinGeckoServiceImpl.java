@@ -30,10 +30,8 @@ import bsc_scan_geckko.repository.GeckoVolumnDayRepository;
 import bsc_scan_geckko.service.CoinGeckoService;
 import bsc_scan_geckko.utils.Utils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class CoinGeckoServiceImpl implements CoinGeckoService {
 
@@ -249,7 +247,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Transactional
     public List<CandidateCoin> initCandidateCoin() {
         try {
-            log.info("start CoinGeckoServiceImpl.initCandidateCoin   --->");
+            System.out.println("start CoinGeckoServiceImpl.initCandidateCoin   --->");
 
             // gecko_id symbol name
 
@@ -489,13 +487,13 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             list.add(new CandidateCoin("tycoon-global", "TCT", "Tycoon Global"));
 
             candidateCoinRepository.saveAll(list);
-            log.info("end CoinGeckoServiceImpl.initCandidateCoin success -->");
+            System.out.println("end CoinGeckoServiceImpl.initCandidateCoin success -->");
 
             return list;
 
         } catch (Exception e) {
-            log.info("end CoinGeckoServiceImpl.initCandidateCoin error --->");
-            log.error(e.getMessage());
+            System.out.println("end CoinGeckoServiceImpl.initCandidateCoin error --->");
+            System.out.println(e.getMessage());
             return new ArrayList<CandidateCoin>();
         }
     }
@@ -505,7 +503,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     public void delete(String gecko_id) {
 
         try {
-            log.info("Start delete  --->");
+            System.out.println("Start delete  --->");
             if (!Objects.equals(null, gecko_id)) {
                 String sql = " DELETE FROM candidate_coin WHERE gecko_id=:gecko_id ;"
                         + " DELETE FROM gecko_volumn_day WHERE gecko_id=:gecko_id ;"
@@ -519,10 +517,10 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 query.executeUpdate();
             }
 
-            log.info("End delete success <---");
+            System.out.println("End delete success <---");
         } catch (Exception e) {
-            log.info("Add token  error --->");
-            log.error(e.getMessage());
+            System.out.println("Add token  error --->");
+            System.out.println(e.getMessage());
         }
     }
 

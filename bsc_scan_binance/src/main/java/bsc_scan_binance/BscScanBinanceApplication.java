@@ -18,9 +18,7 @@ import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.service.CoinGeckoService;
 import bsc_scan_binance.service.impl.WandaBot;
 import bsc_scan_binance.utils.Utils;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @SpringBootApplication
 public class BscScanBinanceApplication {
     public static int app_flag = Utils.const_app_flag_all_coin; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin; 5:
@@ -29,8 +27,9 @@ public class BscScanBinanceApplication {
 
     public static void main(String[] args) {
         try {
-            log.info("Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
-                    + " ---->");
+            System.out.println(
+                    "Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
+                            + " ---->");
 
             if (!Objects.equals(null, args) && args.length > 0) {
                 if (Utils.isNotBlank(args[0])) {
@@ -44,7 +43,7 @@ public class BscScanBinanceApplication {
             // Debug
             // app_flag = Utils.const_app_flag_all_and_msg;
 
-            log.info("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
+            System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
@@ -79,7 +78,7 @@ public class BscScanBinanceApplication {
                             if (!CollectionUtils.isEmpty(orders)) {
                                 for (Orders order : orders) {
                                     gecko_service.loadData(order.getId().getGeckoid());
-                                    log.info("Binance -> Gecko " + " id:" + order.getId().getGeckoid());
+                                    System.out.println("Binance -> Gecko " + " id:" + order.getId().getGeckoid());
                                 }
                             }
                         }
@@ -94,11 +93,11 @@ public class BscScanBinanceApplication {
                         binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
                         binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol().toUpperCase());
 
-                        log.info("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
+                        System.out.println("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
                                 + coin.getSymbol());
 
                     } catch (Exception e) {
-                        log.error("dkd error LoadData:" + e.getMessage());
+                        System.out.println("dkd error LoadData:" + e.getMessage());
                     }
 
                     // wait(1800);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
@@ -115,7 +114,7 @@ public class BscScanBinanceApplication {
 
                         binance_service.getList(false); // ~3p 1 lan
 
-                        log.info("reload: "
+                        System.out.println("reload: "
                                 + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
                         idx = 0;
                         list.clear();
@@ -129,12 +128,12 @@ public class BscScanBinanceApplication {
                     }
                 }
 
-                log.info("End BscScanBinanceApplication "
+                System.out.println("End BscScanBinanceApplication "
                         + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                         + " <----");
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            System.out.println(e.getMessage());
         }
 
     }

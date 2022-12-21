@@ -31,10 +31,8 @@ import bsc_scan_binance.service.CoinGeckoService;
 import bsc_scan_binance.utils.Response;
 import bsc_scan_binance.utils.Utils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class CoinGeckoServiceImpl implements CoinGeckoService {
 
@@ -264,7 +262,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Transactional
     public List<CandidateCoin> initCandidateCoin() {
         try {
-            log.info("start CoinGeckoServiceImpl.initCandidateCoin   --->");
+            System.out.println("start CoinGeckoServiceImpl.initCandidateCoin   --->");
 
             // gecko_id symbol name
 
@@ -504,13 +502,13 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             list.add(new CandidateCoin("tycoon-global", "TCT", "Tycoon Global"));
 
             //candidateCoinRepository.saveAll(list);
-            log.info("end CoinGeckoServiceImpl.initCandidateCoin success -->");
+            System.out.println("end CoinGeckoServiceImpl.initCandidateCoin success -->");
 
             return list;
 
         } catch (Exception e) {
-            log.info("end CoinGeckoServiceImpl.initCandidateCoin error --->");
-            log.error(e.getMessage());
+            System.out.println("end CoinGeckoServiceImpl.initCandidateCoin error --->");
+            System.out.println(e.getMessage());
             return new ArrayList<CandidateCoin>();
         }
     }
@@ -519,7 +517,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Transactional
     public Response add(CoinGeckoTokenRequest request) {
         try {
-            log.info("Start add  --->");
+            System.out.println("Start add  --->");
 
             CandidateCoin entity = new CandidateCoin(request.getId(), request.getSymbol(), request.getName());
             //candidateCoinRepository.save(entity);
@@ -536,11 +534,11 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
             binanceVolumnDayRepository.saveAll(days);
 
-            log.info("End add success <---");
+            System.out.println("End add success <---");
             return new Response("200", "Ok", null, entity);
         } catch (Exception e) {
-            log.info("Add token  error --->");
-            log.error(e.getMessage());
+            System.out.println("Add token  error --->");
+            System.out.println(e.getMessage());
             return new Response("500", "Error", e.toString());
         }
     }
@@ -549,7 +547,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Transactional
     public Response delete(CoinGeckoTokenRequest request) {
         try {
-            log.info("Start delete  --->");
+            System.out.println("Start delete  --->");
             if (!Objects.equals(null, request.getId())) {
                 String sql = " DELETE FROM candidate_coin WHERE gecko_id=:gecko_id ;"
                         + " DELETE FROM gecko_volumn_day WHERE gecko_id=:gecko_id ;"
@@ -563,11 +561,11 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 query.executeUpdate();
             }
 
-            log.info("End delete success <---");
+            System.out.println("End delete success <---");
             return new Response("200", "Delete", null, request.getId());
         } catch (Exception e) {
-            log.info("Add token  error --->");
-            log.error(e.getMessage());
+            System.out.println("Add token  error --->");
+            System.out.println(e.getMessage());
             return new Response("500", "Error", e.toString());
         }
     }
@@ -576,7 +574,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Transactional
     public Response note(CoinGeckoTokenRequest request) {
         try {
-            log.info("Start note  --->");
+            System.out.println("Start note  --->");
 
             if (!Objects.equals("", Utils.getStringValue(request.getId()))
                     && !Objects.equals("", Utils.getStringValue(request.getNote()))) {
@@ -591,13 +589,13 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 query.setParameter("gecko_id", request.getId());
                 query.executeUpdate();
 
-                log.info(request.getId() + "=" + request.getNote());
+                System.out.println(request.getId() + "=" + request.getNote());
             }
-            log.info("End note success <---");
+            System.out.println("End note success <---");
             return new Response("200", "Ok");
         } catch (Exception e) {
-            log.info("Add note error --->");
-            log.error(e.getMessage());
+            System.out.println("Add note error --->");
+            System.out.println(e.getMessage());
             return new Response("500", "Error", e.toString());
         }
     }
@@ -606,7 +604,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     @Transactional
     public Response priority(CoinGeckoTokenRequest request) {
         try {
-            log.info("Start priority  --->");
+            System.out.println("Start priority  --->");
 
             if (!Objects.equals("", Utils.getStringValue(request.getId()))) {
                 String sql = " Update candidate_coin set priority=:priority WHERE gecko_id=:gecko_id ;";
@@ -615,13 +613,13 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 query.setParameter("gecko_id", request.getId());
                 query.executeUpdate();
 
-                log.info(request.getId() + "=" + request.getNote());
+                System.out.println(request.getId() + "=" + request.getNote());
             }
-            log.info("End priority success <---");
+            System.out.println("End priority success <---");
             return new Response("200", "Ok");
         } catch (Exception e) {
-            log.info("Priority error --->");
-            log.error(e.getMessage());
+            System.out.println("Priority error --->");
+            System.out.println(e.getMessage());
             return new Response("500", "Error", e.toString());
         }
     }
