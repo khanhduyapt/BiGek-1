@@ -358,8 +358,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + (isBynaceUrl ? // " AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.25 then
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      // false else true end) \n"
-                            " AND macd.futures LIKE '%move↑%'                                                            \n"
+                            " AND macd.futures LIKE '%move↑%'     \n" //AND macd.futures NOT LIKE '%(Spot)%'
                             : "")
                     + (!(((BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_coin)
                             || (BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_and_msg)))
@@ -379,17 +378,26 @@ public class BinanceServiceImpl implements BinanceService {
             List<CandidateTokenResponse> results = query.getResultList();
 
             int weekUp = 0;
+            int cutUp = 0;
             for (CandidateTokenResponse dto : results) {
                 if (dto.getFutures().contains("W↑")) {
                     weekUp += 1;
+                }
+
+                if (dto.getFutures().contains("move↑")) {
+                    cutUp += 1;
                 }
             }
             String totalMarket = " Total W↑=" + weekUp + "(" + Utils
                     .getPercentStr(BigDecimal.valueOf(results.size() - weekUp), BigDecimal.valueOf(results.size()))
                     .replace("-", "") + ")";
-            totalMarket += " W↓=" + (results.size() - weekUp) + "(" + Utils
+            totalMarket += ", W↓=" + (results.size() - weekUp) + "(" + Utils
                     .getPercentStr(BigDecimal.valueOf(weekUp), BigDecimal.valueOf(results.size())).replace("-", "")
                     + ")";
+
+            totalMarket += ", D↑Ma10=" + cutUp + "(" + Utils
+                    .getPercentStr(BigDecimal.valueOf(results.size() - cutUp), BigDecimal.valueOf(results.size()))
+                    .replace("-", "") + ")";
 
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
 
@@ -3105,16 +3113,15 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
 
         String mUpMa = "";
-        boolean chartDMovingUp = Utils.cutUpMa(list_days, 1);
-        boolean chartDTodayCutMa = Utils.cutUpMa(list_days, 0);
-        mUpMa += (chartDMovingUp ? "D" : chartDTodayCutMa ? "td" : "");
+        boolean chartDTodayCutUpMa = Utils.cutUpMa(list_days, 0);
+        mUpMa += chartDTodayCutUpMa ? "D" : "";
         if (Utils.isNotBlank(mUpMa)) {
             mUpMa = " move↑" + mUpMa.trim();
         }
 
         String mDownMa = "";
-        boolean chartDMovingDown = Utils.cutDownMa(list_days);
-        mDownMa += chartDMovingDown ? "D" : "";
+        boolean chartDTodayCutDown = Utils.cutDownMa(list_days, 0);
+        mDownMa += chartDTodayCutDown ? "D" : "";
 
         if (Utils.isNotBlank(mDownMa)) {
             if (Utils.isNotBlank(mUpMa)) {
@@ -3129,17 +3136,25 @@ public class BinanceServiceImpl implements BinanceService {
         String entry = "";
         String typeLongOrShort = Utils.getTypeLongOrShort(list_42days);
 
-        if (chartDMovingDown && typeLongOrShort.contains("2")) {
+        if (chartDTodayCutDown) {
 
-            entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
+            if (typeLongOrShort.contains("2")) {
+                entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "SHORT") + "}";
+            } else {
+                entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
+            }
 
-        } else if (chartDMovingUp && typeLongOrShort.contains("1")) {
+        } else if (chartDTodayCutUpMa) {
 
-            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
+            if (typeLongOrShort.contains("1")) {
+                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "LONG") + "}";
+            } else {
+                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
+            }
 
         } else {
 
-            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "D") + "}";
+            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Danger") + "}";
 
         }
 

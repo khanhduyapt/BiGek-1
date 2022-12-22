@@ -1284,33 +1284,33 @@ public class Utils {
     public static boolean cutUpMa(List<BtcFutures> list, int candleIndex) {
         BigDecimal ma7d = calcMA10d(list, candleIndex);
 
-        boolean hasCandleUnderMa = false;
-        for (int index = 2; index < 7; index++) {
-            BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
-            if ((preCloseCandlePrice.compareTo(ma7d) < 0)) {
-                hasCandleUnderMa = true;
-            }
-        }
+        //        boolean hasCandleUnderMa = false;
+        //        for (int index = 2; index < 7; index++) {
+        //            BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
+        //            if ((preCloseCandlePrice.compareTo(ma7d) < 0)) {
+        //                hasCandleUnderMa = true;
+        //            }
+        //        }
 
-        if ((list.get(1).getPrice_close_candle().compareTo(ma7d) > 0) && hasCandleUnderMa) {
+        if ((list.get(candleIndex).getPrice_close_candle().compareTo(ma7d) > 0)) {
             return true;
         }
 
         return false;
     }
 
-    public static boolean cutDownMa(List<BtcFutures> list) {
-        BigDecimal ma7d = calcMA10d(list, 1);
+    public static boolean cutDownMa(List<BtcFutures> list, int candleIndex) {
+        BigDecimal ma7d = calcMA10d(list, candleIndex);
 
-        boolean hasCandleUpperMa = false;
-        for (int index = 2; index < 7; index++) {
-            BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
-            if ((preCloseCandlePrice.compareTo(ma7d) > 0)) {
-                hasCandleUpperMa = true;
-            }
-        }
+        //        boolean hasCandleUpperMa = false;
+        //        for (int index = 2; index < 7; index++) {
+        //            BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
+        //            if ((preCloseCandlePrice.compareTo(ma7d) > 0)) {
+        //                hasCandleUpperMa = true;
+        //            }
+        //        }
 
-        if ((list.get(1).getPrice_close_candle().compareTo(ma7d) < 0) && hasCandleUpperMa) {
+        if ((list.get(candleIndex).getPrice_close_candle().compareTo(ma7d) < 0)) {
             return true;
         }
         return false;
@@ -1438,7 +1438,7 @@ public class Utils {
     public static String getTypeLongOrShort(List<BtcFutures> list) {
         String result = "0:Sideway";
 
-        BigDecimal curr_price = list.get(0).getPrice_close_candle();
+        BigDecimal curr_price = list.get(0).getCurrPrice();
 
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
 
