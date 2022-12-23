@@ -368,8 +368,8 @@ public class BinanceServiceImpl implements BinanceService {
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
 
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑%' AND macd.futures LIKE '%move↑%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑%') then 15 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓%' then 19 \n"
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑%' AND macd.futures LIKE '%move↑%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑%') then 35 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓%' then 39 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑%' AND macd.futures LIKE '%move↑%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%SL(Long%') then 15 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓%' then 19 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑%' AND macd.futures LIKE '%move↑%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%SL(Long%') then 35 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓%' then 39 \n"
                     + "       else 100 end) ASC \n"
                     + "   , (case when can.volumn_div_marketcap >= 0.2 then 1 else 0 end) DESC                      \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                    \n";
@@ -3161,7 +3161,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
-                    Utils.sendToMyTelegram(msg);
+                    Utils.sendToTelegram(msg);
                 }
             }
         }
