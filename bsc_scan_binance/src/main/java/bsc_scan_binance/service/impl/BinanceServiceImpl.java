@@ -134,7 +134,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     @SuppressWarnings("unused")
     private static final int LIMIT_DATA_15m = 48;
-    private static final int LIMIT_DATA_1h = 48;
+    private static final int LIMIT_DATA_1h = 50;
     private static final int LIMIT_DATA_4h = 60;
 
     private static final String EVENT_FUNDING_RATE = "FUNDING_RATE";
@@ -153,6 +153,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String CSS_PRICE_FOCUS = "border-bottom border-dark";
     private static final String CSS_PRICE_DANGER = "border-bottom border-danger";
     private static final String CSS_PRICE_WHITE = "text-white bg-info rounded-lg px-1";
+    private static final String CSS_MIN28_DAYS = "text-white rounded-lg bg-info px-1";
 
     private Boolean btc_is_good_price_for_long = false;
     private Boolean btc_is_uptrend_today = true;
@@ -829,7 +830,7 @@ public class BinanceServiceImpl implements BinanceService {
                     String min28day = Utils.removeLastZero(dto.getMin28d().toString()) + "(" + min28d_percent + "%)";
 
                     if (min28d_percent.compareTo(BigDecimal.valueOf(-10)) > 0) {
-                        css.setMin28day_css("text-white rounded-lg bg-info px-1");
+                        css.setMin28day_css(CSS_MIN28_DAYS);
                     }
 
                     css.setAvg_history(avg_history);
@@ -891,6 +892,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 css.setRange_entry_css(CSS_PRICE_WHITE);
                                 css.setRange_volume_css(CSS_PRICE_FOCUS);
+                            }
+
+                            if (sl_e_tp[0].contains("SL(Long_")) {
+                                css.setRange_stoploss_css(CSS_MIN28_DAYS);
                             }
                         }
                     }
@@ -2477,6 +2482,11 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     @Transactional
     public String getLongShortIn48h(String symbol) {
+        boolean exit = true;
+        if (exit) {
+            return "";
+        }
+
         List<BtcFutures> btc1hs = Utils.loadData(symbol, TIME_1h, LIMIT_DATA_1h);
         if (CollectionUtils.isEmpty(btc1hs)) {
             return "";
@@ -3134,46 +3144,55 @@ public class BinanceServiceImpl implements BinanceService {
 
         // sl2ma
         String entry = "";
-        String typeLongOrShort = Utils.getTypeLongOrShort(list_42days);
+        String scapLongOrShort = "";
+        if (type.contains("(Futures)")) {
+            List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, LIMIT_DATA_1h);
+            scapLongOrShort = Utils.getScapLongOrShort(list_h1);
+
+            if (Utils.isNotBlank(scapLongOrShort)) {
+                System.out.println(scapLongOrShort);
+                scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_");
+
+                String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
+                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
+
+                    String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol + ":"
+                            + Utils.removeLastZero(current_price) + ", " + scapLongOrShort;
+
+                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
+
+                    Utils.sendToMyTelegram(msg);
+                }
+            }
+        }
 
         if (chartDTodayCutDown) {
 
-            if (typeLongOrShort.contains("2")) {
-                entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "SHORT") + "}";
+            if (Utils.isNotBlank(scapLongOrShort)) {
+                entry = " sl2ma{" + scapLongOrShort + "}";
             } else {
                 entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
             }
 
         } else if (chartDTodayCutUpMa) {
 
-            if (typeLongOrShort.contains("1")) {
-                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "LONG") + "}";
+            if (Utils.isNotBlank(scapLongOrShort)) {
+                entry = " sl2ma{" + scapLongOrShort + "}";
             } else {
                 entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
             }
 
         } else {
-
-            entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Danger") + "}";
-
+            if (Utils.isNotBlank(scapLongOrShort)) {
+                entry = " sl2ma{" + scapLongOrShort + "}";
+            } else {
+                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Danger") + "}";
+            }
         }
 
         // ---------------------------------------------------------
         if ((isUptrendD) && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)) {
             note += "_Position";
-        }
-
-        if (note.contains("_Position")) {
-            String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
-            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
-
-                String msg = Utils.getTimeHHmm() + type + " (Position) " + symbol + ":"
-                        + Utils.removeLastZero(current_price);
-
-                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
-
-                Utils.sendToMyTelegram(msg);
-            }
         }
 
         String result = ma + note + type + m2ma + entry;
