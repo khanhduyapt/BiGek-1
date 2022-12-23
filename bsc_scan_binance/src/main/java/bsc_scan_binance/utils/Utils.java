@@ -1476,7 +1476,7 @@ public class Utils {
         // otc < ma10 && ma10 < ma50 && ma20 < ma50 -> Short
         if ((curr_price.compareTo(ma50) < 0) && (ma10.compareTo(ma20) < 0) && (ma20.compareTo(ma50) < 0)) {
 
-            BigDecimal SL = low_heigh.get(1).multiply(BigDecimal.valueOf(1.01));
+            BigDecimal SL = low_heigh.get(1).multiply(BigDecimal.valueOf(1.02));
             BigDecimal TP = low_heigh.get(0);
 
             BigDecimal vol = BigDecimal.valueOf(5).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
@@ -1494,7 +1494,7 @@ public class Utils {
         // otc > ma10 && ma10 > ma50 && ma20 > ma50 -> Long
         if ((curr_price.compareTo(ma50) > 0) && (ma10.compareTo(ma20) > 0) && (ma20.compareTo(ma50) > 0)) {
 
-            BigDecimal SL = low_heigh.get(0).multiply(BigDecimal.valueOf(0.99));
+            BigDecimal SL = low_heigh.get(0).multiply(BigDecimal.valueOf(0.98));
             BigDecimal TP = low_heigh.get(1);
 
             BigDecimal vol = BigDecimal.valueOf(5).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
