@@ -3161,7 +3161,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
-                    Utils.sendToTelegram(msg);
+                    Utils.sendToMyTelegram(msg);
                 }
             }
         }
