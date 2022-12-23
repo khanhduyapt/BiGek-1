@@ -1486,7 +1486,7 @@ public class Utils {
                     + getPercentToEntry(entry, SL, false);
             result += ",E(H1):" + getPercentToEntry(curr_price, entry, true);
             result += ",TP:" + getPercentToEntry(entry, TP, true);
-            result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/5$";
+            result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:5$";
 
             return result;
         }
@@ -1504,7 +1504,7 @@ public class Utils {
                     + getPercentToEntry(entry, SL, true);
             result += ",E:" + getPercentToEntry(curr_price, entry, true);
             result += ",TP:" + getPercentToEntry(entry, TP, true);
-            result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/5$";
+            result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:5$";
 
             return result;
         }
