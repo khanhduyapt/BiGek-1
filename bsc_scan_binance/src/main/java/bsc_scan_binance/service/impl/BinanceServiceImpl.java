@@ -3052,11 +3052,8 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_weeks)) {
             return type;
         }
-
-        List<BtcFutures> list_42days = list_weeks.subList(0, 6);
-
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 11);
-        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 10);
+        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 50);
 
         BigDecimal current_price = list_h4.get(0).getCurrPrice();
         Boolean isUptrendW = Utils.isUptrendByMA(list_weeks);
@@ -3146,22 +3143,33 @@ public class BinanceServiceImpl implements BinanceService {
         String entry = "";
         String scapLongOrShort = "";
         if (type.contains("(Futures)")) {
-            List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, LIMIT_DATA_1h);
-            scapLongOrShort = Utils.getScapLongOrShort(list_h1);
+            scapLongOrShort = Utils.getScapLongOrShort(list_h4);
 
             if (Utils.isNotBlank(scapLongOrShort)) {
                 System.out.println(scapLongOrShort);
-                scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_");
+                scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_").replace(":", ": ");
 
-                String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
+                String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
-
-                    String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol + Utils.new_line_from_service
-                            + scapLongOrShort.replace(",", Utils.new_line_from_service);
-
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
 
-                    Utils.sendToMyTelegram(msg);
+                    String[] arr = scapLongOrShort.split(",");
+                    if (arr.length == 4) {
+                        String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
+                                + Utils.new_line_from_service;
+
+                        //SL(Long_1h):0.38122(3.9%)
+                        //E:0.39606(1.25%)
+                        //TP:0.403(1.72%)
+                        //Vol:133$:5$ (only)
+
+                        msg += arr[1] + Utils.new_line_from_service; // Entry
+                        msg += arr[0] + Utils.new_line_from_service; // SL
+                        msg += arr[2] + Utils.new_line_from_service; // TP
+                        msg += arr[3] + Utils.new_line_from_service; // Vol
+
+                        Utils.sendToMyTelegram(msg);
+                    }
                 }
             }
         }

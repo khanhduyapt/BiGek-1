@@ -1362,11 +1362,11 @@ public class Utils {
         return value;
     }
 
-    public static BigDecimal calcMA(List<BtcFutures> list, int length) {
+    public static BigDecimal calcMA(List<BtcFutures> list, int length, int ofCandleIndex) {
         BigDecimal sum = BigDecimal.ZERO;
 
         int count = 0;
-        for (int index = 0; index < length; index++) {
+        for (int index = ofCandleIndex; index < length + ofCandleIndex; index++) {
             if (index < list.size()) {
                 count += 1;
                 BtcFutures dto = list.get(index);
@@ -1467,14 +1467,14 @@ public class Utils {
             return "";
         }
 
-        BigDecimal ma10 = calcMA(list, 10);
-        BigDecimal ma20 = calcMA(list, 20);
-        BigDecimal ma50 = calcMA(list, 50);
+        BigDecimal ma10_cur = calcMA(list, 10, 0);
+        BigDecimal ma10_pre = calcMA(list, 10, 10);
+        BigDecimal ma50 = calcMA(list, 50, 0);
 
         BigDecimal entry = ma50;
 
-        // otc < ma10 && ma10 < ma50 && ma20 < ma50 -> Short
-        if ((curr_price.compareTo(ma50) < 0) && (ma10.compareTo(ma20) < 0) && (ma20.compareTo(ma50) < 0)) {
+        // curr < ma10 < ma50 < ma10_pre -> Short
+        if ((curr_price.compareTo(ma10_cur) < 0) && (ma10_cur.compareTo(ma50) < 0) && (ma50.compareTo(ma10_pre) < 0)) {
 
             BigDecimal SL = low_heigh.get(1).multiply(BigDecimal.valueOf(1.02));
             BigDecimal TP = low_heigh.get(0);
@@ -1484,15 +1484,15 @@ public class Utils {
 
             String result = "SL(Short_" + list.get(0).getId().replace("_00", "") + "):"
                     + getPercentToEntry(entry, SL, false);
-            result += ",E(H1):" + getPercentToEntry(curr_price, entry, true);
+            result += ",E:" + getPercentToEntry(curr_price, entry, true);
             result += ",TP:" + getPercentToEntry(entry, TP, true);
             result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:5$";
 
             return result;
         }
 
-        // otc > ma10 && ma10 > ma50 && ma20 > ma50 -> Long
-        if ((curr_price.compareTo(ma50) > 0) && (ma10.compareTo(ma20) > 0) && (ma20.compareTo(ma50) > 0)) {
+        // curr > ma10 > ma50  > ma10_pre -> Long
+        if ((curr_price.compareTo(ma10_cur) > 0) && (ma10_cur.compareTo(ma50) > 0) && (ma50.compareTo(ma10_pre) > 0)) {
 
             BigDecimal SL = low_heigh.get(0).multiply(BigDecimal.valueOf(0.98));
             BigDecimal TP = low_heigh.get(1);
