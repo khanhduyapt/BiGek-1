@@ -87,7 +87,7 @@ public class BscScanBinanceApplication {
                             binance_service.loadBinanceData("bitcoin", "BTC", startup);
                             binance_service.loadDataVolumeHour("bitcoin", "BTC");
                             binance_service.monitorBtcPrice();
-                            wait(3800); //6000ms=1minute
+                            wait(4200); //6000ms=1minute
                         }
 
                         binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
@@ -101,7 +101,7 @@ public class BscScanBinanceApplication {
                     }
 
                     // wait(1800);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
-                    wait(3800);
+                    wait(4200);
 
                     if (Objects.equals(idx, size - 1)) {
 

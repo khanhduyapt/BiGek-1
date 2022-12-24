@@ -359,7 +359,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   AND can.gecko_id = boll.gecko_id                                                        \n"
                     + "   AND can.gecko_id = vol.gecko_id                                                         \n"
                     + (isBynaceUrl ? // " AND (case when can.symbol <> 'BTC' and can.volumn_div_marketcap < 0.25 then
-                            " AND macd.futures LIKE '%move↑%'     \n" //AND macd.futures NOT LIKE '%(Spot)%'
+                            " AND macd.futures LIKE '%move↑%'     \n" // AND macd.futures NOT LIKE '%(Spot)%'
                             : "")
                     + (!(((BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_coin)
                             || (BscScanBinanceApplication.app_flag == Utils.const_app_flag_all_and_msg)))
@@ -367,9 +367,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
-
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↑%' AND macd.futures LIKE '%move↑%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%SL(Long%') then 15 when macd.futures LIKE '%Futures%' AND macd.futures LIKE '%W↓%' then 19 \n"
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↑%' AND macd.futures LIKE '%move↑%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%SL(Long%') then 35 when macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%W↓%' then 39 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%sl2ma%' ) then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%sl2ma%' ) then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
                     + "       else 100 end) ASC \n"
                     + "   , (case when can.volumn_div_marketcap >= 0.2 then 1 else 0 end) DESC                      \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                    \n";
@@ -897,6 +896,11 @@ public class BinanceServiceImpl implements BinanceService {
                             if (sl_e_tp[0].contains("SL(Long_")) {
                                 css.setRange_stoploss_css(CSS_MIN28_DAYS);
                             }
+
+                            if (sl_e_tp[0].contains("SL(Short_")) {
+                                css.setRange_stoploss_css("text-danger");
+                            }
+
                         }
                     }
 
@@ -2672,7 +2676,8 @@ public class BinanceServiceImpl implements BinanceService {
         //
         // } catch (Exception e) {
         // his.setNote(e.getMessage());
-        // System.out.println("Error monitorBitcoinBalancesOnExchanges ---->" + e.getMessage());
+        // System.out.println("Error monitorBitcoinBalancesOnExchanges ---->" +
+        // e.getMessage());
         // }
         // fundingHistoryRepository.save(his);
         // } catch (Exception e) {
@@ -3041,27 +3046,33 @@ public class BinanceServiceImpl implements BinanceService {
     public String checkWDtrend(String gecko_id, String symbol) {
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 
+        List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
+        if (CollectionUtils.isEmpty(list_weeks)) {
+            return "";
+        }
+        List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 50);
+
         String type = "";
+        String scapLongOrShort = "";
+        String h4ma10x50 = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures)";
+            List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 50);
+            h4ma10x50 = Utils.checkMa10And50(list_h4);
+            scapLongOrShort = Utils.getScapLongOrShort(list_h4);
+            if (Utils.isBlank(scapLongOrShort)) {
+                scapLongOrShort = Utils.getScapLongOrShort(list_days);
+            }
         } else {
             type = " (Spot)";
+            scapLongOrShort = Utils.getScapLongOrShort(list_days);
         }
 
-        List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 11);
-        if (CollectionUtils.isEmpty(list_weeks)) {
-            return type;
-        }
-        List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 11);
-        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 50);
-
-        BigDecimal current_price = list_h4.get(0).getCurrPrice();
-        Boolean isUptrendW = Utils.isUptrendByMA(list_weeks);
+        BigDecimal current_price = list_days.get(0).getCurrPrice();
         Boolean isUptrendD = Utils.isUptrendByMA(list_days);
 
         String ma = "";
-        ma += (isUptrendW ? " W" : "");
-        ma += (isUptrendD ? " D" : "");
+        ma += (isUptrendD ? "D" : "");
         if (Utils.isBlank(ma)) {
             ma = "ma7(none)";
         } else {
@@ -3069,7 +3080,6 @@ public class BinanceServiceImpl implements BinanceService {
         }
         ma += " W:" + Utils.percentToMa(list_weeks, current_price);
         ma += ",D:" + Utils.percentToMa(list_days, current_price);
-        ma += ",H4:" + Utils.percentToMa(list_h4, current_price);
         ma += "~";
 
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
@@ -3082,18 +3092,15 @@ public class BinanceServiceImpl implements BinanceService {
 
         String W1 = list_weeks.get(0).isUptrend() ? "W↑" : "W↓";
         String D1 = list_days.get(0).isUptrend() ? "D↑" : "D↓";
-        String H4 = list_h4.get(0).isUptrend() ? "H4↑" : "H4↓";
 
-        String note = W1 + D1 + H4;
+        String note = W1 + D1;
         note += ",L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
         note += ",H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
         note += ",L10w:" + Utils.getPercentToEntry(current_price, min_week, true) + ",";
 
         // ---------------------------------------------------------
-        int percent_maxpain = 15;
         String curr_week_day_trending = W1 + D1;
         if (Objects.equals("BTC", symbol)) {
-            percent_maxpain = 10;
             btc_week_day_trending = curr_week_day_trending;
             btc_is_uptrend_today = list_days.get(0).isUptrend();
 
@@ -3107,7 +3114,7 @@ public class BinanceServiceImpl implements BinanceService {
                     msg = Utils.getTimeHHmm() + " 💔 Btc 15m kill Short." + Utils.removeLastZero(current_price);
                 }
 
-                String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+                String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getToday_YyyyMMdd();
 
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID5, gecko_id, symbol, msg, true));
@@ -3118,11 +3125,12 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
+        String d1ma10x50 = Utils.checkMa10And50(list_days);
 
         String mUpMa = "";
         boolean chartDTodayCutUpMa = Utils.cutUpMa(list_days, 0);
-        mUpMa += chartDTodayCutUpMa ? "D" : "";
-        if (Utils.isNotBlank(mUpMa)) {
+        mUpMa += chartDTodayCutUpMa ? "D " : " ";
+        if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move↑" + mUpMa.trim();
         }
 
@@ -3137,31 +3145,28 @@ public class BinanceServiceImpl implements BinanceService {
                 mDownMa = "move↓" + mDownMa.trim();
             }
         }
-        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}";
+        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim() + " " + d1ma10x50 + " " + h4ma10x50).trim() + "}";
 
         // sl2ma
         String entry = "";
-        String scapLongOrShort = "";
-        if (type.contains("(Futures)")) {
-            scapLongOrShort = Utils.getScapLongOrShort(list_h4);
+        boolean isUpdated = false;
+        String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol;
+        if (Utils.isNotBlank(scapLongOrShort)) {
+            scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_").replace(":", ": ");
 
-            if (Utils.isNotBlank(scapLongOrShort)) {
-                System.out.println(scapLongOrShort);
-                scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_").replace(":", ": ");
-
-                String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+            if (type.contains("(Futures)") && scapLongOrShort.contains("Long_")) {
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
-                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
-
+                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", true));
+                    isUpdated = true;
                     String[] arr = scapLongOrShort.split(",");
                     if (arr.length == 4) {
                         String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
                                 + Utils.new_line_from_service;
 
-                        //SL(Long_1h):0.38122(3.9%)
-                        //E:0.39606(1.25%)
-                        //TP:0.403(1.72%)
-                        //Vol:133$:5$ (only)
+                        // SL(Long_1h):0.38122(3.9%)
+                        // E:0.39606(1.25%)
+                        // TP:0.403(1.72%)
+                        // Vol:133$:5$ (only)
 
                         msg += arr[1] + Utils.new_line_from_service; // Entry
                         msg += arr[0] + Utils.new_line_from_service; // SL
@@ -3173,33 +3178,22 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         }
-
-        if (chartDTodayCutDown) {
-
-            if (Utils.isNotBlank(scapLongOrShort)) {
-                entry = " sl2ma{" + scapLongOrShort + "}";
-            } else {
-                entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
-            }
-
-        } else if (chartDTodayCutUpMa) {
-
-            if (Utils.isNotBlank(scapLongOrShort)) {
-                entry = " sl2ma{" + scapLongOrShort + "}";
-            } else {
-                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
-            }
-
-        } else {
-            if (Utils.isNotBlank(scapLongOrShort)) {
-                entry = " sl2ma{" + scapLongOrShort + "}";
-            } else {
-                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Danger") + "}";
-            }
+        if (!isUpdated) {
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", false));
         }
 
+        if (Utils.isNotBlank(scapLongOrShort) && (type.contains("(Futures)") || scapLongOrShort.contains("Long_"))) {
+            System.out.print(scapLongOrShort);
+            entry = " sl2ma{" + scapLongOrShort + "}";
+        } else {
+            if (chartDTodayCutDown) {
+                // entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
+            } else if (chartDTodayCutUpMa) {
+                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
+            }
+        }
         // ---------------------------------------------------------
-        if ((isUptrendD) && Utils.isGoodPrice4Posision(current_price, min_week, percent_maxpain)) {
+        if (Utils.isNotBlank(d1ma10x50) || Utils.isNotBlank(h4ma10x50)) {
             note += "_Position";
         }
 
@@ -3214,7 +3208,7 @@ public class BinanceServiceImpl implements BinanceService {
                 + entry;
 
         result += Utils.new_line_from_bot;
-        result += ma + W1 + D1 + H4 + Utils.new_line_from_bot;
+        result += ma + W1 + D1 + Utils.new_line_from_bot;
 
         result += "L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
         result += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
