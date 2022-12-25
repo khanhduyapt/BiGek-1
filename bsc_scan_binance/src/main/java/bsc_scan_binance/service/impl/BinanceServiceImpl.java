@@ -367,8 +367,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%' ) then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%sl2ma%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%' ) then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%sl2ma%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%' AND macd.futures LIKE '%SL(Long%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%' AND macd.futures LIKE '%SL(Long%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
                     + "       else 100 end) ASC \n"
                     + "   , (case when can.volumn_div_marketcap >= 0.2 then 1 else 0 end) DESC                      \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                    \n";
@@ -3084,7 +3084,7 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal min_week = min_max_week.get(0);
         BigDecimal max_week = min_max_week.get(1);
 
-        List<BigDecimal> min_max_day = Utils.getLowHeightCandle(list_days);
+        List<BigDecimal> min_max_day = Utils.getLowHeightCandle(list_days.subList(0, 10));
         BigDecimal min_days = min_max_day.get(0);
         BigDecimal max_days = min_max_day.get(1);
 
@@ -3153,7 +3153,7 @@ public class BinanceServiceImpl implements BinanceService {
             entry = " sl2ma{" + scapLongOrShort + "}";
         } else {
             if (chartDTodayCutDown) {
-                // entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
+                entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
             } else if (chartDTodayCutUpMa) {
                 entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
             } else if ((d1ma10x50 + h4ma10x50).contains("10X50")) {
@@ -3208,8 +3208,14 @@ public class BinanceServiceImpl implements BinanceService {
                         msg += arr[0] + Utils.new_line_from_service; // SL
                         msg += arr[2] + Utils.new_line_from_service; // TP
                         msg += arr[3] + Utils.new_line_from_service; // Vol
-                        msg += result;
-                        Utils.sendToMyTelegram(msg);
+
+                        msg += "L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
+                        msg += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
+                        msg += Utils.new_line_from_service;
+                        msg += "L10w:" + Utils.getPercentToEntry(current_price, min_week, true);
+                        msg += ", H10w:" + Utils.getPercentToEntry(current_price, max_week, false);
+
+                        Utils.sendToMyTelegram(msg.replaceAll(" ", ""));
                     }
                 }
             }

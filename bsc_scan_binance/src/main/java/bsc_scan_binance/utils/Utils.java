@@ -1321,16 +1321,35 @@ public class Utils {
     public static String getSLByMa_Short(List<BtcFutures> list_10d, String entryByChart) {
         BigDecimal entry = list_10d.get(1).getPrice_close_candle();
 
-        List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
-        BigDecimal SL = low_heigh.get(1).multiply(BigDecimal.valueOf(1.01));
-        BigDecimal tp = low_heigh.get(0);
+        BigDecimal ma10 = calcMA10d(list_10d, 0);
+        if (entry.compareTo(ma10) < 0) {
+            entry = ma10;
+        }
+
+        List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_10d.subList(0, 8));
+        BigDecimal SL = low_heigh_sl.get(1).multiply(BigDecimal.valueOf(1.01));
+        List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_10d.subList(0, 30));
+        BigDecimal TP = low_heigh_tp.get(0);
+
+        SL = formatPrice(SL, 5);
+        TP = formatPrice(TP, 5);
+        if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+            entry = formatPrice(ma10, 3);
+            SL = formatPrice(SL, 3);
+            TP = formatPrice(TP, 3);
+        }
+        BigDecimal percent_sl = getPercent(SL, entry).abs();
+        BigDecimal percent_tp = getPercent(TP, entry).abs();
+        if (percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
+            return "";
+        }
 
         BigDecimal vol = BigDecimal.valueOf(5).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
         String result = "SL(" + entryByChart + "):" + getPercentToEntry(entry, SL, false);
-        result += ",E(atc):" + removeLastZero(entry);
-        result += ",TP:" + getPercentToEntry(entry, tp, true);
+        result += ",E:" + removeLastZero(entry);
+        result += ",TP:" + getPercentToEntry(entry, TP, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/5$";
 
         return result;
@@ -1345,16 +1364,30 @@ public class Utils {
             entry = ma10;
         }
 
-        List<BigDecimal> low_heigh = getLowHeightCandle(list_10d);
-        BigDecimal SL = low_heigh.get(0).multiply(BigDecimal.valueOf(0.99));
-        BigDecimal tp = low_heigh.get(1);
+        List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_10d.subList(0, 8));
+        BigDecimal SL = low_heigh_sl.get(0).multiply(BigDecimal.valueOf(0.99));
+        List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_10d.subList(0, 30));
+        BigDecimal TP = low_heigh_tp.get(1);
+
+        SL = formatPrice(SL, 5);
+        TP = formatPrice(TP, 5);
+        if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+            entry = formatPrice(ma10, 3);
+            SL = formatPrice(SL, 3);
+            TP = formatPrice(TP, 3);
+        }
+        BigDecimal percent_sl = getPercent(SL, entry).abs();
+        BigDecimal percent_tp = getPercent(TP, entry).abs();
+        if (percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
+            return "";
+        }
 
         BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
         String result = "SL(" + entryByChart + "):" + getPercentToEntry(entry, SL, true);
         result += ",E:" + getPercentToEntry(curr_price, entry, true);
-        result += ",TP:" + getPercentToEntry(entry, tp, true);
+        result += ",TP:" + getPercentToEntry(entry, TP, true);
         result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:10$";
 
         return result;
@@ -1400,13 +1433,15 @@ public class Utils {
             SL = SL.multiply(BigDecimal.valueOf(1.01));
             TP = low_heigh_tp.get(0);
         }
+
         BigDecimal entry = formatPrice(ma10, 5);
+        SL = formatPrice(SL, 5);
+        TP = formatPrice(TP, 5);
         if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
             entry = formatPrice(ma10, 3);
+            SL = formatPrice(SL, 3);
+            TP = formatPrice(TP, 3);
         }
-
-        SL = formatPrice(SL, 3);
-        TP = formatPrice(TP, 3);
         percent_sl = getPercent(SL, entry).abs();
         percent_tp = getPercent(TP, entry).abs();
         if (percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
