@@ -367,8 +367,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%sl2ma%' ) then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%sl2ma%' ) then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%' ) then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%sl2ma%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%' ) then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%sl2ma%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
                     + "       else 100 end) ASC \n"
                     + "   , (case when can.volumn_div_marketcap >= 0.2 then 1 else 0 end) DESC                      \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                    \n";
@@ -914,8 +914,8 @@ public class BinanceServiceImpl implements BinanceService {
                     if (futu.contains("_Position")) {
                         futu = futu.replace("_Position", "");
 
-                        css.setRange_position("G");
-                        css.setRange_position_css(CSS_PRICE_SUCCESS);
+                        // css.setRange_position("G");
+                        // css.setRange_position_css(CSS_PRICE_SUCCESS);
 
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
@@ -3073,14 +3073,12 @@ public class BinanceServiceImpl implements BinanceService {
 
         String ma = "";
         ma += (isUptrendD ? "D" : "");
-        if (Utils.isBlank(ma)) {
-            ma = "ma7(none)";
-        } else {
+        if (Utils.isNotBlank(ma)) {
             ma = "ma7(" + ma.trim() + ")";
+            ma += " W:" + Utils.percentToMa(list_weeks, current_price);
+            ma += ",D:" + Utils.percentToMa(list_days, current_price);
+            ma += "~";
         }
-        ma += " W:" + Utils.percentToMa(list_weeks, current_price);
-        ma += ",D:" + Utils.percentToMa(list_days, current_price);
-        ma += "~";
 
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
         BigDecimal min_week = min_max_week.get(0);
@@ -3149,40 +3147,8 @@ public class BinanceServiceImpl implements BinanceService {
 
         // sl2ma
         String entry = "";
-        boolean isUpdated = false;
-        String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol;
-        if (Utils.isNotBlank(scapLongOrShort)) {
-            scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_").replace(":", ": ");
-
-            if (type.contains("(Futures)") && scapLongOrShort.contains("Long_")) {
-                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
-                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", true));
-                    isUpdated = true;
-                    String[] arr = scapLongOrShort.split(",");
-                    if (arr.length == 4) {
-                        String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
-                                + Utils.new_line_from_service;
-
-                        // SL(Long_1h):0.38122(3.9%)
-                        // E:0.39606(1.25%)
-                        // TP:0.403(1.72%)
-                        // Vol:133$:5$ (only)
-
-                        msg += arr[1] + Utils.new_line_from_service; // Entry
-                        msg += arr[0] + Utils.new_line_from_service; // SL
-                        msg += arr[2] + Utils.new_line_from_service; // TP
-                        msg += arr[3] + Utils.new_line_from_service; // Vol
-
-                        Utils.sendToMyTelegram(msg);
-                    }
-                }
-            }
-        }
-        if (!isUpdated) {
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", false));
-        }
-
         if (Utils.isNotBlank(scapLongOrShort) && (type.contains("(Futures)") || scapLongOrShort.contains("Long_"))) {
+            scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_").replace(":", ": ");
             System.out.print(scapLongOrShort);
             entry = " sl2ma{" + scapLongOrShort + "}";
         } else {
@@ -3195,7 +3161,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
         // ---------------------------------------------------------
-        if (Utils.isNotBlank(d1ma10x50) || Utils.isNotBlank(h4ma10x50)) {
+        if (d1ma10x50.contains("10↑50")) {
             note += "_Position";
         }
 
@@ -3219,8 +3185,40 @@ public class BinanceServiceImpl implements BinanceService {
 
         result += "L10w:" + Utils.getPercentToEntry(current_price, min_week, true);
         result += ", H10w:" + Utils.getPercentToEntry(current_price, max_week, false);
+        result = result.replaceAll("↑", "^").replaceAll("↓", "v");
 
-        return result.replaceAll("↑", "^").replaceAll("↓", "v");
+        boolean isUpdated = false;
+        String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol;
+        if (Utils.isNotBlank(scapLongOrShort)) {
+            if (type.contains("(Futures)") && scapLongOrShort.contains("Long_")) {
+                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
+                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", true));
+                    isUpdated = true;
+                    String[] arr = scapLongOrShort.split(",");
+                    if (arr.length == 4) {
+                        String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
+                                + Utils.new_line_from_service;
+
+                        // SL(Long_1h):0.38122(3.9%)
+                        // E:0.39606(1.25%)
+                        // TP:0.403(1.72%)
+                        // Vol:133$:5$ (only)
+
+                        msg += arr[1] + Utils.new_line_from_service; // Entry
+                        msg += arr[0] + Utils.new_line_from_service; // SL
+                        msg += arr[2] + Utils.new_line_from_service; // TP
+                        msg += arr[3] + Utils.new_line_from_service; // Vol
+                        msg += result;
+                        Utils.sendToMyTelegram(msg);
+                    }
+                }
+            }
+        }
+        if (!isUpdated) {
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", false));
+        }
+
+        return result;
     }
 
 }
