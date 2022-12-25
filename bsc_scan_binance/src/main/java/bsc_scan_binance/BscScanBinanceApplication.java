@@ -27,9 +27,8 @@ public class BscScanBinanceApplication {
 
     public static void main(String[] args) {
         try {
-            System.out.println(
-                    "Start " + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
-                            + " ---->");
+            System.out.println("Start "
+                    + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()) + " ---->");
 
             if (!Objects.equals(null, args) && args.length > 0) {
                 if (Utils.isNotBlank(args[0])) {
@@ -41,7 +40,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            app_flag = Utils.const_app_flag_all_and_msg;
+            // app_flag = Utils.const_app_flag_all_and_msg;
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -87,7 +86,7 @@ public class BscScanBinanceApplication {
                             binance_service.loadBinanceData("bitcoin", "BTC", startup);
                             binance_service.loadDataVolumeHour("bitcoin", "BTC");
                             binance_service.monitorBtcPrice();
-                            wait(4200); //6000ms=1minute
+                            wait(4200); // 6000ms=1minute
                         }
 
                         binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
@@ -140,7 +139,7 @@ public class BscScanBinanceApplication {
 
     public static void wait(int ms) {
         try {
-            //360000ms=6minute
+            // 360000ms=6minute
             java.lang.Thread.sleep(ms);
         } catch (InterruptedException ex) {
             java.lang.Thread.currentThread().interrupt();

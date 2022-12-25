@@ -1394,70 +1394,75 @@ public class Utils {
     }
 
     public static String getScapLongOrShort(List<BtcFutures> list) {
-        String symbol = list.get(0).getId();
-        BigDecimal curr_price = list.get(0).getCurrPrice();
-        List<BigDecimal> low_heigh_sl = getLowHeightCandle(list.subList(0, 30));
-        List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list.subList(0, 30));
+        try {
 
-        if (symbol.contains("_1d_")) {
-            BigDecimal range_percent = getPercent(low_heigh_tp.get(1), low_heigh_sl.get(0));
-            if (list.get(0).getId().toUpperCase().contains("BTC")) {
-                if (range_percent.compareTo(BigDecimal.valueOf(5)) < 0) {
-                    return "";
-                }
-            } else {
-                if (range_percent.compareTo(BigDecimal.valueOf(15)) < 0) {
-                    return "";
+            String symbol = list.get(0).getId();
+            BigDecimal curr_price = list.get(0).getCurrPrice();
+            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list.subList(0, 30));
+            List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list.subList(0, 30));
+
+            if (symbol.contains("_1d_")) {
+                BigDecimal range_percent = getPercent(low_heigh_tp.get(1), low_heigh_sl.get(0));
+                if (list.get(0).getId().toUpperCase().contains("BTC")) {
+                    if (range_percent.compareTo(BigDecimal.valueOf(5)) < 0) {
+                        return "";
+                    }
+                } else {
+                    if (range_percent.compareTo(BigDecimal.valueOf(15)) < 0) {
+                        return "";
+                    }
                 }
             }
-        }
 
-        BigDecimal ma10 = calcMA(list, 10, 0);
+            BigDecimal ma10 = calcMA(list, 10, 0);
 
-        BigDecimal SL = BigDecimal.ZERO;
-        BigDecimal TP = BigDecimal.ZERO;
+            BigDecimal SL = BigDecimal.ZERO;
+            BigDecimal TP = BigDecimal.ZERO;
 
-        BigDecimal percent_sl = BigDecimal.ZERO;
-        BigDecimal percent_tp = BigDecimal.ZERO;
-        String type = "";
-        if (Utils.isUptrendByMA(list) && (curr_price.compareTo(ma10) > 0)) {
-            // check long
-            type = "Long_";
-            SL = low_heigh_sl.get(0);
-            SL = SL.multiply(BigDecimal.valueOf(0.99));
-            TP = low_heigh_tp.get(1);
-        } else {
-            // check short
-            type = "Short_";
-            SL = low_heigh_sl.get(1);
-            SL = SL.multiply(BigDecimal.valueOf(1.01));
-            TP = low_heigh_tp.get(0);
-        }
+            BigDecimal percent_sl = BigDecimal.ZERO;
+            BigDecimal percent_tp = BigDecimal.ZERO;
+            String type = "";
+            if (Utils.isUptrendByMA(list) && (curr_price.compareTo(ma10) > 0)) {
+                // check long
+                type = "Long_";
+                SL = low_heigh_sl.get(0);
+                SL = SL.multiply(BigDecimal.valueOf(0.99));
+                TP = low_heigh_tp.get(1);
+            } else {
+                // check short
+                type = "Short_";
+                SL = low_heigh_sl.get(1);
+                SL = SL.multiply(BigDecimal.valueOf(1.01));
+                TP = low_heigh_tp.get(0);
+            }
 
-        BigDecimal entry = formatPrice(ma10, 5);
-        SL = formatPrice(SL, 5);
-        TP = formatPrice(TP, 5);
-        if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-            entry = formatPrice(ma10, 3);
-            SL = formatPrice(SL, 3);
-            TP = formatPrice(TP, 3);
-        }
-        percent_sl = getPercent(SL, entry).abs();
-        percent_tp = getPercent(TP, entry).abs();
-        if (percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
+            BigDecimal entry = formatPrice(ma10, 5);
+            SL = formatPrice(SL, 5);
+            TP = formatPrice(TP, 5);
+            if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+                entry = formatPrice(ma10, 3);
+                SL = formatPrice(SL, 3);
+                TP = formatPrice(TP, 3);
+            }
+            percent_sl = getPercent(SL, entry).abs();
+            percent_tp = getPercent(TP, entry).abs();
+            if (percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
+                return "";
+            }
+
+            BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
+            vol = formatPrice(vol.multiply(entry).abs(), 0);
+
+            String result = "SL(" + type + list.get(0).getId().replace("_00", "").replace("_1d", "_D") + "):"
+                    + getPercentToEntry(entry, SL, false);
+            result += ",E:" + getPercentToEntry(curr_price, entry, true);
+            result += ",TP:" + getPercentToEntry(entry, TP, false);
+            result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:10$";
+
+            return result;
+        } catch (Exception e) {
             return "";
         }
-
-        BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-        vol = formatPrice(vol.multiply(entry).abs(), 0);
-
-        String result = "SL(" + type + list.get(0).getId().replace("_00", "").replace("_1d", "_D") + "):"
-                + getPercentToEntry(entry, SL, false);
-        result += ",E:" + getPercentToEntry(curr_price, entry, true);
-        result += ",TP:" + getPercentToEntry(entry, TP, false);
-        result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:10$";
-
-        return result;
     }
 
     public static String percentToMa(List<BtcFutures> list, BigDecimal curr_price) {
