@@ -865,9 +865,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                         css.setRange_move(
                                 m2ma.replace("m2ma", "").replace("{", "").replace("}", "").replace("move", ""));
-                        if (m2ma.contains("move↑")) {
+                        if (m2ma.contains("↑D")) {
                             css.setRange_move_css(CSS_PRICE_WHITE);
-                        } else if (m2ma.contains("move↓")) {
+                        } else if (m2ma.contains("↓D")) {
                             css.setRange_move_css(CSS_PRICE_WARNING);
                         }
                     }
@@ -3189,6 +3189,8 @@ public class BinanceServiceImpl implements BinanceService {
             if (chartDTodayCutDown) {
                 // entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
             } else if (chartDTodayCutUpMa) {
+                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
+            } else if ((d1ma10x50 + h4ma10x50).contains("10X50")) {
                 entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
             }
         }

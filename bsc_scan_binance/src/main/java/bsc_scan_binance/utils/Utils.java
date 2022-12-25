@@ -1599,21 +1599,26 @@ public class Utils {
         BigDecimal ma50 = calcMA(list, 50, 0);
         BigDecimal ma50_pre = calcMA(list, 50, 5);
 
+        String upMa = "";
+        if (symbol.contains("_1d_") && list.get(1).getPrice_close_candle().compareTo(ma50) > 0) {
+            upMa = "(Ma50d)";
+        }
+
         // curr < ma10 < ma50 < ma10_pre -> Short
         if ((curr_price.compareTo(ma10_cur) < 0) && (ma10_cur.compareTo(ma50) < 0)
                 && (ma50_pre.compareTo(ma10_pre) < 0)) {
 
-            return symbol + "10x50";
+            return symbol + "10↓50" + upMa;
         }
 
         // curr > ma10 > ma50 > ma10_pre -> Long
         if ((curr_price.compareTo(ma10_cur) > 0) && (ma10_cur.compareTo(ma50) > 0)
                 && (ma50_pre.compareTo(ma10_pre) > 0)) {
 
-            return symbol + "10X50";
+            return symbol + "10↑50" + upMa;
         }
 
-        return "";
+        return upMa;
     }
 
     public static String getTypeLongOrShort(List<BtcFutures> list) {
