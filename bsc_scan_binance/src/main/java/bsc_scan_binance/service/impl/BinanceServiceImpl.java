@@ -3069,10 +3069,15 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
-        Boolean isUptrendD = Utils.isUptrendByMA(list_days);
+
+        boolean chartWUpMa10 = Utils.cutUpMa(list_weeks, 10, 0);
+        boolean chartDUpMa50 = Utils.cutUpMa(list_days, 50, 0);
+        boolean chartDUpMa10 = Utils.cutUpMa(list_days, 10, 0);
 
         String ma = "";
-        ma += (isUptrendD ? "D" : "");
+        ma += (chartWUpMa10 ? "W10" : "");
+        ma += (chartDUpMa50 ? "D50" : "");
+        ma += (chartDUpMa10 ? "D10" : "");
         if (Utils.isNotBlank(ma)) {
             ma = "ma7(" + ma.trim() + ")";
             ma += " W:" + Utils.percentToMa(list_weeks, current_price);
@@ -3126,8 +3131,9 @@ public class BinanceServiceImpl implements BinanceService {
         String d1ma10x50 = Utils.checkMa10And50(list_days);
 
         String mUpMa = "";
-        boolean chartDTodayCutUpMa = Utils.cutUpMa(list_days, 0);
-        mUpMa += chartDTodayCutUpMa ? "D " : " ";
+        mUpMa += chartDUpMa50 ? "D50 " : " ";
+        mUpMa += chartDUpMa10 ? "D10 " : " ";
+        mUpMa += chartWUpMa10 ? "W10" : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move↑" + mUpMa.trim();
         }
@@ -3154,7 +3160,7 @@ public class BinanceServiceImpl implements BinanceService {
         } else {
             if (chartDTodayCutDown) {
                 entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
-            } else if (chartDTodayCutUpMa) {
+            } else if (chartDUpMa10 || chartDUpMa50) {
                 entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
             } else if ((d1ma10x50 + h4ma10x50).contains("10X50")) {
                 entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";

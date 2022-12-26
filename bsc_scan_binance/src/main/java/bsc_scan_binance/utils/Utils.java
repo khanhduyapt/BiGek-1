@@ -1273,28 +1273,10 @@ public class Utils {
         return false;
     }
 
-    public static Boolean isUptrendByMA(List<BtcFutures> list) {
-        BigDecimal ma7d = calcMA10d(list, 1);
+    public static boolean cutUpMa(List<BtcFutures> list, int length, int ofCandleIndex) {
+        BigDecimal ma = calcMA(list, length, ofCandleIndex);
 
-        if (list.get(1).getPrice_close_candle().compareTo(ma7d) > 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static boolean cutUpMa(List<BtcFutures> list, int candleIndex) {
-        BigDecimal ma7d = calcMA10d(list, candleIndex);
-
-        // boolean hasCandleUnderMa = false;
-        // for (int index = 2; index < 7; index++) {
-        // BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
-        // if ((preCloseCandlePrice.compareTo(ma7d) < 0)) {
-        // hasCandleUnderMa = true;
-        // }
-        // }
-
-        if ((list.get(candleIndex).getPrice_close_candle().compareTo(ma7d) > 0)) {
+        if ((list.get(ofCandleIndex).getPrice_close_candle().compareTo(ma) > 0)) {
             return true;
         }
 
@@ -1422,7 +1404,7 @@ public class Utils {
             BigDecimal percent_sl = BigDecimal.ZERO;
             BigDecimal percent_tp = BigDecimal.ZERO;
             String type = "";
-            if (Utils.isUptrendByMA(list) && (curr_price.compareTo(ma10) > 0)) {
+            if (Utils.cutUpMa(list, 10, 1) && (curr_price.compareTo(ma10) > 0)) {
                 // check long
                 type = "Long_";
                 SL = low_heigh_sl.get(0);
