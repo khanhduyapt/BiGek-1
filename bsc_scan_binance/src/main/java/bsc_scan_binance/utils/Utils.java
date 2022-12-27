@@ -1395,8 +1395,12 @@ public class Utils {
                     }
                 }
             }
-
-            BigDecimal ma10 = calcMA(list, 10, 0);
+            BigDecimal ma = BigDecimal.ZERO;
+            if (symbol.contains("_h4_")) {
+                ma = calcMA(list, 50, 0);
+            } else {
+                ma = calcMA(list, 10, 0);
+            }
 
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP = BigDecimal.ZERO;
@@ -1404,7 +1408,7 @@ public class Utils {
             BigDecimal percent_sl = BigDecimal.ZERO;
             BigDecimal percent_tp = BigDecimal.ZERO;
             String type = "";
-            if (Utils.cutUpMa(list, 10, 1) && (curr_price.compareTo(ma10) > 0)) {
+            if (Utils.cutUpMa(list, 10, 1) && (curr_price.compareTo(ma) >= 0)) {
                 // check long
                 type = "Long_";
                 SL = low_heigh_sl.get(0);
@@ -1418,11 +1422,11 @@ public class Utils {
                 TP = low_heigh_tp.get(0);
             }
 
-            BigDecimal entry = formatPrice(ma10, 5);
+            BigDecimal entry = formatPrice(ma, 5);
             SL = formatPrice(SL, 5);
             TP = formatPrice(TP, 5);
-            if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-                entry = formatPrice(ma10, 3);
+            if (ma.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+                entry = formatPrice(ma, 3);
                 SL = formatPrice(SL, 3);
                 TP = formatPrice(TP, 3);
             }
