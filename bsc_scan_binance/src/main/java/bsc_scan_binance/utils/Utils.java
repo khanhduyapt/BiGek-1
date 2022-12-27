@@ -1396,7 +1396,7 @@ public class Utils {
                 }
             }
             BigDecimal ma = BigDecimal.ZERO;
-            if (symbol.contains("_h4_")) {
+            if (symbol.contains("_4h_")) {
                 ma = calcMA(list, 50, 0);
             } else {
                 ma = calcMA(list, 10, 0);
@@ -1408,13 +1408,14 @@ public class Utils {
             BigDecimal percent_sl = BigDecimal.ZERO;
             BigDecimal percent_tp = BigDecimal.ZERO;
             String type = "";
-            if (Utils.cutUpMa(list, 10, 1) && (curr_price.compareTo(ma) >= 0)) {
+            Boolean cutUpMa10 = Utils.cutUpMa(list, 10, 1);
+            if (cutUpMa10 && (curr_price.compareTo(ma) >= 0)) {
                 // check long
                 type = "Long_";
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.99));
                 TP = low_heigh_tp.get(1);
-            } else {
+            } else if (!cutUpMa10 && (curr_price.compareTo(ma) < 0)) {
                 // check short
                 type = "Short_";
                 SL = low_heigh_sl.get(1);
@@ -1432,10 +1433,12 @@ public class Utils {
             }
             percent_sl = getPercent(SL, entry).abs();
             percent_tp = getPercent(TP, entry).abs();
-            if (percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
+            if (symbol.contains("_1d_") && percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
                 return "";
             }
-
+            if (symbol.contains("_4h_") && percent_sl.multiply(BigDecimal.valueOf(1.2)).compareTo(percent_tp) > 0) {
+                return "";
+            }
             BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
             vol = formatPrice(vol.multiply(entry).abs(), 0);
 

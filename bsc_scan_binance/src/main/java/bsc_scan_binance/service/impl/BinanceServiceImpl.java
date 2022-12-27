@@ -3055,10 +3055,12 @@ public class BinanceServiceImpl implements BinanceService {
         String type = "";
         String scapLongOrShort = "";
         String h4ma10x50 = "";
+        boolean chartHUpMa50 = false;
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures)";
             List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 50);
             h4ma10x50 = Utils.checkMa10And50(list_h4);
+            chartHUpMa50 = Utils.cutUpMa(list_h4, 50, 0);
             scapLongOrShort = Utils.getScapLongOrShort(list_h4);
             if (Utils.isBlank(scapLongOrShort)) {
                 scapLongOrShort = Utils.getScapLongOrShort(list_days);
@@ -3078,6 +3080,8 @@ public class BinanceServiceImpl implements BinanceService {
         ma += (chartWUpMa10 ? "W10" : "");
         ma += (chartDUpMa50 ? "D50" : "");
         ma += (chartDUpMa10 ? "D10" : "");
+        ma += (chartHUpMa50 ? "H4" : "");
+
         if (Utils.isNotBlank(ma)) {
             ma = "ma7(" + ma.trim() + ")";
             ma += " W:" + Utils.percentToMa(list_weeks, current_price);
