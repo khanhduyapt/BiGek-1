@@ -835,7 +835,9 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setAvg_history(avg_history);
                     css.setMin28day(min28day);
                 }
-
+                if (Objects.equals("BETA", dto.getSymbol())) {
+                    boolean test = true;
+                }
                 if (!Objects.equals(null, dto.getPrice_can_buy()) && !Objects.equals(null, dto.getPrice_can_sell())
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_buy()) != 0
                         && BigDecimal.ZERO.compareTo(dto.getPrice_can_sell()) != 0) {
@@ -852,6 +854,16 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setEntry_price(temp_prire_24h);
 
                     String futu = dto.getFutures().replace("(Futures) ", "");
+
+                    // volma(h1x2.5) AAVE
+                    if (futu.contains("volma(") && futu.contains(")volma")) {
+                        String volma = futu.substring(futu.indexOf("volma("), futu.indexOf(")volma"));
+                        futu = futu.replace(volma + ")volma", "").replaceAll("  ", "");
+                        volma = volma.replace("volma(", "");
+                        css.setVolma(volma);
+                        css.setVolma_css("text-primary font-weight-bold");
+                    }
+
                     if (futu.contains("_ma7(") && futu.contains(")~")) {
                         String ma7 = futu.substring(futu.indexOf("_ma7("), futu.indexOf(")~") + 2);
                         futu = futu.replace(ma7, "");
@@ -1006,18 +1018,20 @@ public class BinanceServiceImpl implements BinanceService {
                                 css.setBtc_warning_css("bg-success rounded-lg");
                                 // (Good time to buy)
 
-                                //String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_BTC_" + Utils.getToday_YyyyMMdd() + "_" + Utils.getCurrentHH();
+                                // String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_BTC_" +
+                                // Utils.getToday_YyyyMMdd() + "_" + Utils.getCurrentHH();
                                 //
-                                //if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
+                                // if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
                                 //
-                                //    String msg = Utils.getTimeHHmm() + " (ALT 24h) BTC "
-                                //            + Utils.removeLastZero(price_now) + "(now)";
+                                // String msg = Utils.getTimeHHmm() + " (ALT 24h) BTC "
+                                // + Utils.removeLastZero(price_now) + "(now)";
                                 //
-                                //    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, dto.getGecko_id(),
-                                //            dto.getSymbol(), "", true));
+                                // fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3,
+                                // dto.getGecko_id(),
+                                // dto.getSymbol(), "", true));
                                 //
-                                //    Utils.sendToMyTelegram(msg);
-                                //}
+                                // Utils.sendToMyTelegram(msg);
+                                // }
 
                             } else {
                                 btc_is_good_price_for_long = false;
@@ -3053,8 +3067,13 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+        // select REPLACE(futu.id, '_1h_01', '') as symbol, futu.trading_qty, (select
+        // round(avg(trading_qty), 0) FROM public.btc_futures where id like concat('%',
+        // REPLACE(futu.id, '_1h_01', ''), '%') and id <> concat(REPLACE(futu.id,
+        // '_1h_01', ''), '_1h_00')) as avg_trading_qty from btc_futures futu where id
+        // like '%_1h_01';
+        // btcFuturesRepository.saveAll(list_h1);
 
-        String type = "";
         String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_days, 10);
 
         String ma = "";
@@ -3066,11 +3085,14 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
+        String type = "";
+        String vol = Utils.analysisVolume(list_h1);
         if (binanceFuturesRepository.existsById(gecko_id)) {
-            type = " (Futures)";
+            type = " (Futures) " + vol;
         } else {
-            type = " (Spot)";
+            type = " (Spot) " + vol;
         }
+        type = " " + type.trim();
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
@@ -3155,7 +3177,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String result = note + type + m2ma + entry;
         if (result.length() > 255) {
-            //result = result.substring(0, 250) + "...";
+            // result = result.substring(0, 250) + "...";
         }
         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
         // -------------------------------------------------------------
@@ -3183,18 +3205,17 @@ public class BinanceServiceImpl implements BinanceService {
                 isUpdated = true;
                 // String[] arr = scapLongOrShortH4.split(",");
                 // if (arr.length == 4) {
-                String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
-                        + Utils.new_line_from_service;
+                String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol + Utils.new_line_from_service;
 
                 // SL(Long_1h):0.38122(3.9%)
                 // E:0.39606(1.25%)
                 // TP:0.403(1.72%)
                 // Vol:133$:5$ (only)
 
-                //msg += arr[1] + Utils.new_line_from_service; // Entry
-                //msg += arr[0] + Utils.new_line_from_service; // SL
-                //msg += arr[2] + Utils.new_line_from_service; // TP
-                //msg += arr[3] + Utils.new_line_from_service; // Vol
+                // msg += arr[1] + Utils.new_line_from_service; // Entry
+                // msg += arr[0] + Utils.new_line_from_service; // SL
+                // msg += arr[2] + Utils.new_line_from_service; // TP
+                // msg += arr[3] + Utils.new_line_from_service; // Vol
 
                 msg += scapLongOrShortH4.replace("_ma7(", Utils.new_line_from_service).replace(")~",
                         Utils.new_line_from_service) + Utils.new_line_from_service;
@@ -3206,7 +3227,7 @@ public class BinanceServiceImpl implements BinanceService {
                 msg += ", H10w:" + Utils.getPercentToEntry(current_price, max_week, false);
 
                 Utils.sendToMyTelegram(msg.replaceAll(" ", ""));
-                //                    }
+                // }
 
             }
 

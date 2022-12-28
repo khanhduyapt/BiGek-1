@@ -1353,6 +1353,37 @@ public class Utils {
         return upMa;
     }
 
+    public static String analysisVolume(List<BtcFutures> list) {
+        BigDecimal avg_qty = BigDecimal.ZERO;
+        int count = 0;
+        for (BtcFutures dto : list) {
+            count += 1;
+            avg_qty = avg_qty.add(dto.getTrading_qty());
+        }
+
+        if (count > 0) {
+            avg_qty = avg_qty.divide(BigDecimal.valueOf(count), 0, RoundingMode.CEILING);
+        }
+        BigDecimal tem_qty = avg_qty.multiply(BigDecimal.valueOf(1.1));
+        BigDecimal cur_qty = list.get(0).getTrading_qty();
+        BigDecimal pre_qty = list.get(1).getTrading_qty();
+
+        String result = "";
+        if (cur_qty.compareTo(tem_qty) > 0) {
+            result += " h0x" + formatPrice(cur_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+        }
+        if (pre_qty.compareTo(tem_qty) > 0) {
+            result += " h1x" + formatPrice(pre_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+        }
+        result = result.trim().replace(".0", "");
+
+        if (isNotBlank(result)) {
+            result = "volma(" + result + ")volma";
+        }
+
+        return result;
+    }
+
     public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_sl, int usd) {
         try {
             String type = "";
@@ -1380,8 +1411,8 @@ public class Utils {
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP = BigDecimal.ZERO;
 
-            //BigDecimal percent_sl = BigDecimal.ZERO;
-            //BigDecimal percent_tp = BigDecimal.ZERO;
+            // BigDecimal percent_sl = BigDecimal.ZERO;
+            // BigDecimal percent_tp = BigDecimal.ZERO;
 
             if (type.contains("Long")) {
                 // check long
@@ -1411,25 +1442,26 @@ public class Utils {
             BigDecimal earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn = formatPrice(vol.multiply(earn), 1);
 
-            String result = "SL(" + type + symbol + "): "
-                    + getPercentToEntry(entry, SL, false);
+            String result = "SL(" + type + symbol + "): " + getPercentToEntry(entry, SL, false);
             result += ",E: " + getPercentToEntry(curr_price, entry, true);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + " : " + usd + " : " + removeLastZero(earn)
                     + "$";
 
-            //String ma = "";
-            //entry = curr_price;
-            //vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-            //vol = formatPrice(vol.multiply(entry).abs(), 0);
-            //earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            //earn = formatPrice(vol.multiply(earn), 1);
-            //ma += "SL: " + getPercentToEntry(entry, SL, false);
-            //ma += " E: " + removeLastZero(entry);
-            //ma += " TP: " + getPercentToEntry(entry, TP, false);
-            //ma += " Vol: " + removeLastZero(vol).replace(".0", "") + " : 10 : " + removeLastZero(earn) + "$";
-            //ma = "_ma7(" + ma.trim() + ")~";
-            //result = result + ma;
+            // String ma = "";
+            // entry = curr_price;
+            // vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10,
+            // RoundingMode.CEILING);
+            // vol = formatPrice(vol.multiply(entry).abs(), 0);
+            // earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+            // earn = formatPrice(vol.multiply(earn), 1);
+            // ma += "SL: " + getPercentToEntry(entry, SL, false);
+            // ma += " E: " + removeLastZero(entry);
+            // ma += " TP: " + getPercentToEntry(entry, TP, false);
+            // ma += " Vol: " + removeLastZero(vol).replace(".0", "") + " : 10 : " +
+            // removeLastZero(earn) + "$";
+            // ma = "_ma7(" + ma.trim() + ")~";
+            // result = result + ma;
 
             if (earn.compareTo(BigDecimal.valueOf(1)) < 0) {
                 return "";

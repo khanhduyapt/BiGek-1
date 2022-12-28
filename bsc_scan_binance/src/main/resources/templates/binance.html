@@ -168,9 +168,10 @@ p {
               th:text="${token.gecko_volumn_history}">
            </td>
           <!-- v/mc -->
-          <td style="text-align: right; min-width: 80px !important; max-width: 80px !important;" th:classappend="${token.volumn_div_marketcap_css}">
-              <p th:text="${token.volumn_div_marketcap} + '%'">
-              <p th:classappend="${token.volumn_binance_div_marketcap_css}" th:text="${token.volumn_binance_div_marketcap}">
+          <td style="font-size: 0.9rem !important; text-align: right; min-width: 80px !important; max-width: 80px !important;" th:classappend="${token.volumn_div_marketcap_css}">
+            <p th:text="${token.volumn_div_marketcap} + '%'">
+            <p th:classappend="${token.volumn_binance_div_marketcap_css}" th:text="${token.volumn_binance_div_marketcap}">
+            <p th:classappend="${token.volma_css}" th:text="${token.volma}" style="font-size: 0.6rem !important;">
           </td>
           <!-- Range -->
           <td style="text-align: right; min-width: 568px !important; max-width: 568px !important;">

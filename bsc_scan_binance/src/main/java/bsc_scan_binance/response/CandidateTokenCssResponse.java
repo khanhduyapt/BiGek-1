@@ -33,6 +33,9 @@ public class CandidateTokenCssResponse {
     private String market_cap = "";
     private String market_cap_css = "";
 
+    private String volma = "";
+    private String volma_css = "";
+
     private String current_price = "";
     private String price_target = "";
     private String btc_warning_css = "";
