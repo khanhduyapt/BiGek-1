@@ -1006,19 +1006,18 @@ public class BinanceServiceImpl implements BinanceService {
                                 css.setBtc_warning_css("bg-success rounded-lg");
                                 // (Good time to buy)
 
-                                String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_BTC_" + Utils.getToday_YyyyMMdd() + "_"
-                                        + Utils.getCurrentHH();
-
-                                if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
-
-                                    String msg = Utils.getTimeHHmm() + " (ALT 24h) BTC "
-                                            + Utils.removeLastZero(price_now) + "(now)";
-
-                                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, dto.getGecko_id(),
-                                            dto.getSymbol(), "", true));
-
-                                    Utils.sendToMyTelegram(msg);
-                                }
+                                //String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_BTC_" + Utils.getToday_YyyyMMdd() + "_" + Utils.getCurrentHH();
+                                //
+                                //if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
+                                //
+                                //    String msg = Utils.getTimeHHmm() + " (ALT 24h) BTC "
+                                //            + Utils.removeLastZero(price_now) + "(now)";
+                                //
+                                //    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, dto.getGecko_id(),
+                                //            dto.getSymbol(), "", true));
+                                //
+                                //    Utils.sendToMyTelegram(msg);
+                                //}
 
                             } else {
                                 btc_is_good_price_for_long = false;
@@ -3147,9 +3146,11 @@ public class BinanceServiceImpl implements BinanceService {
             entry = " sl2ma{" + scapLongOrShortH4 + "}";
         }
         // ---------------------------------------------------------
-        if (Utils.isCuttingUpMa50(list_h4) || Utils.isCuttingDownMa50(list_h4) || Utils.isCuttingUpMa50(list_h1)
-                || Utils.isCuttingDownMa50(list_h1)) {
-            note += "_Position";
+        if (scapLongOrShortH4.contains("Long_")) {
+            if (Utils.isCuttingUpMa50(list_h4) || Utils.isCuttingDownMa50(list_h4) || Utils.isCuttingUpMa50(list_h1)
+                    || Utils.isCuttingDownMa50(list_h1)) {
+                note += "_Position";
+            }
         }
 
         String result = note + type + m2ma + entry;
@@ -3176,40 +3177,39 @@ public class BinanceServiceImpl implements BinanceService {
 
         boolean isUpdated = false;
         String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol;
-        if (Utils.isNotBlank(scapLongOrShortH4)) {
-            if (type.contains("(Futures)") && note.contains("_Position")) {
-                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
-                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", true));
-                    isUpdated = true;
-                    //                    String[] arr = scapLongOrShortH4.split(",");
-                    //                    if (arr.length == 4) {
-                    String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
-                            + Utils.new_line_from_service;
+        if (type.contains("(Futures)") && note.contains("_Position")) {
+            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
+                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", true));
+                isUpdated = true;
+                // String[] arr = scapLongOrShortH4.split(",");
+                // if (arr.length == 4) {
+                String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
+                        + Utils.new_line_from_service;
 
-                    // SL(Long_1h):0.38122(3.9%)
-                    // E:0.39606(1.25%)
-                    // TP:0.403(1.72%)
-                    // Vol:133$:5$ (only)
+                // SL(Long_1h):0.38122(3.9%)
+                // E:0.39606(1.25%)
+                // TP:0.403(1.72%)
+                // Vol:133$:5$ (only)
 
-                    //msg += arr[1] + Utils.new_line_from_service; // Entry
-                    //msg += arr[0] + Utils.new_line_from_service; // SL
-                    //msg += arr[2] + Utils.new_line_from_service; // TP
-                    //msg += arr[3] + Utils.new_line_from_service; // Vol
+                //msg += arr[1] + Utils.new_line_from_service; // Entry
+                //msg += arr[0] + Utils.new_line_from_service; // SL
+                //msg += arr[2] + Utils.new_line_from_service; // TP
+                //msg += arr[3] + Utils.new_line_from_service; // Vol
 
-                    msg += scapLongOrShortH4 + Utils.new_line_from_service;
+                msg += scapLongOrShortH4.replace("_ma7(", Utils.new_line_from_service).replace(")~",
+                        Utils.new_line_from_service) + Utils.new_line_from_service;
 
-                    msg += "L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
-                    msg += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
-                    msg += Utils.new_line_from_service;
-                    msg += "L10w:" + Utils.getPercentToEntry(current_price, min_week, true);
-                    msg += ", H10w:" + Utils.getPercentToEntry(current_price, max_week, false);
+                msg += "L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
+                msg += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
+                msg += Utils.new_line_from_service;
+                msg += "L10w:" + Utils.getPercentToEntry(current_price, min_week, true);
+                msg += ", H10w:" + Utils.getPercentToEntry(current_price, max_week, false);
 
-                    Utils.sendToMyTelegram(msg.replaceAll(" ", ""));
-                    //                    }
-
-                }
+                Utils.sendToMyTelegram(msg.replaceAll(" ", ""));
+                //                    }
 
             }
+
         }
         if (!isUpdated) {
             fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", false));
