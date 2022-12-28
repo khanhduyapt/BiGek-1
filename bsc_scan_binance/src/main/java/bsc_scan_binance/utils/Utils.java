@@ -1374,7 +1374,7 @@ public class Utils {
 
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_sl.subList(0, 10));
-            List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_sl.subList(0, 30));
+            List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_sl);
             BigDecimal ma10 = calcMA(list_entry, 10, 0);
 
             BigDecimal SL = BigDecimal.ZERO;
