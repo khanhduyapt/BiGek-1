@@ -1011,7 +1011,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                                 if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
 
-                                    String msg = Utils.getTimeHHmm() + " (GoodPrice 24h) BTC "
+                                    String msg = Utils.getTimeHHmm() + " (ALT 24h) BTC "
                                             + Utils.removeLastZero(price_now) + "(now)";
 
                                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, dto.getGecko_id(),
@@ -3050,38 +3050,24 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_weeks)) {
             return "";
         }
-        List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 50);
+
+        List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
+        List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
 
         String type = "";
-        String scapLongOrShort = "";
-        String h4ma10x50 = "";
-        boolean chartHUpMa50 = false;
+        String scapLongOrShort = Utils.getScapLongOrShort(list_h4, list_days);
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures)";
-            List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 50);
-            h4ma10x50 = Utils.checkMa10And50(list_h4);
-            chartHUpMa50 = Utils.cutUpMa(list_h4, 50, 0);
-            scapLongOrShort = Utils.getScapLongOrShort(list_h4);
-            if (Utils.isBlank(scapLongOrShort)) {
-                scapLongOrShort = Utils.getScapLongOrShort(list_days);
-            }
         } else {
             type = " (Spot)";
-            scapLongOrShort = Utils.getScapLongOrShort(list_days);
         }
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
-        boolean chartWUpMa10 = Utils.cutUpMa(list_weeks, 10, 0);
-        boolean chartDUpMa50 = Utils.cutUpMa(list_days, 50, 0);
-        boolean chartDUpMa10 = Utils.cutUpMa(list_days, 10, 0);
+        boolean chartDUpMa10 = Utils.isAboveMALine(list_days, 10, 0);
 
         String ma = "";
-        ma += (chartWUpMa10 ? "W10" : "");
-        ma += (chartDUpMa50 ? "D50" : "");
         ma += (chartDUpMa10 ? "D10" : "");
-        ma += (chartHUpMa50 ? "H4" : "");
-
         if (Utils.isNotBlank(ma)) {
             ma = "ma7(" + ma.trim() + ")";
             ma += " W:" + Utils.percentToMa(list_weeks, current_price);
@@ -3090,7 +3076,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
-        BigDecimal min_week = min_max_week.get(0);
+        BigDecimal min_week = min_max_week.get(0).multiply(BigDecimal.valueOf(0.99));
         BigDecimal max_week = min_max_week.get(1);
 
         List<BigDecimal> min_max_day = Utils.getLowHeightCandle(list_days.subList(0, 10));
@@ -3132,18 +3118,14 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
-        String d1ma10x50 = Utils.checkMa10And50(list_days);
-
         String mUpMa = "";
-        mUpMa += chartDUpMa50 ? "D50 " : " ";
-        mUpMa += chartDUpMa10 ? "D10 " : " ";
-        mUpMa += chartWUpMa10 ? "W10" : " ";
+        mUpMa += chartDUpMa10 ? "D " : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move↑" + mUpMa.trim();
         }
 
         String mDownMa = "";
-        boolean chartDTodayCutDown = Utils.cutDownMa(list_days, 0);
+        boolean chartDTodayCutDown = Utils.isBelowMALine(list_days, 10, 0);
         mDownMa += chartDTodayCutDown ? "D" : "";
 
         if (Utils.isNotBlank(mDownMa)) {
@@ -3153,7 +3135,7 @@ public class BinanceServiceImpl implements BinanceService {
                 mDownMa = "move↓" + mDownMa.trim();
             }
         }
-        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim() + " " + d1ma10x50 + " " + h4ma10x50).trim() + "}";
+        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}";
 
         // sl2ma
         String entry = "";
@@ -3161,17 +3143,9 @@ public class BinanceServiceImpl implements BinanceService {
             scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_").replace(":", ": ");
             System.out.print(scapLongOrShort);
             entry = " sl2ma{" + scapLongOrShort + "}";
-        } else {
-            if (chartDTodayCutDown) {
-                entry = " sl2ma{" + Utils.getSLByMa_Short(list_days, "Short") + "}";
-            } else if (chartDUpMa10 || chartDUpMa50) {
-                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
-            } else if ((d1ma10x50 + h4ma10x50).contains("10X50")) {
-                entry = " sl2ma{" + Utils.getSLByMa_Long(list_days, "Long") + "}";
-            }
         }
         // ---------------------------------------------------------
-        if (d1ma10x50.contains("10↑50")) {
+        if (Utils.isCuttingUpMa50(list_h4) || Utils.isCuttingDownMa50(list_h4)) {
             note += "_Position";
         }
 
@@ -3200,7 +3174,7 @@ public class BinanceServiceImpl implements BinanceService {
         boolean isUpdated = false;
         String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol;
         if (Utils.isNotBlank(scapLongOrShort)) {
-            if (type.contains("(Futures)") && scapLongOrShort.contains("Long_")) {
+            if (type.contains("(Futures)") && note.contains("_Position")) {
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", true));
                     isUpdated = true;

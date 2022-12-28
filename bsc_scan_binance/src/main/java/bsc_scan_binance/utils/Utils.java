@@ -1273,7 +1273,31 @@ public class Utils {
         return false;
     }
 
-    public static boolean cutUpMa(List<BtcFutures> list, int length, int ofCandleIndex) {
+    public static boolean isCuttingDownMa50(List<BtcFutures> list) {
+        boolean isBelowMa10 = isBelowMALine(list, 10, 0);
+        boolean isBelowMa50 = isBelowMALine(list, 50, 0);
+        boolean isPreAboveMa50 = isAboveMALine(list, 50, 10);
+
+        if (isPreAboveMa50 && isBelowMa10 && isBelowMa50) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isCuttingUpMa50(List<BtcFutures> list) {
+        boolean isAboveMa10 = isAboveMALine(list, 10, 0);
+        boolean isAboveMa50 = isAboveMALine(list, 50, 0);
+        boolean isPreBelowMa50 = isBelowMALine(list, 50, 10);
+
+        if (isPreBelowMa50 && isAboveMa10 && isAboveMa50) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isAboveMALine(List<BtcFutures> list, int length, int ofCandleIndex) {
         BigDecimal ma = calcMA(list, length, ofCandleIndex);
 
         if ((list.get(ofCandleIndex).getPrice_close_candle().compareTo(ma) > 0)) {
@@ -1283,109 +1307,76 @@ public class Utils {
         return false;
     }
 
-    public static boolean cutDownMa(List<BtcFutures> list, int candleIndex) {
-        BigDecimal ma7d = calcMA10d(list, candleIndex);
+    public static boolean isBelowMALine(List<BtcFutures> list, int length, int ofCandleIndex) {
+        BigDecimal ma = calcMA(list, length, ofCandleIndex);
 
-        // boolean hasCandleUpperMa = false;
-        // for (int index = 2; index < 7; index++) {
-        // BigDecimal preCloseCandlePrice = list.get(index).getPrice_close_candle();
-        // if ((preCloseCandlePrice.compareTo(ma7d) > 0)) {
-        // hasCandleUpperMa = true;
-        // }
-        // }
-
-        if ((list.get(candleIndex).getPrice_close_candle().compareTo(ma7d) < 0)) {
+        if ((list.get(ofCandleIndex).getPrice_close_candle().compareTo(ma) < 0)) {
             return true;
         }
+
         return false;
     }
 
-    public static String getSLByMa_Short(List<BtcFutures> list_10d, String entryByChart) {
-        BigDecimal entry = list_10d.get(1).getPrice_close_candle();
+    public static String checkMa10And50(List<BtcFutures> list) {
+        String symbol = list.get(0).getId();
+        if (symbol.contains("_1d_")) {
+            symbol = "D";
+        }
+        if (symbol.contains("_4h_")) {
+            symbol = "4h";
+        }
+        BigDecimal curr_price = list.get(0).getCurrPrice();
+        BigDecimal ma10_cur = calcMA(list, 10, 0);
+        BigDecimal ma10_pre = calcMA(list, 10, 5);
+        BigDecimal ma50 = calcMA(list, 50, 0);
+        BigDecimal ma50_pre = calcMA(list, 50, 5);
 
-        BigDecimal ma10 = calcMA10d(list_10d, 0);
-        if (entry.compareTo(ma10) < 0) {
-            entry = ma10;
+        String upMa = "";
+        if (symbol.contains("_1d_") && list.get(1).getPrice_close_candle().compareTo(ma50) > 0) {
+            upMa = "(Ma50d)";
         }
 
-        List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_10d.subList(0, 8));
-        BigDecimal SL = low_heigh_sl.get(1).multiply(BigDecimal.valueOf(1.01));
-        List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_10d.subList(0, 30));
-        BigDecimal TP = low_heigh_tp.get(0);
+        // curr < ma10 < ma50 < ma10_pre -> Short
+        if ((curr_price.compareTo(ma10_cur) < 0) && (ma10_cur.compareTo(ma50) < 0)
+                && (ma50_pre.compareTo(ma10_pre) < 0)) {
 
-        SL = formatPrice(SL, 5);
-        TP = formatPrice(TP, 5);
-        if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-            entry = formatPrice(ma10, 3);
-            SL = formatPrice(SL, 3);
-            TP = formatPrice(TP, 3);
-        }
-        BigDecimal percent_sl = getPercent(SL, entry).abs();
-        BigDecimal percent_tp = getPercent(TP, entry).abs();
-        if (percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
-            return "";
+            return symbol + "10↓50" + upMa;
         }
 
-        BigDecimal vol = BigDecimal.valueOf(5).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-        vol = formatPrice(vol.multiply(entry).abs(), 0);
+        // curr > ma10 > ma50 > ma10_pre -> Long
+        if ((curr_price.compareTo(ma10_cur) > 0) && (ma10_cur.compareTo(ma50) > 0)
+                && (ma50_pre.compareTo(ma10_pre) > 0)) {
 
-        String result = "SL(" + entryByChart + "):" + getPercentToEntry(entry, SL, false);
-        result += ",E:" + removeLastZero(entry);
-        result += ",TP:" + getPercentToEntry(entry, TP, true);
-        result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$/5$";
+            return symbol + "10↑50" + upMa;
+        }
 
-        return result;
+        return upMa;
     }
 
-    public static String getSLByMa_Long(List<BtcFutures> list_10d, String entryByChart) {
-        BigDecimal curr_price = list_10d.get(0).getCurrPrice();
-        BigDecimal entry = list_10d.get(1).getPrice_close_candle();
-
-        BigDecimal ma10 = calcMA10d(list_10d, 0);
-        if (entry.compareTo(curr_price) > 0) {
-            entry = ma10;
-        }
-
-        List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_10d.subList(0, 8));
-        BigDecimal SL = low_heigh_sl.get(0).multiply(BigDecimal.valueOf(0.99));
-        List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_10d.subList(0, 30));
-        BigDecimal TP = low_heigh_tp.get(1);
-
-        SL = formatPrice(SL, 5);
-        TP = formatPrice(TP, 5);
-        if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-            entry = formatPrice(ma10, 3);
-            SL = formatPrice(SL, 3);
-            TP = formatPrice(TP, 3);
-        }
-        BigDecimal percent_sl = getPercent(SL, entry).abs();
-        BigDecimal percent_tp = getPercent(TP, entry).abs();
-        if (percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
-            return "";
-        }
-
-        BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-        vol = formatPrice(vol.multiply(entry).abs(), 0);
-
-        String result = "SL(" + entryByChart + "):" + getPercentToEntry(entry, SL, true);
-        result += ",E:" + getPercentToEntry(curr_price, entry, true);
-        result += ",TP:" + getPercentToEntry(entry, TP, true);
-        result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:10$";
-
-        return result;
-    }
-
-    public static String getScapLongOrShort(List<BtcFutures> list) {
+    public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_sl) {
         try {
+            String type = "";
 
-            String symbol = list.get(0).getId();
-            BigDecimal curr_price = list.get(0).getCurrPrice();
-            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list.subList(0, 30));
-            List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list.subList(0, 30));
+            if (isAboveMALine(list_entry, 10, 0) && isAboveMALine(list_entry, 50, 0)) {
+
+                type = "Long_";
+
+            } else if (isBelowMALine(list_entry, 10, 0) && isBelowMALine(list_entry, 50, 0)) {
+
+                type = "Short_";
+
+            } else {
+                return "";
+            }
+
+            String symbol = list_entry.get(0).getId();
+            BigDecimal curr_price = list_entry.get(0).getCurrPrice();
+            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_sl.subList(0, 5));
+            List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_sl.subList(0, 30));
 
             if (symbol.contains("_1d_")) {
                 BigDecimal range_percent = getPercent(low_heigh_tp.get(1), low_heigh_sl.get(0));
-                if (list.get(0).getId().toUpperCase().contains("BTC")) {
+                if (list_entry.get(0).getId().toUpperCase().contains("BTC")) {
                     if (range_percent.compareTo(BigDecimal.valueOf(5)) < 0) {
                         return "";
                     }
@@ -1395,27 +1386,21 @@ public class Utils {
                     }
                 }
             }
-            BigDecimal ma = BigDecimal.ZERO;
-            if (symbol.contains("_4h_")) {
-                ma = calcMA(list, 50, 0);
-            } else {
-                ma = calcMA(list, 10, 0);
-            }
+
+            BigDecimal ma10 = calcMA(list_entry, 10, 0);
 
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP = BigDecimal.ZERO;
 
             BigDecimal percent_sl = BigDecimal.ZERO;
             BigDecimal percent_tp = BigDecimal.ZERO;
-            String type = "";
-            Boolean cutUpMa10 = Utils.cutUpMa(list, 10, 1);
-            if (cutUpMa10 && (curr_price.compareTo(ma) >= 0)) {
+
+            if (type.contains("Long")) {
                 // check long
-                type = "Long_";
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.99));
                 TP = low_heigh_tp.get(1);
-            } else if (!cutUpMa10 && (curr_price.compareTo(ma) < 0)) {
+            } else if (type.contains("Short")) {
                 // check short
                 type = "Short_";
                 SL = low_heigh_sl.get(1);
@@ -1423,26 +1408,27 @@ public class Utils {
                 TP = low_heigh_tp.get(0);
             }
 
-            BigDecimal entry = formatPrice(ma, 5);
+            BigDecimal entry = formatPrice(ma10, 5);
             SL = formatPrice(SL, 5);
             TP = formatPrice(TP, 5);
-            if (ma.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-                entry = formatPrice(ma, 3);
+            if (ma10.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+                entry = formatPrice(ma10, 3);
                 SL = formatPrice(SL, 3);
                 TP = formatPrice(TP, 3);
             }
             percent_sl = getPercent(SL, entry).abs();
             percent_tp = getPercent(TP, entry).abs();
-            if (symbol.contains("_1d_") && percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
+            if (type.contains("Long") && percent_sl.multiply(BigDecimal.valueOf(0.8)).compareTo(percent_tp) > 0) {
                 return "";
             }
-            if (symbol.contains("_4h_") && percent_sl.multiply(BigDecimal.valueOf(1.2)).compareTo(percent_tp) > 0) {
+            if (type.contains("Short") && percent_sl.multiply(BigDecimal.valueOf(2)).compareTo(percent_tp) > 0) {
                 return "";
             }
+
             BigDecimal vol = BigDecimal.valueOf(10).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
             vol = formatPrice(vol.multiply(entry).abs(), 0);
 
-            String result = "SL(" + type + list.get(0).getId().replace("_00", "").replace("_1d", "_D") + "):"
+            String result = "SL(" + type + list_entry.get(0).getId().replace("_00", "").replace("_1d", "_D") + "):"
                     + getPercentToEntry(entry, SL, false);
             result += ",E:" + getPercentToEntry(curr_price, entry, true);
             result += ",TP:" + getPercentToEntry(entry, TP, false);
@@ -1612,42 +1598,6 @@ public class Utils {
         }
 
         return "";
-    }
-
-    public static String checkMa10And50(List<BtcFutures> list) {
-        String symbol = list.get(0).getId();
-        if (symbol.contains("_1d_")) {
-            symbol = "D";
-        }
-        if (symbol.contains("_4h_")) {
-            symbol = "4h";
-        }
-        BigDecimal curr_price = list.get(0).getCurrPrice();
-        BigDecimal ma10_cur = calcMA(list, 10, 0);
-        BigDecimal ma10_pre = calcMA(list, 10, 5);
-        BigDecimal ma50 = calcMA(list, 50, 0);
-        BigDecimal ma50_pre = calcMA(list, 50, 5);
-
-        String upMa = "";
-        if (symbol.contains("_1d_") && list.get(1).getPrice_close_candle().compareTo(ma50) > 0) {
-            upMa = "(Ma50d)";
-        }
-
-        // curr < ma10 < ma50 < ma10_pre -> Short
-        if ((curr_price.compareTo(ma10_cur) < 0) && (ma10_cur.compareTo(ma50) < 0)
-                && (ma50_pre.compareTo(ma10_pre) < 0)) {
-
-            return symbol + "10↓50" + upMa;
-        }
-
-        // curr > ma10 > ma50 > ma10_pre -> Long
-        if ((curr_price.compareTo(ma10_cur) > 0) && (ma10_cur.compareTo(ma50) > 0)
-                && (ma50_pre.compareTo(ma10_pre) > 0)) {
-
-            return symbol + "10↑50" + upMa;
-        }
-
-        return upMa;
     }
 
     public static String getTypeLongOrShort(List<BtcFutures> list) {
