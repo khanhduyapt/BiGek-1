@@ -852,10 +852,10 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setEntry_price(temp_prire_24h);
 
                     String futu = dto.getFutures().replace("(Futures) ", "");
-                    if (futu.contains("ma7") && futu.contains("~")) {
-                        String ma7 = futu.substring(0, futu.indexOf("~"));
-                        futu = futu.substring(futu.indexOf("~") + 1, futu.length());
-                        css.setOco_opportunity(ma7.replace("ma7", "Ma10"));
+                    if (futu.contains("_ma7(") && futu.contains(")~")) {
+                        String ma7 = futu.substring(futu.indexOf("_ma7("), futu.indexOf(")~") + 2);
+                        futu = futu.replace(ma7, "");
+                        css.setOco_opportunity(ma7.replace("_ma7(", "").replace(")~", ""));
                     }
 
                     String m2ma = "";
@@ -3053,9 +3053,20 @@ public class BinanceServiceImpl implements BinanceService {
 
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
+        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
 
         String type = "";
-        String scapLongOrShort = Utils.getScapLongOrShort(list_h4, list_days);
+        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_days, 10);
+
+        String ma = "";
+        if (Utils.isCuttingUpMa50(list_h1) || Utils.isCuttingDownMa50(list_h1)) {
+            ma = Utils.getScapLongOrShort(list_h1, list_h4, 5);
+            if (Utils.isNotBlank(ma)) {
+                ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
+                scapLongOrShortH4 += ma;
+            }
+        }
+
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures)";
         } else {
@@ -3066,17 +3077,8 @@ public class BinanceServiceImpl implements BinanceService {
 
         boolean chartDUpMa10 = Utils.isAboveMALine(list_days, 10, 0);
 
-        String ma = "";
-        ma += (chartDUpMa10 ? "D10" : "");
-        if (Utils.isNotBlank(ma)) {
-            ma = "ma7(" + ma.trim() + ")";
-            ma += " W:" + Utils.percentToMa(list_weeks, current_price);
-            ma += ",D:" + Utils.percentToMa(list_days, current_price);
-            ma += "~";
-        }
-
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
-        BigDecimal min_week = min_max_week.get(0).multiply(BigDecimal.valueOf(0.99));
+        BigDecimal min_week = Utils.formatPrice(min_max_week.get(0).multiply(BigDecimal.valueOf(0.99)), 5);
         BigDecimal max_week = min_max_week.get(1);
 
         List<BigDecimal> min_max_day = Utils.getLowHeightCandle(list_days.subList(0, 10));
@@ -3137,21 +3139,22 @@ public class BinanceServiceImpl implements BinanceService {
         }
         String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}";
 
-        // sl2ma
+        // H4 sl2ma
         String entry = "";
-        if (Utils.isNotBlank(scapLongOrShort) && (type.contains("(Futures)") || scapLongOrShort.contains("Long_"))) {
-            scapLongOrShort = scapLongOrShort.replace("_" + symbol.toUpperCase() + "_", "_").replace(":", ": ");
-            System.out.print(scapLongOrShort);
-            entry = " sl2ma{" + scapLongOrShort + "}";
+        if (Utils.isNotBlank(scapLongOrShortH4)
+                && (type.contains("(Futures)") || scapLongOrShortH4.contains("Long_"))) {
+            scapLongOrShortH4 = scapLongOrShortH4.replace("_" + symbol.toUpperCase() + "_", "_");
+            entry = " sl2ma{" + scapLongOrShortH4 + "}";
         }
         // ---------------------------------------------------------
-        if (Utils.isCuttingUpMa50(list_h4) || Utils.isCuttingDownMa50(list_h4)) {
+        if (Utils.isCuttingUpMa50(list_h4) || Utils.isCuttingDownMa50(list_h4) || Utils.isCuttingUpMa50(list_h1)
+                || Utils.isCuttingDownMa50(list_h1)) {
             note += "_Position";
         }
 
-        String result = ma + note + type + m2ma + entry;
+        String result = note + type + m2ma + entry;
         if (result.length() > 255) {
-            result = result.substring(0, 250) + "...";
+            //result = result.substring(0, 250) + "...";
         }
         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, result, true));
         // -------------------------------------------------------------
@@ -3160,7 +3163,7 @@ public class BinanceServiceImpl implements BinanceService {
                 + entry;
 
         result += Utils.new_line_from_bot;
-        result += ma + W1 + D1 + Utils.new_line_from_bot;
+        result += W1 + D1 + Utils.new_line_from_bot;
 
         result += "L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
         result += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
@@ -3173,35 +3176,39 @@ public class BinanceServiceImpl implements BinanceService {
 
         boolean isUpdated = false;
         String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol;
-        if (Utils.isNotBlank(scapLongOrShort)) {
+        if (Utils.isNotBlank(scapLongOrShortH4)) {
             if (type.contains("(Futures)") && note.contains("_Position")) {
                 if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, "", true));
                     isUpdated = true;
-                    String[] arr = scapLongOrShort.split(",");
-                    if (arr.length == 4) {
-                        String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
-                                + Utils.new_line_from_service;
+                    //                    String[] arr = scapLongOrShortH4.split(",");
+                    //                    if (arr.length == 4) {
+                    String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + symbol
+                            + Utils.new_line_from_service;
 
-                        // SL(Long_1h):0.38122(3.9%)
-                        // E:0.39606(1.25%)
-                        // TP:0.403(1.72%)
-                        // Vol:133$:5$ (only)
+                    // SL(Long_1h):0.38122(3.9%)
+                    // E:0.39606(1.25%)
+                    // TP:0.403(1.72%)
+                    // Vol:133$:5$ (only)
 
-                        msg += arr[1] + Utils.new_line_from_service; // Entry
-                        msg += arr[0] + Utils.new_line_from_service; // SL
-                        msg += arr[2] + Utils.new_line_from_service; // TP
-                        msg += arr[3] + Utils.new_line_from_service; // Vol
+                    //msg += arr[1] + Utils.new_line_from_service; // Entry
+                    //msg += arr[0] + Utils.new_line_from_service; // SL
+                    //msg += arr[2] + Utils.new_line_from_service; // TP
+                    //msg += arr[3] + Utils.new_line_from_service; // Vol
 
-                        msg += "L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
-                        msg += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
-                        msg += Utils.new_line_from_service;
-                        msg += "L10w:" + Utils.getPercentToEntry(current_price, min_week, true);
-                        msg += ", H10w:" + Utils.getPercentToEntry(current_price, max_week, false);
+                    msg += scapLongOrShortH4 + Utils.new_line_from_service;
 
-                        Utils.sendToMyTelegram(msg.replaceAll(" ", ""));
-                    }
+                    msg += "L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
+                    msg += ", H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
+                    msg += Utils.new_line_from_service;
+                    msg += "L10w:" + Utils.getPercentToEntry(current_price, min_week, true);
+                    msg += ", H10w:" + Utils.getPercentToEntry(current_price, max_week, false);
+
+                    Utils.sendToMyTelegram(msg.replaceAll(" ", ""));
+                    //                    }
+
                 }
+
             }
         }
         if (!isUpdated) {
