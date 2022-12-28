@@ -867,7 +867,11 @@ public class BinanceServiceImpl implements BinanceService {
                     if (futu.contains("_ma7(") && futu.contains(")~")) {
                         String ma7 = futu.substring(futu.indexOf("_ma7("), futu.indexOf(")~") + 2);
                         futu = futu.replace(ma7, "");
-                        css.setOco_opportunity(ma7.replace("_ma7(", "").replace(")~", ""));
+                        ma7 = ma7.replace("_ma7(", "").replace(")~", "");
+                        css.setOco_opportunity(ma7);
+                        if (ma7.contains("Long_1h")) {
+                            css.setDt_range_css("text-primary");
+                        }
                     }
 
                     String m2ma = "";
@@ -931,8 +935,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
-
-                        // css.setDt_range_css("highlight rounded-lg px-1"); // highlight bg-light
                     }
 
                     if (futu.contains("W↑D↑")) {
