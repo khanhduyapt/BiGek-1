@@ -1398,7 +1398,7 @@ public class Utils {
             }
 
             String symbol = list_entry.get(0).getId();
-            symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)");
+            symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
 
             List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_entry);
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_entry.subList(0, 10));
@@ -1476,11 +1476,11 @@ public class Utils {
         try {
             String type = "";
 
-            if (isAboveMALine(list_entry, 10, 0) && isAboveMALine(list_entry, 50, 0)) {
+            if (isAboveMALine(list_entry, 10, 0) && isAboveMALine(list_entry, 20, 0)) {
 
                 type = "Long_";
 
-            } else if (isBelowMALine(list_entry, 10, 0) && isBelowMALine(list_entry, 50, 0)) {
+            } else if (isBelowMALine(list_entry, 10, 0) && isBelowMALine(list_entry, 20, 0)) {
 
                 type = "Short_";
 

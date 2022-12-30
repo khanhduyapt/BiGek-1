@@ -2924,6 +2924,30 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
 
+        if (Objects.equals("ETH", symbol)) {
+            List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
+            for (String CURR : list_currency) {
+                String ID = CURR + "_USDT";
+                System.out.println("CHECK: " + ID);
+
+                List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_4h, 21);
+                String curr_long_short = Utils.checkMa10And20(list_currentcy, 3, 20);
+
+                if (Utils.isNotBlank(curr_long_short)) {
+
+                    String EVENT_LONG_SHORT_CURRENCY = ID + "_" + Utils.getCurrentYyyyMmDdHH();
+                    String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + ID + " (" + curr_long_short + ")";
+
+                    if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
+                        fundingHistoryRepository
+                                .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
+
+                        Utils.sendToMyTelegram(msg);
+                    }
+                }
+            }
+        }
+
         String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
 
         String ma = Utils.getScapLongOrShort(list_h1, list_h1, 5);
@@ -2990,7 +3014,6 @@ public class BinanceServiceImpl implements BinanceService {
         if (Objects.equals("BTC", symbol) || Objects.equals("EHT", symbol)) {
 
             String resultLongShortH1 = Utils.getScapLongOrShortH1_BTC(list_h1, 10);
-
             if (Utils.isNotBlank(resultLongShortH1)) {
 
                 String EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDdHH();
