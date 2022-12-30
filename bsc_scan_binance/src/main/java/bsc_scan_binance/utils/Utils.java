@@ -698,6 +698,12 @@ public class Utils {
         return Utils.convertDateToString("yyyyMMdd_HH", Calendar.getInstance().getTime());
     }
 
+    public static String getHH(int add) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY, add);
+        return Utils.convertDateToString("HH", calendar.getTime());
+    }
+
     public static Integer getCurrentHH() {
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         return HH;
@@ -1364,17 +1370,53 @@ public class Utils {
         if (count > 0) {
             avg_qty = avg_qty.divide(BigDecimal.valueOf(count), 0, RoundingMode.CEILING);
         }
-        BigDecimal tem_qty = avg_qty.multiply(BigDecimal.valueOf(1.1));
+        BigDecimal tem_qty = avg_qty.multiply(BigDecimal.valueOf(1.2));
         BigDecimal cur_qty = list.get(0).getTrading_qty();
         BigDecimal pre_qty = list.get(1).getTrading_qty();
 
         String result = "";
         if (cur_qty.compareTo(tem_qty) > 0) {
-            result += " h0x" + formatPrice(cur_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            result += " " + getHH(0) + "h x" + formatPrice(cur_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            if (list.get(0).isUptrend()) {
+                result += " pump!";
+            } else {
+                result += " dump!";
+            }
         }
+
         if (pre_qty.compareTo(tem_qty) > 0) {
-            result += " h1x" + formatPrice(pre_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            result += " " + getHH(-1) + "h x" + formatPrice(pre_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            if (list.get(1).isUptrend()) {
+                result += " pump!";
+            } else {
+                result += " dump!";
+            }
         }
+
+        if (isBlank(result)) {
+            pre_qty = list.get(2).getTrading_qty();
+            if (pre_qty.compareTo(tem_qty) > 0) {
+                result += " " + getHH(-2) + "h x"
+                        + formatPrice(pre_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+                if (list.get(1).isUptrend()) {
+                    result += " pump!";
+                } else {
+                    result += " dump!";
+                }
+            }
+
+            pre_qty = list.get(3).getTrading_qty();
+            if (pre_qty.compareTo(tem_qty) > 0) {
+                result += " " + getHH(-3) + "h x"
+                        + formatPrice(pre_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+                if (list.get(1).isUptrend()) {
+                    result += " pump!";
+                } else {
+                    result += " dump!";
+                }
+            }
+        }
+
         result = result.trim().replace(".0", "");
 
         if (isNotBlank(result)) {
@@ -1404,8 +1446,18 @@ public class Utils {
             symbol = symbol.replace("_00", "").replace("_1d", "_D");
 
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
-            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_sl.subList(0, 10));
             List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_sl);
+
+            if (!(symbol.contains("BTC") || symbol.contains("ETH"))) {
+                BigDecimal range_percent = getPercent(low_heigh_tp.get(1), low_heigh_tp.get(0));
+                if (range_percent.compareTo(BigDecimal.valueOf(5)) < 0) {
+                    System.out.println("Sideway: " + list_entry.get(0).getId());
+                    return "";
+                }
+            }
+
+            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_sl.subList(0, 10));
+
             BigDecimal ma10 = calcMA(list_entry, 10, 0);
 
             BigDecimal SL = BigDecimal.ZERO;
@@ -1417,13 +1469,13 @@ public class Utils {
             if (type.contains("Long")) {
                 // check long
                 SL = low_heigh_sl.get(0);
-                SL = SL.multiply(BigDecimal.valueOf(0.99));
+                SL = SL.multiply(BigDecimal.valueOf(0.995));
                 TP = low_heigh_tp.get(1);
             } else if (type.contains("Short")) {
                 // check short
                 type = "Short_";
                 SL = low_heigh_sl.get(1);
-                SL = SL.multiply(BigDecimal.valueOf(1.01));
+                SL = SL.multiply(BigDecimal.valueOf(1.005));
                 TP = low_heigh_tp.get(0);
             }
 

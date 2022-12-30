@@ -367,8 +367,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%' AND macd.futures LIKE '%SL(Long%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%' AND macd.futures LIKE '%SL(Long%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%' AND macd.futures LIKE '%Long%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%' AND macd.futures LIKE '%Long%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
                     + "       else 100 end) ASC \n"
                     + "   , (case when can.volumn_div_marketcap >= 0.2 then 1 else 0 end) DESC                      \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                    \n";
@@ -861,7 +861,12 @@ public class BinanceServiceImpl implements BinanceService {
                         futu = futu.replace(volma + ")volma", "").replaceAll("  ", "");
                         volma = volma.replace("volma(", "");
                         css.setVolma(volma);
-                        css.setVolma_css("text-primary font-weight-bold");
+
+                        if (volma.contains("pump")) {
+                            css.setVolma_css("text-primary font-weight-bold");
+                        } else if (volma.contains("dump")) {
+                            css.setVolma_css("text-danger font-weight-bold");
+                        }
                     }
 
                     if (futu.contains("_ma7(") && futu.contains(")~")) {
@@ -871,6 +876,8 @@ public class BinanceServiceImpl implements BinanceService {
                         css.setOco_opportunity(ma7);
                         if (ma7.contains("Long_1h")) {
                             css.setDt_range_css("text-primary");
+                        } else if (ma7.contains("Short_1h")) {
+                            css.setDt_range_css("text-danger");
                         }
                     }
 
@@ -904,17 +911,18 @@ public class BinanceServiceImpl implements BinanceService {
 
                             BigDecimal entryPercent = Utils.getPercentFromStringPercent(sl_e_tp[1]);
                             if ((entryPercent.compareTo(BigDecimal.valueOf(1.1)) < 0) && m2ma.contains("↑D")) {
-
-                                css.setRange_entry_css(CSS_PRICE_WHITE);
                                 css.setRange_volume_css(CSS_PRICE_FOCUS);
                             }
 
                             if (sl_e_tp[0].contains("SL(Long_")) {
-                                css.setRange_stoploss_css(CSS_MIN28_DAYS);
+                                //css.setRange_stoploss_css("text-primary");
                             }
 
                             if (sl_e_tp[0].contains("SL(Short_")) {
                                 css.setRange_stoploss_css("text-danger");
+                                css.setRange_entry_css("text-danger");
+                                css.setRange_take_profit_css("text-danger");
+                                css.setRange_volume_css("text-danger");
                             }
 
                         }
@@ -978,16 +986,10 @@ public class BinanceServiceImpl implements BinanceService {
 
                         if (range_L10d.compareTo(BigDecimal.valueOf(15)) > 0) {
                             css.setRange_L10d_css(CSS_PRICE_DANGER);
-
-                            css.setRange_entry_css("");
-                            css.setRange_volume_css("");
                         }
 
                         if (range_L10w.compareTo(BigDecimal.valueOf(20)) > 0) {
                             css.setRange_L6w_css(CSS_PRICE_DANGER);
-
-                            css.setRange_entry_css("");
-                            css.setRange_volume_css("");
                         }
 
                     } else {
@@ -1003,37 +1005,12 @@ public class BinanceServiceImpl implements BinanceService {
                         BigDecimal btc_range_b_s = ((price_can_sell_24h.subtract(price_can_buy_24h))
                                 .divide(price_can_buy_24h, 3, RoundingMode.CEILING));
 
-                        int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-                        boolean check_L_H = true;
-                        if (hh < 7 || hh > 12) {
-                            BigDecimal btc_range_L_H = taget_percent_profit_today.subtract(taget_percent_lost_today);
-                            if (btc_range_L_H.compareTo(BigDecimal.valueOf(1)) < 0) {
-                                check_L_H = false;
-                            }
-                        }
-
                         // take_profit_percent > 3% ?
-                        if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0) && check_L_H) {
+                        if ((btc_range_b_s.compareTo(BigDecimal.valueOf(0.015)) >= 0)) {
 
                             if (Utils.isGoodPriceLong(price_now, price_can_buy_24h, price_can_sell_24h)) {
 
                                 css.setBtc_warning_css("bg-success rounded-lg");
-                                // (Good time to buy)
-
-                                // String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_BTC_" +
-                                // Utils.getToday_YyyyMMdd() + "_" + Utils.getCurrentHH();
-                                //
-                                // if (!fundingHistoryRepository.existsPumDump(dto.getGecko_id(), EVENT_ID_3)) {
-                                //
-                                // String msg = Utils.getTimeHHmm() + " (ALT 24h) BTC "
-                                // + Utils.removeLastZero(price_now) + "(now)";
-                                //
-                                // fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3,
-                                // dto.getGecko_id(),
-                                // dto.getSymbol(), "", true));
-                                //
-                                // Utils.sendToMyTelegram(msg);
-                                // }
 
                             } else {
                                 btc_is_good_price_for_long = false;
@@ -1042,18 +1019,6 @@ public class BinanceServiceImpl implements BinanceService {
                             if ((price_now.multiply(BigDecimal.valueOf(1.005)).compareTo(highest_price_today) > 0)) {
 
                                 css.setBtc_warning_css("bg-danger rounded-lg");
-
-                                if (ordersRepository.count() > 0) {
-                                    String curr_percent_btc = Utils.toPercent(price_now, highest_price_today);
-                                    if (!Objects.equals(curr_percent_btc, pre_time_of_btc)) {
-
-                                        Utils.sendToTelegram(
-                                                "(Time to Sell) Btc: " + Utils.removeLastZero(price_now.toString())
-                                                        + Utils.new_line_from_service + css.getLow_to_hight_price()
-                                                        + Utils.new_line_from_service + "Can" + css.getAvg_boll_min()
-                                                        + " " + "Can" + css.getAvg_boll_max());
-                                    }
-                                }
 
                             }
                         }
@@ -1125,117 +1090,6 @@ public class BinanceServiceImpl implements BinanceService {
             System.out.println(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
-    }
-
-    public String monitorTokenSales(List<CandidateTokenCssResponse> results) {
-
-        String buy_msg = "";
-        int count = 1;
-        int idx = 1;
-        String strCanBuy = "(" + Utils.convertDateToString("MM/dd HH:mm", Calendar.getInstance().getTime()) + ")";
-
-        String sp500 = loadPremarketSp500();
-        boolean alert = true;
-        if (sp500.contains("S&P500-") && !Utils.isBusinessTime()) {
-            alert = false;
-        }
-
-        for (CandidateTokenCssResponse dto : results) {
-            idx += 1;
-            if (idx > 100) {
-                break;
-            }
-
-            String msg = monitorToken(dto);
-
-            if (Utils.isNotBlank(msg)) {
-
-                if (msg.contains("BUY:")) {
-
-                    if (Utils.isNotBlank(buy_msg)) {
-                        buy_msg += Utils.new_line_from_service;
-                    }
-                    buy_msg += msg.replace("BUY:", "(" + Utils.getStringValue(count) + ")..");
-
-                    count += 1;
-
-                    if (alert && (count % 10 == 0)) {
-                        if (count < 11) {
-                            Utils.sendToTelegram(strCanBuy + Utils.new_line_from_service + buy_msg);
-                        } else {
-                            Utils.sendToTelegram(Utils.new_line_from_service + buy_msg);
-                        }
-
-                        buy_msg = "";
-                        if (count > 20) {
-                            return "";
-                        }
-                    }
-                }
-
-            }
-        }
-
-        String result = "";
-        if (alert && Utils.isNotBlank(buy_msg) && !msg_vol_up_dict.contains(buy_msg)) {
-
-            if (count < 11) {
-                Utils.sendToTelegram(strCanBuy + Utils.new_line_from_service + buy_msg);
-            } else {
-                Utils.sendToTelegram(Utils.new_line_from_service + buy_msg);
-            }
-
-            msg_vol_up_dict.put(buy_msg, buy_msg);
-            result = buy_msg;
-        }
-
-        return result;
-    }
-
-    public String monitorToken(CandidateTokenCssResponse css) {
-        boolean isCandidate = false;
-        if (css.getSymbol().equals("BTC")) {
-            isCandidate = true;
-        }
-
-        String priceChange24h = css.getPrice_change_percentage_24h().replace("%", "");
-
-        if (!isCandidate && Utils.isNotBlank(css.getAvg_boll_min_css())
-                && (css.getRate1d0h().compareTo(BigDecimal.valueOf(0)) > 0)
-                && (Utils.getBigDecimalValue(priceChange24h).compareTo(BigDecimal.valueOf(6)) < 0)) {
-
-            if (CollectionUtils.isEmpty(ordersRepository.findAllByIdGeckoid(css.getGecko_id()))) {
-                if (binanceFuturesRepository.existsById(css.getGecko_id())) {
-
-                    isCandidate = true;
-                }
-            }
-        }
-
-        if (isCandidate) {
-            String result = Utils.removeLastZero(css.getLow_price_24h().toString());
-            result += "~" + Utils.removeLastZero(css.getEntry_price().toString()) + ", ";
-
-            String stop_loss1 = String.valueOf(css.getStop_loss().subSequence(css.getStop_loss().indexOf("(") + 1,
-                    css.getStop_loss().indexOf(")"))).replaceAll("%", "");
-
-            String stop_loss2 = css.getAvg_boll_min().substring(css.getAvg_boll_min().indexOf("(") + 1,
-                    css.getAvg_boll_min().indexOf("%"));
-
-            result += "SL" + Utils.getBigDecimalValue(stop_loss1).add(Utils.getBigDecimalValue(stop_loss2)) + "%";
-
-            result = "BUY:" + Utils.appendSpace(css.getSymbol(), 4) + result;
-
-            result = result.replace(" ", ".").replace(",", ".");
-
-            if (css.getSymbol().equals("BTC")) {
-                result += Utils.new_line_from_service + css.getOco_depth();
-            }
-
-            return result;
-        }
-
-        return "";
     }
 
     private String setEmaCss(CandidateTokenCssResponse css) {
@@ -3069,22 +2923,13 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
-        // select REPLACE(futu.id, '_1h_01', '') as symbol, futu.trading_qty, (select
-        // round(avg(trading_qty), 0) FROM public.btc_futures where id like concat('%',
-        // REPLACE(futu.id, '_1h_01', ''), '%') and id <> concat(REPLACE(futu.id,
-        // '_1h_01', ''), '_1h_00')) as avg_trading_qty from btc_futures futu where id
-        // like '%_1h_01';
-        // btcFuturesRepository.saveAll(list_h1);
 
-        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_days, 10);
+        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
 
-        String ma = "";
-        if (Utils.isCuttingUpMa50(list_h1) || Utils.isCuttingDownMa50(list_h1)) {
-            ma = Utils.getScapLongOrShort(list_h1, list_h4, 5);
-            if (Utils.isNotBlank(ma)) {
-                ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
-                scapLongOrShortH4 += ma;
-            }
+        String ma = Utils.getScapLongOrShort(list_h1, list_h1, 5);
+        if (Utils.isNotBlank(ma)) {
+            ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
+            scapLongOrShortH4 += ma;
         }
 
         String type = "";
