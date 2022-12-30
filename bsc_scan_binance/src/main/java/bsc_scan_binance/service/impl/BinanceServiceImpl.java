@@ -2919,10 +2919,33 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_weeks)) {
             return "";
         }
-
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
-        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+        List<BtcFutures> list_h1 = new ArrayList<BtcFutures>();
+
+        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
+
+        String type = "";
+        if (binanceFuturesRepository.existsById(gecko_id)) {
+
+            list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+            String ma = Utils.getScapLongOrShort(list_h1, list_h1, 5);
+            if (Utils.isNotBlank(ma)) {
+                ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
+                scapLongOrShortH4 += ma;
+            }
+
+//            String check = Utils.checkMa10And20(list_h1);
+//            if (Utils.isNotBlank(check)) {
+//                System.out.println(symbol + " " + check);
+//            }
+
+            type = " (Futures) " + Utils.analysisVolume(list_h1);
+        } else {
+            type = " (Spot) " + Utils.analysisVolume(list_h4);
+        }
+
+        type = " " + type.trim();
 
         if (Objects.equals("ETH", symbol)) {
             List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
@@ -2931,7 +2954,7 @@ public class BinanceServiceImpl implements BinanceService {
                 System.out.println("CHECK: " + ID);
 
                 List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_4h, 21);
-                String curr_long_short = Utils.checkMa10And20(list_currentcy, 3, 20);
+                String curr_long_short = Utils.checkMa10And20(list_currentcy);
 
                 if (Utils.isNotBlank(curr_long_short)) {
 
@@ -2947,23 +2970,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         }
-
-        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
-
-        String ma = Utils.getScapLongOrShort(list_h1, list_h1, 5);
-        if (Utils.isNotBlank(ma)) {
-            ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
-            scapLongOrShortH4 += ma;
-        }
-
-        String type = "";
-        String vol = Utils.analysisVolume(list_h1);
-        if (binanceFuturesRepository.existsById(gecko_id)) {
-            type = " (Futures) " + vol;
-        } else {
-            type = " (Spot) " + vol;
-        }
-        type = " " + type.trim();
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 

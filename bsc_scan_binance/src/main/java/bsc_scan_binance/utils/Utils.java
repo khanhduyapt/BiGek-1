@@ -1299,25 +1299,68 @@ public class Utils {
         return false;
     }
 
-    public static String checkMa10And20(List<BtcFutures> list, int ma10Source, int ma20Target) {
-        BigDecimal curr_price = list.get(0).getCurrPrice();
-        BigDecimal ma10_cur = calcMA(list, ma10Source, 0);
-        BigDecimal ma10_pre = calcMA(list, ma10Source, 5);
+    public static String checkMa10And20(List<BtcFutures> list) {
+        BigDecimal open = list.get(1).getPrice_open_candle();
+        BigDecimal close = list.get(1).getPrice_close_candle();
 
-        BigDecimal ma20_cur = calcMA(list, ma20Target, 0);
-        BigDecimal ma20_pre = calcMA(list, ma20Target, 5);
+        BigDecimal ma03_cur = calcMA(list, 3, 1);
+        BigDecimal ma03_pre = calcMA(list, 3, 5);
+
+        BigDecimal ma10_cur = calcMA(list, 10, 1);
+        BigDecimal ma10_pre = calcMA(list, 10, 5);
+
+        BigDecimal ma20_cur = calcMA(list, 20, 1);
+        BigDecimal ma20_pre = calcMA(list, 20, 5);
 
         // curr < ma10 < ma50 < ma10_pre -> Short
-        if ((curr_price.compareTo(ma10_cur) < 0) && (ma10_cur.compareTo(ma10_pre) < 0)
-                && (ma10_cur.compareTo(ma20_cur) < 0) && (ma20_pre.compareTo(ma10_pre) < 0)) {
+        if ((ma10_cur.compareTo(ma10_pre) < 0) && (ma10_cur.compareTo(ma20_cur) < 0)
+                && (ma20_pre.compareTo(ma10_pre) < 0)) {
 
             return "Short";
         }
 
-        // curr > ma10 > ma50 > ma10_pre -> Long
-        if ((curr_price.compareTo(ma10_cur) > 0) && (ma10_cur.compareTo(ma10_pre) > 0)
-                && (ma10_cur.compareTo(ma20_cur) > 0) && (ma20_pre.compareTo(ma10_pre) > 0)) {
+        // open > ma20 > ma10 > ma03 > close
+        if ((open.compareTo(close) > 0) && (open.compareTo(ma20_cur) > 0) && (ma20_cur.compareTo(ma10_cur) > 0)
+                && (ma10_cur.compareTo(ma03_cur) > 0) && (ma03_cur.compareTo(close) > 0)) {
+            return "Short";
+        }
 
+        // ma3of5 > ma10 > ma20 > ma3
+        if ((ma03_pre.compareTo(ma10_cur) > 0) && (ma10_cur.compareTo(ma20_cur) > 0)
+                && (ma20_cur.compareTo(ma03_cur) > 0) && (ma03_pre.compareTo(ma03_cur) > 0)) {
+            return "Short";
+        }
+
+        // ma3of5 > ma20 > ma10 > ma3
+        if ((ma03_pre.compareTo(ma20_cur) > 0) && (ma20_cur.compareTo(ma10_cur) > 0)
+                && (ma10_cur.compareTo(ma03_cur) > 0) && (ma03_pre.compareTo(ma03_cur) > 0)) {
+            return "Short";
+        }
+
+        // --------------------------------------------------
+
+        // curr > ma10 > ma50 > ma10_pre -> Long
+        if ((ma10_cur.compareTo(ma10_pre) > 0) && (ma10_cur.compareTo(ma20_cur) > 0)
+                && (ma20_pre.compareTo(ma10_pre) > 0)) {
+
+            return "Long";
+        }
+
+        // open < ma20 < ma10 < ma03 <close
+        if ((open.compareTo(close) < 0) && (open.compareTo(ma20_cur) < 0) && (ma20_cur.compareTo(ma10_cur) < 0)
+                && (ma10_cur.compareTo(ma03_cur) < 0) && (ma03_cur.compareTo(close) < 0)) {
+            return "Long";
+        }
+
+        // ma3of5 < ma20 < ma10 < ma3
+        if ((ma03_pre.compareTo(ma20_cur) < 0) && (ma20_cur.compareTo(ma10_cur) < 0)
+                && (ma10_cur.compareTo(ma03_cur) < 0) && (ma03_pre.compareTo(ma03_cur) < 0)) {
+            return "Long";
+        }
+
+        // ma3of5 < ma10 < ma20 < ma3
+        if ((ma03_pre.compareTo(ma10_cur) < 0) && (ma10_cur.compareTo(ma20_cur) < 0)
+                && (ma20_cur.compareTo(ma03_cur) < 0) && (ma03_pre.compareTo(ma03_cur) < 0)) {
             return "Long";
         }
 
@@ -1391,7 +1434,7 @@ public class Utils {
 
     public static String getScapLongOrShortH1_BTC(List<BtcFutures> list_entry, int usd) {
         try {
-            String type = checkMa10And20(list_entry, 10, 20);
+            String type = checkMa10And20(list_entry);
 
             if (Utils.isBlank(type)) {
                 return "";
