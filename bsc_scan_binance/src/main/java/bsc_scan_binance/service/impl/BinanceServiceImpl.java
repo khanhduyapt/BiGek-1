@@ -2934,13 +2934,10 @@ public class BinanceServiceImpl implements BinanceService {
                 ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
                 scapLongOrShortH4 += ma;
             }
-
-//            String check = Utils.checkMa10And20(list_h1);
-//            if (Utils.isNotBlank(check)) {
-//                System.out.println(symbol + " " + check);
-//            }
-
             type = " (Futures) " + Utils.analysisVolume(list_h1);
+
+            // Utils.getScapLongOrShortH1_BTC(list_h1, list_h4, 10);
+
         } else {
             type = " (Spot) " + Utils.analysisVolume(list_h4);
         }
@@ -2950,18 +2947,21 @@ public class BinanceServiceImpl implements BinanceService {
         if (Objects.equals("ETH", symbol)) {
             List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
             for (String CURR : list_currency) {
+
                 String ID = CURR + "_USDT";
-                System.out.println("CHECK: " + ID);
+                String EVENT_LONG_SHORT_CURRENCY = ID + "_" + Utils.getCurrentYyyyMmDdHH();
 
-                List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_4h, 21);
-                String curr_long_short = Utils.checkMa10And20(list_currentcy);
+                if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
 
-                if (Utils.isNotBlank(curr_long_short)) {
+                    System.out.println("CHECK: " + ID);
+                    List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_4h, 21);
+                    String curr_long_short = Utils.checkMa10And20(list_currentcy);
 
-                    String EVENT_LONG_SHORT_CURRENCY = ID + "_" + Utils.getCurrentYyyyMmDdHH();
-                    String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + ID + " (" + curr_long_short + ")";
+                    if (Utils.isNotBlank(curr_long_short)) {
 
-                    if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
+                        String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " " + ID
+                                + Utils.new_line_from_service + curr_long_short;
+
                         fundingHistoryRepository
                                 .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
 
@@ -2997,7 +2997,7 @@ public class BinanceServiceImpl implements BinanceService {
             btc_week_day_trending = curr_week_day_trending;
             btc_is_uptrend_today = list_days.get(0).isUptrend();
 
-            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
+            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 21);
             BtcFutures curr_btc_15m = list_15m.get(0);
 
             if (curr_btc_15m.isBtcKillLongCandle() || curr_btc_15m.isBtcKillShortCandle()) {
@@ -3015,11 +3015,38 @@ public class BinanceServiceImpl implements BinanceService {
                     Utils.sendToTelegram(msg);
                 }
             }
+
+            String cur_time_of_long_short = Utils.checkMa10And20(list_15m);
+            if (Utils.isNotBlank(cur_time_of_long_short)) {
+                String pre_type = "";
+                if (pre_time_of_long_short.contains("Long")) {
+                    pre_type = "Long";
+                } else if (pre_time_of_long_short.contains("Short")) {
+                    pre_type = "Short";
+                }
+
+                String cur_type = "";
+                if (cur_time_of_long_short.contains("Long")) {
+                    cur_type = "Long";
+                } else if (cur_time_of_long_short.contains("Short")) {
+                    cur_type = "Short";
+                }
+
+                if (!Objects.equals(cur_type, pre_type)) {
+                    String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " " + symbol + "(m15)"
+                            + Utils.new_line_from_service;
+                    msg += "pre: " + pre_time_of_long_short + Utils.new_line_from_service;
+                    msg += "now: " + cur_time_of_long_short;
+
+                    Utils.sendToMyTelegram(msg);
+
+                    pre_time_of_long_short = cur_time_of_long_short;
+                }
+            }
         }
 
-        if (Objects.equals("BTC", symbol) || Objects.equals("EHT", symbol)) {
-
-            String resultLongShortH1 = Utils.getScapLongOrShortH1_BTC(list_h1, 10);
+        if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol)) {
+            String resultLongShortH1 = Utils.getScapLongOrShortH1_BTC(list_h1, list_h4, 10);
             if (Utils.isNotBlank(resultLongShortH1)) {
 
                 String EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDdHH();
