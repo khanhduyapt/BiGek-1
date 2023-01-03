@@ -2998,12 +2998,14 @@ public class BinanceServiceImpl implements BinanceService {
             btc_is_uptrend_today = list_days.get(0).isUptrend();
         }
 
-        if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol)) {
+        if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) || Objects.equals("BNB", symbol)) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
             sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
             // sendMsgMonitorLongShort(gecko_id, symbol, list_15m, list_h1, trendh1);
+        } else {
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_h4, "Long");
         }
 
         // ---------------------------------------------------------

@@ -1405,30 +1405,30 @@ public class Utils {
         if (is3cuttingDown15) {
             result = "Short (ma15)" + note_short;
         }
-        if ((ma3p.compareTo(ma3c) > 0) && is3cuttingDown10 && is3cuttingDown20) {
-            result = "Short (ma3p)" + note_short;
-        }
-        if ((ma20c.compareTo(ma3c) > 0) && is3cuttingDown10) {
-            result = "Short (ma3c)" + note_short;
-        }
-        if (is10cuttingDown20) {
-            result = "Short (ma10)" + note_short;
-        }
+//        if ((ma3p.compareTo(ma3c) > 0) && is3cuttingDown10 && is3cuttingDown20) {
+//            result = "Short (ma3p)" + note_short;
+//        }
+//        if ((ma20c.compareTo(ma3c) > 0) && is3cuttingDown10) {
+//            result = "Short (ma3c)" + note_short;
+//        }
+//        if (is10cuttingDown20) {
+//            result = "Short (ma10)" + note_short;
+//        }
 
         // --------------------------------------------------
 
         if (is3cuttingUp15) {
             result = "Long (ma15)" + note_long;
         }
-        if ((ma3p.compareTo(ma3c) < 0) && is3cuttingUp10 && is3cuttingUp20) {
-            result = "Long (ma3p)" + note_long;
-        }
-        if ((ma20c.compareTo(ma3c) < 0) && is3cuttingUp10) {
-            result = "Long (ma3c)" + note_long;
-        }
-        if (is10cuttingUp20) {
-            result = "Long (ma10)" + note_long;
-        }
+//        if ((ma3p.compareTo(ma3c) < 0) && is3cuttingUp10 && is3cuttingUp20) {
+//            result = "Long (ma3p)" + note_long;
+//        }
+//        if ((ma20c.compareTo(ma3c) < 0) && is3cuttingUp10) {
+//            result = "Long (ma3c)" + note_long;
+//        }
+//        if (is10cuttingUp20) {
+//            result = "Long (ma10)" + note_long;
+//        }
 
 //        // ma3p>ma3; ma10p>ma10; ma20p>ma20; ma20>ma10>ma3
 //        if (!ma20Uptrend && isShortPossition && (ma3p.compareTo(ma3c) > 0) && (ma10p.compareTo(ma10c) > 0)
@@ -1594,7 +1594,7 @@ public class Utils {
                 SL = SL.multiply(BigDecimal.valueOf(0.9995));
                 TP1 = low_heigh_tp1.get(1);
                 TP2 = low_heigh_tp2.get(1);
-                change = "(Short???)";
+//                change = "(Short???)";
             } else if (check10and20.contains("Short")) {
                 // check short
                 type = "(Short)";
@@ -1602,7 +1602,7 @@ public class Utils {
                 SL = SL.multiply(BigDecimal.valueOf(1.0005));
                 TP1 = low_heigh_tp1.get(0);
                 TP2 = low_heigh_tp2.get(0);
-                change = "(Long???)";
+//                change = "(Long???)";
             }
 
             BigDecimal curr_price = list_find_entry.get(0).getCurrPrice();
@@ -1674,13 +1674,14 @@ public class Utils {
             } else if (type.contains("Short")) {
                 type = "Short_";
             } else {
-                if (isAboveMALine(list_entry, 10, 0) && isAboveMALine(list_entry, 20, 0)) {
-                    type = "Long_";
-                } else if (isBelowMALine(list_entry, 10, 0) && isBelowMALine(list_entry, 20, 0)) {
-                    type = "Short_";
-                } else {
-                    return "";
-                }
+                return "";
+//                if (isAboveMALine(list_entry, 10, 0) && isAboveMALine(list_entry, 20, 0)) {
+//                    type = "Long_";
+//                } else if (isBelowMALine(list_entry, 10, 0) && isBelowMALine(list_entry, 20, 0)) {
+//                    type = "Short_";
+//                } else {
+//                    return "";
+//                }
             }
 
             String symbol = list_entry.get(0).getId();

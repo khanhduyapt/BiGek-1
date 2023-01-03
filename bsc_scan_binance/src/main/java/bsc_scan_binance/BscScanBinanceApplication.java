@@ -94,7 +94,11 @@ public class BscScanBinanceApplication {
 
                             msg = binance_service.getChartWD("ethereum", "ETH");
                             System.out.println(msg);
-                            wait(2000); // 6000ms=1minute
+                            wait(2000);
+
+                            msg = binance_service.getChartWD("binancecoin", "BNB");
+                            System.out.println(msg);
+                            wait(2000);
                         }
 
                         binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
