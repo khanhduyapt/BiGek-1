@@ -3,6 +3,7 @@ package bsc_scan_binance;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -83,10 +84,17 @@ public class BscScanBinanceApplication {
                         }
 
                         if (idx % 10 == 0) {
-                            binance_service.loadBinanceData("bitcoin", "BTC", startup);
-                            binance_service.loadDataVolumeHour("bitcoin", "BTC");
-                            binance_service.monitorBtcPrice();
-                            wait(6000); // 6000ms=1minute
+                            // binance_service.loadBinanceData("bitcoin", "BTC", startup);
+                            // binance_service.loadDataVolumeHour("bitcoin", "BTC");
+                            // binance_service.monitorBtcPrice();
+
+                            String msg = binance_service.getChartWD("bitcoin", "BTC");
+                            System.out.println(msg);
+                            wait(2000);
+
+                            msg = binance_service.getChartWD("ethereum", "ETH");
+                            System.out.println(msg);
+                            wait(2000); // 6000ms=1minute
                         }
 
                         binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
@@ -99,8 +107,7 @@ public class BscScanBinanceApplication {
                         System.out.println("dkd error LoadData:" + e.getMessage());
                     }
 
-                    // wait(1800);// 200ms=300 * 2 request/minus; 300ms=200 * 2 request/minus
-                    wait(6000);
+                    wait(2000);
 
                     if (Objects.equals(idx, size - 1)) {
 
@@ -137,9 +144,11 @@ public class BscScanBinanceApplication {
 
     }
 
-    public static void wait(int ms) {
+    public static void wait(int number) {
         try {
-            // 360000ms=6minute
+            // Random r = new Random();
+            int ms = 6000;// + r.nextInt(number);
+
             java.lang.Thread.sleep(ms);
         } catch (InterruptedException ex) {
             java.lang.Thread.currentThread().interrupt();

@@ -1302,25 +1302,69 @@ public class Utils {
     public static String checkMa10And20(List<BtcFutures> list) {
         BigDecimal open = list.get(1).getPrice_open_candle();
         BigDecimal close = list.get(1).getPrice_close_candle();
+        int cur = 0;
         int pre = 3;
-        BigDecimal ma3c = calcMA(list, 3, 1);
+        BigDecimal ma3c = calcMA(list, 3, cur);
         BigDecimal ma3p = calcMA(list, 3, pre);
+        boolean isMa3Up = true;
+        if (ma3p.compareTo(ma3c) > 0) {
+            isMa3Up = false;
+        }
 
-        BigDecimal ma10c = calcMA(list, 10, 1);
+        BigDecimal ma10c = calcMA(list, 10, cur);
         BigDecimal ma10p = calcMA(list, 10, pre);
         boolean isMa10Up = true;
         if (ma10p.compareTo(ma10c) > 0) {
             isMa10Up = false;
         }
 
-        BigDecimal ma20c = calcMA(list, 20, 1);
+        BigDecimal ma20c = calcMA(list, 20, cur);
         BigDecimal ma20p = calcMA(list, 20, pre);
         boolean isMa20Up = true;
         if (ma20p.compareTo(ma20c) > 0) {
             isMa20Up = false;
         }
 
+//        BigDecimal ma30c = calcMA(list, 30, cur);
+//        BigDecimal ma30p = calcMA(list, 30, pre);
+//
+//        Boolean ma10AboveMa30 = false;
+//        if (ma10c.compareTo(ma30c) > 0) {
+//            ma10AboveMa30 = true;
+//        }
+
+        // -----------------------------------------------
+        boolean is3cuttingUp10 = false;// Long
+        if ((ma3c.compareTo(ma10c) > 0) && (ma10p.compareTo(ma3p) > 0)) {
+            is3cuttingUp10 = true;
+        }
+        boolean is3cuttingUp20 = false;// Long
+        if ((ma3c.compareTo(ma20c) > 0) && (ma20p.compareTo(ma3p) > 0)) {
+            is3cuttingUp20 = true;
+        }
+        boolean is10cuttingUp20 = false;// Long
+        if ((ma10c.compareTo(ma20c) > 0) && (ma20p.compareTo(ma10p) > 0)) {
+            is10cuttingUp20 = true;
+        }
+
+        // -----------------------------------------------
+        boolean is3cuttingDown10 = false; // Short
+        if ((ma3p.compareTo(ma10p) > 0) && (ma10c.compareTo(ma3c) > 0)) {
+            is3cuttingDown10 = true;
+        }
+        boolean is3cuttingDown20 = false; // Short
+        if ((ma3p.compareTo(ma20p) > 0) && (ma20c.compareTo(ma3c) > 0)) {
+            is3cuttingDown20 = true;
+        }
+        boolean is10cuttingDown20 = false; // Short
+        if ((ma10p.compareTo(ma20p) > 0) && (ma20c.compareTo(ma10c) > 0)) {
+            is10cuttingDown20 = true;
+        }
+        // -----------------------------------------------
         String note_long = "";
+        if (!isMa3Up) {
+            note_long += " Ma3:Down";
+        }
         if (!isMa10Up) {
             note_long += " Ma10:Down";
         }
@@ -1332,6 +1376,9 @@ public class Utils {
         }
 
         String note_short = "";
+        if (isMa3Up) {
+            note_short += " Ma3:Up";
+        }
         if (isMa10Up) {
             note_short += " Ma10:Up";
         }
@@ -1344,55 +1391,85 @@ public class Utils {
 
         // --------------------------------------------------
         String result = "";
-
-        // ma3p>ma3; ma10p>ma10; ma20p>ma20; ma20>ma10>ma3
-        if ((ma3p.compareTo(ma3c) > 0) && (ma10p.compareTo(ma10c) > 0) && (ma20p.compareTo(ma20c) > 0)
-                && (ma20c.compareTo(ma10c) > 0) && (ma10c.compareTo(ma3c) > 0)) {
-            result = "Short(3p>3c;10p>10c;20p>20c;20c>10c>3c)" + note_short;
+        if ((ma3p.compareTo(ma3c) > 0) && is3cuttingDown10 && is3cuttingDown20) {
+            result = "Short (ma3)" + note_short;
+        }
+        if (is10cuttingDown20) {
+            result = "Short (ma10)" + note_short;
         }
 
-        // open > ma20 > ma10 > ma03 > close
-        if ((open.compareTo(close) > 0) && (open.compareTo(ma20c) > 0) && (ma20c.compareTo(ma10c) > 0)
-                && (ma10c.compareTo(ma3c) > 0) && (ma3c.compareTo(close) > 0)) {
-            result = "Short(open>20c>10c>3c>close)" + note_short;
+        if ((ma3p.compareTo(ma3c) < 0) && is3cuttingUp10 && is3cuttingUp20) {
+            result = "Long (ma3)" + note_long;
+        }
+        if (is10cuttingUp20) {
+            result = "Long (ma10)" + note_long;
         }
 
-        // ma3of5 > ma10 > ma20 > ma3
-        if ((ma3p.compareTo(ma10c) > 0) && (ma10c.compareTo(ma20c) > 0) && (ma20c.compareTo(ma3c) > 0)
-                && (ma3p.compareTo(ma3c) > 0)) {
-            result = "Short(3p>10c>20c>3c)" + note_short;
-        }
+//        // ma3p>ma3; ma10p>ma10; ma20p>ma20; ma20>ma10>ma3
+//        if (!ma20Uptrend && isShortPossition && (ma3p.compareTo(ma3c) > 0) && (ma10p.compareTo(ma10c) > 0)
+//                && (ma20p.compareTo(ma20c) > 0) && (ma20c.compareTo(ma10c) > 0) && (ma10c.compareTo(ma3c) > 0)) {
+//            result = "Short (1)(3p>3c;10p>10c;20p>20c;20c>10c>3c)" + note_short;
+//        }
+//
+//        // open > ma20 > ma10 > ma03 > close
+//        if (!ma20Uptrend && isShortPossition && (open.compareTo(close) > 0) && (open.compareTo(ma20c) > 0)
+//                && (ma20c.compareTo(ma10c) > 0) && (ma10c.compareTo(ma3c) > 0) && (ma3c.compareTo(close) > 0)) {
+//            result = "Short (2)(open>20c>10c>3c>close)" + note_short;
+//        }
+//
+//        if (!ma20Uptrend && isShortPossition) {
+//            result = "Short (3)" + note_short;
+//        }
 
-        // ma3p > ma20 > ma10 > ma3
-        if ((ma3p.compareTo(ma20c) > 0) && (ma20c.compareTo(ma10c) > 0) && (ma10c.compareTo(ma3c) > 0)
-                && (ma3p.compareTo(ma3c) > 0)) {
-            result = "Short(3p>20c>10c>3c)" + note_short;
-        }
+//        // ma3of5 > ma10 > ma20 > ma3
+//        if ((ma3p.compareTo(ma10c) > 0) && (ma10c.compareTo(ma20c) > 0) && (ma20c.compareTo(ma3c) > 0)
+//                && (ma3p.compareTo(ma3c) > 0)) {
+//            result = "Short (3)(3p>10c>20c>3c)" + note_short;
+//        }
+//
+//        // ma3p > ma20 > ma10 > ma3
+//        if ((ma3p.compareTo(ma20c) > 0) && (ma20c.compareTo(ma10c) > 0) && (ma10c.compareTo(ma3c) > 0)
+//                && (ma3p.compareTo(ma3c) > 0)) {
+//            result = "Short (4)(3p>20c>10c>3c)" + note_short;
+//        }
 
         // --------------------------------------------------
 
-        // ma3p<ma3; ma10p<ma10; ma20p<ma20; ma20<ma10<ma3
-        if ((ma3p.compareTo(ma3c) < 0) && (ma10p.compareTo(ma10c) < 0) && (ma20p.compareTo(ma20c) < 0)
-                && (ma20c.compareTo(ma10c) < 0) && (ma10c.compareTo(ma3c) < 0)) {
-            result = "Long(3p<3c;10p<10c;20p<20c;20c<10c<3c)" + note_long;
-        }
+//        // ma3p<ma3; ma10p<ma10; ma20p<ma20; ma20<ma10<ma3
+//        if ( isLongPossition && (ma3p.compareTo(ma3c) < 0) && (ma10p.compareTo(ma10c) < 0)
+//                && (ma20p.compareTo(ma20c) < 0) && (ma20c.compareTo(ma10c) < 0) && (ma10c.compareTo(ma3c) < 0)) {
+//            result = "Long (1)(3p<3c;10p<10c;20p<20c;20c<10c<3c)" + note_long;
+//        }
+//
+//        // open < ma20 < ma10 < ma03 < close
+//        if ( && isLongPossition && (open.compareTo(close) < 0) && (open.compareTo(ma20c) < 0)
+//                && (ma20c.compareTo(ma10c) < 0) && (ma10c.compareTo(ma3c) < 0) && (ma3c.compareTo(close) < 0)) {
+//            result = "Long (2)(open<20c<10c<3c<close)" + note_long;
+//        }
+//
+//        if (ma20Uptrend && isLongPossition) {
+//            result = "Long (3)" + note_long;
+//        }
 
-        // open < ma20 < ma10 < ma03 <close
-        if ((open.compareTo(close) < 0) && (open.compareTo(ma20c) < 0) && (ma20c.compareTo(ma10c) < 0)
-                && (ma10c.compareTo(ma3c) < 0) && (ma3c.compareTo(close) < 0)) {
-            result = "Long(open<20c<10c<3c<close)" + note_long;
-        }
+//        // ma3of5 < ma20 < ma10 < ma3
+//        if ((ma3p.compareTo(ma20c) < 0) && (ma20c.compareTo(ma10c) < 0) && (ma10c.compareTo(ma3c) < 0)
+//                && (ma3p.compareTo(ma3c) < 0)) {
+//            result = "Long (3)(3p<20c<10c<3c)" + note_long;
+//        }
+//
+//        // ma3p < ma10 < ma20 < ma3
+//        if ((ma3p.compareTo(ma10c) < 0) && (ma10c.compareTo(ma20c) < 0) && (ma20c.compareTo(ma3c) < 0)
+//                && (ma3p.compareTo(ma3c) < 0)) {
+//            result = "Long (4)(3p<10c<20c<3c)" + note_long;
+//        }
 
-        // ma3of5 < ma20 < ma10 < ma3
-        if ((ma3p.compareTo(ma20c) < 0) && (ma20c.compareTo(ma10c) < 0) && (ma10c.compareTo(ma3c) < 0)
-                && (ma3p.compareTo(ma3c) < 0)) {
-            result = "Long(3p<20c<10c<3c)" + note_long;
-        }
+        // --------------------------------------------------
 
-        // ma3p < ma10 < ma20 < ma3
-        if ((ma3p.compareTo(ma10c) < 0) && (ma10c.compareTo(ma20c) < 0) && (ma20c.compareTo(ma3c) < 0)
-                && (ma3p.compareTo(ma3c) < 0)) {
-            result = "Long(3p<10c<20c<3c)" + note_long;
+        if (isNotBlank(result)) {
+            String symbol = list.get(0).getId();
+            symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
+
+            System.out.println("checkMa10And20: " + symbol + ": " + result);
         }
 
         return result;
@@ -1463,86 +1540,96 @@ public class Utils {
         return result;
     }
 
-    public static String getScapLongOrShortH1_BTC(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
+    public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_sl_tp,
+            int usd) {
         try {
-            String type = checkMa10And20(list_entry);
+            String check10and20 = checkMa10And20(list_find_entry);
 
-            if (Utils.isBlank(type)) {
+            if (Utils.isBlank(check10and20)) {
                 return "";
             }
 
-            String symbol = list_entry.get(0).getId();
+            String symbol = list_find_entry.get(0).getId();
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
 
-            List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_entry);
-            List<BigDecimal> low_heigh_tp2 = getLowHeightCandle(list_tp);
-            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_entry.subList(0, 10));
+            List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_sl_tp.subList(0, 20));
+            List<BigDecimal> low_heigh_tp2 = getLowHeightCandle(list_sl_tp);
+            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_sl_tp.subList(0, 10));
 
             // BigDecimal ma10 = calcMA(list_entry, 10, 0);
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP1 = BigDecimal.ZERO;
             BigDecimal TP2 = BigDecimal.ZERO;
-            if (type.contains("Long")) {
+            String type = "";
+            String change = "";
+            if (check10and20.contains("Long")) {
                 type = "(Long)";
                 // check long
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.9995));
-                TP2 = low_heigh_tp1.get(1);
+                TP1 = low_heigh_tp1.get(1);
                 TP2 = low_heigh_tp2.get(1);
-            } else if (type.contains("Short")) {
+                change = "(Short???)";
+            } else if (check10and20.contains("Short")) {
                 // check short
                 type = "(Short)";
                 SL = low_heigh_sl.get(1);
                 SL = SL.multiply(BigDecimal.valueOf(1.0005));
                 TP1 = low_heigh_tp1.get(0);
                 TP2 = low_heigh_tp2.get(0);
+                change = "(Long???)";
             }
 
-            BigDecimal curr_price = list_entry.get(0).getCurrPrice();
-
+            BigDecimal curr_price = list_find_entry.get(0).getCurrPrice();
             BigDecimal entry = curr_price;
             SL = formatPrice(SL, 5);
             TP1 = formatPrice(TP1, 5);
+            TP2 = formatPrice(TP2, 5);
             if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
                 entry = formatPrice(entry, 3);
                 SL = formatPrice(SL, 3);
                 TP1 = formatPrice(TP1, 3);
+                TP2 = formatPrice(TP2, 3);
             }
 
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
             vol = formatPrice(vol.multiply(entry).abs(), 0);
 
-            BigDecimal earn = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            earn = formatPrice(vol.multiply(earn), 1);
-            if (earn.compareTo(BigDecimal.valueOf(1)) < 0) {
-                return "";
-            }
+            BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+            earn1 = formatPrice(vol.multiply(earn1), 1);
+
+            BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+            earn2 = formatPrice(vol.multiply(earn2), 1);
 
             String result = type + symbol;
             result += ",,E1(now): " + removeLastZero(entry);
             result += ",SL: " + getPercentToEntry(entry, SL, false);
             result += ",TP1: " + getPercentToEntry(entry, TP1, false);
             result += ". TP2: " + getPercentToEntry(entry, TP2, false);
-            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn: "
-                    + removeLastZero(earn) + "$";
+            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn1: "
+                    + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
 
             // --------------------------------------
-            entry = calcMA(list_entry, 10, 0);
+            entry = calcMA(list_find_entry, 10, 0);
             vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
             vol = formatPrice(vol.multiply(entry).abs(), 0);
-            earn = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            earn = formatPrice(vol.multiply(earn), 1);
-            if (earn.compareTo(BigDecimal.valueOf(1)) < 0) {
-                return "";
-            }
+            earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+            earn1 = formatPrice(vol.multiply(earn1), 1);
+
+            earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+            earn2 = formatPrice(vol.multiply(earn2), 1);
 
             result += ",,E2(Ma10): " + getPercentToEntry(curr_price, entry, true);
             result += ",SL: " + getPercentToEntry(entry, SL, false);
             result += ",TP1: " + getPercentToEntry(entry, TP1, false);
             result += ". TP2: " + getPercentToEntry(entry, TP2, false);
-            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn: "
-                    + removeLastZero(earn) + "$";
+            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn1: "
+                    + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
 
+            result += ",," + check10and20;
+            if (earn1.compareTo(BigDecimal.valueOf(usd / 3)) < 0) {
+                result += change;
+            }
             System.out.println(result);
             return result;
 
