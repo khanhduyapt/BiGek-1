@@ -1392,14 +1392,21 @@ public class Utils {
         // --------------------------------------------------
         String result = "";
         if ((ma3p.compareTo(ma3c) > 0) && is3cuttingDown10 && is3cuttingDown20) {
-            result = "Short (ma3)" + note_short;
+            result = "Short (ma3p)" + note_short;
+        }
+        if ((ma20c.compareTo(ma3c) > 0) && is3cuttingDown10) {
+            result = "Short (ma3c)" + note_short;
         }
         if (is10cuttingDown20) {
             result = "Short (ma10)" + note_short;
         }
 
+        // --------------------------------------------------
         if ((ma3p.compareTo(ma3c) < 0) && is3cuttingUp10 && is3cuttingUp20) {
-            result = "Long (ma3)" + note_long;
+            result = "Long (ma3p)" + note_long;
+        }
+        if ((ma20c.compareTo(ma3c) < 0) && is3cuttingUp10) {
+            result = "Short (ma3c)" + note_short;
         }
         if (is10cuttingUp20) {
             result = "Long (ma10)" + note_long;
@@ -1601,8 +1608,11 @@ public class Utils {
             BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn2 = formatPrice(vol.multiply(earn2), 1);
 
+            BigDecimal ma10 = calcMA(list_find_entry, 10, 0);
+
             String result = type + symbol;
             result += ",,E1(now): " + removeLastZero(entry);
+            result += " E2(ma10): " + getPercentToEntry(curr_price, ma10, true);
             result += ",SL: " + getPercentToEntry(entry, SL, false);
             result += ",TP1: " + getPercentToEntry(entry, TP1, false);
             result += ". TP2: " + getPercentToEntry(entry, TP2, false);
@@ -1610,21 +1620,21 @@ public class Utils {
                     + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
 
             // --------------------------------------
-            entry = calcMA(list_find_entry, 10, 0);
-            vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-            vol = formatPrice(vol.multiply(entry).abs(), 0);
-            earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            earn1 = formatPrice(vol.multiply(earn1), 1);
-
-            earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            earn2 = formatPrice(vol.multiply(earn2), 1);
-
-            result += ",,E2(Ma10): " + getPercentToEntry(curr_price, entry, true);
-            result += ",SL: " + getPercentToEntry(entry, SL, false);
-            result += ",TP1: " + getPercentToEntry(entry, TP1, false);
-            result += ". TP2: " + getPercentToEntry(entry, TP2, false);
-            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn1: "
-                    + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
+//            entry = ma10;
+//            vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
+//            vol = formatPrice(vol.multiply(entry).abs(), 0);
+//            earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+//            earn1 = formatPrice(vol.multiply(earn1), 1);
+//
+//            earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+//            earn2 = formatPrice(vol.multiply(earn2), 1);
+//
+//            result += ",,E2(Ma10): " + getPercentToEntry(curr_price, entry, true);
+//            result += ",SL: " + getPercentToEntry(entry, SL, false);
+//            result += ",TP1: " + getPercentToEntry(entry, TP1, false);
+//            result += ". TP2: " + getPercentToEntry(entry, TP2, false);
+//            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn1: "
+//                    + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
 
             result += ",," + check10and20;
             if (earn1.compareTo(BigDecimal.valueOf(usd / 3)) < 0) {

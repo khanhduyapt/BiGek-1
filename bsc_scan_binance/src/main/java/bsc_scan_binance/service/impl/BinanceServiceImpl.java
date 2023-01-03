@@ -2999,10 +2999,10 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol)) {
-            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 21);
+            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            String trendh1 = sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
             // sendMsgMonitorLongShort(gecko_id, symbol, list_15m, list_h1, trendh1);
         }
 
