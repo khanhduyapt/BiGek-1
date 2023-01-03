@@ -1318,6 +1318,9 @@ public class Utils {
             isMa10Up = false;
         }
 
+        BigDecimal ma15c = calcMA(list, 15, cur);
+        BigDecimal ma15p = calcMA(list, 15, pre);
+
         BigDecimal ma20c = calcMA(list, 20, cur);
         BigDecimal ma20p = calcMA(list, 20, pre);
         boolean isMa20Up = true;
@@ -1338,6 +1341,10 @@ public class Utils {
         if ((ma3c.compareTo(ma10c) > 0) && (ma10p.compareTo(ma3p) > 0)) {
             is3cuttingUp10 = true;
         }
+        boolean is3cuttingUp15 = false;// Long
+        if ((ma3c.compareTo(ma15c) > 0) && (ma15p.compareTo(ma3p) > 0)) {
+            is3cuttingUp15 = true;
+        }
         boolean is3cuttingUp20 = false;// Long
         if ((ma3c.compareTo(ma20c) > 0) && (ma20p.compareTo(ma3p) > 0)) {
             is3cuttingUp20 = true;
@@ -1351,6 +1358,10 @@ public class Utils {
         boolean is3cuttingDown10 = false; // Short
         if ((ma3p.compareTo(ma10p) > 0) && (ma10c.compareTo(ma3c) > 0)) {
             is3cuttingDown10 = true;
+        }
+        boolean is3cuttingDown15 = false; // Short
+        if ((ma3p.compareTo(ma15p) > 0) && (ma15c.compareTo(ma3c) > 0)) {
+            is3cuttingDown15 = true;
         }
         boolean is3cuttingDown20 = false; // Short
         if ((ma3p.compareTo(ma20p) > 0) && (ma20c.compareTo(ma3c) > 0)) {
@@ -1391,6 +1402,9 @@ public class Utils {
 
         // --------------------------------------------------
         String result = "";
+        if (is3cuttingDown15) {
+            result = "Short (ma15)" + note_short;
+        }
         if ((ma3p.compareTo(ma3c) > 0) && is3cuttingDown10 && is3cuttingDown20) {
             result = "Short (ma3p)" + note_short;
         }
@@ -1403,6 +1417,9 @@ public class Utils {
 
         // --------------------------------------------------
 
+        if (is3cuttingUp15) {
+            result = "Long (ma15)" + note_long;
+        }
         if ((ma3p.compareTo(ma3c) < 0) && is3cuttingUp10 && is3cuttingUp20) {
             result = "Long (ma3p)" + note_long;
         }
@@ -1651,18 +1668,19 @@ public class Utils {
 
     public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_sl, int usd) {
         try {
-            String type = "";
-
-            if (isAboveMALine(list_entry, 10, 0) && isAboveMALine(list_entry, 20, 0)) {
-
+            String type = checkMa10And20(list_entry);
+            if (type.contains("Long")) {
                 type = "Long_";
-
-            } else if (isBelowMALine(list_entry, 10, 0) && isBelowMALine(list_entry, 20, 0)) {
-
+            } else if (type.contains("Short")) {
                 type = "Short_";
-
             } else {
-                return "";
+                if (isAboveMALine(list_entry, 10, 0) && isAboveMALine(list_entry, 20, 0)) {
+                    type = "Long_";
+                } else if (isBelowMALine(list_entry, 10, 0) && isBelowMALine(list_entry, 20, 0)) {
+                    type = "Short_";
+                } else {
+                    return "";
+                }
             }
 
             String symbol = list_entry.get(0).getId();
