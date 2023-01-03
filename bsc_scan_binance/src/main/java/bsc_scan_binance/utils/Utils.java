@@ -1402,11 +1402,12 @@ public class Utils {
         }
 
         // --------------------------------------------------
+
         if ((ma3p.compareTo(ma3c) < 0) && is3cuttingUp10 && is3cuttingUp20) {
             result = "Long (ma3p)" + note_long;
         }
         if ((ma20c.compareTo(ma3c) < 0) && is3cuttingUp10) {
-            result = "Short (ma3c)" + note_short;
+            result = "Long (ma3c)" + note_long;
         }
         if (is10cuttingUp20) {
             result = "Long (ma10)" + note_long;
