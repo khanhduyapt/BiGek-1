@@ -1312,16 +1312,16 @@ public class Utils {
 
         int ma_slow = 10;
         if (symbol.contains("_1h_")) {
-            ma_slow = 15;
+            ma_slow = 13;
         }
         if (symbol.contains("_4h_")) {
-            ma_slow = 15;
+            ma_slow = 13;
         }
         if (symbol.contains("_1d_")) {
-            ma_slow = 7;
+            ma_slow = 8;
         }
         if (symbol.contains("_1w_")) {
-            ma_slow = 6;
+            ma_slow = 8;
         }
         return ma_slow;
     }
@@ -1333,37 +1333,37 @@ public class Utils {
 
         int cur = 0;
         int pre = 3;
-        BigDecimal ma3c = calcMA(list, 3, cur);
-        BigDecimal ma3p = calcMA(list, 3, pre);
+        BigDecimal ma5c = calcMA(list, 5, cur);
+        BigDecimal ma5p = calcMA(list, 5, pre);
         boolean isMa3Up = true;
-        if (ma3p.compareTo(ma3c) > 0) {
+        if (ma5p.compareTo(ma5c) > 0) {
             isMa3Up = false;
         }
 
-        BigDecimal ma15c = calcMA(list, ma_slow, cur);
-        BigDecimal ma15p = calcMA(list, ma_slow, pre);
-        boolean isMa15Up = true;
-        if (ma15p.compareTo(ma15c) > 0) {
-            isMa15Up = false;
+        BigDecimal ma13c = calcMA(list, ma_slow, cur);
+        BigDecimal ma13p = calcMA(list, ma_slow, pre);
+        boolean isMa13Up = true;
+        if (ma13p.compareTo(ma13c) > 0) {
+            isMa13Up = false;
         }
 
         // -----------------------------------------------
-        boolean is3cuttingUp15 = false;// Long
-        if ((ma3c.compareTo(ma15c) > 0) && (ma15p.compareTo(ma3p) > 0)) {
-            is3cuttingUp15 = true;
+        boolean is5cuttingUp13 = false;// Long
+        if ((ma5c.compareTo(ma13c) > 0) && (ma13p.compareTo(ma5p) > 0)) {
+            is5cuttingUp13 = true;
         }
 
         // -----------------------------------------------
         boolean is3cuttingDown15 = false; // Short
-        if ((ma3p.compareTo(ma15p) > 0) && (ma15c.compareTo(ma3c) > 0)) {
+        if ((ma5p.compareTo(ma13p) > 0) && (ma13c.compareTo(ma5c) > 0)) {
             is3cuttingDown15 = true;
         }
         // -----------------------------------------------
         String note_long = "";
         if (!isMa3Up) {
-            note_long += " Ma3:Down";
+            note_long += " Ma5:Down";
         }
-        if (!isMa15Up) {
+        if (!isMa13Up) {
             note_long += " Ma" + ma_slow + ":Down";
         }
         if (isNotBlank(note_long)) {
@@ -1372,9 +1372,9 @@ public class Utils {
 
         String note_short = "";
         if (isMa3Up) {
-            note_short += " Ma3:Up";
+            note_short += " Ma5:Up";
         }
-        if (isMa15Up) {
+        if (isMa13Up) {
             note_short += " Ma" + ma_slow + ":Up";
         }
         if (isNotBlank(note_short)) {
@@ -1389,227 +1389,9 @@ public class Utils {
 
         // --------------------------------------------------
 
-        if (is3cuttingUp15) {
+        if (is5cuttingUp13) {
             result = "Long (ma" + ma_slow + ")" + note_long;
         }
-
-        // --------------------------------------------------
-
-        if (isNotBlank(result)) {
-            symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
-
-            System.out.println("checkMa10And20: " + symbol + ": " + result);
-        }
-
-        return result;
-    }
-
-    public static String checkMa10And20_Deleted(List<BtcFutures> list) {
-        String symbol = list.get(0).getId();
-        //symbol = symbol.replace("_00", "").replace("_1d_", "_D").replace("_1h_", "(H1)").replace("_4h_", "(H4)");
-        int ma_slow = 10;
-        if (symbol.contains("_1h_")) {
-            ma_slow = 15;
-        }
-
-        if (symbol.contains("_4h_")) {
-            ma_slow = 10;
-        }
-        if (symbol.contains("_1d_")) {
-            ma_slow = 7;
-        }
-        if (symbol.contains("_1w_")) {
-            ma_slow = 6;
-        }
-
-        BigDecimal open = list.get(1).getPrice_open_candle();
-        BigDecimal close = list.get(1).getPrice_close_candle();
-        int cur = 0;
-        int pre = 3;
-        BigDecimal ma3c = calcMA(list, 3, cur);
-        BigDecimal ma3p = calcMA(list, 3, pre);
-        boolean isMa3Up = true;
-        if (ma3p.compareTo(ma3c) > 0) {
-            isMa3Up = false;
-        }
-
-        BigDecimal ma10c = calcMA(list, 10, cur);
-        BigDecimal ma10p = calcMA(list, 10, pre);
-        boolean isMa10Up = true;
-        if (ma10p.compareTo(ma10c) > 0) {
-            isMa10Up = false;
-        }
-
-        BigDecimal ma15c = calcMA(list, 15, cur);
-        BigDecimal ma15p = calcMA(list, 15, pre);
-
-        BigDecimal ma20c = calcMA(list, 20, cur);
-        BigDecimal ma20p = calcMA(list, 20, pre);
-
-        boolean isMa20Up = true;
-        if (ma20p.compareTo(ma20c) > 0) {
-            isMa20Up = false;
-        }
-
-        //        BigDecimal ma30c = calcMA(list, 30, cur);
-        //        BigDecimal ma30p = calcMA(list, 30, pre);
-        //
-        //        Boolean ma10AboveMa30 = false;
-        //        if (ma10c.compareTo(ma30c) > 0) {
-        //            ma10AboveMa30 = true;
-        //        }
-
-        // -----------------------------------------------
-        boolean is3cuttingUp10 = false;// Long
-        if ((ma3c.compareTo(ma10c) > 0) && (ma10p.compareTo(ma3p) > 0)) {
-            is3cuttingUp10 = true;
-        }
-        boolean is3cuttingUp15 = false;// Long
-        if ((ma3c.compareTo(ma15c) > 0) && (ma15p.compareTo(ma3p) > 0)) {
-            is3cuttingUp15 = true;
-        }
-        boolean is3cuttingUp20 = false;// Long
-        if ((ma3c.compareTo(ma20c) > 0) && (ma20p.compareTo(ma3p) > 0)) {
-            is3cuttingUp20 = true;
-        }
-        boolean is10cuttingUp20 = false;// Long
-        if ((ma10c.compareTo(ma20c) > 0) && (ma20p.compareTo(ma10p) > 0)) {
-            is10cuttingUp20 = true;
-        }
-
-        // -----------------------------------------------
-        boolean is3cuttingDown10 = false; // Short
-        if ((ma3p.compareTo(ma10p) > 0) && (ma10c.compareTo(ma3c) > 0)) {
-            is3cuttingDown10 = true;
-        }
-        boolean is3cuttingDown15 = false; // Short
-        if ((ma3p.compareTo(ma15p) > 0) && (ma15c.compareTo(ma3c) > 0)) {
-            is3cuttingDown15 = true;
-        }
-        boolean is3cuttingDown20 = false; // Short
-        if ((ma3p.compareTo(ma20p) > 0) && (ma20c.compareTo(ma3c) > 0)) {
-            is3cuttingDown20 = true;
-        }
-        boolean is10cuttingDown20 = false; // Short
-        if ((ma10p.compareTo(ma20p) > 0) && (ma20c.compareTo(ma10c) > 0)) {
-            is10cuttingDown20 = true;
-        }
-        // -----------------------------------------------
-        String note_long = "";
-        if (!isMa3Up) {
-            note_long += " Ma3:Down";
-        }
-        if (!isMa10Up) {
-            note_long += " Ma10:Down";
-        }
-        if (!isMa20Up) {
-            note_long += " Ma20:Down";
-        }
-        if (isNotBlank(note_long)) {
-            note_long = " (Remark)" + note_long;
-        }
-
-        String note_short = "";
-        if (isMa3Up) {
-            note_short += " Ma3:Up";
-        }
-        if (isMa10Up) {
-            note_short += " Ma10:Up";
-        }
-        if (isMa20Up) {
-            note_short += " Ma20:Up";
-        }
-        if (isNotBlank(note_short)) {
-            note_short = " (Remark)" + note_short;
-        }
-
-        // --------------------------------------------------
-        String result = "";
-        if (is3cuttingDown15) {
-            result = "Short (ma15)" + note_short;
-        }
-        //        if ((ma3p.compareTo(ma3c) > 0) && is3cuttingDown10 && is3cuttingDown20) {
-        //            result = "Short (ma3p)" + note_short;
-        //        }
-        //        if ((ma20c.compareTo(ma3c) > 0) && is3cuttingDown10) {
-        //            result = "Short (ma3c)" + note_short;
-        //        }
-        //        if (is10cuttingDown20) {
-        //            result = "Short (ma10)" + note_short;
-        //        }
-
-        // --------------------------------------------------
-
-        if (is3cuttingUp15) {
-            result = "Long (ma15)" + note_long;
-        }
-        //        if ((ma3p.compareTo(ma3c) < 0) && is3cuttingUp10 && is3cuttingUp20) {
-        //            result = "Long (ma3p)" + note_long;
-        //        }
-        //        if ((ma20c.compareTo(ma3c) < 0) && is3cuttingUp10) {
-        //            result = "Long (ma3c)" + note_long;
-        //        }
-        //        if (is10cuttingUp20) {
-        //            result = "Long (ma10)" + note_long;
-        //        }
-
-        //        // ma3p>ma3; ma10p>ma10; ma20p>ma20; ma20>ma10>ma3
-        //        if (!ma20Uptrend && isShortPossition && (ma3p.compareTo(ma3c) > 0) && (ma10p.compareTo(ma10c) > 0)
-        //                && (ma20p.compareTo(ma20c) > 0) && (ma20c.compareTo(ma10c) > 0) && (ma10c.compareTo(ma3c) > 0)) {
-        //            result = "Short (1)(3p>3c;10p>10c;20p>20c;20c>10c>3c)" + note_short;
-        //        }
-        //
-        //        // open > ma20 > ma10 > ma03 > close
-        //        if (!ma20Uptrend && isShortPossition && (open.compareTo(close) > 0) && (open.compareTo(ma20c) > 0)
-        //                && (ma20c.compareTo(ma10c) > 0) && (ma10c.compareTo(ma3c) > 0) && (ma3c.compareTo(close) > 0)) {
-        //            result = "Short (2)(open>20c>10c>3c>close)" + note_short;
-        //        }
-        //
-        //        if (!ma20Uptrend && isShortPossition) {
-        //            result = "Short (3)" + note_short;
-        //        }
-
-        //        // ma3of5 > ma10 > ma20 > ma3
-        //        if ((ma3p.compareTo(ma10c) > 0) && (ma10c.compareTo(ma20c) > 0) && (ma20c.compareTo(ma3c) > 0)
-        //                && (ma3p.compareTo(ma3c) > 0)) {
-        //            result = "Short (3)(3p>10c>20c>3c)" + note_short;
-        //        }
-        //
-        //        // ma3p > ma20 > ma10 > ma3
-        //        if ((ma3p.compareTo(ma20c) > 0) && (ma20c.compareTo(ma10c) > 0) && (ma10c.compareTo(ma3c) > 0)
-        //                && (ma3p.compareTo(ma3c) > 0)) {
-        //            result = "Short (4)(3p>20c>10c>3c)" + note_short;
-        //        }
-
-        // --------------------------------------------------
-
-        //        // ma3p<ma3; ma10p<ma10; ma20p<ma20; ma20<ma10<ma3
-        //        if ( isLongPossition && (ma3p.compareTo(ma3c) < 0) && (ma10p.compareTo(ma10c) < 0)
-        //                && (ma20p.compareTo(ma20c) < 0) && (ma20c.compareTo(ma10c) < 0) && (ma10c.compareTo(ma3c) < 0)) {
-        //            result = "Long (1)(3p<3c;10p<10c;20p<20c;20c<10c<3c)" + note_long;
-        //        }
-        //
-        //        // open < ma20 < ma10 < ma03 < close
-        //        if ( && isLongPossition && (open.compareTo(close) < 0) && (open.compareTo(ma20c) < 0)
-        //                && (ma20c.compareTo(ma10c) < 0) && (ma10c.compareTo(ma3c) < 0) && (ma3c.compareTo(close) < 0)) {
-        //            result = "Long (2)(open<20c<10c<3c<close)" + note_long;
-        //        }
-        //
-        //        if (ma20Uptrend && isLongPossition) {
-        //            result = "Long (3)" + note_long;
-        //        }
-
-        //        // ma3of5 < ma20 < ma10 < ma3
-        //        if ((ma3p.compareTo(ma20c) < 0) && (ma20c.compareTo(ma10c) < 0) && (ma10c.compareTo(ma3c) < 0)
-        //                && (ma3p.compareTo(ma3c) < 0)) {
-        //            result = "Long (3)(3p<20c<10c<3c)" + note_long;
-        //        }
-        //
-        //        // ma3p < ma10 < ma20 < ma3
-        //        if ((ma3p.compareTo(ma10c) < 0) && (ma10c.compareTo(ma20c) < 0) && (ma20c.compareTo(ma3c) < 0)
-        //                && (ma3p.compareTo(ma3c) < 0)) {
-        //            result = "Long (4)(3p<10c<20c<3c)" + note_long;
-        //        }
 
         // --------------------------------------------------
 

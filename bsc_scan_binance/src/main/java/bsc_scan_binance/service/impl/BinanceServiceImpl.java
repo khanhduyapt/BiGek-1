@@ -898,7 +898,9 @@ public class BinanceServiceImpl implements BinanceService {
                             css.setRange_move(m2ma);
                             if (m2ma.contains("↑D")) {
                                 css.setRange_move_css(CSS_PRICE_WHITE);
-                            } else if (m2ma.contains("↓D")) {
+                            } else if (m2ma.contains("↑W")) {
+                                css.setRange_move_css(CSS_PRICE_SUCCESS);
+                            } else if (m2ma.contains("↓")) {
                                 css.setRange_move_css(CSS_PRICE_WARNING);
                             }
                         } catch (Exception e) {
@@ -949,7 +951,7 @@ public class BinanceServiceImpl implements BinanceService {
                         futu = futu.replace("_Position", "");
 
                         css.setRange_position("W:Uptrend");
-                        css.setRange_position_css(CSS_PRICE_SUCCESS);
+                        css.setRange_position_css(CSS_PRICE_SUCCESS + " bg-success");
 
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
@@ -3038,7 +3040,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String mUpMa = "";
         //boolean chartDUpMa10 = Utils.isAboveMALine(list_days, 10, 0);
-        mUpMa += checkW.contains("Long") ? "↑W(ma" + Utils.getSlowIndex(list_weeks) + ") " : " ";
+        //mUpMa += checkW.contains("Long") ? "↑W(ma" + Utils.getSlowIndex(list_weeks) + ") " : " ";
         mUpMa += checkD.contains("Long") ? "↑D(ma" + Utils.getSlowIndex(list_days) + ") " : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move" + mUpMa.trim();
@@ -3046,7 +3048,6 @@ public class BinanceServiceImpl implements BinanceService {
 
         String mDownMa = "";
         //boolean chartDTodayCutDown = Utils.isBelowMALine(list_days, 10, 0);
-        mDownMa += checkW.contains("Short") ? "↓W(ma" + Utils.getSlowIndex(list_weeks) + ") " : "";
         mDownMa += checkD.contains("Short") ? "↓D(ma" + Utils.getSlowIndex(list_days) + ") " : "";
 
         if (Utils.isNotBlank(mDownMa)) {
