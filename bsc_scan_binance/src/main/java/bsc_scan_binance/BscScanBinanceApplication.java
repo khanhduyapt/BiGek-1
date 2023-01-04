@@ -3,7 +3,6 @@ package bsc_scan_binance;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
