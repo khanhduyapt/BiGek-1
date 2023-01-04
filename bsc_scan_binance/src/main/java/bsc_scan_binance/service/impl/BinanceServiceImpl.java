@@ -1700,23 +1700,19 @@ public class BinanceServiceImpl implements BinanceService {
 
                 @SuppressWarnings("unchecked")
                 List<Object> arr_usdt = (List<Object>) obj_usdt;
-                @SuppressWarnings("unchecked")
-                List<Object> arr_busd = (List<Object>) obj_busd;
+                if (arr_usdt.size() < 8) {
+                    arr_usdt = (List<Object>) obj_busd;
+                }
+
+                if (arr_usdt.size() < 8) {
+                    continue;
+                }
 
                 BigDecimal price_open_candle = Utils.getBigDecimal(arr_usdt.get(1));
                 BigDecimal price_high = Utils.getBigDecimal(arr_usdt.get(2));
                 BigDecimal price_low = Utils.getBigDecimal(arr_usdt.get(3));
                 BigDecimal price_close_candle = Utils.getBigDecimal(arr_usdt.get(4));
                 String open_time = arr_usdt.get(0).toString();
-
-                if (Objects.equals("0", open_time)) {
-                    price_open_candle = Utils.getBigDecimal(arr_busd.get(1));
-                    price_high = Utils.getBigDecimal(arr_busd.get(2)); // High price
-                    price_low = Utils.getBigDecimal(arr_busd.get(3)); // Low price
-                    price_close_candle = Utils.getBigDecimal(arr_busd.get(4));
-
-                    open_time = arr_busd.get(0).toString();
-                }
 
                 if (!Objects.equals("0", open_time)) {
                     BigDecimal avgPrice = price_open_candle;
@@ -1727,9 +1723,9 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal quote_asset_volume1 = Utils.getBigDecimal(arr_usdt.get(7));
                     BigDecimal number_of_trades1 = Utils.getBigDecimal(arr_usdt.get(8));
 
-                    BigDecimal quote_asset_volume2 = arr_busd.size() > 7 ? Utils.getBigDecimal(arr_busd.get(7))
+                    BigDecimal quote_asset_volume2 = arr_usdt.size() > 7 ? Utils.getBigDecimal(arr_usdt.get(7))
                             : BigDecimal.ZERO;
-                    BigDecimal number_of_trades2 = arr_busd.size() > 8 ? Utils.getBigDecimal(arr_busd.get(8))
+                    BigDecimal number_of_trades2 = arr_usdt.size() > 8 ? Utils.getBigDecimal(arr_usdt.get(8))
                             : BigDecimal.ZERO;
 
                     BigDecimal total_volume = quote_asset_volume1.add(quote_asset_volume2);
@@ -2910,6 +2906,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         return result;
     }
+    // clearTrash
 
     @Override
     @Transactional
@@ -2976,8 +2973,8 @@ public class BinanceServiceImpl implements BinanceService {
                     if (Utils.isNotBlank(curr_long_short)) {
 
                         String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " "
-                                + list_currentcy.get(0).getId().replace("_00", "")
-                                + Utils.new_line_from_service + curr_long_short;
+                                + list_currentcy.get(0).getId().replace("_00", "") + Utils.new_line_from_service
+                                + curr_long_short;
 
                         fundingHistoryRepository
                                 .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
@@ -3028,10 +3025,9 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
-            // sendMsgMonitorLongShort(gecko_id, symbol, list_15m, list_h1, trendh1);
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
         } else if (type.contains("Futures")) {
-            // sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_h4, "Long");
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
         }
 
         // ---------------------------------------------------------
@@ -3039,15 +3035,16 @@ public class BinanceServiceImpl implements BinanceService {
         String checkD = Utils.checkMa10And20(list_days);
 
         String mUpMa = "";
-        //boolean chartDUpMa10 = Utils.isAboveMALine(list_days, 10, 0);
-        //mUpMa += checkW.contains("Long") ? "↑W(ma" + Utils.getSlowIndex(list_weeks) + ") " : " ";
+        // boolean chartDUpMa10 = Utils.isAboveMALine(list_days, 10, 0);
+        // mUpMa += checkW.contains("Long") ? "↑W(ma" + Utils.getSlowIndex(list_weeks) +
+        // ") " : " ";
         mUpMa += checkD.contains("Long") ? "↑D(ma" + Utils.getSlowIndex(list_days) + ") " : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move" + mUpMa.trim();
         }
 
         String mDownMa = "";
-        //boolean chartDTodayCutDown = Utils.isBelowMALine(list_days, 10, 0);
+        // boolean chartDTodayCutDown = Utils.isBelowMALine(list_days, 10, 0);
         mDownMa += checkD.contains("Short") ? "↓D(ma" + Utils.getSlowIndex(list_days) + ") " : "";
 
         if (Utils.isNotBlank(mDownMa)) {
@@ -3101,15 +3098,15 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_sl_tp, String trend) {
 
         String current_trend = "";
-        String result = Utils.getScapLongOrShort_BTC(list_find_entry, list_sl_tp, 10);
+        String result = Utils.getScapLongOrShort_BTC(list_find_entry, list_sl_tp, 5);
+
         if (Utils.isNotBlank(result)) {
 
-            String EVENT_LONG_SHORT = symbol + "_" + Utils.getToday_YyyyMMdd();
-            if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) || Objects.equals("BNB", symbol)) {
-                EVENT_LONG_SHORT = symbol + "_" + Utils.getTimeChangeDailyChart();
-            } else {
-                EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
-            }
+            String EVENT_LONG_SHORT = symbol + "_" + Utils.getTimeChangeDailyChart();
+            // if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) ||
+            // Objects.equals("BNB", symbol)) {
+            // EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
+            // }
 
             if (result.toUpperCase().contains("LONG")) {
                 EVENT_LONG_SHORT += "_Long";
