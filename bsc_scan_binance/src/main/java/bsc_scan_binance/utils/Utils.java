@@ -698,6 +698,14 @@ public class Utils {
         return Utils.convertDateToString("yyyyMMdd_HH", Calendar.getInstance().getTime());
     }
 
+    public static String getCurrentYyyyMmDd_Blog4h() {
+        String result = Utils.convertDateToString("yyyyMMdd_", Calendar.getInstance().getTime());
+        int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        HH = HH / 4;
+        result = result + HH;
+        return result;
+    }
+
     public static String getHH(int add) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, add);
@@ -1848,8 +1856,7 @@ public class Utils {
             result += ",E(now): " + removeLastZero(entry);
             result += " E(ma" + slow_index + "): " + getPercentToEntry(curr_price, ma_slow, true);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
-            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + " : " + usd + " : " + removeLastZero(earn)
-                    + "$";
+            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
 
             if (earn.compareTo(BigDecimal.valueOf(usd / 3)) < 0) {
                 result += "(Danger)";

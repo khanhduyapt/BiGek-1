@@ -870,12 +870,19 @@ public class BinanceServiceImpl implements BinanceService {
                             String ma7 = futu.substring(futu.indexOf("_ma7("), futu.indexOf(")~") + 2);
                             futu = futu.replace(ma7, "");
                             ma7 = ma7.replace("_ma7(", "").replace(")~", "");
-                            css.setOco_opportunity(ma7);
+
                             if (ma7.contains("Long_1h")) {
                                 css.setDt_range_css("text-primary");
-                            } else if (ma7.contains("Short_1h")) {
+                            }
+                            if (ma7.contains("Short_1h")) {
                                 css.setDt_range_css("text-danger");
                             }
+                            if (ma7.contains("(Danger)")) {
+                                css.setDt_range_css("text-danger");
+                            }
+
+                            css.setOco_opportunity(ma7.replace("(Danger)", ""));
+
                         } catch (Exception e) {
                             css.setRange_move("ma7 exception");
                         }
@@ -2914,6 +2921,7 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
+    @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 
@@ -2960,11 +2968,11 @@ public class BinanceServiceImpl implements BinanceService {
             for (String CURR : list_currency) {
 
                 String ID = CURR + "_USDT";
-                String EVENT_LONG_SHORT_CURRENCY = ID + "_" + Utils.getToday_YyyyMMdd();
+                String EVENT_LONG_SHORT_CURRENCY = ID + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
                 if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
 
                     System.out.println("CHECK: " + ID);
-                    List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_1h, 21);
+                    List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_4h, 21);
                     String curr_long_short = Utils.checkMa10And20(list_currentcy);
 
                     if (Utils.isNotBlank(curr_long_short)) {
@@ -2981,6 +2989,17 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
+
+        //try {
+        //    BinanceVolumnDayKey id = (new BinanceVolumnDayKey(gecko_id, symbol,
+        //            Utils.convertDateToString("HH", Calendar.getInstance().getTime())));
+        //    BinanceVolumnDay day = binanceVolumnDayRepository.findById(id).orElse(null);
+        //    if (!Objects.equals(null, day)) {
+        //        day.setPriceAtBinance(current_price);
+        //        binanceVolumnDayRepository.save(day);
+        //    }
+        //} catch (Exception e) {
+        //}
 
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
         BigDecimal min_week = Utils.formatPrice(min_max_week.get(0).multiply(BigDecimal.valueOf(0.99)), 5);
@@ -3081,18 +3100,19 @@ public class BinanceServiceImpl implements BinanceService {
 
     private String sendMsgMonitorLongShort(String gecko_id, String symbol, List<BtcFutures> list_find_entry,
             List<BtcFutures> list_sl_tp, String trend) {
+
         String current_trend = "";
-        String resultLongShortH1 = Utils.getScapLongOrShort_BTC(list_find_entry, list_sl_tp, 10);
-        if (Utils.isNotBlank(resultLongShortH1)) {
+        String result = Utils.getScapLongOrShort_BTC(list_find_entry, list_sl_tp, 10);
+        if (Utils.isNotBlank(result)) {
 
             String EVENT_LONG_SHORT = symbol + "_" + Utils.getToday_YyyyMMdd();
             if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) || Objects.equals("BNB", symbol)) {
                 EVENT_LONG_SHORT = symbol + "_" + Utils.getTimeChangeDailyChart();
             } else {
-                EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+                EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
             }
 
-            if (resultLongShortH1.toUpperCase().contains("LONG")) {
+            if (result.toUpperCase().contains("LONG")) {
                 EVENT_LONG_SHORT += "_Long";
                 current_trend = "Long";
             } else {
@@ -3107,7 +3127,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm();
-            msg += resultLongShortH1.replace(",", Utils.new_line_from_service);
+            msg += result.replace(",", Utils.new_line_from_service);
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
 
