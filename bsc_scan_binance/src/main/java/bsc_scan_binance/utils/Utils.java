@@ -1335,9 +1335,9 @@ public class Utils {
         int pre = 3;
         BigDecimal ma5c = calcMA(list, 5, cur);
         BigDecimal ma5p = calcMA(list, 5, pre);
-        boolean isMa3Up = true;
+        boolean isMa5Up = true;
         if (ma5p.compareTo(ma5c) > 0) {
-            isMa3Up = false;
+            isMa5Up = false;
         }
 
         BigDecimal ma13c = calcMA(list, ma_slow, cur);
@@ -1360,7 +1360,7 @@ public class Utils {
         }
         // -----------------------------------------------
         String note_long = "";
-        if (!isMa3Up) {
+        if (!isMa5Up) {
             note_long += " Ma5:Down";
         }
         if (!isMa13Up) {
@@ -1371,7 +1371,7 @@ public class Utils {
         }
 
         String note_short = "";
-        if (isMa3Up) {
+        if (isMa5Up) {
             note_short += " Ma5:Up";
         }
         if (isMa13Up) {
