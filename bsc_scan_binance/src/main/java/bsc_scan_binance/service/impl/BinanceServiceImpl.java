@@ -1682,10 +1682,6 @@ public class BinanceServiceImpl implements BinanceService {
             final String url_busd = "https://api.binance.com/api/v3/klines?symbol=" + symbol + "BUSD" + "&interval="
                     + TIME_1d + "&limit=" + String.valueOf(LIMIT);
 
-            BigDecimal price_at_binance = Utils.getBinancePrice(symbol);
-            if (Objects.equals(BigDecimal.ZERO, price_at_binance)) {
-                return "";
-            }
             List<Object> result_usdt = Utils.getBinanceData(url_usdt, LIMIT);
             List<Object> result_busd = Utils.getBinanceData(url_busd, LIMIT);
 
@@ -1745,7 +1741,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 Utils.convertDateToString("HH", calendar.getTime())));
                         day.setTotalVolume(total_volume);
                         day.setTotalTrasaction(total_trans);
-                        day.setPriceAtBinance(price_at_binance);
+                        day.setPriceAtBinance(Utils.getBinancePrice(symbol));
                         day.setLow_price(price_low);
                         day.setHight_price(price_high);
                         day.setPrice_open_candle(price_open_candle);
@@ -2976,7 +2972,9 @@ public class BinanceServiceImpl implements BinanceService {
                     String curr_long_short = Utils.checkMa10And20(list_currentcy);
 
                     if (Utils.isNotBlank(curr_long_short)) {
-                        String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " " + ID + " (H1)"
+
+                        String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " "
+                                + list_currentcy.get(0).getId().replace("_00", "")
                                 + Utils.new_line_from_service + curr_long_short;
 
                         fundingHistoryRepository
@@ -2990,16 +2988,16 @@ public class BinanceServiceImpl implements BinanceService {
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
-        //try {
-        //    BinanceVolumnDayKey id = (new BinanceVolumnDayKey(gecko_id, symbol,
-        //            Utils.convertDateToString("HH", Calendar.getInstance().getTime())));
-        //    BinanceVolumnDay day = binanceVolumnDayRepository.findById(id).orElse(null);
-        //    if (!Objects.equals(null, day)) {
-        //        day.setPriceAtBinance(current_price);
-        //        binanceVolumnDayRepository.save(day);
-        //    }
-        //} catch (Exception e) {
-        //}
+        try {
+            BinanceVolumnDayKey id = (new BinanceVolumnDayKey(gecko_id, symbol,
+                    Utils.convertDateToString("HH", Calendar.getInstance().getTime())));
+            BinanceVolumnDay day = binanceVolumnDayRepository.findById(id).orElse(null);
+            if (!Objects.equals(null, day)) {
+                day.setPriceAtBinance(current_price);
+                binanceVolumnDayRepository.save(day);
+            }
+        } catch (Exception e) {
+        }
 
         List<BigDecimal> min_max_week = Utils.getLowHeightCandle(list_weeks);
         BigDecimal min_week = Utils.formatPrice(min_max_week.get(0).multiply(BigDecimal.valueOf(0.99)), 5);
