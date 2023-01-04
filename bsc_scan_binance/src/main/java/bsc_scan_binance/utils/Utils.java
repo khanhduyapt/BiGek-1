@@ -1315,7 +1315,7 @@ public class Utils {
             ma_slow = 13;
         }
         if (symbol.contains("_4h_")) {
-            ma_slow = 8;
+            ma_slow = 13;
         }
         if (symbol.contains("_1d_")) {
             ma_slow = 7;
@@ -1332,8 +1332,8 @@ public class Utils {
         // "(H1)").replace("_4h_", "(H4)");
         int ma_slow = getSlowIndex(list);
 
-        int cur = 0;
-        int pre = 2;
+        int cur = 1;
+        int pre = 3;
         int ma_fast = 3;
         BigDecimal ma_fast_c = calcMA(list, ma_fast, cur);
         BigDecimal ma_fast_p = calcMA(list, ma_fast, pre);
