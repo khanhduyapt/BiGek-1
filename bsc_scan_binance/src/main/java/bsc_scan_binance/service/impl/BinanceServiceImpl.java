@@ -3086,10 +3086,16 @@ public class BinanceServiceImpl implements BinanceService {
                 sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
                 if (Utils.isBusinessTime()) {
-                    String scap15m = Utils.checkMa10And20(list_15m);
-                    if (Utils.isNotBlank(scap15m)) {
-                        Utils.sendToMyTelegram(
-                                Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " " + symbol + "(15m): " + scap15m);
+                    List<BigDecimal> low_heigh_15m = Utils.getLowHeightCandle(list_15m);
+                    BigDecimal percent_15m = Utils.getPercent(low_heigh_15m.get(1), low_heigh_15m.get(0)).abs();
+
+                    if (percent_15m.compareTo(BigDecimal.valueOf(0.95)) > 0) {
+                        String scap15m = Utils.checkMa10And20(list_15m);
+                        if (Utils.isNotBlank(scap15m)) {
+                            Utils.sendToMyTelegram(
+                                    Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " " + symbol + "(15m): "
+                                            + scap15m);
+                        }
                     }
                 }
 
