@@ -3092,9 +3092,19 @@ public class BinanceServiceImpl implements BinanceService {
                     if (percent_15m.compareTo(BigDecimal.valueOf(0.65)) > 0) {
                         String scap15m = Utils.getScapLongOrShort_BTC(list_15m, list_h1, 10);
                         if (Utils.isNotBlank(scap15m)) {
-                            Utils.sendToMyTelegram(
-                                    Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " " + symbol + "(15m): "
-                                            + scap15m);
+
+                            String EVENT_LONG_SHORT = "LONG_SHORT_15m_" + symbol + "_"
+                                    + Utils.getCurrentYyyyMmDd_Blog4h();
+
+                            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
+                                fundingHistoryRepository
+                                        .save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
+
+                                Utils.sendToMyTelegram(
+                                        Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " "
+                                                + scap15m.replace(",", Utils.new_line_from_service));
+                            }
+
                         }
                     }
                 }

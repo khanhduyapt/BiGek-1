@@ -1613,9 +1613,9 @@ public class Utils {
 
             if (list_find_entry.get(0).getId().contains("_15m_")) {
                 result = type + symbol;
-                result += " SL: " + getPercentToEntry(entry, SL, false);
-                result += " Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn1: "
-                        + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
+                result += ",SL: " + getPercentToEntry(entry, SL, false);
+                result += " Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn: "
+                        + removeLastZero(earn1) + "$";
             }
 
             return result;
