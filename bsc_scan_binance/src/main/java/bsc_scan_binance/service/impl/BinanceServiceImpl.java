@@ -3080,8 +3080,23 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) || Objects.equals("BNB", symbol)) {
-            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
-            sendMsgKillLongShort(gecko_id, symbol, list_15m);
+
+            if (Objects.equals("ETH", symbol)) {
+                List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 30);
+                sendMsgKillLongShort(gecko_id, symbol, list_15m);
+
+                if (Utils.isBusinessTime()) {
+                    String scap15m = Utils.checkMa10And20(list_15m);
+                    if (Utils.isNotBlank(scap15m)) {
+                        Utils.sendToMyTelegram(
+                                Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " BTC(15m): " + scap15m);
+                    }
+                }
+
+            } else {
+                List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
+                sendMsgKillLongShort(gecko_id, symbol, list_15m);
+            }
 
             sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");

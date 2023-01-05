@@ -489,7 +489,6 @@ public class Utils {
 
             sendToChatId(Utils.chatId_duydk, msg + " (only)");
         }
-
     }
 
     public static void sendToTelegram(String text) {
@@ -510,7 +509,7 @@ public class Utils {
 
     public static boolean isBusinessTime() {
         int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        if ((23 <= hh || hh <= 7)) {
+        if ((22 <= hh || hh <= 8)) {
             return false;
         }
 
@@ -1311,6 +1310,10 @@ public class Utils {
         String symbol = list.get(0).getId().toLowerCase();
 
         int ma_slow = 10;
+
+        if (symbol.contains("_15m_")) {
+            ma_slow = 13;
+        }
         if (symbol.contains("_1h_")) {
             ma_slow = 13;
         }
