@@ -1559,11 +1559,6 @@ public class Utils {
             BigDecimal curr_price = list_find_entry.get(0).getCurrPrice();
             BigDecimal entry = curr_price;
 
-            entry = formatPrice(entry, 5);
-            SL = formatPrice(SL, 5);
-            TP1 = formatPrice(TP1, 5);
-            TP2 = formatPrice(TP2, 5);
-
             if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
                 entry = formatPrice(entry, 0);
                 SL = formatPrice(SL, 0);
@@ -1579,6 +1574,11 @@ public class Utils {
                 SL = formatPrice(SL, 3);
                 TP1 = formatPrice(TP1, 3);
                 TP2 = formatPrice(TP2, 3);
+            } else {
+                entry = formatPrice(entry, 5);
+                SL = formatPrice(SL, 5);
+                TP1 = formatPrice(TP1, 5);
+                TP2 = formatPrice(TP2, 5);
             }
 
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
@@ -1656,11 +1656,6 @@ public class Utils {
                 TP = low_heigh_tp.get(0);
             }
 
-            entry = formatPrice(entry, 5);
-            SL = formatPrice(SL, 5);
-            TP = formatPrice(TP, 5);
-            ma_slow = formatPrice(ma_slow, 5);
-
             if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
                 entry = formatPrice(entry, 0);
                 SL = formatPrice(SL, 0);
@@ -1676,6 +1671,11 @@ public class Utils {
                 SL = formatPrice(SL, 3);
                 TP = formatPrice(TP, 3);
                 ma_slow = formatPrice(ma_slow, 3);
+            } else {
+                entry = formatPrice(entry, 5);
+                SL = formatPrice(SL, 5);
+                TP = formatPrice(TP, 5);
+                ma_slow = formatPrice(ma_slow, 5);
             }
 
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
