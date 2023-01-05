@@ -1605,8 +1605,12 @@ public class Utils {
                     + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
 
             result += ",," + check10and20;
-
             System.out.println(result);
+
+            if (earn2.compareTo(BigDecimal.valueOf(usd)) < 0) {
+                result = "";
+            }
+
             return result;
 
         } catch (Exception e) {
@@ -1694,9 +1698,8 @@ public class Utils {
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
 
-            if (earn.compareTo(BigDecimal.valueOf(usd)) < 0) {
-                //result += "(Danger)";
-                result = "";
+            if (earn.compareTo(BigDecimal.valueOf(usd / 5)) < 0) {
+                result += "(Danger)";
             }
 
             System.out.println(result);
