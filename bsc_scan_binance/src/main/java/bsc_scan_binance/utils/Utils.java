@@ -1471,8 +1471,7 @@ public class Utils {
         return result;
     }
 
-    public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_sl_tp,
-            int usd) {
+    public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
             String check10and20 = checkMa10And20(list_find_entry);
 
@@ -1483,9 +1482,9 @@ public class Utils {
             String symbol = list_find_entry.get(0).getId();
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
 
-            List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_sl_tp.subList(0, 20));
-            List<BigDecimal> low_heigh_tp2 = getLowHeightCandle(list_sl_tp);
-            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_sl_tp.subList(0, 10));
+            List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp.subList(0, 20));
+            List<BigDecimal> low_heigh_tp2 = getLowHeightCandle(list_tp);
+            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_find_entry.subList(0, 15));
 
             // BigDecimal ma10 = calcMA(list_entry, 10, 0);
             BigDecimal SL = BigDecimal.ZERO;
@@ -1576,7 +1575,7 @@ public class Utils {
         }
     }
 
-    public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_sl, int usd) {
+    public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
             String type = checkMa10And20(list_entry);
             if (Utils.isBlank(type)) {
@@ -1594,8 +1593,8 @@ public class Utils {
             symbol = symbol.replace("_00", "").replace("_1d", "_D");
 
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
-            List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_sl);
-            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_sl.subList(0, 10));
+            List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_tp);
+            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_entry.subList(0, 15));
             int slow_index = getSlowIndex(list_entry);
 
             BigDecimal entry = curr_price;
