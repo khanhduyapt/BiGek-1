@@ -3081,6 +3081,7 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
             sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
         } else if (type.contains("Futures")) {
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Long");
         }
