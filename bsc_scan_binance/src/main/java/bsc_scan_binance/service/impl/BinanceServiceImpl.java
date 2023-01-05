@@ -3089,7 +3089,7 @@ public class BinanceServiceImpl implements BinanceService {
                     String scap15m = Utils.checkMa10And20(list_15m);
                     if (Utils.isNotBlank(scap15m)) {
                         Utils.sendToMyTelegram(
-                                Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " BTC(15m): " + scap15m);
+                                Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " " + symbol + "(15m): " + scap15m);
                     }
                 }
 
