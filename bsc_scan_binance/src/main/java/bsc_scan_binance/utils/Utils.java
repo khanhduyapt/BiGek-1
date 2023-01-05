@@ -1611,6 +1611,13 @@ public class Utils {
                 result = "";
             }
 
+            if (list_find_entry.get(0).getId().contains("_15m_")) {
+                result = type + symbol;
+                result += " SL: " + getPercentToEntry(entry, SL, false);
+                result += " Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn1: "
+                        + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
+            }
+
             return result;
 
         } catch (Exception e) {
@@ -1693,7 +1700,7 @@ public class Utils {
 
             String result = "SL(" + type + symbol + "): " + getPercentToEntry(entry, SL, false);
 
-            result += ",E: " + getPercentToEntry(curr_price, entry, true);
+            result += ",E1: " + getPercentToEntry(curr_price, entry, true);
             result += ". E(ma" + slow_index + "): " + getPercentToEntry(curr_price, ma_slow, true);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";

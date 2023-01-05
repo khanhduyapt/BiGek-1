@@ -3090,7 +3090,7 @@ public class BinanceServiceImpl implements BinanceService {
                     BigDecimal percent_15m = Utils.getPercent(low_heigh_15m.get(1), low_heigh_15m.get(0)).abs();
 
                     if (percent_15m.compareTo(BigDecimal.valueOf(0.95)) > 0) {
-                        String scap15m = Utils.checkMa10And20(list_15m);
+                        String scap15m = Utils.getScapLongOrShort_BTC(list_15m, list_h1, 10);
                         if (Utils.isNotBlank(scap15m)) {
                             Utils.sendToMyTelegram(
                                     Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " " + symbol + "(15m): "
