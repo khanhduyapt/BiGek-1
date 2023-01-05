@@ -3006,6 +3006,8 @@ public class BinanceServiceImpl implements BinanceService {
         if (binanceFuturesRepository.existsById(gecko_id)) {
             list_h1 = Utils.loadData(symbol, TIME_1h, 60);
             type = " (Futures) " + Utils.analysisVolume(list_h1);
+            // debug
+            // sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
         } else {
             type = " (Spot) " + Utils.analysisVolume(list_h4);
         }
@@ -3078,7 +3080,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
         } else if (type.contains("Futures")) {
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
         }

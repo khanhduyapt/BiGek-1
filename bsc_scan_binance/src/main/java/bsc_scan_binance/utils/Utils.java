@@ -1478,8 +1478,21 @@ public class Utils {
             if (Utils.isBlank(check10and20)) {
                 return "";
             }
-
             String symbol = list_find_entry.get(0).getId();
+
+            if (symbol.contains("_1h_")) {
+                BigDecimal ma3ofH1 = calcMA(list_find_entry, 3, 0);
+                BigDecimal ma21ofH4 = calcMA(list_tp, 21, 0);
+
+                if ((ma3ofH1.compareTo(ma21ofH4) > 0) && (check10and20.contains("Short"))) {
+                    return "";
+                }
+
+                if ((ma3ofH1.compareTo(ma21ofH4) < 0) && (check10and20.contains("Long"))) {
+                    return "";
+                }
+            }
+
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
 
             List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp.subList(0, 20));
