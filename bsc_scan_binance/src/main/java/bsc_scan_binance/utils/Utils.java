@@ -1316,10 +1316,10 @@ public class Utils {
         int ma_slow = 10;
 
         if (symbol.contains("_15m_")) {
-            ma_slow = 13;
+            ma_slow = 8;
         }
         if (symbol.contains("_1h_")) {
-            ma_slow = 13;
+            ma_slow = 8;
         }
         if (symbol.contains("_4h_")) {
             ma_slow = 13;
@@ -1580,7 +1580,7 @@ public class Utils {
                 result = "";
             }
 
-            if (list_find_entry.get(0).getId().contains("_15m_")) {
+            if (list_find_entry.get(0).getId().contains("_15m_") || list_find_entry.get(0).getId().contains("_1h_")) {
                 result = type + symbol;
                 result += ",SL: " + getPercentToEntry(entry, SL, false);
                 result += ". TP: " + getPercentToEntry(entry, TP1, false);
