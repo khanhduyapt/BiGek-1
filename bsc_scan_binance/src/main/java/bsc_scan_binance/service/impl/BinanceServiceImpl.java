@@ -1665,6 +1665,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     @Transactional
     public String loadBinanceData(String gecko_id, String symbol, boolean isStartUp) {
@@ -1698,7 +1699,6 @@ public class BinanceServiceImpl implements BinanceService {
                 Object obj_usdt = result_usdt.get(idx);
                 Object obj_busd = result_busd.get(idx);
 
-                @SuppressWarnings("unchecked")
                 List<Object> arr_usdt = (List<Object>) obj_usdt;
                 if (arr_usdt.size() < 8) {
                     arr_usdt = (List<Object>) obj_busd;
@@ -2916,6 +2916,67 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
+    private String sendMsgMonitorLongShort(String gecko_id, String symbol, List<BtcFutures> list_find_entry,
+            List<BtcFutures> list_sl_tp, String trend) {
+
+        String current_trend = "";
+        String result = Utils.getScapLongOrShort_BTC(list_find_entry, list_sl_tp, 5);
+
+        if (Utils.isNotBlank(result)) {
+
+            String EVENT_LONG_SHORT = symbol + "_" + Utils.getTimeChangeDailyChart();
+            // if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) ||
+            // Objects.equals("BNB", symbol)) {
+            // EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
+            // }
+
+            if (result.toUpperCase().contains("LONG")) {
+                EVENT_LONG_SHORT += "_Long";
+                current_trend = "Long";
+            } else {
+                EVENT_LONG_SHORT += "_Short";
+                current_trend = "Short";
+            }
+
+            if (Utils.isNotBlank(trend)) {
+                if (!current_trend.contains(trend)) {
+                    return current_trend;
+                }
+            }
+
+            String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm();
+            msg += result.replace(",", Utils.new_line_from_service);
+            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
+                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
+
+                Utils.sendToMyTelegram(msg);
+            }
+        }
+
+        return current_trend;
+    }
+
+    private void sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
+        BtcFutures ido = list_15m.get(0);
+        if (ido.isBtcKillLongCandle() || ido.isBtcKillShortCandle()) {
+            String msg = Utils.getTimeHHmm() + " 💔 " + symbol + " 15m kill Long. "
+                    + Utils.removeLastZero(ido.getCurrPrice());
+
+            if (ido.isBtcKillShortCandle()) {
+                msg = Utils.getTimeHHmm() + " 💔 " + symbol + " 15m kill Short. "
+                        + Utils.removeLastZero(ido.getCurrPrice());
+            }
+
+            String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+
+            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
+                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID5, gecko_id, symbol, msg, true));
+
+                Utils.sendToTelegram(msg);
+            }
+        }
+    }
+
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
@@ -2929,33 +2990,19 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h1 = new ArrayList<BtcFutures>();
 
         String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
+        String dayLongShort = Utils.getScapLongOrShort(list_days, list_days, 10);
+        if (Utils.isNotBlank(dayLongShort)) {
+            dayLongShort = "_ma7(" + dayLongShort.trim().replace(",", " ") + ")~";
+            scapLongOrShortH4 += dayLongShort;
+        }
+
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             list_h1 = Utils.loadData(symbol, TIME_1h, 60);
             type = " (Futures) " + Utils.analysisVolume(list_h1);
-
-            String ma = Utils.getScapLongOrShort(list_h1, list_h4, 10);
-            if (Utils.isNotBlank(ma)) {
-                ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
-                scapLongOrShortH4 += ma;
-            } else {
-                ma = Utils.getScapLongOrShort(list_days, list_days, 10);
-                if (Utils.isNotBlank(ma)) {
-                    ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
-                    scapLongOrShortH4 += ma;
-                }
-            }
-
         } else {
             type = " (Spot) " + Utils.analysisVolume(list_h4);
-
-            String ma = Utils.getScapLongOrShort(list_days, list_days, 10);
-            if (Utils.isNotBlank(ma)) {
-                ma = "_ma7(" + ma.trim().replace(",", " ") + ")~";
-                scapLongOrShortH4 += ma;
-            }
         }
-
         type = " " + type.trim();
 
         if (Objects.equals("ETH", symbol)) {
@@ -3094,64 +3141,4 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
-    private String sendMsgMonitorLongShort(String gecko_id, String symbol, List<BtcFutures> list_find_entry,
-            List<BtcFutures> list_sl_tp, String trend) {
-
-        String current_trend = "";
-        String result = Utils.getScapLongOrShort_BTC(list_find_entry, list_sl_tp, 5);
-
-        if (Utils.isNotBlank(result)) {
-
-            String EVENT_LONG_SHORT = symbol + "_" + Utils.getTimeChangeDailyChart();
-            // if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) ||
-            // Objects.equals("BNB", symbol)) {
-            // EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
-            // }
-
-            if (result.toUpperCase().contains("LONG")) {
-                EVENT_LONG_SHORT += "_Long";
-                current_trend = "Long";
-            } else {
-                EVENT_LONG_SHORT += "_Short";
-                current_trend = "Short";
-            }
-
-            if (Utils.isNotBlank(trend)) {
-                if (!current_trend.contains(trend)) {
-                    return current_trend;
-                }
-            }
-
-            String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm();
-            msg += result.replace(",", Utils.new_line_from_service);
-            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
-                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
-
-                Utils.sendToMyTelegram(msg);
-            }
-        }
-
-        return current_trend;
-    }
-
-    private void sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
-        BtcFutures ido = list_15m.get(0);
-        if (ido.isBtcKillLongCandle() || ido.isBtcKillShortCandle()) {
-            String msg = Utils.getTimeHHmm() + " 💔 " + symbol + " 15m kill Long. "
-                    + Utils.removeLastZero(ido.getCurrPrice());
-
-            if (ido.isBtcKillShortCandle()) {
-                msg = Utils.getTimeHHmm() + " 💔 " + symbol + " 15m kill Short. "
-                        + Utils.removeLastZero(ido.getCurrPrice());
-            }
-
-            String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
-
-            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
-                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID5, gecko_id, symbol, msg, true));
-
-                Utils.sendToTelegram(msg);
-            }
-        }
-    }
 }

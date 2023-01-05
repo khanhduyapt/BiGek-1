@@ -1318,10 +1318,10 @@ public class Utils {
             ma_slow = 13;
         }
         if (symbol.contains("_1d_")) {
-            ma_slow = 10;
+            ma_slow = 13;
         }
         if (symbol.contains("_1w_")) {
-            ma_slow = 6;
+            ma_slow = 8;
         }
         return ma_slow;
     }
