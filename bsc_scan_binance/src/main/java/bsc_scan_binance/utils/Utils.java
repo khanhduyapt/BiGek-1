@@ -1651,7 +1651,7 @@ public class Utils {
 
             if ((symbol.contains("BTC") || symbol.contains("ETH") || symbol.contains("BNB"))) {
             } else {
-                entry = entry.multiply(BigDecimal.valueOf(0.995));
+                entry = entry.multiply(BigDecimal.valueOf(0.99));
             }
 
             BigDecimal ma_slow = calcMA(list_entry, slow_index, 0);
