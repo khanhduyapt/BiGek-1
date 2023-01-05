@@ -3002,6 +3002,9 @@ public class BinanceServiceImpl implements BinanceService {
             scapLongOrShortH4 += dayLongShort;
         }
 
+        // debug
+        // Utils.checkMa10And20(list_h4);
+
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             list_h1 = Utils.loadData(symbol, TIME_1h, 60);

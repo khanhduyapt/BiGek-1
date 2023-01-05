@@ -1395,6 +1395,42 @@ public class Utils {
             result = "Long (ma" + ma_slow + ")" + note_long;
         }
 
+        //// --------------------------------------------------
+        //if (isBlank(result)) {
+        //    BigDecimal open = list.get(cur).getPrice_open_candle();
+        //    BigDecimal close = list.get(cur).getPrice_close_candle();
+        //    // cay nen cur(Long) chua ca 2 duong MA
+        //    if ((ma_fast_c.compareTo(ma13c) > 0) && (open.compareTo(close) < 0) && (open.compareTo(ma_fast_c) < 0)
+        //            && (open.compareTo(ma13c) < 0)
+        //            && (close.compareTo(ma_fast_c) > 0) && (close.compareTo(ma13c) > 0)) {
+        //        result = "Long (candle" + cur + ")" + note_long;
+        //    }
+        //
+        //    // cay nen cur(Short) chua ca 2 duong MA
+        //    if ((ma_fast_c.compareTo(ma13c) < 0) && (open.compareTo(close) > 0) && (open.compareTo(ma_fast_c) > 0)
+        //            && (open.compareTo(ma13c) > 0)
+        //            && (close.compareTo(ma_fast_c) < 0) && (close.compareTo(ma13c) < 0)) {
+        //        result = "Short (candle" + cur + ")" + note_long;
+        //    }
+        //}
+        //// --------------------------------------------------
+        //if (isBlank(result)) {
+        //    BigDecimal open = list.get(pre).getPrice_open_candle();
+        //    BigDecimal close = list.get(pre).getPrice_close_candle();
+        //    // cay nen pre(Long) chua ca 2 duong MA
+        //    if ((ma_fast_c.compareTo(ma13c) > 0) && (open.compareTo(close) < 0) && (open.compareTo(ma_fast_p) < 0)
+        //            && (open.compareTo(ma13p) < 0)
+        //            && (close.compareTo(ma_fast_p) > 0) && (close.compareTo(ma13p) > 0)) {
+        //        result = "Long (candle" + pre + ")" + note_long;
+        //    }
+        //
+        //    // cay nen pre(Short) chua ca 2 duong MA
+        //    if ((ma_fast_c.compareTo(ma13c) < 0) && (open.compareTo(close) > 0) && (open.compareTo(ma_fast_p) > 0)
+        //            && (open.compareTo(ma13p) > 0)
+        //            && (close.compareTo(ma_fast_p) < 0) && (close.compareTo(ma13p) < 0)) {
+        //        result = "Short (candle" + pre + ")" + note_long;
+        //    }
+        //}
         // --------------------------------------------------
 
         if (isNotBlank(result)) {
