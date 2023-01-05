@@ -2931,10 +2931,6 @@ public class BinanceServiceImpl implements BinanceService {
         if (Utils.isNotBlank(result)) {
 
             String EVENT_LONG_SHORT = symbol + "_" + Utils.getTimeChangeDailyChart();
-            // if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) ||
-            // Objects.equals("BNB", symbol)) {
-            // EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
-            // }
 
             if (result.toUpperCase().contains("LONG")) {
                 EVENT_LONG_SHORT += "_Long";
@@ -3100,9 +3096,8 @@ public class BinanceServiceImpl implements BinanceService {
                                 fundingHistoryRepository
                                         .save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
 
-                                Utils.sendToMyTelegram(
-                                        Utils.getYyyyMmDD_TimeHHmm()
-                                                + scap15m.replace(",", Utils.new_line_from_service));
+                                Utils.sendToMyTelegram(Utils.getYyyyMmDD_TimeHHmm()
+                                        + scap15m.replace(",", Utils.new_line_from_service));
                             }
 
                         }

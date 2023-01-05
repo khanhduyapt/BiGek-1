@@ -1402,42 +1402,6 @@ public class Utils {
             result = "Long (ma" + ma_slow + ")" + note_long;
         }
 
-        //// --------------------------------------------------
-        //if (isBlank(result)) {
-        //    BigDecimal open = list.get(cur).getPrice_open_candle();
-        //    BigDecimal close = list.get(cur).getPrice_close_candle();
-        //    // cay nen cur(Long) chua ca 2 duong MA
-        //    if ((ma_fast_c.compareTo(ma13c) > 0) && (open.compareTo(close) < 0) && (open.compareTo(ma_fast_c) < 0)
-        //            && (open.compareTo(ma13c) < 0)
-        //            && (close.compareTo(ma_fast_c) > 0) && (close.compareTo(ma13c) > 0)) {
-        //        result = "Long (candle" + cur + ")" + note_long;
-        //    }
-        //
-        //    // cay nen cur(Short) chua ca 2 duong MA
-        //    if ((ma_fast_c.compareTo(ma13c) < 0) && (open.compareTo(close) > 0) && (open.compareTo(ma_fast_c) > 0)
-        //            && (open.compareTo(ma13c) > 0)
-        //            && (close.compareTo(ma_fast_c) < 0) && (close.compareTo(ma13c) < 0)) {
-        //        result = "Short (candle" + cur + ")" + note_long;
-        //    }
-        //}
-        //// --------------------------------------------------
-        //if (isBlank(result)) {
-        //    BigDecimal open = list.get(pre).getPrice_open_candle();
-        //    BigDecimal close = list.get(pre).getPrice_close_candle();
-        //    // cay nen pre(Long) chua ca 2 duong MA
-        //    if ((ma_fast_c.compareTo(ma13c) > 0) && (open.compareTo(close) < 0) && (open.compareTo(ma_fast_p) < 0)
-        //            && (open.compareTo(ma13p) < 0)
-        //            && (close.compareTo(ma_fast_p) > 0) && (close.compareTo(ma13p) > 0)) {
-        //        result = "Long (candle" + pre + ")" + note_long;
-        //    }
-        //
-        //    // cay nen pre(Short) chua ca 2 duong MA
-        //    if ((ma_fast_c.compareTo(ma13c) < 0) && (open.compareTo(close) > 0) && (open.compareTo(ma_fast_p) > 0)
-        //            && (open.compareTo(ma13p) > 0)
-        //            && (close.compareTo(ma_fast_p) < 0) && (close.compareTo(ma13p) < 0)) {
-        //        result = "Short (candle" + pre + ")" + note_long;
-        //    }
-        //}
         // --------------------------------------------------
 
         if (isNotBlank(result)) {
@@ -1597,11 +1561,12 @@ public class Utils {
             BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn2 = formatPrice(vol.multiply(earn2), 1);
 
-            BigDecimal ma10 = calcMA(list_find_entry, 10, 0);
+            int ma_slow = getSlowIndex(list_find_entry);
+            BigDecimal ma10 = calcMA(list_find_entry, ma_slow, 0);
 
             String result = type + symbol;
             result += ",,E1(now): " + removeLastZero(entry);
-            result += " E2(ma10): " + getPercentToEntry(curr_price, ma10, true);
+            result += " E2(ma" + ma_slow + "): " + getPercentToEntry(curr_price, ma10, true);
             result += ",SL: " + getPercentToEntry(entry, SL, false);
             result += ",TP1: " + getPercentToEntry(entry, TP1, false);
             result += ". TP2: " + getPercentToEntry(entry, TP2, false);
