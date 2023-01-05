@@ -1563,16 +1563,22 @@ public class Utils {
             SL = formatPrice(SL, 5);
             TP1 = formatPrice(TP1, 5);
             TP2 = formatPrice(TP2, 5);
-            if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-                entry = formatPrice(entry, 3);
-                SL = formatPrice(SL, 3);
-                TP1 = formatPrice(TP1, 3);
-                TP2 = formatPrice(TP2, 3);
+
+            if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
+                entry = formatPrice(entry, 0);
+                SL = formatPrice(SL, 0);
+                TP1 = formatPrice(TP1, 0);
+                TP2 = formatPrice(TP2, 0);
             } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
                 entry = formatPrice(entry, 2);
                 SL = formatPrice(SL, 2);
                 TP1 = formatPrice(TP1, 2);
                 TP2 = formatPrice(TP2, 2);
+            } else if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+                entry = formatPrice(entry, 3);
+                SL = formatPrice(SL, 3);
+                TP1 = formatPrice(TP1, 3);
+                TP2 = formatPrice(TP2, 3);
             }
 
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
@@ -1628,6 +1634,12 @@ public class Utils {
             int slow_index = getSlowIndex(list_entry);
 
             BigDecimal entry = curr_price;
+
+            if ((symbol.contains("BTC") || symbol.contains("ETH") || symbol.contains("BNB"))) {
+            } else {
+                entry = entry.multiply(BigDecimal.valueOf(0.995));
+            }
+
             BigDecimal ma_slow = calcMA(list_entry, slow_index, 0);
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP = BigDecimal.ZERO;
@@ -1648,16 +1660,22 @@ public class Utils {
             SL = formatPrice(SL, 5);
             TP = formatPrice(TP, 5);
             ma_slow = formatPrice(ma_slow, 5);
-            if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-                entry = formatPrice(entry, 3);
-                SL = formatPrice(SL, 3);
-                TP = formatPrice(TP, 3);
-                ma_slow = formatPrice(ma_slow, 3);
+
+            if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
+                entry = formatPrice(entry, 0);
+                SL = formatPrice(SL, 0);
+                TP = formatPrice(TP, 0);
+                ma_slow = formatPrice(ma_slow, 0);
             } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
                 entry = formatPrice(entry, 2);
                 SL = formatPrice(SL, 2);
                 TP = formatPrice(TP, 2);
                 ma_slow = formatPrice(ma_slow, 2);
+            } else if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+                entry = formatPrice(entry, 3);
+                SL = formatPrice(SL, 3);
+                TP = formatPrice(TP, 3);
+                ma_slow = formatPrice(ma_slow, 3);
             }
 
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
@@ -1668,8 +1686,8 @@ public class Utils {
 
             String result = "SL(" + type + symbol + "): " + getPercentToEntry(entry, SL, false);
 
-            result += ",E(now): " + removeLastZero(entry);
-            result += " E(ma" + slow_index + "): " + getPercentToEntry(curr_price, ma_slow, true);
+            result += ",E: " + getPercentToEntry(curr_price, entry, true);
+            result += ". E(ma" + slow_index + "): " + getPercentToEntry(curr_price, ma_slow, true);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
 
