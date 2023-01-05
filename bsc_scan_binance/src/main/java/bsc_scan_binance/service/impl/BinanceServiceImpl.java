@@ -3025,7 +3025,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
 
                     System.out.println("CHECK: " + ID);
-                    List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_4h, 21);
+                    List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_1h, 30);
                     String curr_long_short = Utils.checkMa10And20(list_currentcy);
 
                     if (Utils.isNotBlank(curr_long_short)) {
