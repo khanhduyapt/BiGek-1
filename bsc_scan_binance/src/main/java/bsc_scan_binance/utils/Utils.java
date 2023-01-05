@@ -1333,7 +1333,7 @@ public class Utils {
         int ma_slow = getSlowIndex(list);
 
         int cur = 1;
-        int pre = 3;
+        int pre = 2;
         int ma_fast = 3;
         BigDecimal ma_fast_c = calcMA(list, ma_fast, cur);
         BigDecimal ma_fast_p = calcMA(list, ma_fast, pre);
@@ -1545,25 +1545,6 @@ public class Utils {
             result += ". TP2: " + getPercentToEntry(entry, TP2, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn1: "
                     + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
-
-            // --------------------------------------
-            // entry = ma10;
-            // vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10,
-            // RoundingMode.CEILING);
-            // vol = formatPrice(vol.multiply(entry).abs(), 0);
-            // earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            // earn1 = formatPrice(vol.multiply(earn1), 1);
-            //
-            // earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            // earn2 = formatPrice(vol.multiply(earn2), 1);
-            //
-            // result += ",,E2(Ma10): " + getPercentToEntry(curr_price, entry, true);
-            // result += ",SL: " + getPercentToEntry(entry, SL, false);
-            // result += ",TP1: " + getPercentToEntry(entry, TP1, false);
-            // result += ". TP2: " + getPercentToEntry(entry, TP2, false);
-            // result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd
-            // + "$ Earn1: "
-            // + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
 
             result += ",," + check10and20;
 

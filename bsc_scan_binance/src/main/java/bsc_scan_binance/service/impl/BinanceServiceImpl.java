@@ -871,17 +871,20 @@ public class BinanceServiceImpl implements BinanceService {
                             futu = futu.replace(ma7, "");
                             ma7 = ma7.replace("_ma7(", "").replace(")~", "");
 
-                            if (ma7.contains("Long_1h")) {
-                                css.setDt_range_css("text-primary");
-                            }
-                            if (ma7.contains("Short_1h")) {
-                                css.setDt_range_css("text-danger");
-                            }
-                            if (ma7.contains("(Danger)")) {
-                                css.setDt_range_css("text-danger");
-                            }
+                            if (ma7.contains("Long") || (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0)) {
 
-                            css.setOco_opportunity(ma7.replace("(Danger)", ""));
+                                if (ma7.contains("Long_1h")) {
+                                    css.setDt_range_css("text-primary");
+                                }
+                                if (ma7.contains("Short_1h")) {
+                                    css.setDt_range_css("text-danger");
+                                }
+                                if (ma7.contains("(Danger)")) {
+                                    css.setDt_range_css("text-danger");
+                                }
+
+                                css.setOco_opportunity(ma7.replace("(Danger)", ""));
+                            }
 
                         } catch (Exception e) {
                             css.setRange_move("ma7 exception");
@@ -914,25 +917,28 @@ public class BinanceServiceImpl implements BinanceService {
                             String sl2ma = futu.substring(futu.indexOf("sl2ma{"), futu.indexOf("}sl2ma"));
                             futu = futu.replace(sl2ma + "}sl2ma", "").replaceAll("  ", "");
                             sl2ma = sl2ma.replace("sl2ma{", "");
-                            css.setStr_entry_price(sl2ma);
 
-                            String[] sl_e_tp = sl2ma.split(",");
-                            if (sl_e_tp.length >= 4) {
+                            if (sl2ma.contains("Long") || (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0)) {
+                                css.setStr_entry_price(sl2ma);
 
-                                css.setRange_stoploss(sl_e_tp[0]);
-                                css.setRange_entry(sl_e_tp[1]);
-                                css.setRange_take_profit(sl_e_tp[2]);
-                                css.setRange_volume(sl_e_tp[3].replace("(Danger)", ""));
+                                String[] sl_e_tp = sl2ma.split(",");
+                                if (sl_e_tp.length >= 4) {
 
-                                if (sl_e_tp[3].contains("Danger")) {
-                                    css.setRange_volume_css("text-danger");
-                                }
+                                    css.setRange_stoploss(sl_e_tp[0]);
+                                    css.setRange_entry(sl_e_tp[1]);
+                                    css.setRange_take_profit(sl_e_tp[2]);
+                                    css.setRange_volume(sl_e_tp[3].replace("(Danger)", ""));
 
-                                if (sl_e_tp[0].contains("SL(Short_")) {
-                                    css.setRange_stoploss_css("text-danger");
-                                    css.setRange_entry_css("text-danger");
-                                    css.setRange_take_profit_css("text-danger");
-                                    css.setRange_volume_css("text-danger");
+                                    if (sl_e_tp[3].contains("Danger")) {
+                                        css.setRange_volume_css("text-danger");
+                                    }
+
+                                    if (sl_e_tp[0].contains("SL(Short_")) {
+                                        css.setRange_stoploss_css("text-danger");
+                                        css.setRange_entry_css("text-danger");
+                                        css.setRange_take_profit_css("text-danger");
+                                        css.setRange_volume_css("text-danger");
+                                    }
                                 }
                             }
                         } catch (Exception e) {
@@ -3020,8 +3026,8 @@ public class BinanceServiceImpl implements BinanceService {
                     if (Utils.isNotBlank(curr_long_short)) {
 
                         String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " "
-                                + list_currentcy.get(0).getId().replace("_00", "") + Utils.new_line_from_service
-                                + curr_long_short;
+                                + list_currentcy.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                                + Utils.new_line_from_service + curr_long_short;
 
                         fundingHistoryRepository
                                 .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
