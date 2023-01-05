@@ -1318,7 +1318,7 @@ public class Utils {
             ma_slow = 13;
         }
         if (symbol.contains("_1d_")) {
-            ma_slow = 8;
+            ma_slow = 10;
         }
         if (symbol.contains("_1w_")) {
             ma_slow = 8;
@@ -1640,8 +1640,9 @@ public class Utils {
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
 
-            if (earn.compareTo(BigDecimal.valueOf(usd / 3)) < 0) {
-                result += "(Danger)";
+            if (earn.compareTo(BigDecimal.valueOf(usd)) < 0) {
+                //result += "(Danger)";
+                result = "";
             }
 
             System.out.println(result);
