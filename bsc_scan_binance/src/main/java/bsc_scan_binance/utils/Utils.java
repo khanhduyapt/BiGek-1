@@ -674,6 +674,10 @@ public class Utils {
         return result;
     }
 
+    public static String getYyyyMmDD_TimeHHmm() {
+        return Utils.convertDateToString("(yyyyMMdd_HH:mm) ", Calendar.getInstance().getTime());
+    }
+
     public static String getTimeHHmm() {
         return Utils.convertDateToString("(HH:mm)", Calendar.getInstance().getTime());
     }

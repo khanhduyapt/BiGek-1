@@ -2950,7 +2950,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm();
+            String msg = Utils.getYyyyMmDD_TimeHHmm();
             msg += result.replace(",", Utils.new_line_from_service);
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
@@ -3030,7 +3030,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     if (Utils.isNotBlank(curr_long_short)) {
 
-                        String msg = Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " "
+                        String msg = Utils.getYyyyMmDD_TimeHHmm()
                                 + list_currentcy.get(0).getId().replace("_00", "").replace("_", "_USDT_")
                                 + Utils.new_line_from_service + curr_long_short;
 
@@ -3101,7 +3101,7 @@ public class BinanceServiceImpl implements BinanceService {
                                         .save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
 
                                 Utils.sendToMyTelegram(
-                                        Utils.getToday_YyyyMMdd() + Utils.getTimeHHmm() + " "
+                                        Utils.getYyyyMmDD_TimeHHmm()
                                                 + scap15m.replace(",", Utils.new_line_from_service));
                             }
 
