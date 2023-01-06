@@ -1581,7 +1581,8 @@ public class Utils {
             }
 
             if (list_find_entry.get(0).getId().contains("_15m_") || list_find_entry.get(0).getId().contains("_1h_")) {
-                result = type + symbol;
+                result = type + list_find_entry.get(0).getId().replace("_00", "") + " (Ma"
+                        + getSlowIndex(list_find_entry) + ")";
                 result += ",SL: " + getPercentToEntry(entry, SL, false);
                 result += ". TP: " + getPercentToEntry(entry, TP1, false);
                 result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$ Earn: "
