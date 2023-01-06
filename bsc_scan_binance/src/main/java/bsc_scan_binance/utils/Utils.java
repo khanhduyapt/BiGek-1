@@ -1316,10 +1316,10 @@ public class Utils {
         int ma_slow = 10;
 
         if (symbol.contains("_15m_")) {
-            ma_slow = 8;
+            ma_slow = 13;
         }
         if (symbol.contains("_1h_")) {
-            ma_slow = 8;
+            ma_slow = 13;
         }
         if (symbol.contains("_4h_")) {
             ma_slow = 13;
