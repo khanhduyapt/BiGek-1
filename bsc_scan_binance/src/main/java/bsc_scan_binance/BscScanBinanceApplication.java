@@ -40,7 +40,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            // app_flag = Utils.const_app_flag_all_and_msg;
+            app_flag = Utils.const_app_flag_all_and_msg;
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -55,6 +55,7 @@ public class BscScanBinanceApplication {
                 try {
                     TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
                     telegramBotsApi.registerBot(wandaBot);
+                    binance_service.clearTrash();
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }

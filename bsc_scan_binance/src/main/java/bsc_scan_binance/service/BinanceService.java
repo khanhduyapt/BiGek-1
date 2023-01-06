@@ -42,4 +42,6 @@ public interface BinanceService {
     public String getBitfinexLongShortBtc();
 
     public String getChartWD(String gecko_id, String symbol);
+
+    public void clearTrash();
 }

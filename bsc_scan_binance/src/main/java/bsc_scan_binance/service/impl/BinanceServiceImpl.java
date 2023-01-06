@@ -3006,7 +3006,6 @@ public class BinanceServiceImpl implements BinanceService {
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
-        List<BtcFutures> list_h1 = new ArrayList<BtcFutures>();
 
         String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
 
@@ -3015,13 +3014,13 @@ public class BinanceServiceImpl implements BinanceService {
 
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
-            list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+            List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
 
-            String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
-            if (Utils.isNotBlank(h1LongShort)) {
-                h1LongShort = "_ma7(" + h1LongShort.trim().replace(",", " ") + ")~";
-                scapLongOrShortH4 += h1LongShort;
-            }
+            // String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
+            // if (Utils.isNotBlank(h1LongShort)) {
+            // h1LongShort = "_ma7(" + h1LongShort.trim().replace(",", " ") + ")~";
+            // scapLongOrShortH4 += h1LongShort;
+            // }
 
             type = " (Futures) " + Utils.analysisVolume(list_h1);
 
@@ -3062,8 +3061,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Utils.isNotBlank(currency_msg)) {
 
-                    fundingHistoryRepository
-                            .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
+                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
 
                     currency_msg = Utils.getYyyyMmDD_TimeHHmm() + currency_msg;
                     Utils.sendToMyTelegram(currency_msg);
@@ -3112,37 +3110,38 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            //String scap = Utils.checkMa10And20(list_15m);
-            //if (Utils.isNotBlank(scap)) {
-            //    type += " scap{" + scap.replace(" ", "") + "_h1}scap";
-            //}
+            // String scap = Utils.checkMa10And20(list_15m);
+            // if (Utils.isNotBlank(scap)) {
+            // type += " scap{" + scap.replace(" ", "") + "_h1}scap";
+            // }
             //
-            //if (Objects.equals("ETH", symbol)) {
-            //    if (Utils.isBusinessTime()) {
-            //        List<BigDecimal> low_heigh_15m = Utils.getLowHeightCandle(list_15m);
-            //        BigDecimal percent_15m = Utils.getPercent(low_heigh_15m.get(1), low_heigh_15m.get(0)).abs();
+            // if (Objects.equals("ETH", symbol)) {
+            // if (Utils.isBusinessTime()) {
+            // List<BigDecimal> low_heigh_15m = Utils.getLowHeightCandle(list_15m);
+            // BigDecimal percent_15m = Utils.getPercent(low_heigh_15m.get(1),
+            // low_heigh_15m.get(0)).abs();
             //
-            //        if (percent_15m.compareTo(BigDecimal.valueOf(0.65)) > 0) {
-            //            String scap15m = Utils.getScapLongOrShort_BTC(list_15m, list_h1, 10);
-            //            if (Utils.isNotBlank(scap15m)) {
+            // if (percent_15m.compareTo(BigDecimal.valueOf(0.65)) > 0) {
+            // String scap15m = Utils.getScapLongOrShort_BTC(list_15m, list_h1, 10);
+            // if (Utils.isNotBlank(scap15m)) {
             //
-            //                String EVENT_LONG_SHORT = "LONG_SHORT_15m_" + symbol + "_"
-            //                        + Utils.getCurrentYyyyMmDd_Blog2h();
+            // String EVENT_LONG_SHORT = "LONG_SHORT_15m_" + symbol + "_"
+            // + Utils.getCurrentYyyyMmDd_Blog2h();
             //
-            //                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
-            //                    fundingHistoryRepository
-            //                            .save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
+            // if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
+            // fundingHistoryRepository
+            // .save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
             //
-            //                    Utils.sendToMyTelegram(Utils.getYyyyMmDD_TimeHHmm()
-            //                            + scap15m.replace(",", Utils.new_line_from_service));
-            //                }
+            // Utils.sendToMyTelegram(Utils.getYyyyMmDD_TimeHHmm()
+            // + scap15m.replace(",", Utils.new_line_from_service));
+            // }
             //
-            //            }
-            //        }
-            //    }
-            //}
+            // }
+            // }
+            // }
+            // }
 
-            sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
+            // sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
         } else if (type.contains("Futures")) {
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Long");
@@ -3210,6 +3209,12 @@ public class BinanceServiceImpl implements BinanceService {
         result = result.replaceAll("↑", "^").replaceAll("↓", "v");
 
         return result;
+    }
+
+    @Override
+    @Transactional
+    public void clearTrash() {
+        fundingHistoryRepository.deleteAll();
     }
 
 }
