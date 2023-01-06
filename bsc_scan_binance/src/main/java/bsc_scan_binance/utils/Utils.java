@@ -1341,47 +1341,48 @@ public class Utils {
         return ma_slow;
     }
 
-    public static String checkMa10And20(List<BtcFutures> list) {
+    public static String checkMa3And13(List<BtcFutures> list) {
+        return checkMa3AndX(list, getSlowIndex(list));
+    }
+
+    public static String checkMa3AndX(List<BtcFutures> list, int slowIndex) {
         String symbol = list.get(0).getId();
-        // symbol = symbol.replace("_00", "").replace("_1d_", "_D").replace("_1h_",
-        // "(H1)").replace("_4h_", "(H4)");
-        int ma_slow = getSlowIndex(list);
 
         int cur = 1;
         int pre = 2;
-        int ma_fast = 3;
-        BigDecimal ma_fast_c = calcMA(list, ma_fast, cur);
-        BigDecimal ma_fast_p = calcMA(list, ma_fast, pre);
+        int fastIndex = 3;
+        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
+        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
         boolean isMa_fast_Up = true;
         if (ma_fast_p.compareTo(ma_fast_c) > 0) {
             isMa_fast_Up = false;
         }
 
-        BigDecimal ma13c = calcMA(list, ma_slow, cur);
-        BigDecimal ma13p = calcMA(list, ma_slow, pre);
+        BigDecimal ma13c = calcMA(list, slowIndex, cur);
+        BigDecimal ma13p = calcMA(list, slowIndex, pre);
         boolean isMa13Up = true;
         if (ma13p.compareTo(ma13c) > 0) {
             isMa13Up = false;
         }
 
         // -----------------------------------------------
-        boolean is5cuttingUp13 = false;// Long
+        boolean isCuttingUp = false;// Long
         if ((ma_fast_c.compareTo(ma13c) > 0) && (ma13p.compareTo(ma_fast_p) > 0)) {
-            is5cuttingUp13 = true;
+            isCuttingUp = true;
         }
 
         // -----------------------------------------------
-        boolean is3cuttingDown15 = false; // Short
+        boolean isCuttingDown = false; // Short
         if ((ma_fast_p.compareTo(ma13p) > 0) && (ma13c.compareTo(ma_fast_c) > 0)) {
-            is3cuttingDown15 = true;
+            isCuttingDown = true;
         }
         // -----------------------------------------------
         String note_long = "";
         if (!isMa_fast_Up) {
-            note_long += " Ma" + ma_fast + ":Down";
+            note_long += " Ma" + fastIndex + ":Down";
         }
         if (!isMa13Up) {
-            note_long += " Ma" + ma_slow + ":Down";
+            note_long += " Ma" + slowIndex + ":Down";
         }
         if (isNotBlank(note_long)) {
             note_long = " (Remark)" + note_long;
@@ -1389,10 +1390,10 @@ public class Utils {
 
         String note_short = "";
         if (isMa_fast_Up) {
-            note_short += " Ma" + ma_fast + ":Up";
+            note_short += " Ma" + fastIndex + ":Up";
         }
         if (isMa13Up) {
-            note_short += " Ma" + ma_slow + ":Up";
+            note_short += " Ma" + slowIndex + ":Up";
         }
         if (isNotBlank(note_short)) {
             note_short = " (Remark)" + note_short;
@@ -1400,14 +1401,14 @@ public class Utils {
 
         // --------------------------------------------------
         String result = "";
-        if (is3cuttingDown15) {
-            result = "Short (ma" + ma_slow + ")" + note_short;
+        if (isCuttingDown) {
+            result = "Short (ma" + slowIndex + ")" + note_short;
         }
 
         // --------------------------------------------------
 
-        if (is5cuttingUp13) {
-            result = "Long (ma" + ma_slow + ")" + note_long;
+        if (isCuttingUp) {
+            result = "Long (ma" + slowIndex + ")" + note_long;
         }
 
         // --------------------------------------------------
@@ -1415,7 +1416,7 @@ public class Utils {
         if (isNotBlank(result)) {
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
 
-            System.out.println("checkMa10And20: " + symbol + ": " + result);
+            System.out.println("checkMa3And13: " + symbol + ": " + result);
         }
 
         return result;
@@ -1488,7 +1489,7 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check10and20 = checkMa10And20(list_find_entry);
+            String check10and20 = checkMa3And13(list_find_entry);
 
             if (Utils.isBlank(check10and20)) {
                 return "";
@@ -1606,7 +1607,7 @@ public class Utils {
 
     public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String type = checkMa10And20(list_entry);
+            String type = checkMa3And13(list_entry);
             if (Utils.isBlank(type)) {
                 return "";
             }

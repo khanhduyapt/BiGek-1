@@ -3037,38 +3037,28 @@ public class BinanceServiceImpl implements BinanceService {
             String currency_msg = "";
             List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
             for (String CURR : list_currency) {
-                List<BtcFutures> list_cur_h1 = Utils.loadData(CURR, TIME_1h, 30);
+                //List<BtcFutures> list_cur_h1 = Utils.loadData(CURR, TIME_1h, 30);
                 List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
 
                 String msg = "";
-
-                String curr_long_short = Utils.checkMa10And20(list_cur_h1);
-                if (Utils.isNotBlank(curr_long_short)) {
-
-                    msg = list_cur_h1.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                            + Utils.new_line_from_service + curr_long_short;
-
-                    currency_msg += msg + Utils.new_line_from_service + Utils.new_line_from_service;
-                }
-
-                String cur_h4 = Utils.checkMa10And20(list_cur_h4);
+                String cur_h4 = Utils.checkMa3AndX(list_cur_h4, 8);
                 if (Utils.isNotBlank(cur_h4)) {
                     msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
                             + Utils.new_line_from_service + cur_h4;
 
-                    currency_msg += msg + Utils.new_line_from_service + Utils.new_line_from_service;
+                    currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
                 }
             }
 
             if (Utils.isNotBlank(currency_msg)) {
-                String ID = "AUD_EUR_GBP_USDT";
-                String EVENT_LONG_SHORT_CURRENCY = ID + Utils.getCurrentYyyyMmDd_Blog2h();
+                String ID = "AUD_EUR_GBP_USDT_";
+                String EVENT_LONG_SHORT_CURRENCY = ID + Utils.getCurrentYyyyMmDdHH();
                 if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
 
                     fundingHistoryRepository
                             .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
 
-                    currency_msg = Utils.getYyyyMmDD_TimeHHmm() + Utils.new_line_from_service + currency_msg;
+                    currency_msg = Utils.getYyyyMmDD_TimeHHmm() + currency_msg;
                     Utils.sendToMyTelegram(currency_msg);
                 }
             }
@@ -3152,8 +3142,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
-        String checkW = Utils.checkMa10And20(list_weeks);
-        String checkD = Utils.checkMa10And20(list_days);
+        String checkW = Utils.checkMa3And13(list_weeks);
+        String checkD = Utils.checkMa3And13(list_days);
 
         String mUpMa = "";
         // boolean chartDUpMa10 = Utils.isAboveMALine(list_days, 10, 0);
