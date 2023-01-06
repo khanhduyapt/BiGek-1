@@ -3112,38 +3112,38 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) || Objects.equals("BNB", symbol)) {
 
-            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 30);
+            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            String scap = Utils.checkMa10And20(list_15m);
-            if (Utils.isNotBlank(scap)) {
-                type += " scap{" + scap.replace(" ", "") + "_h1}scap";
-            }
-
-            if (Objects.equals("ETH", symbol)) {
-                if (Utils.isBusinessTime()) {
-                    List<BigDecimal> low_heigh_15m = Utils.getLowHeightCandle(list_15m);
-                    BigDecimal percent_15m = Utils.getPercent(low_heigh_15m.get(1), low_heigh_15m.get(0)).abs();
-
-                    if (percent_15m.compareTo(BigDecimal.valueOf(0.65)) > 0) {
-                        String scap15m = Utils.getScapLongOrShort_BTC(list_15m, list_h1, 10);
-                        if (Utils.isNotBlank(scap15m)) {
-
-                            String EVENT_LONG_SHORT = "LONG_SHORT_15m_" + symbol + "_"
-                                    + Utils.getCurrentYyyyMmDd_Blog2h();
-
-                            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
-                                fundingHistoryRepository
-                                        .save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
-
-                                Utils.sendToMyTelegram(Utils.getYyyyMmDD_TimeHHmm()
-                                        + scap15m.replace(",", Utils.new_line_from_service));
-                            }
-
-                        }
-                    }
-                }
-            }
+            //String scap = Utils.checkMa10And20(list_15m);
+            //if (Utils.isNotBlank(scap)) {
+            //    type += " scap{" + scap.replace(" ", "") + "_h1}scap";
+            //}
+            //
+            //if (Objects.equals("ETH", symbol)) {
+            //    if (Utils.isBusinessTime()) {
+            //        List<BigDecimal> low_heigh_15m = Utils.getLowHeightCandle(list_15m);
+            //        BigDecimal percent_15m = Utils.getPercent(low_heigh_15m.get(1), low_heigh_15m.get(0)).abs();
+            //
+            //        if (percent_15m.compareTo(BigDecimal.valueOf(0.65)) > 0) {
+            //            String scap15m = Utils.getScapLongOrShort_BTC(list_15m, list_h1, 10);
+            //            if (Utils.isNotBlank(scap15m)) {
+            //
+            //                String EVENT_LONG_SHORT = "LONG_SHORT_15m_" + symbol + "_"
+            //                        + Utils.getCurrentYyyyMmDd_Blog2h();
+            //
+            //                if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
+            //                    fundingHistoryRepository
+            //                            .save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
+            //
+            //                    Utils.sendToMyTelegram(Utils.getYyyyMmDD_TimeHHmm()
+            //                            + scap15m.replace(",", Utils.new_line_from_service));
+            //                }
+            //
+            //            }
+            //        }
+            //    }
+            //}
 
             sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
