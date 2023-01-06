@@ -3033,28 +3033,42 @@ public class BinanceServiceImpl implements BinanceService {
         type = " " + type.trim();
 
         if (Objects.equals("ETH", symbol)) {
+
+            String currency_msg = "";
             List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
             for (String CURR : list_currency) {
+                List<BtcFutures> list_cur_h1 = Utils.loadData(CURR, TIME_1h, 30);
+                List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
 
-                String ID = CURR + "_USDT";
-                String EVENT_LONG_SHORT_CURRENCY = ID + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
+                String msg = "";
+
+                String curr_long_short = Utils.checkMa10And20(list_cur_h1);
+                if (Utils.isNotBlank(curr_long_short)) {
+
+                    msg = list_cur_h1.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                            + Utils.new_line_from_service + curr_long_short;
+
+                    currency_msg += msg + Utils.new_line_from_service + Utils.new_line_from_service;
+                }
+
+                String cur_h4 = Utils.checkMa10And20(list_cur_h4);
+                if (Utils.isNotBlank(cur_h4)) {
+                    msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                            + Utils.new_line_from_service + cur_h4;
+
+                    currency_msg += msg + Utils.new_line_from_service + Utils.new_line_from_service;
+                }
+            }
+
+            if (Utils.isNotBlank(currency_msg)) {
+                String ID = "AUD_EUR_GBP_USDT";
+                String EVENT_LONG_SHORT_CURRENCY = ID + Utils.getCurrentYyyyMmDd_Blog4h();
                 if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
 
-                    System.out.println("CHECK: " + ID);
-                    List<BtcFutures> list_currentcy = Utils.loadData(CURR, TIME_1h, 30);
-                    String curr_long_short = Utils.checkMa10And20(list_currentcy);
+                    fundingHistoryRepository
+                            .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
 
-                    if (Utils.isNotBlank(curr_long_short)) {
-
-                        String msg = Utils.getYyyyMmDD_TimeHHmm()
-                                + list_currentcy.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                                + Utils.new_line_from_service + curr_long_short;
-
-                        fundingHistoryRepository
-                                .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
-
-                        Utils.sendToMyTelegram(msg);
-                    }
+                    Utils.sendToMyTelegram(currency_msg);
                 }
             }
         }
