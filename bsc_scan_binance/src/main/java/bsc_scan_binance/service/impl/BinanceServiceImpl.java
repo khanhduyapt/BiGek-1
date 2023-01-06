@@ -3033,34 +3033,34 @@ public class BinanceServiceImpl implements BinanceService {
         type = " " + type.trim();
 
         if (Objects.equals("ETH", symbol)) {
+            String ID = "AUD_EUR_GBP_USDT_";
+            String EVENT_LONG_SHORT_CURRENCY = ID + Utils.getCurrentYyyyMmDd_Blog2h();
 
-            String currency_msg = "";
-            List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
-            for (String CURR : list_currency) {
-                List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
+            if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
+                String currency_msg = "";
+                List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
+                for (String CURR : list_currency) {
+                    List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
 
-                String msg = "";
-                String cur_h4_ma8 = Utils.checkMa3AndX(list_cur_h4, 8);
-                if (Utils.isNotBlank(cur_h4_ma8)) {
-                    msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                            + Utils.new_line_from_service + cur_h4_ma8;
+                    String msg = "";
+                    String cur_h4_ma8 = Utils.checkMa3AndX(list_cur_h4, 8);
+                    if (Utils.isNotBlank(cur_h4_ma8)) {
+                        msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                                + Utils.new_line_from_service + cur_h4_ma8;
 
-                    currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
+                        currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
+                    }
+
+                    String cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 13);
+                    if (Utils.isNotBlank(cur_h4_ma13)) {
+                        msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                                + Utils.new_line_from_service + cur_h4_ma13;
+
+                        currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
+                    }
                 }
 
-                String cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 13);
-                if (Utils.isNotBlank(cur_h4_ma13)) {
-                    msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                            + Utils.new_line_from_service + cur_h4_ma13;
-
-                    currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
-                }
-            }
-
-            if (Utils.isNotBlank(currency_msg)) {
-                String ID = "AUD_EUR_GBP_USDT_";
-                String EVENT_LONG_SHORT_CURRENCY = ID + Utils.getCurrentYyyyMmDdHH();
-                if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
+                if (Utils.isNotBlank(currency_msg)) {
 
                     fundingHistoryRepository
                             .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
