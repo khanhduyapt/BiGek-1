@@ -701,6 +701,14 @@ public class Utils {
         return Utils.convertDateToString("yyyyMMdd_HH", Calendar.getInstance().getTime());
     }
 
+    public static String getCurrentYyyyMmDd_Blog2h() {
+        String result = Utils.convertDateToString("yyyyMMdd_", Calendar.getInstance().getTime());
+        int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        HH = HH / 2;
+        result = result + HH;
+        return result;
+    }
+
     public static String getCurrentYyyyMmDd_Blog4h() {
         String result = Utils.convertDateToString("yyyyMMdd_", Calendar.getInstance().getTime());
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));

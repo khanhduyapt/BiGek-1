@@ -3062,7 +3062,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (Utils.isNotBlank(currency_msg)) {
                 String ID = "AUD_EUR_GBP_USDT";
-                String EVENT_LONG_SHORT_CURRENCY = ID + Utils.getCurrentYyyyMmDd_Blog4h();
+                String EVENT_LONG_SHORT_CURRENCY = ID + Utils.getCurrentYyyyMmDd_Blog2h();
                 if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
 
                     fundingHistoryRepository
@@ -3130,7 +3130,7 @@ public class BinanceServiceImpl implements BinanceService {
                         if (Utils.isNotBlank(scap15m)) {
 
                             String EVENT_LONG_SHORT = "LONG_SHORT_15m_" + symbol + "_"
-                                    + Utils.getCurrentYyyyMmDd_Blog4h();
+                                    + Utils.getCurrentYyyyMmDd_Blog2h();
 
                             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
                                 fundingHistoryRepository
