@@ -865,6 +865,23 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
+                    if (futu.contains("scap{") && futu.contains("}scap")) {
+                        try {
+                            String scap = futu.substring(futu.indexOf("scap{"), futu.indexOf("}scap"));
+                            futu = futu.replace(scap + "}scap", "").replaceAll("  ", "");
+                            scap = scap.replace("scap{", "");
+                            css.setRange_scap(scap);
+
+                            if (scap.contains("Long")) {
+                                css.setRange_scap_css(CSS_PRICE_SUCCESS);
+                            } else if (scap.contains("Short")) {
+                                css.setRange_scap_css(CSS_PRICE_WARNING);
+                            }
+                        } catch (Exception e) {
+                            css.setRange_move("scap exception");
+                        }
+                    }
+
                     if (futu.contains("_ma7(") && futu.contains(")~")) {
                         try {
                             String ma7 = futu.substring(futu.indexOf("_ma7("), futu.indexOf(")~") + 2);
@@ -2992,11 +3009,6 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h1 = new ArrayList<BtcFutures>();
 
         String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
-        String dayLongShort = Utils.getScapLongOrShort(list_days, list_days, 10);
-        if (Utils.isNotBlank(dayLongShort)) {
-            dayLongShort = "_ma7(" + dayLongShort.trim().replace(",", " ") + ")~";
-            scapLongOrShortH4 += dayLongShort;
-        }
 
         // debug
         // Utils.checkMa10And20(list_h4);
@@ -3004,7 +3016,15 @@ public class BinanceServiceImpl implements BinanceService {
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+
+            String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
+            if (Utils.isNotBlank(h1LongShort)) {
+                h1LongShort = "_ma7(" + h1LongShort.trim().replace(",", " ") + ")~";
+                scapLongOrShortH4 += h1LongShort;
+            }
+
             type = " (Futures) " + Utils.analysisVolume(list_h1);
+
             // debug
             // sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
         } else {
@@ -3077,10 +3097,15 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) || Objects.equals("BNB", symbol)) {
 
-            if (Objects.equals("ETH", symbol)) {
-                List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 30);
-                sendMsgKillLongShort(gecko_id, symbol, list_15m);
+            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 30);
+            sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
+            String scap = Utils.checkMa10And20(list_15m);
+            if (Utils.isNotBlank(scap)) {
+                type += " scap{" + scap.replace(" ", "") + "_h1}scap";
+            }
+
+            if (Objects.equals("ETH", symbol)) {
                 if (Utils.isBusinessTime()) {
                     List<BigDecimal> low_heigh_15m = Utils.getLowHeightCandle(list_15m);
                     BigDecimal percent_15m = Utils.getPercent(low_heigh_15m.get(1), low_heigh_15m.get(0)).abs();
@@ -3103,10 +3128,6 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
                 }
-
-            } else {
-                List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
-                sendMsgKillLongShort(gecko_id, symbol, list_15m);
             }
 
             sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");

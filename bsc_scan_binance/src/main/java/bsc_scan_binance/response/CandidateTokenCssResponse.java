@@ -132,6 +132,8 @@ public class CandidateTokenCssResponse {
     private String range_L6w_css = "";
     private String range_type = "";
     private String range_type_css = "";
+    private String range_scap = "";
+    private String range_scap_css = "";
 
     private String range_position_css = "";
     private String range_move_css = "";
