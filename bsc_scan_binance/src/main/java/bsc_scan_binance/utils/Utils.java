@@ -1345,6 +1345,15 @@ public class Utils {
         return checkMa3AndX(list, getSlowIndex(list));
     }
 
+    //    down:
+    //        -20
+    //        -24
+    //        -60
+    //
+    //    up:
+    //        -15
+    //        20
+
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex) {
         String symbol = list.get(0).getId();
 

@@ -3037,14 +3037,21 @@ public class BinanceServiceImpl implements BinanceService {
             String currency_msg = "";
             List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
             for (String CURR : list_currency) {
-                //List<BtcFutures> list_cur_h1 = Utils.loadData(CURR, TIME_1h, 30);
                 List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
 
                 String msg = "";
-                String cur_h4 = Utils.checkMa3AndX(list_cur_h4, 8);
-                if (Utils.isNotBlank(cur_h4)) {
+                String cur_h4_ma8 = Utils.checkMa3AndX(list_cur_h4, 8);
+                if (Utils.isNotBlank(cur_h4_ma8)) {
                     msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                            + Utils.new_line_from_service + cur_h4;
+                            + Utils.new_line_from_service + cur_h4_ma8;
+
+                    currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
+                }
+
+                String cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 13);
+                if (Utils.isNotBlank(cur_h4_ma13)) {
+                    msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                            + Utils.new_line_from_service + cur_h4_ma13;
 
                     currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
                 }
