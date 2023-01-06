@@ -3068,6 +3068,7 @@ public class BinanceServiceImpl implements BinanceService {
                     fundingHistoryRepository
                             .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
 
+                    currency_msg = Utils.getYyyyMmDD_TimeHHmm() + Utils.new_line_from_service + currency_msg;
                     Utils.sendToMyTelegram(currency_msg);
                 }
             }
