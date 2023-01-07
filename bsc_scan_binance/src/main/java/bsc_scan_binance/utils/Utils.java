@@ -1718,7 +1718,6 @@ public class Utils {
             result += ",Earn1: " + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
 
             result += ",," + check3and8;
-            System.out.println(result);
 
             if (list_find_entry.get(0).getId().contains("_15m_") || list_find_entry.get(0).getId().contains("_1h_")) {
                 result = type + list_find_entry.get(0).getId().replace("_00", "") + " (Ma"
@@ -1731,11 +1730,13 @@ public class Utils {
             }
 
             if (earn1.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
-                result = "";
+                // result = "";
             }
             if (earn2.compareTo(BigDecimal.valueOf(usd)) < 0) {
-                result = "";
+                // result = "";
             }
+
+            System.out.println("getScapLongOrShort_BTC: " + result);
 
             return result;
 
