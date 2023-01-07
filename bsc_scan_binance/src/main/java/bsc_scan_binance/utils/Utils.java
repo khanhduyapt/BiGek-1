@@ -674,7 +674,7 @@ public class Utils {
         return result;
     }
 
-    public static String getYyyyMmDD_TimeHHmm() {
+    public static String getMmDD_TimeHHmm() {
         return Utils.convertDateToString("(MM-dd HH:mm) ", Calendar.getInstance().getTime());
     }
 

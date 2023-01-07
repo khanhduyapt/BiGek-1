@@ -128,6 +128,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String TIME_15m = "15m";
 
     private static final String TIME_1h = "1h";
+    private static final String TIME_2h = "2h";
     private static final String TIME_4h = "4h";
     private static final String TIME_1d = "1d";
     private static final String TIME_1w = "1w";
@@ -2939,12 +2940,16 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
-    private String sendMsgMonitorFibo(String gecko_id, String symbol, List<BtcFutures> list_h4) {
+    private void sendMsgMonitorFibo(String gecko_id, String symbol, List<BtcFutures> list_h4, String only_trend) {
 
-        String current_trend = "";
         String result = Utils.checkMa3AndX(list_h4, 8);
 
-        if (Utils.isNotBlank(result) && (result.toUpperCase().contains("LONG"))) {
+        if (Utils.isNotBlank(result)) {
+            if (Utils.isNotBlank(only_trend)) {
+                if (!result.contains(only_trend)) {
+                    return;
+                }
+            }
 
             String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + "_" + symbol + "_";
             if (list_h4.get(0).getId().contains("_4h_")) {
@@ -2953,7 +2958,7 @@ public class BinanceServiceImpl implements BinanceService {
                 EVENT_LONG_SHORT += Utils.getCurrentYyyyMmDd_Blog2h();
             }
 
-            String msg = Utils.getYyyyMmDD_TimeHHmm();
+            String msg = Utils.getMmDD_TimeHHmm();
             msg += symbol + Utils.new_line_from_service;
             msg += result.replace(",", Utils.new_line_from_service);
 
@@ -2963,8 +2968,6 @@ public class BinanceServiceImpl implements BinanceService {
                 Utils.sendToMyTelegram(msg);
             }
         }
-
-        return current_trend;
     }
 
     private String sendMsgMonitorLongShort(String gecko_id, String symbol, List<BtcFutures> list_find_entry,
@@ -2994,7 +2997,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            String msg = Utils.getYyyyMmDD_TimeHHmm();
+            String msg = Utils.getMmDD_TimeHHmm();
             msg += result.replace(",", Utils.new_line_from_service);
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
@@ -3057,7 +3060,6 @@ public class BinanceServiceImpl implements BinanceService {
             // sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
         } else {
             type = " (Spot) ";
-            sendMsgMonitorFibo(gecko_id, symbol, list_h4);
         }
         type = " " + type + Utils.analysisVolume(list_h4);
 
@@ -3069,31 +3071,21 @@ public class BinanceServiceImpl implements BinanceService {
                 String currency_msg = "";
                 List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
                 for (String CURR : list_currency) {
+
                     List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
-
-                    String msg = "";
-                    String cur_h4_ma8 = Utils.checkMa3AndX(list_cur_h4, 8);
-                    if (Utils.isNotBlank(cur_h4_ma8)) {
-                        msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                                + Utils.new_line_from_service + cur_h4_ma8;
-
-                        currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
-                    }
-
                     String cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 13);
                     if (Utils.isNotBlank(cur_h4_ma13)) {
-                        msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                        String msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
                                 + Utils.new_line_from_service + cur_h4_ma13;
 
                         currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
                     }
+
                 }
 
                 if (Utils.isNotBlank(currency_msg)) {
-
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
-
-                    currency_msg = Utils.getYyyyMmDD_TimeHHmm() + currency_msg;
+                    currency_msg = Utils.getMmDD_TimeHHmm() + currency_msg;
                     Utils.sendToMyTelegram(currency_msg);
                 }
             }
