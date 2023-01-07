@@ -675,7 +675,7 @@ public class Utils {
     }
 
     public static String getYyyyMmDD_TimeHHmm() {
-        return Utils.convertDateToString("(yyyyMMdd_HH:mm) ", Calendar.getInstance().getTime());
+        return Utils.convertDateToString("(MM-dd HH:mm) ", Calendar.getInstance().getTime());
     }
 
     public static String getTimeHHmm() {
@@ -1389,22 +1389,22 @@ public class Utils {
             isMa_fast_Up = false;
         }
 
-        BigDecimal ma13c = calcMA(list, slowIndex, cur);
+        BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
         BigDecimal ma13p = calcMA(list, slowIndex, pre);
         boolean isMa13Up = true;
-        if (ma13p.compareTo(ma13c) > 0) {
+        if (ma13p.compareTo(ma_slow_c) > 0) {
             isMa13Up = false;
         }
 
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
-        if ((ma_fast_c.compareTo(ma13c) > 0) && (ma13p.compareTo(ma_fast_p) > 0)) {
+        if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma13p.compareTo(ma_fast_p) > 0)) {
             isCuttingUp = true;
         }
 
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
-        if ((ma_fast_p.compareTo(ma13p) > 0) && (ma13c.compareTo(ma_fast_c) > 0)) {
+        if ((ma_fast_p.compareTo(ma13p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
             isCuttingDown = true;
         }
         // -----------------------------------------------
@@ -1433,15 +1433,11 @@ public class Utils {
         // --------------------------------------------------
         String result = "";
         if (isCuttingDown) {
-            result = "Short (ma" + slowIndex + chart + ")" + note_short;
+            result = "Short (ma" + slowIndex + ")" + chart + note_short;
         }
-
-        // --------------------------------------------------
-
         if (isCuttingUp) {
-            result = "Long (ma" + slowIndex + chart + ")" + note_long;
+            result = "Long (ma" + slowIndex + ")" + chart + note_long;
         }
-
         // --------------------------------------------------
 
         if (isNotBlank(result)) {
@@ -1472,13 +1468,12 @@ public class Utils {
                 String timing1 = timingTarget(chart, start_index * 3);
                 String timing2 = timingTarget(chart, start_index * 5);
                 // String timing3 = timingTarget(chart, start_index * 8);
-                List<BigDecimal> tpList = calcFiboTakeProfit(lh_stoploss, ma13c);
-                result += ",SL0: " + getPercentToEntry(ma13c, tpList.get(0), isLong);
-                result += ",Ma" + slowIndex + ": "
-                        + getPercentToEntry(list.get(0).getCurrPrice(), tpList.get(1), isLong);
-                result += ",Tp1: " + getPercentToEntry(ma13c, tpList.get(2), isLong);
-                result += " Tp2: " + getPercentToEntry(ma13c, tpList.get(3), isLong);
-                result += " Tp3: " + getPercentToEntry(ma13c, tpList.get(4), isLong);
+                List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_slow_c);
+                result += ",SL0: " + getPercentToEntry(ma_slow_c, fiboList.get(0), isLong);
+                result += ",E(ma): " + getPercentToEntry(list.get(0).getCurrPrice(), fiboList.get(1), isLong);
+                result += ",Tp1: " + getPercentToEntry(ma_slow_c, fiboList.get(2), isLong);
+                result += " Tp2: " + getPercentToEntry(ma_slow_c, fiboList.get(3), isLong);
+                result += " Tp(max): " + getPercentToEntry(ma_slow_c, fiboList.get(4), isLong);
                 result += ",Stop: " + timing1 + "~" + timing2;
             }
 
