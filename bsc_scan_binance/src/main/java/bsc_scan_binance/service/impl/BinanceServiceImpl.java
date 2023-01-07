@@ -2947,7 +2947,10 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Utils.isNotBlank(result)) {
 
-            String EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
+            String EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
+            if (list_find_entry.get(0).getId().contains("_4h_")) {
+                EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
+            }
 
             if (result.toUpperCase().contains("LONG")) {
                 EVENT_LONG_SHORT += "_Long";
