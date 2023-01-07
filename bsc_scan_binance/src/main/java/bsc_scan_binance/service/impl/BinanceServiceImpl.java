@@ -2944,7 +2944,7 @@ public class BinanceServiceImpl implements BinanceService {
         String current_trend = "";
         String result = Utils.checkMa3AndX(list_h4, 8);
 
-        if (Utils.isNotBlank(result)) {
+        if (Utils.isNotBlank(result) && (result.toUpperCase().contains("LONG"))) {
 
             String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + "_" + symbol + "_";
             if (list_h4.get(0).getId().contains("_4h_")) {
@@ -3039,11 +3039,10 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
 
         // debug
-        sendMsgMonitorFibo(gecko_id, symbol, list_h4);
-
-        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
+        // sendMsgMonitorFibo(gecko_id, symbol, list_h4);
 
         String type = "";
+
         if (binanceFuturesRepository.existsById(gecko_id)) {
             // List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
             // String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
@@ -3058,6 +3057,7 @@ public class BinanceServiceImpl implements BinanceService {
             // sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
         } else {
             type = " (Spot) ";
+            sendMsgMonitorFibo(gecko_id, symbol, list_h4);
         }
         type = " " + type + Utils.analysisVolume(list_h4);
 
@@ -3207,6 +3207,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         // H4 sl2ma
         String entry = "";
+        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
         if (Utils.isNotBlank(scapLongOrShortH4)
                 && (type.contains("(Futures)") || scapLongOrShortH4.contains("Long_"))) {
             scapLongOrShortH4 = scapLongOrShortH4.replace("_" + symbol.toUpperCase() + "_", "_");
