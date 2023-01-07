@@ -3010,6 +3010,10 @@ public class BinanceServiceImpl implements BinanceService {
         String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
 
         // debug
+        String debug = Utils.checkMa3AndX(list_h4, 8);
+        if (Utils.isNotBlank(debug)) {
+            Utils.sendToMyTelegram(symbol + Utils.new_line_from_service + debug);
+        }
 
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
@@ -3139,7 +3143,9 @@ public class BinanceServiceImpl implements BinanceService {
             // }
             // }
 
-            // sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
+            List<BtcFutures> list_h2 = Utils.loadData(symbol, "2h", 15);
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h2, list_h4, "");
+
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
         } else if (type.contains("Futures")) {
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Long");
