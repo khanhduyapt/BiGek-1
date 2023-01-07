@@ -2941,7 +2941,6 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgMonitorFibo(String gecko_id, String symbol, List<BtcFutures> list_h4, String only_trend) {
-
         String result = Utils.checkMa3AndX(list_h4, 8);
 
         if (Utils.isNotBlank(result)) {
@@ -2965,7 +2964,7 @@ public class BinanceServiceImpl implements BinanceService {
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
 
-                Utils.sendToMyTelegram(msg);
+                Utils.sendToMyTelegram(msg.replace(" ", ""));
             }
         }
     }
@@ -3002,7 +3001,7 @@ public class BinanceServiceImpl implements BinanceService {
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
 
-                Utils.sendToMyTelegram(msg);
+                Utils.sendToMyTelegram(msg.replace(" ", ""));
             }
         }
 
@@ -3042,10 +3041,10 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
 
         // debug
-        // sendMsgMonitorFibo(gecko_id, symbol, list_h4);
+        // List<BtcFutures> list_debug = Utils.loadData("BNB", TIME_2h, 60);
+        // sendMsgMonitorFibo("binancecoin", "BNB", list_debug, "");
 
         String type = "";
-
         if (binanceFuturesRepository.existsById(gecko_id)) {
             // List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
             // String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
@@ -3168,7 +3167,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
         } else if (type.contains("Futures")) {
-            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Long");
+            // sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Long");
         }
 
         // ---------------------------------------------------------

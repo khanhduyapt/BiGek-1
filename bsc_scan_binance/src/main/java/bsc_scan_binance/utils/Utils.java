@@ -1433,10 +1433,10 @@ public class Utils {
         // --------------------------------------------------
         String result = "";
         if (isCuttingDown) {
-            result = "Short (ma" + slowIndex + ")" + chart + note_short;
+            result = "Short (ma" + slowIndex + ") " + chart.trim().toUpperCase() + note_short;
         }
         if (isCuttingUp) {
-            result = "Long (ma" + slowIndex + ")" + chart + note_long;
+            result = "Long (ma" + slowIndex + ") " + chart.trim().toUpperCase() + note_long;
         }
         // --------------------------------------------------
 
@@ -1537,12 +1537,12 @@ public class Utils {
         Calendar calendar = Calendar.getInstance();
         int hours = getCurrentHH();
 
-        if (chartName.contains("2h")) {
+        if (chartName.contains("2h") || chartName.contains("h2")) {
             hours = hours / 2;
             hours = hours * 2;
             calendar.set(Calendar.HOUR_OF_DAY, hours - 1);
             calendar.add(Calendar.HOUR_OF_DAY, length * 2);
-        } else if (chartName.contains("4h")) {
+        } else if (chartName.contains("4h") || chartName.contains("h4")) {
             hours = hours / 4;
             hours = hours * 4;
             calendar.set(Calendar.HOUR_OF_DAY, hours - 1);
@@ -1712,9 +1712,9 @@ public class Utils {
             // result += " E2(ma" + ma_slow + "): " + getPercentToEntry(curr_price, ma10,
             // true);
             result += ",SL: " + getPercentToEntry(entry, SL, false);
-            result += ", Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$";
+            result += " Vol: " + removeLastZero(vol).replace(".0", "") + "$ Loss: " + usd + "$";
             result += ",TP1: " + getPercentToEntry(entry, TP1, false);
-            result += ". TP2: " + getPercentToEntry(entry, TP2, false);
+            result += " TP2: " + getPercentToEntry(entry, TP2, false);
             result += ",Earn1: " + removeLastZero(earn1) + "$ Earn2: " + removeLastZero(earn2) + "$";
 
             result += ",," + check3and8;
@@ -1820,7 +1820,7 @@ public class Utils {
             String result = "SL(" + type + symbol + "): " + getPercentToEntry(entry, SL, false);
 
             result += ",E1: " + getPercentToEntry(curr_price, entry, true);
-            result += ". E(ma" + slow_index + "): " + getPercentToEntry(curr_price, ma_slow, true);
+            result += " E(ma" + slow_index + "): " + getPercentToEntry(curr_price, ma_slow, true);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
 
