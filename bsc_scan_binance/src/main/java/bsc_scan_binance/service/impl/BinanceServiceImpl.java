@@ -364,8 +364,8 @@ public class BinanceServiceImpl implements BinanceService {
                                     : "")
                     + " order by                                                                                    \n"
                     + "     coalesce(can.priority, 3) ASC                                                           \n"
-                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%' AND macd.futures LIKE '%Long%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
-                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%' AND macd.futures LIKE '%Long%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
+                    + "   , (case when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%_Position%') then 10 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%Long_4h%') then 11 when (macd.futures LIKE '%Futures%' AND macd.futures LIKE '%move↑%') then 15 when macd.futures LIKE '%Futures%' then 19 \n"
+                    + "           when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%_Position%') then 30 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%Long_4h%') then 31 when (macd.futures LIKE '%Spot%'    AND macd.futures LIKE '%move↑%') then 35 when macd.futures LIKE '%Spot%'    then 39 \n"
                     + "       else 100 end) ASC \n"
                     + "   , (case when can.volumn_div_marketcap >= 0.2 then 1 else 0 end) DESC                      \n"
                     + "   , vbvr.rate1d0h DESC, vbvr.rate4h DESC                                                    \n";
@@ -2947,7 +2947,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Utils.isNotBlank(result)) {
 
-            String EVENT_LONG_SHORT = symbol + "_" + Utils.getTimeChangeDailyChart();
+            String EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
 
             if (result.toUpperCase().contains("LONG")) {
                 EVENT_LONG_SHORT += "_Long";
@@ -3010,19 +3010,17 @@ public class BinanceServiceImpl implements BinanceService {
         String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
 
         // debug
-        // Utils.checkMa10And20(list_h4);
 
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
-            List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
-
+            // List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
             // String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
             // if (Utils.isNotBlank(h1LongShort)) {
             // h1LongShort = "_ma7(" + h1LongShort.trim().replace(",", " ") + ")~";
             // scapLongOrShortH4 += h1LongShort;
             // }
 
-            type = " (Futures) " + Utils.analysisVolume(list_h1);
+            type = " (Futures) " + Utils.analysisVolume(list_h4);
 
             // debug
             // sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");

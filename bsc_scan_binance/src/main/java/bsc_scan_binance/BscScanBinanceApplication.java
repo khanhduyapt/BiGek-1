@@ -90,15 +90,15 @@ public class BscScanBinanceApplication {
 
                             String msg = binance_service.getChartWD("bitcoin", "BTC");
                             System.out.println(msg);
-                            wait(2000);
+                            wait(1);
 
                             msg = binance_service.getChartWD("ethereum", "ETH");
                             System.out.println(msg);
-                            wait(2000);
+                            wait(1);
 
                             msg = binance_service.getChartWD("binancecoin", "BNB");
                             System.out.println(msg);
-                            wait(2000);
+                            wait(1);
                         }
 
                         binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
@@ -111,7 +111,7 @@ public class BscScanBinanceApplication {
                         System.out.println("dkd error LoadData:" + e.getMessage());
                     }
 
-                    wait(2000);
+                    wait(1);
 
                     if (Objects.equals(idx, size - 1)) {
 
@@ -151,7 +151,7 @@ public class BscScanBinanceApplication {
     public static void wait(int number) {
         try {
             // Random r = new Random();
-            int ms = 6000;// + r.nextInt(number);
+            int ms = 8000;// + r.nextInt(number);
 
             java.lang.Thread.sleep(ms);
         } catch (InterruptedException ex) {
