@@ -1413,6 +1413,16 @@ public class Utils {
     }
 
     public static String analysisVolume(List<BtcFutures> list) {
+        int time_count = 0;
+        if (list.get(0).getId().contains("_4h_")) {
+            time_count = -4;
+        } else if (list.get(0).getId().contains("_2h_")) {
+            time_count = -2;
+        } else if (list.get(0).getId().contains("_1h_")) {
+            time_count = -1;
+        } else {
+            return "";
+        }
         BigDecimal avg_qty = BigDecimal.ZERO;
         int count = 0;
         for (BtcFutures dto : list) {
@@ -1424,12 +1434,14 @@ public class Utils {
             avg_qty = avg_qty.divide(BigDecimal.valueOf(count), 0, RoundingMode.CEILING);
         }
         BigDecimal tem_qty = avg_qty.multiply(BigDecimal.valueOf(1.2));
-        BigDecimal cur_qty = list.get(0).getTrading_qty();
-        BigDecimal pre_qty = list.get(1).getTrading_qty();
+        BigDecimal cur_qty_0 = list.get(0).getTrading_qty();
+        BigDecimal pre_qty_1 = list.get(1).getTrading_qty();
+        BigDecimal pre_qty_2 = list.get(2).getTrading_qty();
+        BigDecimal pre_qty_3 = list.get(3).getTrading_qty();
 
         String result = "";
-        if (cur_qty.compareTo(tem_qty) > 0) {
-            result += " " + getHH(0) + "h x" + formatPrice(cur_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+        if (cur_qty_0.compareTo(tem_qty) > 0) {
+            result += " " + getHH(0) + "h x" + formatPrice(cur_qty_0.divide(avg_qty, 2, RoundingMode.CEILING), 1);
             if (list.get(0).isUptrend()) {
                 result += " pump!";
             } else {
@@ -1437,8 +1449,9 @@ public class Utils {
             }
         }
 
-        if (pre_qty.compareTo(tem_qty) > 0) {
-            result += " " + getHH(-2) + "h x" + formatPrice(pre_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+        if (pre_qty_1.compareTo(tem_qty) > 0) {
+            result += " " + getHH(time_count) + "h x"
+                    + formatPrice(pre_qty_1.divide(avg_qty, 2, RoundingMode.CEILING), 1);
             if (list.get(1).isUptrend()) {
                 result += " pump!";
             } else {
@@ -1446,25 +1459,23 @@ public class Utils {
             }
         }
 
-        if (isBlank(result)) {
-            pre_qty = list.get(2).getTrading_qty();
-            if (pre_qty.compareTo(tem_qty) > 0) {
-                result += " " + getHH(-4) + "h x" + formatPrice(pre_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
-                if (list.get(1).isUptrend()) {
-                    result += " pump!";
-                } else {
-                    result += " dump!";
-                }
+        if (pre_qty_2.compareTo(tem_qty) > 0) {
+            result += " " + getHH(time_count * 2) + "h x"
+                    + formatPrice(pre_qty_2.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            if (list.get(2).isUptrend()) {
+                result += " pump!";
+            } else {
+                result += " dump!";
             }
+        }
 
-            pre_qty = list.get(3).getTrading_qty();
-            if (pre_qty.compareTo(tem_qty) > 0) {
-                result += " " + getHH(-6) + "h x" + formatPrice(pre_qty.divide(avg_qty, 2, RoundingMode.CEILING), 1);
-                if (list.get(1).isUptrend()) {
-                    result += " pump!";
-                } else {
-                    result += " dump!";
-                }
+        if (pre_qty_3.compareTo(tem_qty) > 0) {
+            result += " " + getHH(time_count * 3) + "h x"
+                    + formatPrice(pre_qty_3.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            if (list.get(3).isUptrend()) {
+                result += " pump!";
+            } else {
+                result += " dump!";
             }
         }
 
@@ -2208,6 +2219,13 @@ public class Utils {
             isCuttingDown = true;
         }
         // -----------------------------------------------
+        String volume_h4 = Utils.analysisVolume(list);
+        if (isNotBlank(volume_h4)) {
+            volume_h4 = ",TradingQty: " + volume_h4.replace("volma{", "").replace("}volma", "");
+        } else {
+            volume_h4 = ",TradingQty: Weak";
+        }
+
         String note_long = "";
         if (!isMa_fast_Up) {
             note_long += " Ma" + fastIndex + ":Down";
@@ -2216,7 +2234,7 @@ public class Utils {
             note_long += " Ma" + slowIndex + ":Down";
         }
         if (isNotBlank(note_long)) {
-            note_long = " (Remark)" + note_long;
+            note_long = " (Remark)," + note_long + volume_h4;
         }
 
         String note_short = "";
@@ -2227,7 +2245,7 @@ public class Utils {
             note_short += " Ma" + slowIndex + ":Up";
         }
         if (isNotBlank(note_short)) {
-            note_short = " (Remark)" + note_short;
+            note_short = " (Remark)," + note_short + volume_h4;
         }
 
         // --------------------------------------------------
@@ -2308,10 +2326,10 @@ public class Utils {
         }
 
         if (isCuttingDown && isNotBlank(note_short)) {
-            result += "," + note_short;
+            result += ",," + note_short;
         }
         if (isCuttingUp && isNotBlank(note_long)) {
-            result += "," + note_long;
+            result += ",," + note_long;
         }
 
         return result;

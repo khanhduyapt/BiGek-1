@@ -3051,7 +3051,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
-
+        String volume_h4 = Utils.analysisVolume(list_h4);
         // debug
         // List<BtcFutures> list_debug = Utils.loadData("BNB", TIME_2h, 60);
         // sendMsgMonitorFibo("binancecoin", "BNB", list_debug, "");
@@ -3072,7 +3072,7 @@ public class BinanceServiceImpl implements BinanceService {
         } else {
             type = " (Spot) ";
         }
-        type = " " + type + Utils.analysisVolume(list_h4);
+        type = type + volume_h4;
 
         if (Objects.equals("ETH", symbol)) {
             String ID = "AUD_EUR_GBP_USDT_";
