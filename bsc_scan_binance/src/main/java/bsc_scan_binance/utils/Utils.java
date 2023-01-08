@@ -2187,7 +2187,10 @@ public class Utils {
         BigDecimal ma_50 = calcMA(list, 50, 0);
 
         if ((ma_3.compareTo(ma_8) > 0) && (ma_3.compareTo(ma_13) > 0) && (ma_3.compareTo(ma_50) > 0)) {
-            if ((ma_8.compareTo(ma_50) > 0) || (ma_13.compareTo(ma_50) > 0)) {
+            if ((ma_8.compareTo(ma_50) > 0) && (ma_13.compareTo(ma_50) < 0)) {
+                return true;
+            }
+            if ((ma_13.compareTo(ma_50) > 0) && (ma_8.compareTo(ma_50) < 0)) {
                 return true;
             }
             if ((ma_8.compareTo(ma_50) < 0) && (ma_13.compareTo(ma_50) < 0)) {
@@ -2290,8 +2293,20 @@ public class Utils {
             result = "Short (Chart:" + chart.trim().toUpperCase() + ")" + (isPerfectShort(list) ? " (Perfect)" : "");
         }
         if (isCuttingUp) {
+            List<BigDecimal> low_heigh = getLowHeightCandle(list);
+            BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
+            range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+            BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
+
+            if (ma_fast_c.compareTo(max_allow_long) > 0) {
+                return "";
+            }
+
             result = "Long (Chart:" + chart.trim().toUpperCase() + ")" + (isPerfectLong(list) ? " (Perfect)" : "");
         }
+
+        // --------------------------------------------------
+
         // --------------------------------------------------
 
         if (isNotBlank(result)) {
