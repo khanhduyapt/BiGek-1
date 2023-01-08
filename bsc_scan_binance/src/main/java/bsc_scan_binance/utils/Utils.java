@@ -1424,10 +1424,16 @@ public class Utils {
             return "";
         }
         BigDecimal avg_qty = BigDecimal.ZERO;
+        int length = list.size();
+        if (length > 13) {
+            length = 13;
+        }
         int count = 0;
         for (BtcFutures dto : list) {
-            count += 1;
-            avg_qty = avg_qty.add(dto.getTrading_qty());
+            if (count < length) {
+                count += 1;
+                avg_qty = avg_qty.add(dto.getTrading_qty());
+            }
         }
 
         if (count > 0) {
