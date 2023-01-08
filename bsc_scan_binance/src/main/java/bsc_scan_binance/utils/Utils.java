@@ -856,6 +856,26 @@ public class Utils {
         return BigDecimal.valueOf(Double.valueOf(formatter.toString()));
     }
 
+    public static BigDecimal roundDefault(BigDecimal value) {
+        BigDecimal entry = value;
+
+        if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
+
+            entry = formatPrice(entry, 1);
+        } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
+
+            entry = formatPrice(entry, 2);
+        } else if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
+
+            entry = formatPrice(entry, 3);
+        } else {
+
+            entry = formatPrice(entry, 5);
+        }
+
+        return entry;
+    }
+
     public static int getDecimalNumber(BigDecimal value) {
 
         String val = removeLastZero(getStringValue(value));
@@ -1301,7 +1321,7 @@ public class Utils {
             return 13;
         }
         if (symbol.contains("_4h_")) {
-            return 8;
+            return 13;
         }
         if (symbol.contains("_1d_")) {
             return 8;
@@ -1316,10 +1336,10 @@ public class Utils {
     public static String getSlowName(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
         if (symbol.contains("_15m_")) {
-            return "15m";
+            return "m15";
         }
         if (symbol.contains("_1h_")) {
-            return "1h";
+            return "h1";
         }
         if (symbol.contains("_2h_")) {
             return "h2";
@@ -1347,35 +1367,12 @@ public class Utils {
 
         BigDecimal SL = low_heigh;
         BigDecimal entry2 = entry;
-        if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
-            SL = formatPrice(SL, 1);
-            entry2 = formatPrice(entry2, 1);
 
-            tp_3618 = formatPrice(tp_3618, 1);
-            tp_4236 = formatPrice(tp_4236, 1);
-            tp_6854 = formatPrice(tp_6854, 1);
-        } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
-            SL = formatPrice(SL, 2);
-            entry2 = formatPrice(entry2, 2);
-
-            tp_3618 = formatPrice(tp_3618, 2);
-            tp_4236 = formatPrice(tp_4236, 2);
-            tp_6854 = formatPrice(tp_6854, 2);
-        } else if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-            SL = formatPrice(SL, 3);
-            entry2 = formatPrice(entry2, 3);
-
-            tp_3618 = formatPrice(tp_3618, 3);
-            tp_4236 = formatPrice(tp_4236, 3);
-            tp_6854 = formatPrice(tp_6854, 3);
-        } else {
-            SL = formatPrice(SL, 5);
-            entry2 = formatPrice(entry2, 5);
-
-            tp_3618 = formatPrice(tp_3618, 5);
-            tp_4236 = formatPrice(tp_4236, 5);
-            tp_6854 = formatPrice(tp_6854, 5);
-        }
+        SL = roundDefault(SL);
+        entry2 = roundDefault(entry2);
+        tp_3618 = roundDefault(tp_3618);
+        tp_4236 = roundDefault(tp_4236);
+        tp_6854 = roundDefault(tp_6854);
 
         result.add(SL); // 1
         result.add(entry2); // 1
@@ -1539,27 +1536,10 @@ public class Utils {
                 TP = low_heigh_tp.get(0);
             }
 
-            if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
-                entry = formatPrice(entry, 1);
-                SL = formatPrice(SL, 1);
-                TP = formatPrice(TP, 1);
-                ma_slow = formatPrice(ma_slow, 1);
-            } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
-                entry = formatPrice(entry, 2);
-                SL = formatPrice(SL, 2);
-                TP = formatPrice(TP, 2);
-                ma_slow = formatPrice(ma_slow, 2);
-            } else if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-                entry = formatPrice(entry, 3);
-                SL = formatPrice(SL, 3);
-                TP = formatPrice(TP, 3);
-                ma_slow = formatPrice(ma_slow, 3);
-            } else {
-                entry = formatPrice(entry, 5);
-                SL = formatPrice(SL, 5);
-                TP = formatPrice(TP, 5);
-                ma_slow = formatPrice(ma_slow, 5);
-            }
+            entry = roundDefault(entry);
+            SL = roundDefault(SL);
+            TP = roundDefault(TP);
+            ma_slow = roundDefault(ma_slow);
 
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
             vol = formatPrice(vol.multiply(entry).abs(), 0);
@@ -2134,27 +2114,10 @@ public class Utils {
             BigDecimal curr_price = list_find_entry.get(0).getCurrPrice();
             BigDecimal entry = curr_price;
 
-            if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
-                entry = formatPrice(entry, 1);
-                SL = formatPrice(SL, 1);
-                TP1 = formatPrice(TP1, 1);
-                TP2 = formatPrice(TP2, 1);
-            } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
-                entry = formatPrice(entry, 2);
-                SL = formatPrice(SL, 2);
-                TP1 = formatPrice(TP1, 2);
-                TP2 = formatPrice(TP2, 2);
-            } else if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-                entry = formatPrice(entry, 3);
-                SL = formatPrice(SL, 3);
-                TP1 = formatPrice(TP1, 3);
-                TP2 = formatPrice(TP2, 3);
-            } else {
-                entry = formatPrice(entry, 5);
-                SL = formatPrice(SL, 5);
-                TP1 = formatPrice(TP1, 5);
-                TP2 = formatPrice(TP2, 5);
-            }
+            entry = roundDefault(entry);
+            SL = roundDefault(SL);
+            TP1 = roundDefault(TP1);
+            TP2 = roundDefault(TP2);
 
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
             vol = formatPrice(vol.multiply(entry).abs(), 0);
@@ -2201,15 +2164,48 @@ public class Utils {
             size = 50;
         }
         BigDecimal ma_size = calcMA(list, size, cur);
-        String str_ma_size = "";
-        String per = removeLastZero(getPercent(ma_fast_c, ma_size).abs());
+        String str_ma_size = getSlowName(list).toUpperCase() + ":";
+        String per = getPercentToEntry(ma_fast_c, ma_size, true);
         if (ma_fast_c.compareTo(ma_size) > 0) {
-            str_ma_size = " Above(Ma" + size + ":" + per + "%)";
+            str_ma_size += "Above_Ma" + size + ":" + per;
         } else {
-            str_ma_size = " Below(Ma" + size + ":" + per + "%)";
+            str_ma_size += "Below_Ma" + size + ":" + per;
         }
 
         return str_ma_size;
+    }
+
+    public static boolean isPerfectLong(List<BtcFutures> list) {
+        BigDecimal ma_3 = calcMA(list, 3, 0);
+        BigDecimal ma_8 = calcMA(list, 8, 0);
+        BigDecimal ma_13 = calcMA(list, 13, 0);
+        BigDecimal ma_50 = calcMA(list, 50, 0);
+
+        if ((ma_3.compareTo(ma_8) > 0) && (ma_3.compareTo(ma_13) > 0) && (ma_3.compareTo(ma_50) > 0)) {
+            if ((ma_8.compareTo(ma_50) > 0) || (ma_13.compareTo(ma_50) > 0)) {
+                return true;
+            }
+            if ((ma_8.compareTo(ma_50) < 0) && (ma_13.compareTo(ma_50) < 0)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isPerfectShort(List<BtcFutures> list) {
+        BigDecimal ma_3 = calcMA(list, 3, 0);
+        BigDecimal ma_8 = calcMA(list, 8, 0);
+        BigDecimal ma_13 = calcMA(list, 13, 0);
+        BigDecimal ma_50 = calcMA(list, 50, 0);
+
+        if ((ma_3.compareTo(ma_8) < 0) && (ma_3.compareTo(ma_13) < 0) && (ma_3.compareTo(ma_50) < 0)) {
+            if (((ma_8.compareTo(ma_50) < 0) || (ma_13.compareTo(ma_50) < 0))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex) {
@@ -2282,10 +2278,10 @@ public class Utils {
         // --------------------------------------------------
         String result = "";
         if (isCuttingDown) {
-            result = "Short (Chart:" + chart.trim().toUpperCase() + ")";
+            result = "Short (Chart:" + chart.trim().toUpperCase() + ")" + (isPerfectShort(list) ? " (Perfect)" : "");
         }
         if (isCuttingUp) {
-            result = "Long (Chart:" + chart.trim().toUpperCase() + ")";
+            result = "Long (Chart:" + chart.trim().toUpperCase() + ")" + (isPerfectLong(list) ? " (Perfect)" : "");
         }
         // --------------------------------------------------
 

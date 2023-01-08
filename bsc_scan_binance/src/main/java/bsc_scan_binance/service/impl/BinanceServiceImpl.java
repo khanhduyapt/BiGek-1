@@ -911,7 +911,9 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
-                    css.setRange_backer(Utils.getStringValue(dto.getBacker()).replace("_", " ").replace("...", " "));
+                    css.setRange_backer(Utils.getStringValue(dto.getBacker()).replace("_", " ").replace(",,", ",")
+                            .replace("   :", ":").replace(" :", ":").replace("...", " ").replace(",", ", ")
+                            .replace("  ", " "));
 
                     String m2ma = "";
                     if (futu.contains("m2ma{") && futu.contains("}m2ma")) {
@@ -968,7 +970,14 @@ public class BinanceServiceImpl implements BinanceService {
                                         css.setRange_entry_css("text-danger");
                                         css.setRange_take_profit_css("text-danger");
                                         css.setRange_volume_css("text-danger");
+                                    } else if (sl_e_tp[0].contains("SL(Long_")) {
+                                        css.setRange_stoploss_css("text-primary");
+                                        css.setRange_entry_css("text-primary");
+                                        css.setRange_take_profit_css("text-primary");
+                                        css.setRange_volume_css("text-primary");
                                     }
+                                } else {
+                                    css.setRange_stoploss(sl2ma);
                                 }
                             }
                         } catch (Exception e) {
@@ -3098,6 +3107,7 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Long");
         }
 
+        // AUD_EUR_GBP_USDT
         if (Objects.equals("ETH", symbol)) {
             String ID = "AUD_EUR_GBP_USDT_";
             String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog4h();
@@ -3119,7 +3129,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (Utils.isNotBlank(currency_msg)) {
                     fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
-                    currency_msg = Utils.getMmDD_TimeHHmm() + currency_msg;
+
+                    currency_msg = Utils.getMmDD_TimeHHmm() + currency_msg.replace(",", Utils.new_line_from_service);
+
                     Utils.sendToMyTelegram(currency_msg);
                 }
             }
@@ -3191,7 +3203,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
         String checkMa50 = Utils.checkMa3And50(list_h4);
-        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + " H4:" + checkMa50 + "}m2ma";
+        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + " " + checkMa50 + "}m2ma";
 
         // H4 sl2ma
         String entry = "";
