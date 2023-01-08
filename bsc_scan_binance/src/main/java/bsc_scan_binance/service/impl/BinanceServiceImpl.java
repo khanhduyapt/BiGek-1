@@ -144,7 +144,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_DANGER_CZ_KILL_LONG = "CZ_KILL_LONG";
     private static final String EVENT_BTC_RANGE = "BTC_RANGE";
     private static final String EVENT_BTC_ON_EXCHANGES = "BTC_EXCHANGES";
-    private static final String EVENT_FIBO_LONG_SHORT = "FIBO";
+    private static final String EVENT_FIBO_LONG_SHORT = "FIBO_";
     private static final String EVENT_TREND_1W1D = "1W1D";
     private static final String EVENT_COMPRESSED_CHART = "Ma3_10_20_";
     private static final String EVENT_PUMP = "Pump_1";
@@ -910,6 +910,8 @@ public class BinanceServiceImpl implements BinanceService {
                             css.setRange_move("ma7 exception");
                         }
                     }
+
+                    css.setRange_backer(Utils.getStringValue(dto.getBacker()).replace("_", " ").replace("...", " "));
 
                     String m2ma = "";
                     if (futu.contains("m2ma{") && futu.contains("}m2ma")) {
@@ -2957,7 +2959,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + "_" + symbol + "_";
+            String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + symbol + "_";
             if (list_h4.get(0).getId().contains("_4h_")) {
                 EVENT_LONG_SHORT += Utils.getCurrentYyyyMmDd_Blog4h();
             } else {
@@ -2980,13 +2982,16 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_sl_tp, String trend) {
 
         String current_trend = "";
-        String result = Utils.getScapLongOrShort_BTC(list_find_entry, list_sl_tp, 5);
+        String result = Utils.getScapLongOrShort_BTC(list_find_entry, list_sl_tp, 10);
 
         if (Utils.isNotBlank(result)) {
 
-            String EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
+            String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + list_find_entry.get(0).getId() + "_"
+                    + Utils.getCurrentYyyyMmDd_Blog2h();
+
             if (list_find_entry.get(0).getId().contains("_4h_")) {
-                EVENT_LONG_SHORT = symbol + "_" + Utils.getCurrentYyyyMmDd_Blog4h();
+                EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + list_find_entry.get(0).getId() + "_"
+                        + Utils.getCurrentYyyyMmDd_Blog4h();
             }
 
             if (result.toUpperCase().contains("LONG")) {
@@ -3071,7 +3076,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Objects.equals("ETH", symbol)) {
             String ID = "AUD_EUR_GBP_USDT_";
-            String EVENT_LONG_SHORT_CURRENCY = ID + Utils.getCurrentYyyyMmDd_Blog2h();
+            String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
 
             if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
                 String currency_msg = "";
@@ -3103,7 +3108,7 @@ public class BinanceServiceImpl implements BinanceService {
             if (Utils.isNotBlank(note)) {
                 PriorityCoinHistory his = new PriorityCoinHistory();
                 his.setGeckoid(gecko_id);
-                his.setSymbol(Utils.getCurrentYyyyMmDdHH() + "_" + symbol);
+                his.setSymbol(Utils.getMmDD_TimeHHmm());
                 if (note.length() > 255) {
                     note = note.substring(0, 250) + "...";
                 }
