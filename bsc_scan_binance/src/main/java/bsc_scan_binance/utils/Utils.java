@@ -2168,6 +2168,11 @@ public class Utils {
         String per = getPercentToEntry(ma_fast_c, ma_size, true);
         if (ma_fast_c.compareTo(ma_size) > 0) {
             str_ma_size += "Above_Ma" + size + ":" + per;
+
+            BigDecimal ma_fast_p = calcMA(list, 3, 2);
+            if (ma_fast_p.compareTo(ma_size) < 0) {
+                str_ma_size += "Long";
+            }
         } else {
             str_ma_size += "Below_Ma" + size + ":" + per;
         }
@@ -2233,6 +2238,10 @@ public class Utils {
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
         if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma13p.compareTo(ma_fast_p) > 0)) {
+            isCuttingUp = true;
+        }
+        if (str_ma_size.contains("Long")) {
+            str_ma_size = str_ma_size.replace("Long", "");
             isCuttingUp = true;
         }
 
