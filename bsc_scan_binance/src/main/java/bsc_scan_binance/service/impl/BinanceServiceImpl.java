@@ -2976,15 +2976,16 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
+            String msg = Utils.getMmDD_TimeHHmm() + symbol;
+
             String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + symbol + "_";
             if (list_h4.get(0).getId().contains("_4h_")) {
                 EVENT_LONG_SHORT += Utils.getCurrentYyyyMmDd_Blog4h();
             } else {
                 EVENT_LONG_SHORT += Utils.getCurrentYyyyMmDd_Blog2h();
+                msg += " prepare: ";
             }
 
-            String msg = Utils.getMmDD_TimeHHmm();
-            msg += symbol + " prepare: ";
             msg += result.replace(",", Utils.new_line_from_service);
 
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
