@@ -2194,7 +2194,7 @@ public class Utils {
     }
 
     public static String checkMa3And50(List<BtcFutures> list) {
-        int cur = 1;
+        int cur = 0;
         BigDecimal ma_fast_c = calcMA(list, 3, cur);
         int size = list.size();
         if (size > 50) {
@@ -2202,10 +2202,11 @@ public class Utils {
         }
         BigDecimal ma_size = calcMA(list, size, cur);
         String str_ma_size = "";
+        String per = removeLastZero(getPercent(ma_fast_c, ma_size).abs());
         if (ma_fast_c.compareTo(ma_size) > 0) {
-            str_ma_size = " Above(Ma" + size + ")";
+            str_ma_size = " Above(Ma" + size + ":" + per + "%)";
         } else {
-            str_ma_size = " Below(Ma" + size + ")";
+            str_ma_size = " Below(Ma" + size + ":" + per + "%)";
         }
 
         return str_ma_size;
