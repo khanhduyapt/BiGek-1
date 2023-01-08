@@ -2312,7 +2312,7 @@ public class Utils {
         if (isNotBlank(result)) {
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
 
-            if (list.get(0).getId().contains("_4h_") || list.get(0).getId().contains("_2h_")) {
+            if (list.get(0).getId().contains("_4h_")) {
                 boolean isLong = result.contains("Long");
                 List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
 

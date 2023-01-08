@@ -2984,7 +2984,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             String msg = Utils.getMmDD_TimeHHmm();
-            msg += symbol + Utils.new_line_from_service;
+            msg += symbol + " prepare: ";
             msg += result.replace(",", Utils.new_line_from_service);
 
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
