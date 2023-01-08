@@ -44,6 +44,7 @@ import bsc_scan_binance.entity.GeckoVolumeMonth;
 import bsc_scan_binance.entity.GeckoVolumeMonthKey;
 import bsc_scan_binance.entity.GeckoVolumeUpPre4h;
 import bsc_scan_binance.entity.Orders;
+import bsc_scan_binance.entity.PriorityCoinHistory;
 import bsc_scan_binance.repository.BinanceFuturesRepository;
 import bsc_scan_binance.repository.BinanceVolumeDateTimeRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
@@ -59,6 +60,7 @@ import bsc_scan_binance.repository.FundingHistoryRepository;
 import bsc_scan_binance.repository.GeckoVolumeMonthRepository;
 import bsc_scan_binance.repository.GeckoVolumeUpPre4hRepository;
 import bsc_scan_binance.repository.OrdersRepository;
+import bsc_scan_binance.repository.PriorityCoinHistoryRepository;
 import bsc_scan_binance.response.BollAreaResponse;
 import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
@@ -115,7 +117,7 @@ public class BinanceServiceImpl implements BinanceService {
     private BtcFuturesRepository btcFuturesRepository;
 
     @Autowired
-    private CandidateCoinRepository candidateCoinRepository;
+    private PriorityCoinHistoryRepository priorityCoinHistoryRepository;
 
     @Autowired
     private FundingHistoryRepository fundingHistoryRepository;
@@ -199,9 +201,9 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    boll.is_top_area,                                                                      \n"
                     + "    0 as profit,                                                                           \n"
                     + "                                                                                           \n"
-                    + "    (select count(w.gecko_id) from binance_volumn_week w where w.ema > 0 and w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd between TO_CHAR(NOW() - interval  '6 days', 'yyyyMMdd') and TO_CHAR(NOW(), 'yyyyMMdd')) as count_up, "
+                    + "    0 as count_up, "
 
-                    + "   vol.pumping_history,                                                                     \n "
+                    + "   vol.pumping_history,                                                                    \n "
 
                     + "   ROUND(can.volumn_div_marketcap * 100, 0) volumn_div_marketcap,                          \n"
                     + "                                                                                           \n"
@@ -237,7 +239,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.circulating_supply,                                                                 \n"
                     + "   can.binance_trade,                                                                      \n"
                     + "   can.coin_gecko_link,                                                                    \n"
-                    + "   can.backer,                                                                             \n"
+                    + "   (select concat (name,' ', symbol) from priority_coin_history w where w.gecko_id = can.gecko_id) as backer,                                                                             \n"
                     + "   can.note,                                                                               \n"
                     + "                                                                                           \n"
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4), '~', ROUND(w.ema, 5), '~', coalesce(price_change_24h, 0), '~', ROUND(gecko_volume, 1) ) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as today,  \n"
@@ -2773,6 +2775,11 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Transactional
     private void loadFundingHistory(String gecko_id, String symbol) {
+        boolean notusingthismethod = true;
+        if (notusingthismethod) {
+            return;
+        }
+
         if (Objects.equals("BTC", symbol)) {
             return;
         }
@@ -3079,7 +3086,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                         currency_msg += Utils.new_line_from_service + Utils.new_line_from_service + msg;
                     }
-
                 }
 
                 if (Utils.isNotBlank(currency_msg)) {
@@ -3093,12 +3099,17 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         try {
-            BinanceVolumnDayKey id = (new BinanceVolumnDayKey(gecko_id, symbol,
-                    Utils.convertDateToString("HH", Calendar.getInstance().getTime())));
-            BinanceVolumnDay day = binanceVolumnDayRepository.findById(id).orElse(null);
-            if (!Objects.equals(null, day)) {
-                day.setPriceAtBinance(current_price);
-                binanceVolumnDayRepository.save(day);
+            String note = Utils.checkMa3AndSlowIndex(list_h4).replace(" ", "");
+            if (Utils.isNotBlank(note)) {
+                PriorityCoinHistory his = new PriorityCoinHistory();
+                his.setGeckoid(gecko_id);
+                his.setSymbol(Utils.getCurrentYyyyMmDdHH() + "_" + symbol);
+                if (note.length() > 255) {
+                    note = note.substring(0, 250) + "...";
+                }
+                his.setName(note);
+
+                priorityCoinHistoryRepository.save(his);
             }
         } catch (Exception e) {
         }
@@ -3131,37 +3142,6 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            // String scap = Utils.checkMa10And20(list_15m);
-            // if (Utils.isNotBlank(scap)) {
-            // type += " scap{" + scap.replace(" ", "") + "_h1}scap";
-            // }
-            //
-            // if (Objects.equals("ETH", symbol)) {
-            // if (Utils.isBusinessTime()) {
-            // List<BigDecimal> low_heigh_15m = Utils.getLowHeightCandle(list_15m);
-            // BigDecimal percent_15m = Utils.getPercent(low_heigh_15m.get(1),
-            // low_heigh_15m.get(0)).abs();
-            //
-            // if (percent_15m.compareTo(BigDecimal.valueOf(0.65)) > 0) {
-            // String scap15m = Utils.getScapLongOrShort_BTC(list_15m, list_h1, 10);
-            // if (Utils.isNotBlank(scap15m)) {
-            //
-            // String EVENT_LONG_SHORT = "LONG_SHORT_15m_" + symbol + "_"
-            // + Utils.getCurrentYyyyMmDd_Blog2h();
-            //
-            // if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
-            // fundingHistoryRepository
-            // .save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
-            //
-            // Utils.sendToMyTelegram(Utils.getYyyyMmDD_TimeHHmm()
-            // + scap15m.replace(",", Utils.new_line_from_service));
-            // }
-            //
-            // }
-            // }
-            // }
-            // }
-
             List<BtcFutures> list_h2 = Utils.loadData(symbol, "2h", 15);
             sendMsgMonitorLongShort(gecko_id, symbol, list_h2, list_h4, "");
 
@@ -3171,8 +3151,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
-        String checkW = Utils.checkMa3And13(list_weeks);
-        String checkD = Utils.checkMa3And13(list_days);
+        String checkW = Utils.checkMa3AndSlowIndex(list_weeks);
+        String checkD = Utils.checkMa3AndSlowIndex(list_days);
 
         String mUpMa = "";
         // boolean chartDUpMa10 = Utils.isAboveMALine(list_days, 10, 0);

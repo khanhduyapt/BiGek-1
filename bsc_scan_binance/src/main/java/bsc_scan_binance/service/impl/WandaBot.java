@@ -67,7 +67,7 @@ public class WandaBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         try {
             SendMessage message = new SendMessage();
-            message.setChatId(update.getMessage().getChatId().toString());
+            message.setChatId(Utils.getStringValue(update.getMessage().getChatId()));
 
             String userName = update.getMessage().getChat().getUserName();
             Boolean is_linhdk = Objects.equal("LokaDon", userName);
@@ -79,8 +79,8 @@ public class WandaBot extends TelegramLongPollingBot {
                 return;
             }
 
-            System.out.println(update.getMessage().getText());
-            String command = update.getMessage().getText();
+            String command = Utils.getStringValue(update.getMessage().getText());
+            System.out.println(command);
 
             if (command.contains("/btc")) {
 

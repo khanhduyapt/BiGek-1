@@ -34,13 +34,11 @@ import org.springframework.web.servlet.LocaleResolver;
 import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.PrepareOrders;
-import bsc_scan_binance.entity.PriorityCoin;
 import bsc_scan_binance.response.BtcFuturesResponse;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.FundingResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
-import bsc_scan_binance.response.PriorityCoinResponse;
 
 public class Utils {
     public static final String chatId_duydk = "5099224587";
@@ -235,11 +233,6 @@ public class Utils {
         return new ArrayList<BtcFutures>();
     }
 
-    public static String toString(PriorityCoin tele) {
-        return tele.getSymbol() + ":" + tele.getName() + " P:" + tele.getCurrent_price() + "$ Target:"
-                + tele.getTarget_percent() + " ema:" + tele.getEma();
-    }
-
     public static String createMsgBalance(OrdersProfitResponse dto, String newline) {
         String result = String.format("[%s]", dto.getGecko_id()) + newline + "Price: "
                 + dto.getPrice_at_binance().toString() + "$, "
@@ -270,24 +263,6 @@ public class Utils {
         return "L:" + Utils.removeLastZero(low_price.toString()) + "(" + Utils.toPercent(low_price, curr_price, 1)
                 + "%)" + "-H:" + Utils.removeLastZero(hight_price.toString()) + "("
                 + Utils.toPercent(hight_price, curr_price, 1) + "%)" + "$";
-    }
-
-    public static String createMsgPriorityToken(PriorityCoin dto, String newline) {
-        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGeckoid())
-                + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline;
-        // + "Price: " + dto.getCurrent_price().toString() + "$" + newline
-        // + dto.getNote().replace("~", newline) + newline
-        result += createMsgLowHeight(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price());
-        return result;
-    }
-
-    public static String createMsgPriorityCoinResponse(PriorityCoinResponse dto, String newline) {
-        String result = String.format("[%s]_[%s]", dto.getSymbol(), dto.getGecko_id())
-                + whenGoodPrice(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price()) + newline + "Price: "
-                + dto.getCurrent_price().toString() + "$" + newline + dto.getNote() + newline
-                + createMsgLowHeight(dto.getCurrent_price(), dto.getLow_price(), dto.getHeight_price());
-
-        return result;
     }
 
     public static String getDataType(PrepareOrders entity) {
@@ -509,7 +484,7 @@ public class Utils {
 
     public static boolean isBusinessTime() {
         int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        if ((22 <= hh || hh <= 8)) {
+        if ((23 <= hh || hh <= 8)) {
             return false;
         }
 
@@ -669,13 +644,13 @@ public class Utils {
         if (hh >= 0 && hh < 7) {
             calendar.add(Calendar.DAY_OF_MONTH, -1);
         }
-        String result = Utils.convertDateToString("yyyyMMdd", calendar.getTime()) + "_07";
+        String result = Utils.convertDateToString("yyyy.MM.dd", calendar.getTime()) + "_07";
 
         return result;
     }
 
     public static String getMmDD_TimeHHmm() {
-        return Utils.convertDateToString("(MM-dd HH:mm) ", Calendar.getInstance().getTime());
+        return Utils.convertDateToString("(MM-dd_HH:mm) ", Calendar.getInstance().getTime());
     }
 
     public static String getTimeHHmm() {
@@ -683,8 +658,7 @@ public class Utils {
     }
 
     public static String getToday_YyyyMMdd() {
-
-        return Utils.convertDateToString("yyyyMMdd", Calendar.getInstance().getTime());
+        return Utils.convertDateToString("yyyy.MM.dd", Calendar.getInstance().getTime());
     }
 
     public static String getToday_dd() {
@@ -698,7 +672,7 @@ public class Utils {
     }
 
     public static String getCurrentYyyyMmDdHH() {
-        return Utils.convertDateToString("yyyy.MM.dd_HH", Calendar.getInstance().getTime());
+        return Utils.convertDateToString("yyyy.MM.dd_HH", Calendar.getInstance().getTime()) + "h";
     }
 
     public static String getCurrentYyyyMmDd_Blog2h() {
@@ -1363,128 +1337,6 @@ public class Utils {
         return "";
     }
 
-    public static String checkMa3And13(List<BtcFutures> list) {
-        return checkMa3AndX(list, getSlowIndex(list));
-    }
-
-    // down:
-    // -20
-    // -24
-    // -60
-    //
-    // up:
-    // -15
-    // 20
-
-    public static String checkMa3AndX(List<BtcFutures> list, int slowIndex) {
-        String symbol = list.get(0).getId();
-        String chart = getSlowName(list);
-        int cur = 1;
-        int pre = 2;
-        int fastIndex = 3;
-        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
-        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
-        boolean isMa_fast_Up = true;
-        if (ma_fast_p.compareTo(ma_fast_c) > 0) {
-            isMa_fast_Up = false;
-        }
-
-        BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
-        BigDecimal ma13p = calcMA(list, slowIndex, pre);
-        boolean isMa13Up = true;
-        if (ma13p.compareTo(ma_slow_c) > 0) {
-            isMa13Up = false;
-        }
-
-        // -----------------------------------------------
-        boolean isCuttingUp = false;// Long
-        if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma13p.compareTo(ma_fast_p) > 0)) {
-            isCuttingUp = true;
-        }
-
-        // -----------------------------------------------
-        boolean isCuttingDown = false; // Short
-        if ((ma_fast_p.compareTo(ma13p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
-            isCuttingDown = true;
-        }
-        // -----------------------------------------------
-        String note_long = "";
-        if (!isMa_fast_Up) {
-            note_long += " Ma" + fastIndex + ":Down";
-        }
-        if (!isMa13Up) {
-            note_long += " Ma" + slowIndex + ":Down";
-        }
-        if (isNotBlank(note_long)) {
-            note_long = " (Remark)" + note_long;
-        }
-
-        String note_short = "";
-        if (isMa_fast_Up) {
-            note_short += " Ma" + fastIndex + ":Up";
-        }
-        if (isMa13Up) {
-            note_short += " Ma" + slowIndex + ":Up";
-        }
-        if (isNotBlank(note_short)) {
-            note_short = " (Remark)" + note_short;
-        }
-
-        // --------------------------------------------------
-        String result = "";
-        if (isCuttingDown) {
-            result = "Short (ma" + slowIndex + ") " + chart.trim().toUpperCase() + note_short;
-        }
-        if (isCuttingUp) {
-            result = "Long (ma" + slowIndex + ") " + chart.trim().toUpperCase() + note_long;
-        }
-        // --------------------------------------------------
-
-        if (isNotBlank(result)) {
-            symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
-
-            if (list.get(0).getId().contains("_4h_") || list.get(0).getId().contains("_2h_")) {
-                boolean isLong = result.contains("Long");
-                List<BigDecimal> low_heigh = getLowHeightCandle(
-                        list.subList(0, list.size() > slowIndex ? slowIndex : list.size()));
-
-                int start_index = 0;
-                BigDecimal lh_stoploss = isLong ? low_heigh.get(0) : low_heigh.get(1);
-                for (int index = 0; index <= slowIndex; index++) {
-                    if (index < list.size()) {
-                        BtcFutures dto = list.get(index);
-                        if (isLong) {
-                            if (lh_stoploss.compareTo(dto.getLow_price()) >= 0) {
-                                start_index = index;
-                            }
-                        } else {
-                            if (lh_stoploss.compareTo(dto.getHight_price()) <= 0) {
-                                start_index = index;
-                            }
-                        }
-                    }
-                }
-
-                String timing1 = timingTarget(chart, start_index * 3);
-                String timing2 = timingTarget(chart, start_index * 5);
-                // String timing3 = timingTarget(chart, start_index * 8);
-                List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_slow_c);
-                result += ",SL0: " + getPercentToEntry(ma_slow_c, fiboList.get(0), isLong);
-                result += ",E(ma): " + getPercentToEntry(list.get(0).getCurrPrice(), fiboList.get(1), isLong);
-                result += ",Tp1: " + getPercentToEntry(ma_slow_c, fiboList.get(2), isLong);
-                result += " Tp2: " + getPercentToEntry(ma_slow_c, fiboList.get(3), isLong);
-                result += " Tp(max): " + getPercentToEntry(ma_slow_c, fiboList.get(4), isLong);
-                result += ",Stop: " + timing1 + "~" + timing2;
-            }
-
-            String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
-
-            System.out.println(log);
-        }
-
-        return result;
-    }
-
     public static List<BigDecimal> calcFiboTakeProfit(BigDecimal low_heigh, BigDecimal entry) {
         BigDecimal sub1_0 = entry.subtract(low_heigh);
 
@@ -1493,36 +1345,26 @@ public class Utils {
         BigDecimal tp_4236 = low_heigh.add((sub1_0.multiply(BigDecimal.valueOf(4.236))));
         BigDecimal tp_6854 = low_heigh.add((sub1_0.multiply(BigDecimal.valueOf(6.854))));
 
-        BigDecimal entry2 = entry;
-        BigDecimal low_heigh2 = low_heigh;
-        if (entry2.compareTo(BigDecimal.valueOf(100)) > 0) {
-            low_heigh2 = formatPrice(low_heigh2, 0);
-            entry2 = formatPrice(entry2, 0);
-            tp_3618 = formatPrice(tp_3618, 0);
-            tp_4236 = formatPrice(tp_4236, 0);
-            tp_6854 = formatPrice(tp_6854, 0);
-        } else if (entry2.compareTo(BigDecimal.valueOf(1)) > 0) {
-            low_heigh2 = formatPrice(low_heigh2, 2);
-            entry2 = formatPrice(entry2, 2);
+        if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
+            tp_3618 = formatPrice(tp_3618, 1);
+            tp_4236 = formatPrice(tp_4236, 1);
+            tp_6854 = formatPrice(tp_6854, 1);
+        } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
             tp_3618 = formatPrice(tp_3618, 2);
             tp_4236 = formatPrice(tp_4236, 2);
             tp_6854 = formatPrice(tp_6854, 2);
-        } else if (entry2.compareTo(BigDecimal.valueOf(0.5)) > 0) {
-            low_heigh2 = formatPrice(low_heigh2, 3);
-            entry2 = formatPrice(entry2, 3);
+        } else if (entry.compareTo(BigDecimal.valueOf(0.5)) > 0) {
             tp_3618 = formatPrice(tp_3618, 3);
             tp_4236 = formatPrice(tp_4236, 3);
             tp_6854 = formatPrice(tp_6854, 3);
         } else {
-            low_heigh2 = formatPrice(low_heigh2, 5);
-            entry2 = formatPrice(entry2, 5);
             tp_3618 = formatPrice(tp_3618, 5);
             tp_4236 = formatPrice(tp_4236, 5);
             tp_6854 = formatPrice(tp_6854, 5);
         }
 
-        result.add(low_heigh2); // 1
-        result.add(entry2); // 1
+        result.add(low_heigh); // 1
+        result.add(entry); // 1
         result.add(tp_3618); // 3.618
         result.add(tp_4236); // 4.236
         result.add(tp_6854); // 6.854
@@ -1623,7 +1465,7 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check3and8 = checkMa3And13(list_find_entry);
+            String check3and8 = checkMa3AndSlowIndex(list_find_entry);
 
             if (Utils.isBlank(check3and8)) {
                 return "";
@@ -1674,10 +1516,10 @@ public class Utils {
             BigDecimal entry = curr_price;
 
             if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
-                entry = formatPrice(entry, 0);
-                SL = formatPrice(SL, 0);
-                TP1 = formatPrice(TP1, 0);
-                TP2 = formatPrice(TP2, 0);
+                entry = formatPrice(entry, 1);
+                SL = formatPrice(SL, 1);
+                TP1 = formatPrice(TP1, 1);
+                TP2 = formatPrice(TP2, 1);
             } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
                 entry = formatPrice(entry, 2);
                 SL = formatPrice(SL, 2);
@@ -1747,7 +1589,7 @@ public class Utils {
 
     public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String type = checkMa3And13(list_entry);
+            String type = checkMa3AndSlowIndex(list_entry);
             if (Utils.isBlank(type)) {
                 return "";
             }
@@ -1791,10 +1633,10 @@ public class Utils {
             }
 
             if (entry.compareTo(BigDecimal.valueOf(100)) > 0) {
-                entry = formatPrice(entry, 0);
-                SL = formatPrice(SL, 0);
-                TP = formatPrice(TP, 0);
-                ma_slow = formatPrice(ma_slow, 0);
+                entry = formatPrice(entry, 1);
+                SL = formatPrice(SL, 1);
+                TP = formatPrice(TP, 1);
+                ma_slow = formatPrice(ma_slow, 1);
             } else if (entry.compareTo(BigDecimal.valueOf(1)) > 0) {
                 entry = formatPrice(entry, 2);
                 SL = formatPrice(SL, 2);
@@ -2319,249 +2161,151 @@ public class Utils {
 
         return dto;
     }
-}
 
+    public static String checkMa3AndSlowIndex(List<BtcFutures> list) {
+        return checkMa3AndX(list, getSlowIndex(list));
+    }
+
+// down:
+// -20
+// -24
+// -60
 //
-//public String calcPointCompressedChart(String gecko_id, String symbol) {
-//  boolean exit = true;
-//  if (exit) {
-//      return "";
-//  }
-//  if (23 <= pre_HH || pre_HH <= 8) {
-//      // return "";
-//  }
-//
-//  String note = "";
-//  // Utils.sendToMyTelegram(" 💹 Long: 📉 💚 💔");
-//  try {
-//      List<BtcFutures> list_3days;
-//      String type = "";
-//
-//      if (binanceFuturesRepository.existsById(gecko_id)) {
-//          type = " (Futures)";
-//          // list_3days = Utils.loadData(symbol, TIME_1h, 72);
-//      } else {
-//          type = " (Spot)";
-//          // list_3days = Utils.loadData(symbol, TIME_1d, 14);
-//      }
-//      list_3days = Utils.loadData(symbol, TIME_1h, 72);
-//
-//      if (CollectionUtils.isEmpty(list_3days)) {
-//          return "";
-//      }
-//      BtcFutures cur_1h = list_3days.get(0);
-//
-//      BigDecimal min_open = BigDecimal.valueOf(1000000);
-//      BigDecimal min_low = BigDecimal.valueOf(1000000);
-//      BigDecimal max_Hig = BigDecimal.ZERO;
-//
-//      BigDecimal min24h = BigDecimal.valueOf(1000000);
-//      BigDecimal max24h = BigDecimal.ZERO;
-//
-//      BigDecimal max_vol_4h = BigDecimal.ZERO;
-//
-//      BigDecimal sum_vol_68h = BigDecimal.ZERO;
-//      BigDecimal avg_vol_68h = BigDecimal.ZERO;
-//
-//      for (int index = 0; index < list_3days.size(); index++) {
-//          BtcFutures dto = list_3days.get(index);
-//
-//          if (min_low.compareTo(dto.getLow_price()) > 0) {
-//              min_low = dto.getLow_price();
-//          }
-//
-//          if (max_Hig.compareTo(dto.getHight_price()) < 0) {
-//              max_Hig = dto.getHight_price();
-//          }
-//
-//          if (dto.isUptrend()) {
-//              if (min_open.compareTo(dto.getPrice_open_candle()) > 0) {
-//                  min_open = dto.getPrice_open_candle();
-//              }
-//          } else {
-//              if (min_open.compareTo(dto.getPrice_close_candle()) > 0) {
-//                  min_open = dto.getPrice_close_candle();
-//              }
-//          }
-//
-//          // ----------------------------------
-//
-//          if (Objects.equals("BTC", symbol) && (index < 24)) {
-//              if (min24h.compareTo(dto.getLow_price()) > 0) {
-//                  min24h = dto.getLow_price();
-//              }
-//
-//              if (max24h.compareTo(dto.getHight_price()) < 0) {
-//                  max24h = dto.getHight_price();
-//              }
-//          }
-//
-//          // ----------------------------------
-//          // if (type.contains("Futures")) {
-//          if (index < 4) {
-//              if (max_vol_4h.compareTo(dto.getTrading_qty()) < 0) {
-//                  max_vol_4h = dto.getTrading_qty();
-//              }
-//          } else {
-//              sum_vol_68h = sum_vol_68h.add(Utils.getBigDecimal(dto.getTrading_qty()));
-//          }
-//          // }
-//      }
-//
-//      String shark = "";
-//      // if (type.contains("Futures")) {
-//      avg_vol_68h = sum_vol_68h.divide(BigDecimal.valueOf(list_3days.size() - 4), 1, RoundingMode.CEILING);
-//      if (max_vol_4h.compareTo(avg_vol_68h.multiply(BigDecimal.valueOf(3))) > 0) {
-//          shark = " (Shark)";
-//          type = shark;
-//      }
-//      // }
-//
-//      String longshort = "";
-//      BigDecimal price_at_binance = cur_1h.getCurrPrice();
-//      String time = Utils.convertDateToString("(HH:mm)", Calendar.getInstance().getTime());
-//
-//      if (Utils.isGoodPriceLong(price_at_binance, min_low, max_Hig)) {
-//          longshort = " 💹 (Long) ";
-//          note = " Fibo(Long) E: " + Utils.removeLastZero(min_low) + " ("
-//                  + Utils.getPercentStr(min_low, price_at_binance) + ")" + type;
-//
-//      } else if (Utils.isGoodPriceShort(price_at_binance, min_low, max_Hig)) {
-//          longshort = " 📉 (Short) ";
-//          note = " Fibo(Short) E: " + Utils.removeLastZero(max_Hig) + " ("
-//                  + Utils.getPercentStr(price_at_binance, max_Hig) + ")" + type;
-//
-//      }
-//
-//      List<BtcFutures> list_15m = new ArrayList<BtcFutures>();
-//      if (Utils.isNotBlank(longshort)) {
-//          list_15m = Utils.loadData(symbol, "15m", 16); // 16h15=4h
-//      }
-//
-//      if (Objects.equals("BTC", symbol)) {
-//          if (Utils.isNotBlank(longshort)) {
-//              String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_" + symbol + "_" + Utils.getToday_YyyyMMdd() + "_"
-//                      + min24h;
-//
-//              if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
-//
-//                  String msg = time + symbol + ":" + Utils.removeLastZero(price_at_binance) + "(now), ATL3d:"
-//                          + Utils.removeLastZero(min_low) + "(" + Utils.toPercent(price_at_binance, min_low, 2)
-//                          + ")";
-//                  fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
-//
-//                  Utils.sendToTelegram(msg);
-//
-//                  return " Fibo " + longshort.trim() + type;
-//              }
-//          }
-//
-//          // --------------------------------------------------------
-//
-//          // 24h
-//          String msg_btc_24h = "";
-//          if (Utils.isGoodPriceLong(price_at_binance, min24h, max24h)) {
-//              msg_btc_24h = " (24h) Btc: " + Utils.removeLastZero(price_at_binance) + "(now), min24h: "
-//                      + Utils.removeLastZero(min24h) + " (" + Utils.getPercentStr(min24h, price_at_binance) + ")";
-//          } else if (Utils.isGoodPriceShort(price_at_binance, min24h, max24h)) {
-//              msg_btc_24h = " (24h) Btc: " + Utils.removeLastZero(price_at_binance) + "(now), max24h: "
-//                      + Utils.removeLastZero(max24h) + " (" + Utils.getPercentStr(price_at_binance, max24h) + ")";
-//          }
-//
-//          if (Utils.isNotBlank(msg_btc_24h)) {
-//              String EVENT_ID_3 = EVENT_COMPRESSED_CHART + "_24h_" + symbol + "_" + Utils.getToday_YyyyMMdd()
-//                      + "_" + min24h;
-//              if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_3)) {
-//
-//                  String msg = time + msg_btc_24h;
-//                  fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID_3, gecko_id, symbol, note, true));
-//
-//                  Utils.sendToTelegram(msg);
-//
-//                  return " Fibo " + msg_btc_24h + type;
-//              }
-//          }
-//
-//          // --------------------------------------------------------
-//
-//          if (Utils.isBlank(longshort)) {
-//              list_15m = Utils.loadData(symbol, "15m", 1);
-//          }
-//          BtcFutures curr_btc_15m = list_15m.get(0);
-//
-//          if (curr_btc_15m.isBtcKillLongCandle() || curr_btc_15m.isBtcKillShortCandle()) {
-//
-//              String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
-//
-//              if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
-//                  fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID5, gecko_id, symbol, note, true));
-//
-//                  String msg = time + " 💔 Btc 15m kill Long.";
-//
-//                  if (curr_btc_15m.isBtcKillShortCandle()) {
-//                      msg = time + " 💔 Btc 15m kill Short.";
-//                  }
-//
-//                  Utils.sendToTelegram(msg);
-//
-//                  return shark;
-//              }
-//          }
-//
-//      } else {
-//
-//          if (!btc_is_uptrend_today && longshort.contains("Short")) {
-//              String EVENT_ID_4 = EVENT_DUMP + "_" + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
-//
-//              if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
-//                  if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
-//                      if (Utils.hasPumpCandle(list_15m, false)) {
-//
-//                          fundingHistoryRepository
-//                                  .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
-//
-//                          String msg = time + " 💹 (ATH3d):" + symbol + ", High3d:"
-//                                  + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
-//
-//                          Utils.sendToTelegram(msg);
-//
-//                          return " Fibo(Short) Volx4" + type;
-//                      }
-//                  }
-//              }
-//          } // short
-//
-//      }
-//
-//      if (longshort.contains("Short")) {
-//          // Pumping = Short
-//          if (Utils.isPumpingCandle(list_15m)) {
-//              if (candidateCoinRepository.checkConditionsForShort(gecko_id)) {
-//
-//                  String msg = time + " 💹 (ATH3d):" + symbol;
-//                  msg += " " + Utils.getPercentToEntry(price_at_binance, max_Hig, false);
-//
-//                  String EVENT_ID_4 = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + symbol;
-//
-//                  if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID_4)) {
-//                      fundingHistoryRepository
-//                              .save(createPumpDumpEntity(EVENT_ID_4, gecko_id, symbol, note, true));
-//
-//                      Utils.sendToTelegram(msg);
-//                  }
-//              }
-//
-//          }
-//      }
-//
-//      String EVENT_ID = EVENT_FIBO_LONG_SHORT + "_" + symbol;
-//      fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, gecko_id, symbol, note, false));
-//
-//      return note;
-//
-//  } catch (Exception e) {
-//      e.printStackTrace();
-//  }
-//
-//  return note;
-//}
+// up:
+// -15
+// 20
+
+    public static String checkMa3AndX(List<BtcFutures> list, int slowIndex) {
+        String symbol = list.get(0).getId();
+        String chart = getSlowName(list);
+        int cur = 1;
+        int pre = 2;
+        int fastIndex = 3;
+        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
+        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
+        boolean isMa_fast_Up = true;
+        if (ma_fast_p.compareTo(ma_fast_c) > 0) {
+            isMa_fast_Up = false;
+        }
+
+        BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
+        BigDecimal ma13p = calcMA(list, slowIndex, pre);
+        boolean isMa13Up = true;
+        if (ma13p.compareTo(ma_slow_c) > 0) {
+            isMa13Up = false;
+        }
+
+        // -----------------------------------------------
+        boolean isCuttingUp = false;// Long
+        if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma13p.compareTo(ma_fast_p) > 0)) {
+            isCuttingUp = true;
+        }
+
+        // -----------------------------------------------
+        boolean isCuttingDown = false; // Short
+        if ((ma_fast_p.compareTo(ma13p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
+            isCuttingDown = true;
+        }
+        // -----------------------------------------------
+        String note_long = "";
+        if (!isMa_fast_Up) {
+            note_long += " Ma" + fastIndex + ":Down";
+        }
+        if (!isMa13Up) {
+            note_long += " Ma" + slowIndex + ":Down";
+        }
+        if (isNotBlank(note_long)) {
+            note_long = " (Remark)" + note_long;
+        }
+
+        String note_short = "";
+        if (isMa_fast_Up) {
+            note_short += " Ma" + fastIndex + ":Up";
+        }
+        if (isMa13Up) {
+            note_short += " Ma" + slowIndex + ":Up";
+        }
+        if (isNotBlank(note_short)) {
+            note_short = " (Remark)" + note_short;
+        }
+
+        // --------------------------------------------------
+        String result = "";
+        if (isCuttingDown) {
+            result = "Short (Chart:" + chart.trim().toUpperCase() + ")" + note_short;
+        }
+        if (isCuttingUp) {
+            result = "Long (Chart:) " + chart.trim().toUpperCase() + ")" + note_long;
+        }
+        // --------------------------------------------------
+
+        if (isNotBlank(result)) {
+            symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
+
+            if (list.get(0).getId().contains("_4h_") || list.get(0).getId().contains("_2h_")) {
+                boolean isLong = result.contains("Long");
+                List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
+
+                int start_index = 0;
+                BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
+                        : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
+                for (int index = 0; index <= 13; index++) {
+                    if (index < list.size()) {
+                        BtcFutures dto = list.get(index);
+                        if (isLong) {
+                            if (lh_stoploss.compareTo(dto.getLow_price()) >= 0) {
+                                start_index = index;
+                            }
+                        } else {
+                            if (lh_stoploss.compareTo(dto.getHight_price()) <= 0) {
+                                start_index = index;
+                            }
+                        }
+                    }
+                }
+                String timing1 = timingTarget(chart, start_index * 3);
+                String timing2 = timingTarget(chart, start_index * 5);
+                // String timing3 = timingTarget(chart, start_index * 8);
+
+                List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_slow_c);
+
+                BigDecimal currPrice = list.get(0).getCurrPrice();
+                BigDecimal SL = lh_stoploss;
+                BigDecimal entry = ma_slow_c;
+
+                BigDecimal TP1 = fiboList.get(2);
+                BigDecimal TP2 = fiboList.get(3);
+                BigDecimal TP3 = fiboList.get(4);
+
+                int usd = 10;
+                BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
+                vol = formatPrice(vol.multiply(entry).abs(), 0);
+
+                BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+                earn1 = formatPrice(vol.multiply(earn1), 1);
+
+                BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+                earn2 = formatPrice(vol.multiply(earn2), 1);
+
+                BigDecimal earn3 = TP3.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+                earn3 = formatPrice(vol.multiply(earn3), 1);
+
+                result += ",SL: " + getPercentToEntry(entry, SL, isLong);
+                result += ",E: " + getPercentToEntry(currPrice, entry, isLong);
+                result += ",Vol: " + removeLastZero(vol).replace(".0", "") + "$(Loss:" + usd + "$)";
+                result += ",Tp1: " + getPercentToEntry(entry, TP1, isLong) + "(" + removeLastZero(earn1) + "$)";
+                result += ",Tp2: " + getPercentToEntry(entry, TP2, isLong) + "(" + removeLastZero(earn2) + "$)";
+                result += ",Tp(max): " + getPercentToEntry(entry, TP3, isLong) + "(" + removeLastZero(earn3) + "$)";
+                if (isNotBlank(timing1 + timing2)) {
+                    result += ",Stop: " + timing1 + "~" + timing2;
+                }
+            }
+
+            String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
+
+            System.out.println(log);
+        }
+
+        return result;
+    }
+}
