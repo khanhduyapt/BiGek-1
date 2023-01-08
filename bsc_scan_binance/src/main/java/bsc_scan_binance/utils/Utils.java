@@ -678,7 +678,7 @@ public class Utils {
     public static String getCurrentYyyyMmDd_Blog2h() {
         String result = Utils.convertDateToString("yyyy.MM.dd_", Calendar.getInstance().getTime());
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        HH = HH / 2;
+        HH = HH / 4;
         result = result + HH;
         return result;
     }
@@ -686,7 +686,7 @@ public class Utils {
     public static String getCurrentYyyyMmDd_Blog4h() {
         String result = Utils.convertDateToString("yyyy.MM.dd_", Calendar.getInstance().getTime());
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        HH = HH / 4;
+        HH = HH / 8;
         result = result + HH;
         return result;
     }
@@ -2193,6 +2193,24 @@ public class Utils {
         }
     }
 
+    public static String checkMa3And50(List<BtcFutures> list) {
+        int cur = 1;
+        BigDecimal ma_fast_c = calcMA(list, 3, cur);
+        int size = list.size();
+        if (size > 50) {
+            size = 50;
+        }
+        BigDecimal ma_size = calcMA(list, size, cur);
+        String str_ma_size = "";
+        if (ma_fast_c.compareTo(ma_size) > 0) {
+            str_ma_size = " Above(Ma" + size + ")";
+        } else {
+            str_ma_size = " Below(Ma" + size + ")";
+        }
+
+        return str_ma_size;
+    }
+
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex) {
         String symbol = list.get(0).getId();
         String chart = getSlowName(list);
@@ -2212,6 +2230,8 @@ public class Utils {
         if (ma13p.compareTo(ma_slow_c) > 0) {
             isMa13Up = false;
         }
+
+        String str_ma_size = checkMa3And50(list);
 
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
@@ -2240,7 +2260,9 @@ public class Utils {
             note_long += " Ma" + slowIndex + ":Down";
         }
         if (isNotBlank(note_long)) {
-            note_long = " (Remark)," + note_long + volume_h4;
+            note_long = " (Remark)," + note_long + ", " + str_ma_size + volume_h4;
+        } else {
+            note_long = " (Remark)," + str_ma_size + volume_h4;
         }
 
         String note_short = "";
@@ -2251,7 +2273,9 @@ public class Utils {
             note_short += " Ma" + slowIndex + ":Up";
         }
         if (isNotBlank(note_short)) {
-            note_short = " (Remark)," + note_short + volume_h4;
+            note_short = " (Remark)," + note_short + ", " + str_ma_size + volume_h4;
+        } else {
+            note_short = " (Remark)," + str_ma_size + volume_h4;
         }
 
         // --------------------------------------------------
@@ -2336,6 +2360,10 @@ public class Utils {
         }
         if (isCuttingUp && isNotBlank(note_long)) {
             result += ",," + note_long;
+        }
+
+        if (!(result.contains("Long") || result.contains("Short"))) {
+            result = "";
         }
 
         return result;

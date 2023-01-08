@@ -239,7 +239,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.circulating_supply,                                                                 \n"
                     + "   can.binance_trade,                                                                      \n"
                     + "   can.coin_gecko_link,                                                                    \n"
-                    + "   (select concat (name,' ', symbol) from priority_coin_history w where w.gecko_id = can.gecko_id) as backer,                                                                             \n"
+                    + "   (select concat (symbol,' ', name) from priority_coin_history w where w.gecko_id = can.gecko_id) as backer,                                                                             \n"
                     + "   can.note,                                                                               \n"
                     + "                                                                                           \n"
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4), '~', ROUND(w.ema, 5), '~', coalesce(price_change_24h, 0), '~', ROUND(gecko_volume, 1) ) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as today,  \n"
@@ -927,6 +927,14 @@ public class BinanceServiceImpl implements BinanceService {
                                 css.setRange_move_css(CSS_PRICE_SUCCESS);
                             } else if (m2ma.contains("↓")) {
                                 css.setRange_move_css(CSS_PRICE_WARNING);
+                            }
+
+                            if (Utils.isNotBlank(m2ma)) {
+                                if (m2ma.contains("Above")) {
+                                    css.setRange_move_css(CSS_MIN28_DAYS);
+                                } else if (m2ma.contains("Below")) {
+                                    css.setRange_move_css(CSS_PRICE_WARNING);
+                                }
                             }
                         } catch (Exception e) {
                             css.setRange_move("m2ma exception");
@@ -3044,39 +3052,55 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
-
+        String type = "";
+        if (binanceFuturesRepository.existsById(gecko_id)) {
+            type = " (Futures) ";
+        } else {
+            type = " (Spot) ";
+        }
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
         if (CollectionUtils.isEmpty(list_weeks)) {
             return "";
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
-        String volume_h4 = Utils.analysisVolume(list_h4);
+        type = type + Utils.analysisVolume(list_h4);
+
         // debug
         // List<BtcFutures> list_debug = Utils.loadData("BNB", TIME_2h, 60);
         // sendMsgMonitorFibo("binancecoin", "BNB", list_debug, "");
+        // List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+        // String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
+        // if (Utils.isNotBlank(h1LongShort)) {
+        // h1LongShort = "_ma7(" + h1LongShort.trim().replace(",", " ") + ")~";
+        // scapLongOrShortH4 += h1LongShort;
+        // }
 
-        String type = "";
-        if (binanceFuturesRepository.existsById(gecko_id)) {
-            // List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
-            // String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
-            // if (Utils.isNotBlank(h1LongShort)) {
-            // h1LongShort = "_ma7(" + h1LongShort.trim().replace(",", " ") + ")~";
-            // scapLongOrShortH4 += h1LongShort;
-            // }
+        String MAIN_TOKEN = "_BTC_ETH_BNB_";
+        String ALLOW_SHORT = "_XMR_APE_TRX_LTC_DOT_LINK_XLM_DOGE_VET_UNI_AVAX_MATIC_FIL_ALGO_ATOM_";
+        String MONITOR_TOKEN = "_HOOK_HFT_APT_GMX_";
 
-            type = " (Futures) ";
+        if (MAIN_TOKEN.contains("_" + symbol + "_")) {
+            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
+            sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            // debug
-            // sendMsgMonitorLongShort(gecko_id, symbol, list_h1, list_h4, "");
-        } else {
-            type = " (Spot) ";
+            List<BtcFutures> list_h2 = Utils.loadData(symbol, "2h", 50);
+            sendMsgMonitorFibo(gecko_id, symbol, list_h2, "");
+
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
+        } else if (type.contains("Futures")) {
+            if (ALLOW_SHORT.contains("_" + symbol + "_")) {
+                sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Short");
+            }
         }
-        type = type + volume_h4;
+        boolean allow_long = false;
+        if (allow_long || MONITOR_TOKEN.contains("_" + symbol + "_NO_NOW_")) {
+            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Long");
+        }
 
         if (Objects.equals("ETH", symbol)) {
             String ID = "AUD_EUR_GBP_USDT_";
-            String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
+            String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog4h();
 
             if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
                 String currency_msg = "";
@@ -3142,19 +3166,6 @@ public class BinanceServiceImpl implements BinanceService {
             btc_is_uptrend_today = list_days.get(0).isUptrend();
         }
 
-        if (Objects.equals("BTC", symbol) || Objects.equals("ETH", symbol) || Objects.equals("BNB", symbol)) {
-
-            List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
-            sendMsgKillLongShort(gecko_id, symbol, list_15m);
-
-            List<BtcFutures> list_h2 = Utils.loadData(symbol, "2h", 15);
-            sendMsgMonitorLongShort(gecko_id, symbol, list_h2, list_h4, "");
-
-            sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "");
-        } else if (type.contains("Futures")) {
-            // sendMsgMonitorLongShort(gecko_id, symbol, list_h4, list_days, "Long");
-        }
-
         // ---------------------------------------------------------
         String checkW = Utils.checkMa3AndSlowIndex(list_weeks);
         String checkD = Utils.checkMa3AndSlowIndex(list_days);
@@ -3179,7 +3190,8 @@ public class BinanceServiceImpl implements BinanceService {
                 mDownMa = "move" + mDownMa.trim();
             }
         }
-        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}m2ma";
+        String checkMa50 = Utils.checkMa3And50(list_h4);
+        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + " H4:" + checkMa50 + "}m2ma";
 
         // H4 sl2ma
         String entry = "";
@@ -3223,7 +3235,10 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     @Transactional
     public void clearTrash() {
-        fundingHistoryRepository.deleteAll();
+        List<FundingHistory> list = fundingHistoryRepository.clearTrash();
+        if (!CollectionUtils.isEmpty(list)) {
+            fundingHistoryRepository.deleteAll(list);
+        }
     }
 
 }
