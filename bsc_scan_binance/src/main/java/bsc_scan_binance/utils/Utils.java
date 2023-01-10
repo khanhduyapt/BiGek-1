@@ -2423,9 +2423,8 @@ public class Utils {
                 }
             }
 
-            String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
-
-            System.out.println(log);
+            //String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
+            //System.out.println(log);
         }
 
         if (isCuttingDown && isNotBlank(note_short)) {
@@ -2438,7 +2437,9 @@ public class Utils {
         if (!(result.contains("Long") || result.contains("Short"))) {
             result = "";
         }
-
+        if (isNotBlank(result)) {
+            System.out.println(result);
+        }
         return result;
     }
 }

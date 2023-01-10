@@ -3038,18 +3038,20 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            String result = sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
-            checkMa3AndX = result;
-            if (Utils.isBlank(result)) {
-                result = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21, false);
+            checkMa3AndX = sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
+            if (Utils.isBlank(checkMa3AndX)) {
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21, false);
 
-                if (Utils.isBlank(result)) {
-                    result = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 13, false);
+                if (Utils.isBlank(checkMa3AndX)) {
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 13, false);
                 }
             }
 
         } else if (type.contains("Futures")) {
             checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, true);
+            if (Utils.isBlank(checkMa3AndX)) {
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21, false);
+            }
         }
 
         //List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);
