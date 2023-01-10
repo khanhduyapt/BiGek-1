@@ -3073,7 +3073,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                 List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
                 String cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 13, false);
-
+                if (Utils.isBlank(cur_h4_ma13)) {
+                    cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 8, false);
+                }
                 if (Utils.isNotBlank(cur_h4_ma13)) {
                     String msg = Utils.getMmDD_TimeHHmm()
                             + list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")

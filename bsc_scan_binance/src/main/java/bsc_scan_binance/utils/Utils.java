@@ -2342,7 +2342,7 @@ public class Utils {
             type = "";
         } else if (slowIndex >= 20) {
             type = "(Prepare)";
-        } else if (slowIndex >= 10) {
+        } else if (slowIndex >= 8) {
             type = "(Check)";
         }
 
