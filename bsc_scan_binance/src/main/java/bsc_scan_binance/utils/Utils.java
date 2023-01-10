@@ -2232,15 +2232,15 @@ public class Utils {
             isMaSlowUp = false;
         }
 
-        String str_ma_size = checkMa3And50(list);
+        String str_ma_50 = checkMa3And50(list);
 
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
         if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
             isCuttingUp = true;
         }
-        if (str_ma_size.contains("Long")) {
-            str_ma_size = str_ma_size.replace("Long", "");
+        if (str_ma_50.contains("Long")) {
+            str_ma_50 = str_ma_50.replace("Long", "");
             isCuttingUp = true;
         }
 
@@ -2265,9 +2265,9 @@ public class Utils {
             note_long += " Ma" + slowIndex + ":Down.";
         }
         if (isNotBlank(note_long)) {
-            note_long = " (Remark)," + note_long + ", " + str_ma_size + volume;
+            note_long = " (Remark)," + note_long + ", " + str_ma_50 + volume;
         } else {
-            note_long = " (Remark)," + str_ma_size + volume;
+            note_long = " (Remark)," + str_ma_50 + volume;
         }
 
         String note_short = "";
@@ -2278,9 +2278,9 @@ public class Utils {
             note_short += " Ma" + slowIndex + ":Up.";
         }
         if (isNotBlank(note_short)) {
-            note_short = " (Remark)," + note_short + ", " + str_ma_size + volume;
+            note_short = " (Remark)," + note_short + ", " + str_ma_50 + volume;
         } else {
-            note_short = " (Remark)," + str_ma_size + volume;
+            note_short = " (Remark)," + str_ma_50 + volume;
         }
 
         // --------------------------------------------------
