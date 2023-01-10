@@ -678,7 +678,7 @@ public class Utils {
     public static String getCurrentYyyyMmDd_Blog2h() {
         String result = Utils.convertDateToString("yyyy.MM.dd_", Calendar.getInstance().getTime());
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        HH = HH / 4;
+        HH = HH / 2;
         result = result + HH;
         return result;
     }
@@ -686,7 +686,7 @@ public class Utils {
     public static String getCurrentYyyyMmDd_Blog4h() {
         String result = Utils.convertDateToString("yyyy.MM.dd_", Calendar.getInstance().getTime());
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
-        HH = HH / 8;
+        HH = HH / 4;
         result = result + HH;
         return result;
     }
