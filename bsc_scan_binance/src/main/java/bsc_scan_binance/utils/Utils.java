@@ -2162,10 +2162,6 @@ public class Utils {
         BigDecimal ma_50_c = calcMA(list, 50, 1);
         BigDecimal ma_50_p = calcMA(list, 50, 2);
 
-        if ((ma_3_c.compareTo(ma_3_p) > 0) && (ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_p.compareTo(ma_3_p) > 0)) {
-            result = true;
-        }
-
         if ((open.compareTo(close) < 0) && (ma_3_c.compareTo(ma_3_p) > 0)) {
             if ((open.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0)
                     && (open.compareTo(ma_3_c) < 0) && (ma_3_c.compareTo(close) < 0)) {
@@ -2187,6 +2183,10 @@ public class Utils {
 
                 result = true;
             }
+        }
+
+        if ((ma_3_c.compareTo(ma_3_p) > 0) && (ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_p.compareTo(ma_3_p) > 0)) {
+            result = true;
         }
 
         if (ma_3_c.compareTo(ma_21_c) < 0) {
@@ -2211,11 +2211,19 @@ public class Utils {
         BigDecimal ma_50_c = calcMA(list, 50, 1);
         BigDecimal ma_50_p = calcMA(list, 50, 2);
 
-        if ((ma_3_c.compareTo(ma_3_p) < 0) && (ma_3_c.compareTo(ma_50_c) < 0) && (ma_50_p.compareTo(ma_3_p) < 0)) {
-            result = true;
-        }
         BigDecimal open2 = list.get(2).getPrice_open_candle();
+        BigDecimal open = list.get(1).getPrice_open_candle();
         BigDecimal close = list.get(1).getPrice_close_candle();
+
+        if ((open.compareTo(close) > 0) && (ma_3_c.compareTo(ma_3_p) < 0)) {
+            if ((open.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close) > 0)
+                    && (open.compareTo(ma_21_c) > 0) && (ma_21_c.compareTo(close) > 0)
+                    && (open.compareTo(ma_13_c) > 0) && (ma_13_c.compareTo(close) > 0)
+                    && (open.compareTo(ma_3_c) > 0) && (ma_3_c.compareTo(close) > 0)) {
+
+                result = true;
+            }
+        }
 
         if ((open2.compareTo(close) > 0) && (ma_3_c.compareTo(ma_3_p) < 0)) {
             if ((open2.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close) > 0)
@@ -2225,6 +2233,14 @@ public class Utils {
 
                 result = true;
             }
+        }
+
+        if ((ma_3_c.compareTo(ma_3_p) < 0) && (ma_3_c.compareTo(ma_50_c) < 0) && (ma_50_p.compareTo(ma_3_p) < 0)) {
+            result = true;
+        }
+
+        if (ma_3_c.compareTo(ma_21_c) > 0) {
+            result = false;
         }
 
         return result;
