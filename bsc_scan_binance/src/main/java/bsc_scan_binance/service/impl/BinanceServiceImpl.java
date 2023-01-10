@@ -242,7 +242,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   can.circulating_supply,                                                                 \n"
                     + "   can.binance_trade,                                                                      \n"
                     + "   can.coin_gecko_link,                                                                    \n"
-                    + "   (select concat (symbol,' ', name) from priority_coin_history w where w.gecko_id = can.gecko_id) as backer,                                                                             \n"
+                    + "   (select concat (w.symbol,' ', w.name) from priority_coin_history w where w.gecko_id = can.gecko_id) as backer,                                                                             \n"
                     + "   can.note,                                                                               \n"
                     + "                                                                                           \n"
                     + "   (select concat(w.total_volume, '~', ROUND(w.avg_price, 4), '~', ROUND(w.min_price, 4), '~', ROUND(w.max_price, 4), '~', ROUND(w.ema, 5), '~', coalesce(price_change_24h, 0), '~', ROUND(gecko_volume, 1) ) from binance_volumn_week w where w.gecko_id = can.gecko_id and w.symbol = can.symbol and yyyymmdd = TO_CHAR(NOW(), 'yyyyMMdd'))                     as today,  \n"
@@ -2971,29 +2971,16 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
-    private void sendMsgMonitorFiboH4(String gecko_id, String symbol, List<BtcFutures> list_h4, String only_trend) {
+    private String sendMsgMonitorFibo(String gecko_id, String symbol, List<BtcFutures> list, String only_trend,
+            int maIndex) {
         String msg = Utils.getMmDD_TimeHHmm() + symbol;
 
-        String result = Utils.checkMa3AndX(list_h4, 50);
-
-        if ("_BTC_ETH_BNB_".contains(symbol)) {
-            if (Utils.isBlank(result)) {
-                result = Utils.checkMa3AndX(list_h4, 21);
-                if (Utils.isNotBlank(result)) {
-                    msg += " ,Prepare: ";
-                } else {
-                    result = Utils.checkMa3AndX(list_h4, 13);
-                    if (Utils.isNotBlank(result)) {
-                        msg += " ,Trend_Reversal: ";
-                    }
-                }
-            }
-        }
+        String result = Utils.checkMa3AndX(list, maIndex);
 
         if (Utils.isNotBlank(result)) {
             if (Utils.isNotBlank(only_trend)) {
                 if (!result.contains(only_trend)) {
-                    return;
+                    return "";
                 }
             }
 
@@ -3004,8 +2991,11 @@ public class BinanceServiceImpl implements BinanceService {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
 
                 Utils.sendToMyTelegram(msg.replace(" ", ""));
+
             }
         }
+
+        return result;
     }
 
     private String sendMsgMonitorLongShort_BTC(String gecko_id, String symbol, List<BtcFutures> list_find_entry,
@@ -3099,17 +3089,19 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
             String result = sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
+
             if (Utils.isBlank(result)) {
-                sendMsgMonitorFiboH4(gecko_id, symbol, list_h4, "");
+                sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21);
             }
 
         } else if (type.contains("Futures")) {
-            sendMsgMonitorFiboH4(gecko_id, symbol, list_h4, TREND_LONG);
+            sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50);
         }
 
-        boolean allow_long = false;
-        if (allow_long || MONITOR_TOKEN.contains("_" + symbol + "_NO_NOW_")) {
-            sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, TREND_LONG);
+        List<BtcFutures> list_debug = Utils.loadData(symbol, "5m", 60);
+        sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 50);
+        if (Utils.is3CuttingUp50ForLong(list_debug) || Utils.is3CuttingDown50ForShort(list_debug)) {
+            boolean a = true;
         }
 
         // AUD_EUR_GBP_USDT
@@ -3124,6 +3116,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                     List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
                     String cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 13);
+
                     if (Utils.isNotBlank(cur_h4_ma13)) {
                         String msg = list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
                                 + Utils.new_line_from_service + cur_h4_ma13;

@@ -2174,37 +2174,36 @@ public class Utils {
         return str_ma_size;
     }
 
-    public static boolean isPerfectLong(List<BtcFutures> list) {
-        BigDecimal ma_3 = calcMA(list, 3, 0);
-        BigDecimal ma_8 = calcMA(list, 8, 0);
-        BigDecimal ma_13 = calcMA(list, 13, 0);
-        BigDecimal ma_50 = calcMA(list, 50, 0);
+    public static boolean is3CuttingUp50ForLong(List<BtcFutures> list) {
+        if (list.size() < 50) {
+            return false;
+        }
+        BigDecimal ma_3_c = calcMA(list, 3, 1);
+        BigDecimal ma_3_p = calcMA(list, 3, 2);
 
-        if ((ma_3.compareTo(ma_8) > 0) && (ma_3.compareTo(ma_13) > 0) && (ma_3.compareTo(ma_50) > 0)) {
-            if ((ma_8.compareTo(ma_50) > 0) && (ma_13.compareTo(ma_50) < 0)) {
-                return true;
-            }
-            if ((ma_13.compareTo(ma_50) > 0) && (ma_8.compareTo(ma_50) < 0)) {
-                return true;
-            }
-            if ((ma_8.compareTo(ma_50) < 0) && (ma_13.compareTo(ma_50) < 0)) {
-                return true;
-            }
+        BigDecimal ma_50_c = calcMA(list, 50, 1);
+        BigDecimal ma_50_p = calcMA(list, 50, 2);
+
+        if ((ma_3_c.compareTo(ma_3_p) > 0) && (ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_p.compareTo(ma_3_p) > 0)) {
+            return true;
         }
 
         return false;
     }
 
-    public static boolean isPerfectShort(List<BtcFutures> list) {
-        BigDecimal ma_3 = calcMA(list, 3, 0);
-        BigDecimal ma_8 = calcMA(list, 8, 0);
-        BigDecimal ma_13 = calcMA(list, 13, 0);
-        BigDecimal ma_50 = calcMA(list, 50, 0);
+    public static boolean is3CuttingDown50ForShort(List<BtcFutures> list) {
+        if (list.size() < 50) {
+            return false;
+        }
 
-        if ((ma_3.compareTo(ma_8) < 0) && (ma_3.compareTo(ma_13) < 0) && (ma_3.compareTo(ma_50) < 0)) {
-            if (((ma_8.compareTo(ma_50) < 0) || (ma_13.compareTo(ma_50) < 0))) {
-                return true;
-            }
+        BigDecimal ma_3_c = calcMA(list, 3, 1);
+        BigDecimal ma_3_p = calcMA(list, 3, 2);
+
+        BigDecimal ma_50_c = calcMA(list, 50, 1);
+        BigDecimal ma_50_p = calcMA(list, 50, 2);
+
+        if ((ma_3_c.compareTo(ma_3_p) < 0) && (ma_3_c.compareTo(ma_50_c) < 0) && (ma_50_p.compareTo(ma_3_p) < 0)) {
+            return true;
         }
 
         return false;
@@ -2284,19 +2283,19 @@ public class Utils {
         // --------------------------------------------------
         String result = "";
         if (isCuttingDown) {
-            result = "Short (Chart:" + chart.trim().toUpperCase() + ")" + (isPerfectShort(list) ? " (Perfect)" : "");
+            result = "Short (Chart:" + chart.trim().toUpperCase() + ")";
         }
         if (isCuttingUp) {
+            result = "Long (Chart:" + chart.trim().toUpperCase() + ")";
+
             List<BigDecimal> low_heigh = getLowHeightCandle(list);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
             range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
             if (ma_fast_c.compareTo(max_allow_long) > 0) {
-                return "";
+                result += "(Range:Danger!!!!!!)";
             }
-
-            result = "Long (Chart:" + chart.trim().toUpperCase() + ")" + (isPerfectLong(list) ? " (Perfect)" : "");
         }
 
         // --------------------------------------------------
@@ -2328,7 +2327,6 @@ public class Utils {
                 }
                 String timing1 = timingTarget(chart, start_index);
                 String timing2 = timingTarget(chart, start_index * 5);
-                // String timing3 = timingTarget(chart, start_index * 8);
 
                 BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
                         : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
