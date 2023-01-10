@@ -2158,7 +2158,7 @@ public class Utils {
             size = 50;
         }
         BigDecimal ma_size = calcMA(list, size, cur);
-        String str_ma_size = getSlowName(list).toUpperCase() + ":";
+        String str_ma_size = "";
         String per = getPercentToEntry(ma_fast_c, ma_size, true);
         if (ma_fast_c.compareTo(ma_size) > 0) {
             str_ma_size += "Above_Ma" + size + ":" + per;
@@ -2180,6 +2180,9 @@ public class Utils {
         }
         BigDecimal ma_3_c = calcMA(list, 3, 1);
         BigDecimal ma_3_p = calcMA(list, 3, 2);
+
+        //BigDecimal ma_21_c = calcMA(list, 21, 1);
+        //BigDecimal ma_21_p = calcMA(list, 21, 2);
 
         BigDecimal ma_50_c = calcMA(list, 50, 1);
         BigDecimal ma_50_p = calcMA(list, 50, 2);
@@ -2256,10 +2259,10 @@ public class Utils {
 
         String note_long = "";
         if (!isMa_fast_Up) {
-            note_long += " Ma" + fastIndex + ":Down";
+            note_long += " Ma" + fastIndex + ":Down.";
         }
         if (!isMaSlowUp) {
-            note_long += " Ma" + slowIndex + ":Down";
+            note_long += " Ma" + slowIndex + ":Down.";
         }
         if (isNotBlank(note_long)) {
             note_long = " (Remark)," + note_long + ", " + str_ma_size + volume;
@@ -2269,10 +2272,10 @@ public class Utils {
 
         String note_short = "";
         if (isMa_fast_Up) {
-            note_short += " Ma" + fastIndex + ":Up";
+            note_short += " Ma" + fastIndex + ":Up.";
         }
         if (isMaSlowUp) {
-            note_short += " Ma" + slowIndex + ":Up";
+            note_short += " Ma" + slowIndex + ":Up.";
         }
         if (isNotBlank(note_short)) {
             note_short = " (Remark)," + note_short + ", " + str_ma_size + volume;
@@ -2288,15 +2291,15 @@ public class Utils {
         } else if (slowIndex >= 20) {
             type = "(Prepare)";
         } else if (slowIndex >= 10) {
-            type = "(Trend Reversal)";
+            type = "(Check)";
         }
 
         String result = "";
         if (isCuttingDown) {
-            result = "Short (Chart:" + chart.trim().toUpperCase() + ")" + type;
+            result = type + "Short (Chart:" + chart.trim().toUpperCase() + ")";
         }
         if (isCuttingUp) {
-            result = "Long (Chart:" + chart.trim().toUpperCase() + ")" + type;
+            result = type + "Long (Chart:" + chart.trim().toUpperCase() + ")";
 
             List<BigDecimal> low_heigh = getLowHeightCandle(list);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));

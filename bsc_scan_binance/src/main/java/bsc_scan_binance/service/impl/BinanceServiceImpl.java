@@ -2987,6 +2987,7 @@ public class BinanceServiceImpl implements BinanceService {
             msg = (msg + result).replace(",", Utils.new_line_from_service);
 
             String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + symbol + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
+
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
 
@@ -3091,7 +3092,6 @@ public class BinanceServiceImpl implements BinanceService {
             String result = sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
 
             if (Utils.isBlank(result)) {
-                //List<BtcFutures> list_h2 = Utils.loadData(symbol, TIME_2h, 60);
                 result = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21);
 
                 if (Utils.isBlank(result)) {
@@ -3103,8 +3103,14 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50);
         }
 
-        List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);
-        sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 50);
+        //List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);
+        //String test = sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 50);
+        //if (Utils.isBlank(test)) {
+        //    test = sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 21);
+        //    if (Utils.isBlank(test)) {
+        //        sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 13);
+        //    }
+        //}
 
         // AUD_EUR_GBP_USDT
         if (Objects.equals("ETH", symbol)) {
