@@ -3052,17 +3052,16 @@ public class BinanceServiceImpl implements BinanceService {
             for (String CURR : list_currency) {
                 String ID = CURR + "_USDT";
 
-                List<BtcFutures> list_cur = Utils.loadData(CURR, TIME_1h, 50);
-                String cur_h1_ma21 = Utils.checkMa3AndX(list_cur, 21, false);
+                String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
+                if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
 
-                if (Utils.isNotBlank(cur_h1_ma21)) {
-                    String msg = Utils.getMmDD_TimeHHmm()
-                            + list_cur.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                            + Utils.new_line_from_service + cur_h1_ma21.replace(",", Utils.new_line_from_service);
+                    List<BtcFutures> list_cur = Utils.loadData(CURR, TIME_1h, 50);
+                    String cur_h1_ma21 = Utils.checkMa3AndX(list_cur, 21, false);
 
-                    String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
-
-                    if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
+                    if (Utils.isNotBlank(cur_h1_ma21)) {
+                        String msg = Utils.getMmDD_TimeHHmm()
+                                + list_cur.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                                + Utils.new_line_from_service + cur_h1_ma21.replace(",", Utils.new_line_from_service);
 
                         fundingHistoryRepository
                                 .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
