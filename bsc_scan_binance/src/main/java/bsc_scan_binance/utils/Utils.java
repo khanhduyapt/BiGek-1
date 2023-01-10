@@ -2267,7 +2267,7 @@ public class Utils {
             isMaSlowUp = false;
         }
 
-        String str_ma_50 = checkMa3And50(list);
+        String str_ma_50 = "";
 
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
@@ -2276,6 +2276,7 @@ public class Utils {
         }
 
         if (slowIndex >= 35) {
+            str_ma_50 = checkMa3And50(list);
             isCuttingUp = is3CuttingUp50ForLong(list);
         }
         if (isCuttingUp && !isMa_fast_Up) {
