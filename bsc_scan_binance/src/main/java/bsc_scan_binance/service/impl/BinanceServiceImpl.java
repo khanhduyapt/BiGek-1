@@ -3033,13 +3033,13 @@ public class BinanceServiceImpl implements BinanceService {
 
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         String MONITOR_TOKEN = "_HOOK_HFT_APT_GMX_";
-
+        String checkMa3AndX = "";
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
             String result = sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
-
+            checkMa3AndX = result;
             if (Utils.isBlank(result)) {
                 result = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21, false);
 
@@ -3049,7 +3049,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
         } else if (type.contains("Futures")) {
-            sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, true);
+            checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, true);
         }
 
         //List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);
@@ -3198,6 +3198,8 @@ public class BinanceServiceImpl implements BinanceService {
 
         result += "L10w:" + Utils.getPercentToEntry(current_price, min_week, true);
         result += ", H10w:" + Utils.getPercentToEntry(current_price, max_week, false);
+        result += checkMa3AndX.replace(",", Utils.new_line_from_bot);
+
         result = result.replaceAll("↑", "^").replaceAll("↓", "v");
 
         return result;
