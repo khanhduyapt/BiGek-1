@@ -2155,7 +2155,8 @@ public class Utils {
         BigDecimal ma_3_c = calcMA(list, 3, 1);
         BigDecimal ma_3_p = calcMA(list, 3, 2);
 
-        BigDecimal ma_21_c = calcMA(list, 3, 1);
+        BigDecimal ma_13_c = calcMA(list, 13, 1);
+        BigDecimal ma_21_c = calcMA(list, 21, 1);
 
         BigDecimal ma_50_c = calcMA(list, 50, 1);
         BigDecimal ma_50_p = calcMA(list, 50, 2);
@@ -2164,11 +2165,17 @@ public class Utils {
             result = true;
         }
 
-        if ((ma_3_c.compareTo(ma_3_p) > 0)
-                && (open.compareTo(close) < 0) && (open.compareTo(ma_50_c) < 0)
-                && (open.compareTo(ma_3_c) < 0)
-                && (ma_50_c.compareTo(close) < 0) && (ma_3_c.compareTo(close) < 0)) {
-            result = true;
+        if ((open.compareTo(close) < 0) && (ma_3_c.compareTo(ma_3_p) > 0)) {
+            if ((open.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0)
+                    && (open.compareTo(ma_3_c) < 0) && (ma_3_c.compareTo(close) < 0)) {
+                result = true;
+            }
+
+            if ((open.compareTo(ma_21_c) < 0) && (ma_21_c.compareTo(close) < 0)
+                    && (open.compareTo(ma_13_c) < 0) && (ma_13_c.compareTo(close) < 0)
+                    && (open.compareTo(ma_3_c) < 0) && (ma_3_c.compareTo(close) < 0)) {
+                result = true;
+            }
         }
 
         if (ma_3_c.compareTo(ma_21_c) < 0) {
