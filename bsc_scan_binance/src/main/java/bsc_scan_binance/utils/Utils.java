@@ -1465,7 +1465,7 @@ public class Utils {
 
     public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String type = checkMa3AndSlowIndex(list_entry);
+            String type = checkMa3AndX(list_entry, getSlowIndex(list_entry), false);
             if (Utils.isBlank(type)) {
                 return "";
             }
@@ -2021,10 +2021,6 @@ public class Utils {
         return dto;
     }
 
-    public static String checkMa3AndSlowIndex(List<BtcFutures> list) {
-        return checkMa3AndX(list, getSlowIndex(list));
-    }
-
     // down:
     // -20
     // -24
@@ -2036,7 +2032,7 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check3and50 = checkMa3AndSlowIndex(list_find_entry);
+            String check3and50 = checkMa3AndX(list_find_entry, getSlowIndex(list_find_entry), true);
 
             if (Utils.isBlank(check3and50)) {
                 return "";
@@ -2140,11 +2136,6 @@ public class Utils {
         String per = getPercentToEntry(ma_fast_c, ma_size, true);
         if (ma_fast_c.compareTo(ma_size) > 0) {
             str_ma_size += "Above_Ma" + size + ":" + per;
-
-            BigDecimal ma_fast_p = calcMA(list, 3, 2);
-            if (ma_fast_p.compareTo(ma_size) < 0) {
-                str_ma_size += "Long";
-            }
         } else {
             str_ma_size += "Below_Ma" + size + ":" + per;
         }
@@ -2156,30 +2147,35 @@ public class Utils {
         if (list.size() < 50) {
             return false;
         }
+        boolean result = false;
+
         BigDecimal open = list.get(1).getPrice_open_candle();
         BigDecimal close = list.get(1).getPrice_close_candle();
 
         BigDecimal ma_3_c = calcMA(list, 3, 1);
         BigDecimal ma_3_p = calcMA(list, 3, 2);
 
-        //BigDecimal ma_21_c = calcMA(list, 21, 1);
-        //BigDecimal ma_21_p = calcMA(list, 21, 2);
+        BigDecimal ma_21_c = calcMA(list, 3, 1);
 
         BigDecimal ma_50_c = calcMA(list, 50, 1);
         BigDecimal ma_50_p = calcMA(list, 50, 2);
 
         if ((ma_3_c.compareTo(ma_3_p) > 0) && (ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_p.compareTo(ma_3_p) > 0)) {
-            return true;
+            result = true;
         }
 
         if ((ma_3_c.compareTo(ma_3_p) > 0)
                 && (open.compareTo(close) < 0) && (open.compareTo(ma_50_c) < 0)
                 && (open.compareTo(ma_3_c) < 0)
                 && (ma_50_c.compareTo(close) < 0) && (ma_3_c.compareTo(close) < 0)) {
-            return true;
+            result = true;
         }
 
-        return false;
+        if (ma_3_c.compareTo(ma_21_c) < 0) {
+            result = false;
+        }
+
+        return result;
     }
 
     public static boolean is3CuttingDown50ForShort(List<BtcFutures> list) {
@@ -2200,7 +2196,7 @@ public class Utils {
         return false;
     }
 
-    public static String checkMa3AndX(List<BtcFutures> list, int slowIndex) {
+    public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail) {
         String symbol = list.get(0).getId();
         String chart = getSlowName(list);
         int cur = 1;
@@ -2227,12 +2223,9 @@ public class Utils {
         if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
             isCuttingUp = true;
         }
-        if (str_ma_50.contains("Long")) {
-            str_ma_50 = str_ma_50.replace("Long", "");
-            isCuttingUp = true;
-        }
-        if (is3CuttingUp50ForLong(list)) {
-            isCuttingUp = true;
+
+        if (slowIndex >= 35) {
+            isCuttingUp = is3CuttingUp50ForLong(list);
         }
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
@@ -2297,7 +2290,8 @@ public class Utils {
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
             if (ma_fast_c.compareTo(max_allow_long) > 0) {
-                result += "(Range:Danger!!!!!!)";
+                //result += "(Range:Danger!!!!!!)";
+                return "";
             }
         }
 
@@ -2308,7 +2302,7 @@ public class Utils {
         if (isNotBlank(result)) {
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
             //
-            if (list.get(0).getId().contains("_4h_") && (slowIndex >= 35)) {
+            if (showDetail) {
                 boolean isLong = result.contains("Long");
                 List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
 
