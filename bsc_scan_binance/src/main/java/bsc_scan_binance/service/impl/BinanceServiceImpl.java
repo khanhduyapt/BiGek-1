@@ -3071,14 +3071,12 @@ public class BinanceServiceImpl implements BinanceService {
             for (String CURR : list_currency) {
                 String ID = CURR + "_USDT";
 
-                List<BtcFutures> list_cur_h4 = Utils.loadData(CURR, TIME_4h, 30);
-                String cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 13, false);
-                if (Utils.isBlank(cur_h4_ma13)) {
-                    cur_h4_ma13 = Utils.checkMa3AndX(list_cur_h4, 8, false);
-                }
+                List<BtcFutures> list_cur = Utils.loadData(CURR, TIME_1h, 60);
+                String cur_h4_ma13 = Utils.checkMa3AndX(list_cur, 50, false);
+
                 if (Utils.isNotBlank(cur_h4_ma13)) {
                     String msg = Utils.getMmDD_TimeHHmm()
-                            + list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+                            + list_cur.get(0).getId().replace("_00", "").replace("_", "_USDT_")
                             + Utils.new_line_from_service + cur_h4_ma13.replace(",", Utils.new_line_from_service);
 
                     String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
