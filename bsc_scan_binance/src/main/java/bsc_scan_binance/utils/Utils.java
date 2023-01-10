@@ -1314,14 +1314,8 @@ public class Utils {
 
     public static int getSlowIndex(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
-        if (symbol.contains("_15m_")) {
-            return 13;
-        }
-        if (symbol.contains("_1h_")) {
-            return 13;
-        }
         if (symbol.contains("_4h_")) {
-            return 13;
+            return 21;
         }
         if (symbol.contains("_1d_")) {
             return 8;
@@ -1330,7 +1324,7 @@ public class Utils {
             return 8;
         }
 
-        return 8;
+        return 21;
     }
 
     public static String getSlowName(List<BtcFutures> list) {
@@ -2053,14 +2047,14 @@ public class Utils {
         return checkMa3AndX(list, getSlowIndex(list));
     }
 
-// down:
-// -20
-// -24
-// -60
-//
-// up:
-// -15
-// 20
+    // down:
+    // -20
+    // -24
+    // -60
+    //
+    // up:
+    // -15
+    // 20
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
@@ -2230,17 +2224,17 @@ public class Utils {
         }
 
         BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
-        BigDecimal ma13p = calcMA(list, slowIndex, pre);
-        boolean isMa13Up = true;
-        if (ma13p.compareTo(ma_slow_c) > 0) {
-            isMa13Up = false;
+        BigDecimal ma_slow_p = calcMA(list, slowIndex, pre);
+        boolean isMaSlowUp = true;
+        if (ma_slow_p.compareTo(ma_slow_c) > 0) {
+            isMaSlowUp = false;
         }
 
         String str_ma_size = checkMa3And50(list);
 
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
-        if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma13p.compareTo(ma_fast_p) > 0)) {
+        if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
             isCuttingUp = true;
         }
         if (str_ma_size.contains("Long")) {
@@ -2250,7 +2244,7 @@ public class Utils {
 
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
-        if ((ma_fast_p.compareTo(ma13p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
+        if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
             isCuttingDown = true;
         }
         // -----------------------------------------------
@@ -2265,7 +2259,7 @@ public class Utils {
         if (!isMa_fast_Up) {
             note_long += " Ma" + fastIndex + ":Down";
         }
-        if (!isMa13Up) {
+        if (!isMaSlowUp) {
             note_long += " Ma" + slowIndex + ":Down";
         }
         if (isNotBlank(note_long)) {
@@ -2278,7 +2272,7 @@ public class Utils {
         if (isMa_fast_Up) {
             note_short += " Ma" + fastIndex + ":Up";
         }
-        if (isMa13Up) {
+        if (isMaSlowUp) {
             note_short += " Ma" + slowIndex + ":Up";
         }
         if (isNotBlank(note_short)) {
@@ -2332,13 +2326,14 @@ public class Utils {
                         }
                     }
                 }
-                String timing1 = timingTarget(chart, start_index * 3);
+                String timing1 = timingTarget(chart, start_index);
                 String timing2 = timingTarget(chart, start_index * 5);
                 // String timing3 = timingTarget(chart, start_index * 8);
 
                 BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
                         : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
-                List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_slow_c);
+                BigDecimal ma_13 = calcMA(list, 13, 1);
+                List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_13);
 
                 BigDecimal currPrice = list.get(0).getCurrPrice();
                 BigDecimal SL = fiboList.get(0);
@@ -2367,7 +2362,7 @@ public class Utils {
                 result += ",TP2: " + getPercentToEntry(entry, TP2, isLong) + "..." + removeLastZero(earn2) + "$";
                 result += ",TP3: " + getPercentToEntry(entry, TP3, isLong) + "..." + removeLastZero(earn3) + "$";
                 if (isNotBlank(timing1 + timing2)) {
-                    result += ",STOP: " + timing1 + "~" + timing2;
+                    result += ",STOP(-): " + timing1 + "~END:" + timing2;
                 }
             }
 
