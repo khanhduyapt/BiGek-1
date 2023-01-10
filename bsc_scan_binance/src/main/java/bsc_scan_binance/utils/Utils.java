@@ -2303,11 +2303,15 @@ public class Utils {
 
         String note_long = "";
         if (!isMa_fast_Up) {
-            note_long += " Ma" + fastIndex + ":Down.";
+            note_long += " Ma" + fastIndex + ":Down,";
         }
         if (!isMaSlowUp) {
-            note_long += " Ma" + slowIndex + ":Down.";
+            note_long += " Ma" + slowIndex + ":Down,";
         }
+        if (!list.get(0).isUptrend()) {
+            note_long += " Candle:Down.";
+        }
+
         if (isNotBlank(note_long)) {
             note_long = " (Remark)," + note_long + ", " + str_ma_50 + volume;
         } else {
@@ -2316,11 +2320,15 @@ public class Utils {
 
         String note_short = "";
         if (isMa_fast_Up) {
-            note_short += " Ma" + fastIndex + ":Up.";
+            note_short += " Ma" + fastIndex + ":Up,";
         }
         if (isMaSlowUp) {
-            note_short += " Ma" + slowIndex + ":Up.";
+            note_short += " Ma" + slowIndex + ":Up,";
         }
+        if (list.get(0).isUptrend()) {
+            note_short += " Candle:Up,";
+        }
+
         if (isNotBlank(note_short)) {
             note_short = " (Remark)," + note_short + ", " + str_ma_50 + volume;
         } else {
