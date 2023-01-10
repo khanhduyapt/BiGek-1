@@ -1315,7 +1315,7 @@ public class Utils {
     public static int getSlowIndex(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
         if (symbol.contains("_4h_")) {
-            return 21;
+            return 50;
         }
         if (symbol.contains("_1d_")) {
             return 8;
@@ -1324,7 +1324,7 @@ public class Utils {
             return 8;
         }
 
-        return 21;
+        return 50;
     }
 
     public static String getSlowName(List<BtcFutures> list) {
@@ -2058,9 +2058,9 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check3and8 = checkMa3AndSlowIndex(list_find_entry);
+            String check3and50 = checkMa3AndSlowIndex(list_find_entry);
 
-            if (Utils.isBlank(check3and8)) {
+            if (Utils.isBlank(check3and50)) {
                 return "";
             }
             String symbol = list_find_entry.get(0).getId();
@@ -2069,11 +2069,11 @@ public class Utils {
                 BigDecimal ma3ofH1 = calcMA(list_find_entry, 3, 0);
                 BigDecimal ma21ofH4 = calcMA(list_tp, 21, 0);
 
-                if ((ma3ofH1.compareTo(ma21ofH4) > 0) && (check3and8.contains("Short"))) {
+                if ((ma3ofH1.compareTo(ma21ofH4) > 0) && (check3and50.contains("Short"))) {
                     return "";
                 }
 
-                if ((ma3ofH1.compareTo(ma21ofH4) < 0) && (check3and8.contains("Long"))) {
+                if ((ma3ofH1.compareTo(ma21ofH4) < 0) && (check3and50.contains("Long"))) {
                     return "";
                 }
             }
@@ -2089,14 +2089,14 @@ public class Utils {
             BigDecimal TP1 = BigDecimal.ZERO;
             BigDecimal TP2 = BigDecimal.ZERO;
             String type = "";
-            if (check3and8.contains("Long")) {
+            if (check3and50.contains("Long")) {
                 type = "(Long)";
                 // check long
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.9995));
                 TP1 = low_heigh_tp1.get(1);
                 TP2 = low_heigh_tp2.get(1);
-            } else if (check3and8.contains("Short")) {
+            } else if (check3and50.contains("Short")) {
                 // check short
                 type = "(Short)";
                 SL = low_heigh_sl.get(1);
@@ -2131,7 +2131,7 @@ public class Utils {
             result += ",VOL: " + removeLastZero(vol).replace(".0", "") + "$...Loss: " + usd + "$";
             result += ",TP1: " + getPercentToEntry(entry, TP1, false) + "..." + removeLastZero(earn1) + "$";
             result += ",TP2: " + getPercentToEntry(entry, TP2, false) + "..." + removeLastZero(earn2) + "$";
-            result += ",," + check3and8;
+            result += ",," + check3and50;
 
             BigDecimal tp_percent = getPercent(entry, TP1).abs();
             if (tp_percent.compareTo(BigDecimal.valueOf(1)) < 0) {

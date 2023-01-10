@@ -150,6 +150,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     private static final String TREND_LONG = "Long";
     private static final String TREND_SHORT = "Short";
+    private static final String TREND_SHIT_COIN = "Long_ShitCoin";
 
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
     private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-1";
@@ -2971,18 +2972,20 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgMonitorFiboH4(String gecko_id, String symbol, List<BtcFutures> list_h4, String only_trend) {
+        String msg = Utils.getMmDD_TimeHHmm() + symbol;
 
         String result = Utils.checkMa3AndX(list_h4, 50);
 
-        String msg = Utils.getMmDD_TimeHHmm() + symbol;
-        if (Utils.isBlank(result)) {
-            result = Utils.checkMa3AndX(list_h4, 21);
-            if (Utils.isNotBlank(result)) {
-                msg += " ,Prepare: ";
-            } else {
-                result = Utils.checkMa3AndX(list_h4, 13);
+        if ("_BTC_ETH_BNB_".contains(symbol)) {
+            if (Utils.isBlank(result)) {
+                result = Utils.checkMa3AndX(list_h4, 21);
                 if (Utils.isNotBlank(result)) {
-                    msg += " ,Trend_Reversal: ";
+                    msg += " ,Prepare: ";
+                } else {
+                    result = Utils.checkMa3AndX(list_h4, 13);
+                    if (Utils.isNotBlank(result)) {
+                        msg += " ,Trend_Reversal: ";
+                    }
                 }
             }
         }
@@ -3024,7 +3027,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (Utils.isNotBlank(trend)) {
                 if (!current_trend.contains(trend)) {
-                    return current_trend;
+                    return "";
                 }
             }
 
@@ -3037,7 +3040,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        return current_trend;
+        return result;
     }
 
     private void sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
@@ -3089,14 +3092,16 @@ public class BinanceServiceImpl implements BinanceService {
         // }
 
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
-        String ALLOW_SHORT = "_XMR_APE_TRX_LTC_DOT_LINK_XLM_DOGE_VET_UNI_AVAX_MATIC_FIL_ALGO_ATOM_";
         String MONITOR_TOKEN = "_HOOK_HFT_APT_GMX_";
 
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
+            String result = sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
+            if (Utils.isBlank(result)) {
+                sendMsgMonitorFiboH4(gecko_id, symbol, list_h4, "");
+            }
 
         } else if (type.contains("Futures")) {
             sendMsgMonitorFiboH4(gecko_id, symbol, list_h4, TREND_LONG);
