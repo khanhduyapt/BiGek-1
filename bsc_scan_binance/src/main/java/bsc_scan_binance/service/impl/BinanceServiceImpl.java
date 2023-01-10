@@ -899,6 +899,17 @@ public class BinanceServiceImpl implements BinanceService {
                             futu = futu.replace(ma7, "");
                             ma7 = ma7.replace("_ma7(", "").replace(")~", "");
 
+                            if (Utils.isNotBlank(ma7)) {
+                                if (ma7.contains("Above")) {
+                                    css.setDt_range_css("text-primary");
+                                    ma7 = ma7.replace("Above_", "");
+                                } else if (ma7.contains("Below")) {
+                                    css.setDt_range_css("text-danger");
+                                    ma7 = ma7.replace("Below_", "");
+                                }
+                            }
+                            css.setOco_opportunity(ma7);
+
                             if (ma7.contains(TREND_LONG)
                                     || (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0)) {
 
@@ -939,17 +950,6 @@ public class BinanceServiceImpl implements BinanceService {
                             } else if (m2ma.contains("↓")) {
                                 css.setRange_move_css(CSS_PRICE_WARNING);
                             }
-
-                            if (Utils.isNotBlank(m2ma)) {
-                                if (m2ma.contains("Above")) {
-                                    css.setRange_move_css(CSS_MIN28_DAYS);
-                                    m2ma = m2ma.replace("Above_", "");
-                                } else if (m2ma.contains("Below")) {
-                                    css.setRange_move_css(CSS_PRICE_WARNING);
-                                    m2ma = m2ma.replace("Below_", "");
-                                }
-                            }
-
                             css.setRange_move(m2ma);
 
                         } catch (Exception e) {
@@ -3159,8 +3159,9 @@ public class BinanceServiceImpl implements BinanceService {
                 mDownMa = "move" + mDownMa.trim();
             }
         }
-        String checkMa50 = Utils.checkMa3And50(list_h4);
-        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + " " + checkMa50 + "}m2ma";
+
+        String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}m2ma";
+        String checkMa50 = "_ma7(" + Utils.checkMa3And50(list_h4) + ")~";
 
         // H4 sl2ma
         String entry = "";
@@ -3177,7 +3178,7 @@ public class BinanceServiceImpl implements BinanceService {
             note += "_Position";
         }
 
-        String result = note + type + m2ma + entry;
+        String result = note + type + m2ma + checkMa50 + entry;
         if (result.length() > 255) {
             // result = result.substring(0, 250) + "...";
         }
