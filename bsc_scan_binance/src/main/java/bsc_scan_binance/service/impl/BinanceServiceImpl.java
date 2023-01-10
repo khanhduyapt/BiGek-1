@@ -36,6 +36,7 @@ import bsc_scan_binance.entity.BinanceVolumnWeekKey;
 import bsc_scan_binance.entity.BollArea;
 import bsc_scan_binance.entity.BtcFutures;
 import bsc_scan_binance.entity.BtcVolumeDay;
+import bsc_scan_binance.entity.CandidateCoin;
 import bsc_scan_binance.entity.DepthAsks;
 import bsc_scan_binance.entity.DepthBids;
 import bsc_scan_binance.entity.FundingHistory;
@@ -53,6 +54,7 @@ import bsc_scan_binance.repository.BitcoinBalancesOnExchangesRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcFuturesRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
+import bsc_scan_binance.repository.CandidateCoinRepository;
 import bsc_scan_binance.repository.DepthAsksRepository;
 import bsc_scan_binance.repository.DepthBidsRepository;
 import bsc_scan_binance.repository.FundingHistoryRepository;
@@ -117,6 +119,9 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Autowired
     private PriorityCoinHistoryRepository priorityCoinHistoryRepository;
+
+    @Autowired
+    private CandidateCoinRepository candidateCoinRepository;
 
     @Autowired
     private FundingHistoryRepository fundingHistoryRepository;
@@ -220,7 +225,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "   ROUND(coalesce((SELECT pre.price_at_binance FROM public.binance_volumn_day pre WHERE cur.gecko_id = pre.gecko_id AND cur.symbol = pre.symbol AND hh=TO_CHAR((NOW() - interval '4 hours'), 'HH24')), 0), 5) as price_pre_4h, \n"
                     + "                                                                                           \n"
                     + "   can.market_cap ,                                                                        \n"
-                    + "   cur.price_at_binance            as current_price,                                       \n"
+                    + "   can.current_price               as current_price,                                       \n"
                     + "   can.total_volume                as gecko_total_volume,                                  \n"
                     + "   false as top10_vol_up,                                                                  \n"
                     + "   0 as vol_up_rate,                                                                       \n"
@@ -1005,7 +1010,7 @@ public class BinanceServiceImpl implements BinanceService {
                     if (futu.contains("_Position")) {
                         futu = futu.replace("_Position", "");
 
-                        css.setRange_position("W:Uptrend");
+                        css.setRange_position("D");
                         css.setRange_position_css(CSS_PRICE_SUCCESS + " bg-success");
 
                         css.setRange_wdh_css("text-primary");
@@ -3102,6 +3107,13 @@ public class BinanceServiceImpl implements BinanceService {
 
                 priorityCoinHistoryRepository.save(his);
             }
+
+            CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
+            if (!Objects.equals(null, entity)) {
+                entity.setCurrentPrice(current_price);
+                candidateCoinRepository.save(entity);
+            }
+
         } catch (Exception e) {
         }
 
@@ -3129,21 +3141,16 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
-        //String checkW = Utils.checkMa3AndX(list_weeks, 8, false);
-        String checkD = Utils.checkMa3AndX(list_days, 8, false);
-
         String mUpMa = "";
-        // boolean chartDUpMa10 = Utils.isAboveMALine(list_days, 10, 0);
-        // mUpMa += checkW.contains(TREND_LONG) ? "↑W(ma" + Utils.getSlowIndex(list_weeks) +
-        // ") " : " ";
-        mUpMa += checkD.contains(TREND_LONG) ? "↑D(ma" + Utils.getSlowIndex(list_days) + ") " : " ";
+        boolean chartDUpMa10 = Utils.isAboveMALine(list_days, Utils.getSlowIndex(list_days), 0);
+        mUpMa += chartDUpMa10 ? "↑D(ma" + Utils.getSlowIndex(list_days) + ") " : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move" + mUpMa.trim();
         }
 
         String mDownMa = "";
         // boolean chartDTodayCutDown = Utils.isBelowMALine(list_days, 10, 0);
-        mDownMa += checkD.contains(TREND_SHORT) ? "↓D(ma" + Utils.getSlowIndex(list_days) + ") " : "";
+        mDownMa += !chartDUpMa10 ? "↓D(ma" + Utils.getSlowIndex(list_days) + ") " : "";
 
         if (Utils.isNotBlank(mDownMa)) {
             if (Utils.isNotBlank(mUpMa)) {
@@ -3165,9 +3172,10 @@ public class BinanceServiceImpl implements BinanceService {
         }
         // ---------------------------------------------------------
 
-        // if (checkW.contains(TREND_LONG)) {
-        // note += "_Position";
-        // }
+        String checkD = Utils.checkMa3AndX(list_days, 8, false);
+        if (checkD.contains(TREND_LONG)) {
+            note += "_Position";
+        }
 
         String result = note + type + m2ma + entry;
         if (result.length() > 255) {
