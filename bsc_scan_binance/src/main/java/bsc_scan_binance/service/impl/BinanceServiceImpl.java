@@ -2973,7 +2973,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     private String sendMsgMonitorFibo(String gecko_id, String symbol, List<BtcFutures> list, String only_trend,
             int maIndex) {
-        String msg = Utils.getMmDD_TimeHHmm() + symbol;
+        String msg = Utils.getMmDD_TimeHHmm() + symbol + ",";
 
         String result = Utils.checkMa3AndX(list, maIndex);
 
@@ -2984,7 +2984,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-            msg += result.replace(",", Utils.new_line_from_service);
+            msg = (msg + result).replace(",", Utils.new_line_from_service);
 
             String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + symbol + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
@@ -3073,7 +3073,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         // debug
         // List<BtcFutures> list_debug = Utils.loadData("BNB", TIME_2h, 60);
-        // sendMsgMonitorFibo("binancecoin", "BNB", list_debug, "");
+        // sendMsgMo nitorFibo("binancecoin", "BNB", list_debug, "");
         // List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
         // String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
         // if (Utils.isNotBlank(h1LongShort)) {
@@ -3091,18 +3091,20 @@ public class BinanceServiceImpl implements BinanceService {
             String result = sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
 
             if (Utils.isBlank(result)) {
-                sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21);
+                //List<BtcFutures> list_h2 = Utils.loadData(symbol, TIME_2h, 60);
+                result = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21);
+
+                if (Utils.isBlank(result)) {
+                    result = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 13);
+                }
             }
 
         } else if (type.contains("Futures")) {
             sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50);
         }
 
-        List<BtcFutures> list_debug = Utils.loadData(symbol, "5m", 60);
+        List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);
         sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 50);
-        if (Utils.is3CuttingUp50ForLong(list_debug) || Utils.is3CuttingDown50ForShort(list_debug)) {
-            boolean a = true;
-        }
 
         // AUD_EUR_GBP_USDT
         if (Objects.equals("ETH", symbol)) {

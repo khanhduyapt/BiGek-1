@@ -1348,7 +1348,7 @@ public class Utils {
             return "W";
         }
 
-        return "";
+        return symbol.replace("_00", "");
     }
 
     public static List<BigDecimal> calcFiboTakeProfit(BigDecimal low_heigh, BigDecimal entry) {
@@ -2247,11 +2247,11 @@ public class Utils {
             isCuttingDown = true;
         }
         // -----------------------------------------------
-        String volume_h4 = Utils.analysisVolume(list);
-        if (isNotBlank(volume_h4)) {
-            volume_h4 = ",TradingQty: " + volume_h4.replace("volma{", "").replace("}volma", "");
+        String volume = Utils.analysisVolume(list);
+        if (isNotBlank(volume)) {
+            volume = ",TradingQty: " + volume.replace("volma{", "").replace("}volma", "");
         } else {
-            volume_h4 = ",TradingQty: Weak";
+            volume = ",TradingQty: Weak";
         }
 
         String note_long = "";
@@ -2262,9 +2262,9 @@ public class Utils {
             note_long += " Ma" + slowIndex + ":Down";
         }
         if (isNotBlank(note_long)) {
-            note_long = " (Remark)," + note_long + ", " + str_ma_size + volume_h4;
+            note_long = " (Remark)," + note_long + ", " + str_ma_size + volume;
         } else {
-            note_long = " (Remark)," + str_ma_size + volume_h4;
+            note_long = " (Remark)," + str_ma_size + volume;
         }
 
         String note_short = "";
@@ -2275,18 +2275,28 @@ public class Utils {
             note_short += " Ma" + slowIndex + ":Up";
         }
         if (isNotBlank(note_short)) {
-            note_short = " (Remark)," + note_short + ", " + str_ma_size + volume_h4;
+            note_short = " (Remark)," + note_short + ", " + str_ma_size + volume;
         } else {
-            note_short = " (Remark)," + str_ma_size + volume_h4;
+            note_short = " (Remark)," + str_ma_size + volume;
         }
 
         // --------------------------------------------------
+
+        String type = "";
+        if (slowIndex >= 35) {
+            type = "";
+        } else if (slowIndex >= 20) {
+            type = "(Prepare)";
+        } else if (slowIndex >= 10) {
+            type = "(Trend Reversal)";
+        }
+
         String result = "";
         if (isCuttingDown) {
-            result = "Short (Chart:" + chart.trim().toUpperCase() + ")";
+            result = "Short (Chart:" + chart.trim().toUpperCase() + ")" + type;
         }
         if (isCuttingUp) {
-            result = "Long (Chart:" + chart.trim().toUpperCase() + ")";
+            result = "Long (Chart:" + chart.trim().toUpperCase() + ")" + type;
 
             List<BigDecimal> low_heigh = getLowHeightCandle(list);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
@@ -2304,8 +2314,8 @@ public class Utils {
 
         if (isNotBlank(result)) {
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
-
-            if (list.get(0).getId().contains("_4h_")) {
+            //
+            if (list.get(0).getId().contains("_4h_") && (slowIndex >= 35)) {
                 boolean isLong = result.contains("Long");
                 List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
 
@@ -2360,7 +2370,7 @@ public class Utils {
                 result += ",TP2: " + getPercentToEntry(entry, TP2, isLong) + "..." + removeLastZero(earn2) + "$";
                 result += ",TP3: " + getPercentToEntry(entry, TP3, isLong) + "..." + removeLastZero(earn3) + "$";
                 if (isNotBlank(timing1 + timing2)) {
-                    result += ",STOP(-): " + timing1 + "~END:" + timing2;
+                    result += ",STOP(-): " + timing1 + ",END:" + timing2;
                 }
             }
 
