@@ -3049,7 +3049,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
         } else if (type.contains("Futures")) {
-            sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
+            sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, true);
         }
 
         //List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);

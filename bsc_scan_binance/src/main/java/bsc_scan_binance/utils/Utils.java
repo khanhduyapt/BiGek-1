@@ -2361,7 +2361,7 @@ public class Utils {
         if (isNotBlank(result)) {
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
             //
-            if (showDetail) {
+            if (symbol.contains("_4h_") && showDetail) {
                 boolean isLong = result.contains("Long");
                 List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
 
@@ -2412,6 +2412,7 @@ public class Utils {
                 result += ",E___: " + getPercentToEntry(currPrice, entry, isLong);
                 result += ",SL__: " + getPercentToEntry(entry, SL, isLong);
                 result += ",VOL: " + removeLastZero(vol).replace(".0", "") + "$...Loss:" + usd + "$";
+
                 result += ",TP1: " + getPercentToEntry(entry, TP1, isLong) + "..." + removeLastZero(earn1) + "$";
                 result += ",TP2: " + getPercentToEntry(entry, TP2, isLong) + "..." + removeLastZero(earn2) + "$";
                 result += ",TP3: " + getPercentToEntry(entry, TP3, isLong) + "..." + removeLastZero(earn3) + "$";
