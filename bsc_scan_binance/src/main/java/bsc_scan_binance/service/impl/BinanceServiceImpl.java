@@ -926,7 +926,7 @@ public class BinanceServiceImpl implements BinanceService {
                             futu = futu.replace(m2ma + "}m2ma", "").replaceAll("  ", "");
 
                             m2ma = m2ma.replace("m2ma{", "").replace("move", "");
-                            css.setRange_move(m2ma);
+
                             if (m2ma.contains("↑D")) {
                                 css.setRange_move_css(CSS_PRICE_WHITE);
                             } else if (m2ma.contains("↑W")) {
@@ -938,10 +938,15 @@ public class BinanceServiceImpl implements BinanceService {
                             if (Utils.isNotBlank(m2ma)) {
                                 if (m2ma.contains("Above")) {
                                     css.setRange_move_css(CSS_MIN28_DAYS);
+                                    m2ma = m2ma.replace("Above_", "");
                                 } else if (m2ma.contains("Below")) {
                                     css.setRange_move_css(CSS_PRICE_WARNING);
+                                    m2ma = m2ma.replace("Below_", "");
                                 }
                             }
+
+                            css.setRange_move(m2ma);
+
                         } catch (Exception e) {
                             css.setRange_move("m2ma exception");
                         }
@@ -3042,13 +3047,12 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
         }
 
-        List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);
-        String test = sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 50, true);
-
+        //List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);
+        //String test = sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 50, false);
         //if (Utils.isBlank(test)) {
-        //    test = sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 21);
+        //    test = sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 21, false);
         //    if (Utils.isBlank(test)) {
-        //        sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 13);
+        //        sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 13, false);
         //    }
         //}
 
@@ -3125,7 +3129,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
-        String checkW = Utils.checkMa3AndX(list_weeks, 8, false);
+        //String checkW = Utils.checkMa3AndX(list_weeks, 8, false);
         String checkD = Utils.checkMa3AndX(list_days, 8, false);
 
         String mUpMa = "";
@@ -3161,9 +3165,9 @@ public class BinanceServiceImpl implements BinanceService {
         }
         // ---------------------------------------------------------
 
-        if (checkW.contains(TREND_LONG)) {
-            note += "_Position";
-        }
+        // if (checkW.contains(TREND_LONG)) {
+        // note += "_Position";
+        // }
 
         String result = note + type + m2ma + entry;
         if (result.length() > 255) {

@@ -2227,10 +2227,16 @@ public class Utils {
         if (slowIndex >= 35) {
             isCuttingUp = is3CuttingUp50ForLong(list);
         }
+        if (isCuttingUp && !isMa_fast_Up) {
+            isCuttingUp = false;
+        }
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
             isCuttingDown = true;
+        }
+        if (isCuttingDown && isMa_fast_Up) {
+            isCuttingDown = false;
         }
         // -----------------------------------------------
         String volume = Utils.analysisVolume(list);
