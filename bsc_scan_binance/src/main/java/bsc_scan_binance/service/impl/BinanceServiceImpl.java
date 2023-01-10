@@ -3077,7 +3077,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Utils.isNotBlank(cur_h4_ma13)) {
                     String msg = Utils.getMmDD_TimeHHmm()
                             + list_cur_h4.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                            + Utils.new_line_from_service + cur_h4_ma13;
+                            + Utils.new_line_from_service + cur_h4_ma13.replace(",", Utils.new_line_from_service);
 
                     String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
 
