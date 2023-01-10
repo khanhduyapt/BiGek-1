@@ -1327,7 +1327,7 @@ public class Utils {
         return 50;
     }
 
-    public static String getSlowName(List<BtcFutures> list) {
+    public static String getChartName(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
         if (symbol.contains("_15m_")) {
             return "m15";
@@ -2133,11 +2133,12 @@ public class Utils {
         }
         BigDecimal ma_size = calcMA(list, size, cur);
         String str_ma_size = "";
+        String chartName = getChartName(list);
         String per = getPercentToEntry(ma_fast_c, ma_size, true);
         if (ma_fast_c.compareTo(ma_size) > 0) {
-            str_ma_size += "Above_Ma" + size + ":" + per;
+            str_ma_size += "Above_Ma" + size + "(" + chartName + "):" + per;
         } else {
-            str_ma_size += "Below_Ma" + size + ":" + per;
+            str_ma_size += "Below_Ma" + size + "(" + chartName + "):" + per;
         }
 
         return str_ma_size;
@@ -2248,7 +2249,7 @@ public class Utils {
 
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail) {
         String symbol = list.get(0).getId();
-        String chart = getSlowName(list);
+        String chart = getChartName(list);
         int cur = 1;
         int pre = 2;
         int fastIndex = 3;
