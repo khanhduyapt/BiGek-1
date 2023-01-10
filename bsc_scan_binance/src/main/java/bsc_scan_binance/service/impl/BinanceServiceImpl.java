@@ -3021,16 +3021,6 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         type = type + Utils.analysisVolume(list_h4);
 
-        // debug
-        // List<BtcFutures> list_debug = Utils.loadData("BNB", TIME_2h, 60);
-        // sendMsgMo nitorFibo("binancecoin", "BNB", list_debug, "");
-        // List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
-        // String h1LongShort = Utils.getScapLongOrShort(list_h1, list_h4, 10);
-        // if (Utils.isNotBlank(h1LongShort)) {
-        // h1LongShort = "_ma7(" + h1LongShort.trim().replace(",", " ") + ")~";
-        // scapLongOrShortH4 += h1LongShort;
-        // }
-
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         String SPOT_TOKEN = "_HOOK_HFT_APT_GMX_TWT_";
         String checkMa3AndX = "";
@@ -3054,15 +3044,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        //List<BtcFutures> list_debug = Utils.loadData(symbol, "15m", 60);
-        //String test = sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 50, false);
-        //if (Utils.isBlank(test)) {
-        //    test = sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 21, false);
-        //    if (Utils.isBlank(test)) {
-        //        sendMsgMonitorFibo(gecko_id, symbol, list_debug, "", 13, false);
-        //    }
-        //}
-
         // AUD_EUR_GBP_USDT
         if (Objects.equals("ETH", symbol)) {
 
@@ -3071,13 +3052,13 @@ public class BinanceServiceImpl implements BinanceService {
             for (String CURR : list_currency) {
                 String ID = CURR + "_USDT";
 
-                List<BtcFutures> list_cur = Utils.loadData(CURR, TIME_1h, 60);
-                String cur_h4_ma13 = Utils.checkMa3AndX(list_cur, 50, false);
+                List<BtcFutures> list_cur = Utils.loadData(CURR, TIME_1h, 50);
+                String cur_h1_ma21 = Utils.checkMa3AndX(list_cur, 21, false);
 
-                if (Utils.isNotBlank(cur_h4_ma13)) {
+                if (Utils.isNotBlank(cur_h1_ma21)) {
                     String msg = Utils.getMmDD_TimeHHmm()
                             + list_cur.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                            + Utils.new_line_from_service + cur_h4_ma13.replace(",", Utils.new_line_from_service);
+                            + Utils.new_line_from_service + cur_h1_ma21.replace(",", Utils.new_line_from_service);
 
                     String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
 
