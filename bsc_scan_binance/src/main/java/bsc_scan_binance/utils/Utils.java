@@ -1433,8 +1433,6 @@ public class Utils {
         BigDecimal tem_qty = avg_qty.multiply(BigDecimal.valueOf(1.2));
         BigDecimal cur_qty_0 = list.get(0).getTrading_qty();
         BigDecimal pre_qty_1 = list.get(1).getTrading_qty();
-        BigDecimal pre_qty_2 = list.get(2).getTrading_qty();
-        BigDecimal pre_qty_3 = list.get(3).getTrading_qty();
 
         String result = "";
         if (cur_qty_0.compareTo(tem_qty) > 0) {
@@ -1450,26 +1448,6 @@ public class Utils {
             result += " " + getHH(time_count) + "h x"
                     + formatPrice(pre_qty_1.divide(avg_qty, 2, RoundingMode.CEILING), 1);
             if (list.get(1).isUptrend()) {
-                result += " pump!";
-            } else {
-                result += " dump!";
-            }
-        }
-
-        if (pre_qty_2.compareTo(tem_qty) > 0) {
-            result += " " + getHH(time_count * 2) + "h x"
-                    + formatPrice(pre_qty_2.divide(avg_qty, 2, RoundingMode.CEILING), 1);
-            if (list.get(2).isUptrend()) {
-                result += " pump!";
-            } else {
-                result += " dump!";
-            }
-        }
-
-        if (pre_qty_3.compareTo(tem_qty) > 0) {
-            result += " " + getHH(time_count * 3) + "h x"
-                    + formatPrice(pre_qty_3.divide(avg_qty, 2, RoundingMode.CEILING), 1);
-            if (list.get(3).isUptrend()) {
                 result += " pump!";
             } else {
                 result += " dump!";
@@ -2178,6 +2156,9 @@ public class Utils {
         if (list.size() < 50) {
             return false;
         }
+        BigDecimal open = list.get(1).getPrice_open_candle();
+        BigDecimal close = list.get(1).getPrice_close_candle();
+
         BigDecimal ma_3_c = calcMA(list, 3, 1);
         BigDecimal ma_3_p = calcMA(list, 3, 2);
 
@@ -2188,6 +2169,13 @@ public class Utils {
         BigDecimal ma_50_p = calcMA(list, 50, 2);
 
         if ((ma_3_c.compareTo(ma_3_p) > 0) && (ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_p.compareTo(ma_3_p) > 0)) {
+            return true;
+        }
+
+        if ((ma_3_c.compareTo(ma_3_p) > 0)
+                && (open.compareTo(close) < 0) && (open.compareTo(ma_50_c) < 0)
+                && (open.compareTo(ma_3_c) < 0)
+                && (ma_50_c.compareTo(close) < 0) && (ma_3_c.compareTo(close) < 0)) {
             return true;
         }
 
@@ -2243,7 +2231,9 @@ public class Utils {
             str_ma_50 = str_ma_50.replace("Long", "");
             isCuttingUp = true;
         }
-
+        if (is3CuttingUp50ForLong(list)) {
+            isCuttingUp = true;
+        }
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
