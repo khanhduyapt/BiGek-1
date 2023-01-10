@@ -151,7 +151,7 @@ public class BscScanBinanceApplication {
     public static void wait(int number) {
         try {
             // Random r = new Random();
-            int ms = 8000;// + r.nextInt(number);
+            int ms = 12000;// + r.nextInt(number);
 
             java.lang.Thread.sleep(ms);
         } catch (InterruptedException ex) {

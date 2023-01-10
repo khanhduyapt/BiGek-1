@@ -2164,23 +2164,23 @@ public class Utils {
         BigDecimal ma_50_p = calcMA(list, 50, 2);
 
         if ((open.compareTo(close) < 0) && (ma_3_c.compareTo(ma_3_p) > 0)) {
-            if ((open.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0)
-                    && (open.compareTo(ma_3_c) < 0) && (ma_3_c.compareTo(close) < 0)) {
+            if ((open.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0) && (open.compareTo(ma_3_c) < 0)
+                    && (ma_3_c.compareTo(close) < 0)) {
                 result = true;
             }
 
-            if ((open.compareTo(ma_21_c) < 0) && (ma_21_c.compareTo(close) < 0)
-                    && (open.compareTo(ma_13_c) < 0) && (ma_13_c.compareTo(close) < 0)
-                    && (open.compareTo(ma_3_c) < 0) && (ma_3_c.compareTo(close) < 0)) {
+            if ((open.compareTo(ma_21_c) < 0) && (ma_21_c.compareTo(close) < 0) && (open.compareTo(ma_13_c) < 0)
+                    && (ma_13_c.compareTo(close) < 0) && (open.compareTo(ma_3_c) < 0)
+                    && (ma_3_c.compareTo(close) < 0)) {
                 result = true;
             }
         }
 
         if ((open2.compareTo(close) < 0) && (ma_3_c.compareTo(ma_3_p) > 0)) {
-            if ((open2.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0)
-                    && (open2.compareTo(ma_21_c) < 0) && (ma_21_c.compareTo(close) < 0)
-                    && (open2.compareTo(ma_13_c) < 0) && (ma_13_c.compareTo(close) < 0)
-                    && (open2.compareTo(ma_3_c) < 0) && (ma_3_c.compareTo(close) < 0)) {
+            if ((open2.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0) && (open2.compareTo(ma_21_c) < 0)
+                    && (ma_21_c.compareTo(close) < 0) && (open2.compareTo(ma_13_c) < 0)
+                    && (ma_13_c.compareTo(close) < 0) && (open2.compareTo(ma_3_c) < 0)
+                    && (ma_3_c.compareTo(close) < 0)) {
 
                 result = true;
             }
@@ -2217,9 +2217,8 @@ public class Utils {
         BigDecimal close = list.get(1).getPrice_close_candle();
 
         if ((open.compareTo(close) > 0) && (ma_3_c.compareTo(ma_3_p) < 0)) {
-            if ((open.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close) > 0)
-                    && (open.compareTo(ma_21_c) > 0) && (ma_21_c.compareTo(close) > 0)
-                    && (open.compareTo(ma_13_c) > 0) && (ma_13_c.compareTo(close) > 0)
+            if ((open.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close) > 0) && (open.compareTo(ma_21_c) > 0)
+                    && (ma_21_c.compareTo(close) > 0) && (open.compareTo(ma_13_c) > 0) && (ma_13_c.compareTo(close) > 0)
                     && (open.compareTo(ma_3_c) > 0) && (ma_3_c.compareTo(close) > 0)) {
 
                 result = true;
@@ -2227,10 +2226,10 @@ public class Utils {
         }
 
         if ((open2.compareTo(close) > 0) && (ma_3_c.compareTo(ma_3_p) < 0)) {
-            if ((open2.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close) > 0)
-                    && (open2.compareTo(ma_21_c) > 0) && (ma_21_c.compareTo(close) > 0)
-                    && (open2.compareTo(ma_13_c) > 0) && (ma_13_c.compareTo(close) > 0)
-                    && (open2.compareTo(ma_3_c) > 0) && (ma_3_c.compareTo(close) > 0)) {
+            if ((open2.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close) > 0) && (open2.compareTo(ma_21_c) > 0)
+                    && (ma_21_c.compareTo(close) > 0) && (open2.compareTo(ma_13_c) > 0)
+                    && (ma_13_c.compareTo(close) > 0) && (open2.compareTo(ma_3_c) > 0)
+                    && (ma_3_c.compareTo(close) > 0)) {
 
                 result = true;
             }
@@ -2245,6 +2244,16 @@ public class Utils {
         }
 
         return result;
+    }
+
+    public static boolean maIsUptrend(List<BtcFutures> list, int maIndex) {
+        BigDecimal ma_slow_c = calcMA(list, maIndex, 1);
+        BigDecimal ma_slow_p = calcMA(list, maIndex, 3);
+        if (ma_slow_c.compareTo(ma_slow_p) > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail) {
@@ -2359,7 +2368,7 @@ public class Utils {
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
             if (ma_fast_c.compareTo(max_allow_long) > 0) {
-                //result += "(Range:Danger!!!!!!)";
+                // result += "(Range:Danger!!!!!!)";
                 return "";
             }
         }
@@ -2431,8 +2440,8 @@ public class Utils {
                 }
             }
 
-            //String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
-            //System.out.println(log);
+            // String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
+            // System.out.println(log);
         }
 
         if (isCuttingDown && isNotBlank(note_short)) {
