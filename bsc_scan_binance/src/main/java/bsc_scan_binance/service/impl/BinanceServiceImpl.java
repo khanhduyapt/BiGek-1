@@ -3127,10 +3127,11 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         type = type + Utils.analysisVolume(list_h4);
+        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
 
+        String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         String SPOT_TOKEN = "_HOOK_HFT_APT_GMX_TWT_";
-        String checkMa3AndX = "";
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
@@ -3150,9 +3151,9 @@ public class BinanceServiceImpl implements BinanceService {
 
                 List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
 
-                String temp_result_btc = sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 50, false);
-                if (Utils.isBlank(temp_result_btc)) {
-                    sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 21, false);
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 50, false);
+                if (Utils.isBlank(checkMa3AndX)) {
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 21, false);
                 }
             }
         } else if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
@@ -3160,6 +3161,13 @@ public class BinanceServiceImpl implements BinanceService {
                 checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
                 if (Utils.isBlank(checkMa3AndX)) {
                     checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 21, false);
+                    if (Utils.isBlank(checkMa3AndX)) {
+                        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+                        checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_LONG, 50, false);
+                        if (Utils.isBlank(checkMa3AndX)) {
+                            checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_LONG, 21, false);
+                        }
+                    }
                 }
             }
         }
@@ -3167,12 +3175,12 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         try {
-            String note = "";
-            if (MAIN_TOKEN.contains("_" + symbol + "_")) {
-                note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_H4_BTC).replace(" ", "");
-            } else {
-                note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG).replace(" ", "");
-            }
+            String note = checkMa3AndX;
+            //if (MAIN_TOKEN.contains("_" + symbol + "_")) {
+            //    note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_H4_BTC).replace(" ", "");
+            //} else {
+            //    note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG).replace(" ", "");
+            //}
 
             if (Utils.isNotBlank(note)) {
                 PriorityCoinHistory his = new PriorityCoinHistory();
@@ -3243,7 +3251,6 @@ public class BinanceServiceImpl implements BinanceService {
 
         // H4 sl2ma
         String entry = "";
-        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
         if (Utils.isNotBlank(scapLongOrShortH4)
                 && (type.contains("(Futures)") || scapLongOrShortH4.contains("Long_"))) {
             scapLongOrShortH4 = scapLongOrShortH4.replace("_" + symbol.toUpperCase() + "_", "_");

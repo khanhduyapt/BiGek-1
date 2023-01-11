@@ -1643,64 +1643,6 @@ public class Utils {
         return result;
     }
 
-    public static String getScapLongOrShort_candle(List<BtcFutures> list) {
-        BigDecimal curr_price = list.get(0).getCurrPrice();
-
-        List<BigDecimal> low_heigh_10days = getLowHeightCandle(list.subList(0, 10));
-        BigDecimal range = (low_heigh_10days.get(1).subtract(low_heigh_10days.get(0)));
-
-        range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
-
-        if (curr_price.compareTo(low_heigh_10days.get(0).add(range)) > 0
-                && curr_price.compareTo(low_heigh_10days.get(1).subtract(range)) < 0) {
-            // return "";
-        }
-
-        BigDecimal ma10_cur = calcMA(list, 10, 0);
-
-        BigDecimal entry = curr_price;
-        BigDecimal open_price = list.get(1).getPrice_open_candle();
-        BigDecimal close_price = list.get(1).getPrice_close_candle();
-
-        // curr < ma10 < ma50 < ma10_pre -> Short
-        if ((ma10_cur.compareTo(open_price) < 0) && (ma10_cur.compareTo(close_price) > 0)) {
-
-            BigDecimal SL = low_heigh_10days.get(1).multiply(BigDecimal.valueOf(1.02));
-            BigDecimal TP = low_heigh_10days.get(0);
-
-            BigDecimal vol = BigDecimal.valueOf(5).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-            vol = formatPrice(vol.multiply(entry).abs(), 0);
-
-            String result = "SL(Short_" + list.get(0).getId().replace("_00", "") + "):"
-                    + getPercentToEntry(entry, SL, false);
-            result += ",E:" + getPercentToEntry(curr_price, entry, true);
-            result += ",TP:" + getPercentToEntry(entry, TP, true);
-            result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:5$";
-
-            return result;
-        }
-
-        // curr > ma10 > ma50 > ma10_pre -> Long
-        if ((ma10_cur.compareTo(open_price) > 0) && (close_price.compareTo(ma10_cur) > 0)) {
-
-            BigDecimal SL = low_heigh_10days.get(0).multiply(BigDecimal.valueOf(0.98));
-            BigDecimal TP = low_heigh_10days.get(1);
-
-            BigDecimal vol = BigDecimal.valueOf(5).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-            vol = formatPrice(vol.multiply(entry).abs(), 0);
-
-            String result = "SL(Long_" + list.get(0).getId().replace("_00", "") + "):"
-                    + getPercentToEntry(entry, SL, true);
-            result += ",E:" + getPercentToEntry(curr_price, entry, true);
-            result += ",TP:" + getPercentToEntry(entry, TP, true);
-            result += ",Vol:" + removeLastZero(vol).replace(".0", "") + "$:5$";
-
-            return result;
-        }
-
-        return "";
-    }
-
     public static String getTypeLongOrShort(List<BtcFutures> list) {
         String result = "0:Sideway";
 
@@ -2385,11 +2327,27 @@ public class Utils {
 
         if (isNotBlank(result)) {
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
-            //
-            if (showDetail) {
-                boolean isLong = result.contains(TREND_LONG);
-                List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
+            int usd = 10;
+            boolean isLong = result.contains(TREND_LONG);
+            List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
+            BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
+                    : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
+            BigDecimal ma_13 = calcMA(list, 13, 1);
+            List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_13);
 
+            BigDecimal SL = fiboList.get(0);
+            BigDecimal entry = fiboList.get(1);
+            BigDecimal TP1 = fiboList.get(2);
+            BigDecimal TP2 = fiboList.get(3);
+            BigDecimal TP3 = fiboList.get(4);
+
+            BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
+            vol = formatPrice(vol.multiply(entry).abs(), 0);
+
+            result += ",SL__: " + getPercentToEntry(entry, SL, true);
+            result += ",VOL: " + removeLastZero(vol).replace(".0", "") + "$...Loss:" + usd + "$";
+
+            if (showDetail) {
                 int start_index = 0;
                 BigDecimal temp = isLong ? low_heigh.get(0) : low_heigh.get(1);
                 for (int index = 0; index <= 13; index++) {
@@ -2409,21 +2367,6 @@ public class Utils {
                 String timing1 = timingTarget(chart, start_index);
                 String timing2 = timingTarget(chart, start_index * 5);
 
-                BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
-                        : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
-                BigDecimal ma_13 = calcMA(list, 13, 1);
-                List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_13);
-
-                BigDecimal SL = fiboList.get(0);
-                BigDecimal entry = fiboList.get(1);
-                BigDecimal TP1 = fiboList.get(2);
-                BigDecimal TP2 = fiboList.get(3);
-                BigDecimal TP3 = fiboList.get(4);
-
-                int usd = 10;
-                BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-                vol = formatPrice(vol.multiply(entry).abs(), 0);
-
                 BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
                 earn1 = formatPrice(vol.multiply(earn1), 1);
 
@@ -2434,9 +2377,6 @@ public class Utils {
                 earn3 = formatPrice(vol.multiply(earn3), 1);
 
                 result += ",E___: " + getPercentToEntry(currPrice, entry, isLong);
-                result += ",SL__: " + getPercentToEntry(entry, SL, isLong);
-                result += ",VOL: " + removeLastZero(vol).replace(".0", "") + "$...Loss:" + usd + "$";
-
                 result += ",TP1: " + getPercentToEntry(entry, TP1, isLong) + "..." + removeLastZero(earn1) + "$";
                 result += ",TP2: " + getPercentToEntry(entry, TP2, isLong) + "..." + removeLastZero(earn2) + "$";
                 result += ",TP3: " + getPercentToEntry(entry, TP3, isLong) + "..." + removeLastZero(earn3) + "$";
