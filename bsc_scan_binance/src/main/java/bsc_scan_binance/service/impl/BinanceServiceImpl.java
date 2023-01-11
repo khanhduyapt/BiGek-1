@@ -3139,7 +3139,13 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         try {
-            String note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_BTC).replace(" ", "");
+            String note = "";
+            if (MAIN_TOKEN.contains("_" + symbol + "_")) {
+                note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_BTC).replace(" ", "");
+            } else {
+                note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG).replace(" ", "");
+            }
+
             if (Utils.isNotBlank(note)) {
                 PriorityCoinHistory his = new PriorityCoinHistory();
                 his.setGeckoid(gecko_id);
