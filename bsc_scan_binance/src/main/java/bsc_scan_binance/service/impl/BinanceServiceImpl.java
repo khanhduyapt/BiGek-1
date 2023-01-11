@@ -155,7 +155,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     private static final String TREND_LONG = "Long";
     private static final String TREND_SHORT = "Short";
-    private static final String TREND_SHIT_COIN = "Long_ShitCoin";
+    private static final String TREND_OPPOSITE = "Opposite";
 
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
     private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-1";
@@ -3025,38 +3025,32 @@ public class BinanceServiceImpl implements BinanceService {
 
                 boolean IsUpAUD_3 = Utils.maIsUptrend(list_H4_AUD, 3);
                 boolean IsUpAUD_8 = Utils.maIsUptrend(list_H4_AUD, 8);
-                boolean IsUpAUD_13 = Utils.maIsUptrend(list_H4_AUD, 13);
-                boolean IsUpAUD = IsUpAUD_3;
-                if (IsUpAUD_3 = IsUpAUD_8) {
+                boolean IsUpAUD = IsUpAUD_8;
+                if (IsUpAUD_3 == IsUpAUD_8) {
                     TREND_H4_AUD = IsUpAUD_8 ? TREND_LONG : TREND_SHORT;
                     IsUpAUD = IsUpAUD_8;
                 } else {
-                    TREND_H4_AUD = IsUpAUD_13 ? TREND_LONG : TREND_SHORT;
-                    IsUpAUD = IsUpAUD_13;
+                    TREND_H4_AUD = TREND_OPPOSITE;
                 }
 
                 boolean IsUpEUR_3 = Utils.maIsUptrend(list_H4_EUR, 3);
                 boolean IsUpEUR_8 = Utils.maIsUptrend(list_H4_EUR, 8);
-                boolean IsUpEUR_13 = Utils.maIsUptrend(list_H4_EUR, 13);
-                boolean IsUpEUR = IsUpEUR_3;
-                if (IsUpEUR_3 = IsUpEUR_8) {
+                boolean IsUpEUR = IsUpEUR_8;
+                if (IsUpEUR_3 == IsUpEUR_8) {
                     TREND_H4_EUR = IsUpEUR_8 ? TREND_LONG : TREND_SHORT;
                     IsUpEUR = IsUpEUR_8;
                 } else {
-                    TREND_H4_EUR = IsUpEUR_13 ? TREND_LONG : TREND_SHORT;
-                    IsUpEUR = IsUpEUR_13;
+                    TREND_H4_EUR = TREND_OPPOSITE;
                 }
 
                 boolean IsUpGBP_3 = Utils.maIsUptrend(list_H4_GBP, 3);
                 boolean IsUpGBP_8 = Utils.maIsUptrend(list_H4_GBP, 8);
-                boolean IsUpGBP_13 = Utils.maIsUptrend(list_H4_GBP, 13);
-                boolean IsUpGBP = IsUpGBP_3;
-                if (IsUpGBP_3 = IsUpGBP_8) {
+                boolean IsUpGBP = IsUpGBP_8;
+                if (IsUpGBP_3 == IsUpGBP_8) {
                     TREND_H4_GBP = IsUpGBP_8 ? TREND_LONG : TREND_SHORT;
                     IsUpGBP = IsUpGBP_8;
                 } else {
-                    TREND_H4_GBP = IsUpGBP_13 ? TREND_LONG : TREND_SHORT;
-                    IsUpGBP = IsUpGBP_13;
+                    TREND_H4_GBP = TREND_OPPOSITE;
                 }
 
                 int count_usd_uptrend = 3;
@@ -3082,6 +3076,10 @@ public class BinanceServiceImpl implements BinanceService {
                     trend = TREND_H4_EUR;
                 } else if (Objects.equals("GBP", CURR)) {
                     trend = TREND_H4_GBP;
+                }
+
+                if (Objects.equals(trend, TREND_OPPOSITE)) {
+                    continue;
                 }
 
                 String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
