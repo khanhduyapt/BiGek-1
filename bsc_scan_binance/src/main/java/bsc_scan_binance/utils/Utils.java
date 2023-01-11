@@ -1490,10 +1490,10 @@ public class Utils {
 
             BigDecimal entry = curr_price;
 
-            if ((symbol.contains("BTC") || symbol.contains("ETH") || symbol.contains("BNB"))) {
-            } else {
-                entry = entry.multiply(BigDecimal.valueOf(0.99));
-            }
+            //if ((symbol.contains("BTC") || symbol.contains("ETH") || symbol.contains("BNB"))) {
+            //} else {
+            //    entry = entry.multiply(BigDecimal.valueOf(0.99));
+            //}
 
             BigDecimal ma_slow = calcMA(list_entry, slow_index, 0);
             BigDecimal SL = BigDecimal.ZERO;
@@ -1524,7 +1524,7 @@ public class Utils {
 
             String result = "SL(" + type + symbol + "): " + getPercentToEntry(entry, SL, false);
 
-            result += ",E1: " + getPercentToEntry(curr_price, entry, true);
+            result += ",E: " + removeLastZero(entry);
             result += " E(ma" + slow_index + "): " + getPercentToEntry(curr_price, ma_slow, true);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";

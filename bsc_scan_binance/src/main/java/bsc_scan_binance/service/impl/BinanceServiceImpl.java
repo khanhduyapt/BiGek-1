@@ -3128,6 +3128,9 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         type = type + Utils.analysisVolume(list_h4);
         String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
+        if (Utils.isBlank(scapLongOrShortH4)) {
+            scapLongOrShortH4 = Utils.getScapLongOrShort(list_days, list_days, 10);
+        }
 
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
@@ -3161,10 +3164,6 @@ public class BinanceServiceImpl implements BinanceService {
                 checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
                 if (Utils.isBlank(checkMa3AndX)) {
                     checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 21, false);
-                    //if (Utils.isBlank(checkMa3AndX)) {
-                    //    List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
-                    //    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_LONG, 50, false);
-                    //}
                 }
             }
         }
@@ -3172,21 +3171,14 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         try {
-            String note = checkMa3AndX;
-            //if (MAIN_TOKEN.contains("_" + symbol + "_")) {
-            //    note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_H4_BTC).replace(" ", "");
-            //} else {
-            //    note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG).replace(" ", "");
-            //}
-
-            if (Utils.isNotBlank(note)) {
+            if (Utils.isNotBlank(checkMa3AndX)) {
                 PriorityCoinHistory his = new PriorityCoinHistory();
                 his.setGeckoid(gecko_id);
                 his.setSymbol(Utils.getMmDD_TimeHHmm());
-                if (note.length() > 255) {
-                    note = note.substring(0, 250) + "...";
+                if (checkMa3AndX.length() > 255) {
+                    checkMa3AndX = checkMa3AndX.substring(0, 250) + "...";
                 }
-                his.setName(note);
+                his.setName(checkMa3AndX);
 
                 priorityCoinHistoryRepository.save(his);
             }
@@ -3248,8 +3240,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         // H4 sl2ma
         String entry = "";
-        if (Utils.isNotBlank(scapLongOrShortH4)
-                && (type.contains("(Futures)") || scapLongOrShortH4.contains("Long_"))) {
+        if (Utils.isNotBlank(scapLongOrShortH4)) {
             scapLongOrShortH4 = scapLongOrShortH4.replace("_" + symbol.toUpperCase() + "_", "_");
             entry = " sl2ma{" + scapLongOrShortH4 + "}sl2ma";
         }
