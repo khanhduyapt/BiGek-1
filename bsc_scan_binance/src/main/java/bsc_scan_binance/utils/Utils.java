@@ -65,6 +65,7 @@ public class Utils {
     public static final String TREND_LONG = "Long";
     public static final String TREND_SHORT = "Short";
     public static final int MA_INDEX_STOP_LONG = 8;
+    public static final int MA_INDEX_CURRENCY = 21;
 
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"

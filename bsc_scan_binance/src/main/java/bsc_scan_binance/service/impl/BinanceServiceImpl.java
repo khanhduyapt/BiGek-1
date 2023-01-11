@@ -3021,12 +3021,28 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (!Objects.equals(pre_Blog4H_CheckUSD, Utils.getCurrentYyyyMmDd_Blog4h())) {
-            List<BtcFutures> list_H4_AUD = Utils.loadData("AUD", TIME_4h, 15);
-            List<BtcFutures> list_H4_EUR = Utils.loadData("EUR", TIME_4h, 15);
-            List<BtcFutures> list_H4_GBP = Utils.loadData("GBP", TIME_4h, 15);
+            List<BtcFutures> list_H4_AUD = Utils.loadData("AUD", TIME_4h, 60);
+            List<BtcFutures> list_H4_EUR = Utils.loadData("EUR", TIME_4h, 60);
+            List<BtcFutures> list_H4_GBP = Utils.loadData("GBP", TIME_4h, 60);
+
+            String temp = "";
+            temp = sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 50, false);
+            if (Utils.isBlank(temp)) {
+                sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 21, false);
+            }
+
+            temp = sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 50, false);
+            if (Utils.isBlank(temp)) {
+                sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 21, false);
+            }
+
+            temp = sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 50, false);
+            if (Utils.isBlank(temp)) {
+                sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 21, false);
+            }
 
             boolean IsUpAUD_3 = Utils.maIsUptrend(list_H4_AUD, 3);
-            boolean IsUpAUD_8 = Utils.maIsUptrend(list_H4_AUD, 8);
+            boolean IsUpAUD_8 = Utils.maIsUptrend(list_H4_AUD, Utils.MA_INDEX_CURRENCY);
             boolean IsUpAUD = IsUpAUD_8;
             if (IsUpAUD_3 == IsUpAUD_8) {
                 TREND_H4_AUD = IsUpAUD_8 ? TREND_LONG : TREND_SHORT;
@@ -3036,7 +3052,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             boolean IsUpEUR_3 = Utils.maIsUptrend(list_H4_EUR, 3);
-            boolean IsUpEUR_8 = Utils.maIsUptrend(list_H4_EUR, 8);
+            boolean IsUpEUR_8 = Utils.maIsUptrend(list_H4_EUR, Utils.MA_INDEX_CURRENCY);
             boolean IsUpEUR = IsUpEUR_8;
             if (IsUpEUR_3 == IsUpEUR_8) {
                 TREND_H4_EUR = IsUpEUR_8 ? TREND_LONG : TREND_SHORT;
@@ -3046,7 +3062,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             boolean IsUpGBP_3 = Utils.maIsUptrend(list_H4_GBP, 3);
-            boolean IsUpGBP_8 = Utils.maIsUptrend(list_H4_GBP, 8);
+            boolean IsUpGBP_8 = Utils.maIsUptrend(list_H4_GBP, Utils.MA_INDEX_CURRENCY);
             boolean IsUpGBP = IsUpGBP_8;
             if (IsUpGBP_3 == IsUpGBP_8) {
                 TREND_H4_GBP = IsUpGBP_8 ? TREND_LONG : TREND_SHORT;
