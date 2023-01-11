@@ -2354,13 +2354,13 @@ public class Utils {
         } else if (slowIndex >= 8) {
             type = "(Check)";
         }
-
+        BigDecimal currPrice = list.get(0).getCurrPrice();
         String result = "";
         if (isCuttingDown) {
-            result = type + "Short (Chart:" + chart.trim().toUpperCase() + ")";
+            result = type + "Short (Chart:" + chart.trim().toUpperCase() + "):" + roundDefault(currPrice);
         }
         if (isCuttingUp) {
-            result = type + "Long (Chart:" + chart.trim().toUpperCase() + ")";
+            result = type + "Long (Chart:" + chart.trim().toUpperCase() + "):" + roundDefault(currPrice);
 
             List<BigDecimal> low_heigh = getLowHeightCandle(list);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
@@ -2408,7 +2408,6 @@ public class Utils {
                 BigDecimal ma_13 = calcMA(list, 13, 1);
                 List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_13);
 
-                BigDecimal currPrice = list.get(0).getCurrPrice();
                 BigDecimal SL = fiboList.get(0);
                 BigDecimal entry = fiboList.get(1);
                 BigDecimal TP1 = fiboList.get(2);
