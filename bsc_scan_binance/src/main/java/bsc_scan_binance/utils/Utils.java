@@ -64,6 +64,7 @@ public class Utils {
 
     public static final String TREND_LONG = "Long";
     public static final String TREND_SHORT = "Short";
+    public static final String TREND_DANGER = "(Danger)";
     public static final int MA_INDEX_STOP_LONG = 8;
     public static final int MA_INDEX_CURRENCY = 21;
 
@@ -1468,53 +1469,6 @@ public class Utils {
         return result;
     }
 
-    public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
-        try {
-            String chart = getChartName(list_entry).toUpperCase();
-
-            BigDecimal curr_price = list_entry.get(0).getCurrPrice();
-            List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_tp);
-            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_entry.subList(0, 15));
-            int slow_index = getSlowIndex(list_entry);
-
-            BigDecimal entry = curr_price;
-            BigDecimal ma_slow = calcMA(list_entry, slow_index, 0);
-            BigDecimal SL = BigDecimal.ZERO;
-            BigDecimal TP = BigDecimal.ZERO;
-
-            // check long
-            SL = low_heigh_sl.get(0);
-            SL = SL.multiply(BigDecimal.valueOf(0.9995));
-            TP = low_heigh_tp.get(1);
-
-            entry = roundDefault(entry);
-            SL = roundDefault(SL);
-            TP = roundDefault(TP);
-            ma_slow = roundDefault(ma_slow);
-
-            BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-            vol = formatPrice(vol.multiply(entry).abs(), 0);
-
-            BigDecimal earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            earn = formatPrice(vol.multiply(earn), 1);
-
-            String result = "SL(Long:" + chart + "): " + getPercentToEntry(entry, SL, false);
-            result += ",E: " + removeLastZero(entry);
-            result += ",TP: " + getPercentToEntry(entry, TP, false);
-            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
-
-            if (earn.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
-                result += "(Danger)";
-            }
-
-            System.out.println(list_entry.get(0).getId() + ":" + result);
-            return result;
-
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
     public static String percentToMa(List<BtcFutures> list, BigDecimal curr_price) {
         BigDecimal ma7d = calcMA10d(list, 0);
 
@@ -1948,6 +1902,53 @@ public class Utils {
     // up:
     // -15
     // 20
+
+    public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
+        try {
+            String chart = getChartName(list_entry).toUpperCase();
+
+            BigDecimal curr_price = list_entry.get(0).getCurrPrice();
+            List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_tp);
+            List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_entry.subList(0, 15));
+            int slow_index = getSlowIndex(list_entry);
+
+            BigDecimal entry = curr_price;
+            BigDecimal ma_slow = calcMA(list_entry, slow_index, 0);
+            BigDecimal SL = BigDecimal.ZERO;
+            BigDecimal TP = BigDecimal.ZERO;
+
+            // check long
+            SL = low_heigh_sl.get(0);
+            SL = SL.multiply(BigDecimal.valueOf(0.9995));
+            TP = low_heigh_tp.get(1);
+
+            entry = roundDefault(entry);
+            SL = roundDefault(SL);
+            TP = roundDefault(TP);
+            ma_slow = roundDefault(ma_slow);
+
+            BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
+            vol = formatPrice(vol.multiply(entry).abs(), 0);
+
+            BigDecimal earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+            earn = formatPrice(vol.multiply(earn), 1);
+
+            String result = "SL(Long:" + chart + "): " + getPercentToEntry(entry, SL, false);
+            result += ",E: " + removeLastZero(entry);
+            result += ",TP: " + getPercentToEntry(entry, TP, false);
+            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
+
+            if (earn.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
+                result += TREND_DANGER;
+            }
+
+            System.out.println(list_entry.get(0).getId() + ":" + result);
+            return result;
+
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {

@@ -931,11 +931,11 @@ public class BinanceServiceImpl implements BinanceService {
                                 if (ma7.contains("Short_1h")) {
                                     css.setDt_range_css("text-danger");
                                 }
-                                if (ma7.contains("(Danger)")) {
+                                if (ma7.contains(Utils.TREND_DANGER)) {
                                     css.setDt_range_css("text-danger");
                                 }
 
-                                css.setOco_opportunity(ma7.replace("(Danger)", ""));
+                                css.setOco_opportunity(ma7.replace(Utils.TREND_DANGER, ""));
                             }
 
                         } catch (Exception e) {
@@ -985,10 +985,10 @@ public class BinanceServiceImpl implements BinanceService {
                                 css.setRange_stoploss(sl_e_tp[0]);
                                 css.setRange_entry(sl_e_tp[1]);
                                 css.setRange_take_profit(sl_e_tp[2]);
-                                css.setRange_volume(sl_e_tp[3].replace("(Danger)", ""));
+                                css.setRange_volume(sl_e_tp[3]);
 
-                                if (sl_e_tp[3].contains("Danger")) {
-                                    css.setRange_volume_css("text-danger");
+                                if (sl_e_tp[3].contains(Utils.TREND_DANGER)) {
+                                    css.setRange_volume_css("text-danger font-weight-bold");
                                 }
 
                                 if (sl_e_tp[0].contains("SL(Short_")) {
@@ -3145,7 +3145,7 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         type = type + Utils.analysisVolume(list_h4);
 
-        String scapLongOrShortH4 = Utils.getScapLong(list_h4, list_h4, 10);
+        String scapLongOrShortH4 = Utils.getScapLong(list_h4, list_days, 10);
         if (Utils.isStopLong(list_h4)) {
             scapLongOrShortH4 = TREND_STOP_LONG;
         }
