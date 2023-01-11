@@ -83,7 +83,7 @@ public class BscScanBinanceApplication {
                             }
                         }
 
-                        if (idx % 20 == 0) {
+                        if (idx % 10 == 0) {
                             // binance_service.loadBinanceData("bitcoin", "BTC", startup);
                             // binance_service.loadDataVolumeHour("bitcoin", "BTC");
                             // binance_service.monitorBtcPrice();
