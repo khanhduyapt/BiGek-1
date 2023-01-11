@@ -171,6 +171,10 @@ public class BinanceServiceImpl implements BinanceService {
     private int pre_HH_CheckUSD = 0;
     private String pre_Blog4H_CheckUSD = "";
     private String TREND_CURRENCY_TODAY = TREND_LONG;
+    private String TREND_AUD = TREND_LONG;
+    private String TREND_EUR = TREND_LONG;
+    private String TREND_GBP = TREND_LONG;
+
     private Boolean usd_is_uptrend_today = true;
 
     private String monitorBitcoinBalancesOnExchanges_temp = "";
@@ -2626,14 +2630,14 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     public String getBtcBalancesOnExchanges() {
         return "";
-//        int HH = Utils.getCurrentHH();
-//        if (HH != pre_monitorBitcoinBalancesOnExchanges_HH) {
-//            monitorBitcoinBalancesOnExchanges_temp = monitorBitcoinBalancesOnExchanges();
-//            pre_monitorBitcoinBalancesOnExchanges_HH = HH;
-//            return monitorBitcoinBalancesOnExchanges_temp;
-//        } else {
-//            return monitorBitcoinBalancesOnExchanges_temp;
-//        }
+        //        int HH = Utils.getCurrentHH();
+        //        if (HH != pre_monitorBitcoinBalancesOnExchanges_HH) {
+        //            monitorBitcoinBalancesOnExchanges_temp = monitorBitcoinBalancesOnExchanges();
+        //            pre_monitorBitcoinBalancesOnExchanges_HH = HH;
+        //            return monitorBitcoinBalancesOnExchanges_temp;
+        //        } else {
+        //            return monitorBitcoinBalancesOnExchanges_temp;
+        //        }
     }
 
     @Override
@@ -3025,6 +3029,11 @@ public class BinanceServiceImpl implements BinanceService {
                 boolean IsUpAUD = Utils.maIsUptrend(list_AUD, 3);
                 boolean IsUpEUR = Utils.maIsUptrend(list_EUR, 3);
                 boolean IsUpGBP = Utils.maIsUptrend(list_GBP, 3);
+
+                TREND_AUD = IsUpAUD ? TREND_LONG : TREND_SHORT;
+                TREND_EUR = IsUpEUR ? TREND_LONG : TREND_SHORT;
+                TREND_GBP = IsUpGBP ? TREND_LONG : TREND_SHORT;
+
                 int count_usd_uptrend = 3;
                 count_usd_uptrend -= IsUpAUD ? 1 : 0;
                 count_usd_uptrend -= IsUpEUR ? 1 : 0;
@@ -3041,27 +3050,35 @@ public class BinanceServiceImpl implements BinanceService {
             List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
             for (String CURR : list_currency) {
                 String ID = CURR + "_USDT";
+                String trend = TREND_LONG;
+                if (Objects.equals("AUD", CURR)) {
+                    trend = TREND_AUD;
+                } else if (Objects.equals("EUR", CURR)) {
+                    trend = TREND_EUR;
+                } else if (Objects.equals("GBP", CURR)) {
+                    trend = TREND_GBP;
+                }
 
                 String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
                 if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
 
                     List<BtcFutures> list_cur = Utils.loadData(CURR, TIME_1h, 60);
                     String cur_h1_result = Utils.checkMa3AndX(list_cur, 50, false);
-                    if (!cur_h1_result.contains(TREND_CURRENCY_TODAY)) {
+                    if (!cur_h1_result.contains(trend)) {
                         cur_h1_result = "";
                     }
 
                     if (Utils.isBlank(cur_h1_result)) {
                         cur_h1_result = Utils.checkMa3AndX(list_cur, 21, false);
                     }
-                    if (!cur_h1_result.contains(TREND_CURRENCY_TODAY)) {
+                    if (!cur_h1_result.contains(trend)) {
                         cur_h1_result = "";
                     }
 
                     if (Utils.isBlank(cur_h1_result)) {
                         cur_h1_result = Utils.checkMa3AndX(list_cur, 13, false);
                     }
-                    if (!cur_h1_result.contains(TREND_CURRENCY_TODAY)) {
+                    if (!cur_h1_result.contains(trend)) {
                         cur_h1_result = "";
                     }
 
