@@ -156,7 +156,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String TREND_LONG = "Long";
     private static final String TREND_SHORT = "Short";
     private static final String TREND_OPPOSITE = "Opposite";
-    private static final String TREND_STOP_LONG = "STOP:Long";
+    private static final String TREND_STOP_LONG = "Stop:Long";
 
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
     private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-1";
@@ -1004,7 +1004,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 }
                             } else {
                                 css.setRange_stoploss(sl2ma);
-                                css.setRange_stoploss_css("text-danger");
+                                css.setRange_stoploss_css("text-danger font-weight-bold");
                             }
                         } catch (Exception e) {
                             css.setRange_move("sl2ma exception");
