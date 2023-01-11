@@ -3146,9 +3146,6 @@ public class BinanceServiceImpl implements BinanceService {
         type = type + Utils.analysisVolume(list_h4);
 
         String scapLongOrShortH4 = Utils.getScapLong(list_h4, list_days, 10);
-        if (Utils.isStopLong(list_h4)) {
-            scapLongOrShortH4 = TREND_STOP_LONG;
-        }
 
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
@@ -3156,6 +3153,8 @@ public class BinanceServiceImpl implements BinanceService {
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
+
+            scapLongOrShortH4 = Utils.getScapLongOrShort_BTC(list_h4, list_days, 10);
 
             if (Objects.equals("BTC", symbol)) {
                 sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, Utils.MA_INDEX_STOP_LONG, false);
@@ -3195,6 +3194,9 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
+        if (Utils.isStopLong(list_h4)) {
+            scapLongOrShortH4 = TREND_STOP_LONG;
+        }
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         try {

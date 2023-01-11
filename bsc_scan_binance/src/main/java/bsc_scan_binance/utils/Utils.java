@@ -2016,9 +2016,6 @@ public class Utils {
             BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn2 = formatPrice(vol.multiply(earn2), 1);
 
-            // int ma_slow = getSlowIndex(list_find_entry);
-            // BigDecimal ma10 = calcMA(list_find_entry, ma_slow, 0);
-
             String result = type + symbol;
             result += ",Now: " + removeLastZero(entry) + "$";
             result += ",SL__: " + getPercentToEntry(entry, SL, false);
@@ -2027,12 +2024,8 @@ public class Utils {
             result += ",TP2: " + getPercentToEntry(entry, TP2, false) + "..." + removeLastZero(earn2) + "$";
             result += ",," + check3and50;
 
-            BigDecimal tp_percent = getPercent(entry, TP1).abs();
-            if (tp_percent.compareTo(BigDecimal.valueOf(1)) < 0) {
-                return "";
-            }
-            if (earn2.compareTo(BigDecimal.valueOf(usd)) < 0) {
-                // result = "";
+            if (earn1.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
+                result += TREND_DANGER;
             }
 
             System.out.println("getScapLongOrShort_BTC: " + result);
