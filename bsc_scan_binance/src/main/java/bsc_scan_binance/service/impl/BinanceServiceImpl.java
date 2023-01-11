@@ -426,6 +426,7 @@ public class BinanceServiceImpl implements BinanceService {
             String ddAdd1 = Utils.getDdFromToday(1);
             String ddAdd2 = Utils.getDdFromToday(2);
             String msg_position = "";
+            int count_stop_long = 0;
             // monitorTokenSales(results);
             for (CandidateTokenResponse dto : results) {
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
@@ -717,8 +718,6 @@ public class BinanceServiceImpl implements BinanceService {
                 int idx_vol_min = getIndexMin(volList);
                 int idx_price_min = getIndexMin(avgPriceList);
 
-                String pumping = setEmaCss(css);
-
                 String str_down = "";
                 if (Utils.getBigDecimal(avgPriceList.get(idx_price_min)).compareTo(BigDecimal.ZERO) > 0) {
                     BigDecimal down = Utils.getBigDecimal(avgPriceList.get(idx_price_max))
@@ -1000,6 +999,9 @@ public class BinanceServiceImpl implements BinanceService {
                             } else {
                                 css.setRange_stoploss(sl2ma);
                                 css.setRange_stoploss_css("text-danger font-weight-bold");
+                                if (sl2ma.contains(TREND_STOP_LONG)) {
+                                    count_stop_long += 1;
+                                }
                             }
                         } catch (Exception e) {
                             css.setRange_move("sl2ma exception");
@@ -1149,8 +1151,12 @@ public class BinanceServiceImpl implements BinanceService {
                 index += 1;
             }
 
-            String EVENT_ID = EVENT_COMPRESSED_CHART + "_POSITION_" + Utils.getCurrentYyyyMmDdHH();
-            sendMsgPerHour(EVENT_ID, "(Long) Position:" + Utils.new_line_from_service + msg_position);
+            if ((count_stop_long > 0) || Utils.isNotBlank(msg_position)) {
+                String EVENT_ID = EVENT_COMPRESSED_CHART + "_POSITION_" + Utils.getCurrentYyyyMmDd_Blog4h();
+
+                sendMsgPerHour(EVENT_ID, "(Long) " + TREND_STOP_LONG + ":" + count_stop_long + "/total(" + list.size()
+                        + ")" + Utils.new_line_from_service + "Position:" + Utils.new_line_from_service + msg_position);
+            }
 
             return list;
 
@@ -1160,72 +1166,6 @@ public class BinanceServiceImpl implements BinanceService {
             System.out.println(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
-    }
-
-    private String setEmaCss(CandidateTokenCssResponse css) {
-        String value = "";
-        if (Utils.isNotBlank(css.getToday_ema())) {
-            css.setToday_ema_css("text-primary font-weight-bold");
-
-            if (Utils.isBlank(css.getDay_0_ema()) && Utils.isBlank(css.getDay_1_ema())
-                    && Utils.isBlank(css.getDay_2_ema())) {
-
-                css.setStar(css.getStar() + "Pump");
-                css.setStar_css("text-white rounded-lg bg-info");
-
-                String EVENT_ID = EVENT_PUMP + "_" + Utils.getToday_YyyyMMdd() + "_" + css.getGecko_id() + "_"
-                        + css.getSymbol();
-
-                if (!fundingHistoryRepository.existsPumDump(css.getGecko_id(), EVENT_ID)) {
-
-                    fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, css.getGecko_id(), css.getSymbol(),
-                            Utils.getToday_YyyyMMdd() + " Pumping", true));
-
-                    value = css.getSymbol() + ":" + Utils.removeLastZero(css.getCurrent_price())
-                            + Utils.new_line_from_service;
-                }
-
-            }
-        }
-
-        if (Utils.isNotBlank(css.getDay_0_ema())) {
-            css.setDay_0_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_1_ema())) {
-            css.setDay_1_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_2_ema())) {
-            css.setDay_2_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_3_ema())) {
-            css.setDay_3_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_4_ema())) {
-            css.setDay_4_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_5_ema())) {
-            css.setDay_5_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_6_ema())) {
-            css.setDay_6_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_7_ema())) {
-            css.setDay_7_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_8_ema())) {
-            css.setDay_8_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_9_ema())) {
-            css.setDay_9_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_10_ema())) {
-            css.setDay_10_ema_css("text-primary");
-        }
-        if (Utils.isNotBlank(css.getDay_11_ema())) {
-            css.setDay_11_ema_css("text-primary");
-        }
-
-        return value;
     }
 
     private Long getValue(String value) {
