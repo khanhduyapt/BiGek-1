@@ -64,6 +64,7 @@ public class Utils {
 
     public static final String TREND_LONG = "Long";
     public static final String TREND_SHORT = "Short";
+    public static final int MA_INDEX_STOP_LONG = 8;
 
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
@@ -1468,20 +1469,7 @@ public class Utils {
 
     public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String type = checkMa3AndX(list_entry, getSlowIndex(list_entry), false, Utils.TREND_LONG);
-            if (Utils.isBlank(type)) {
-                return "";
-            }
-
-            if (type.contains(TREND_LONG)) {
-                type = "Long_";
-            }
-            if (type.contains(TREND_SHORT)) {
-                type = "Short_";
-            }
-
-            String symbol = list_entry.get(0).getId();
-            symbol = symbol.replace("_00", "").replace("_1d", "_D");
+            String chart = getChartName(list_entry).toUpperCase();
 
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
             List<BigDecimal> low_heigh_tp = getOpenCloseCandle(list_tp);
@@ -1489,27 +1477,14 @@ public class Utils {
             int slow_index = getSlowIndex(list_entry);
 
             BigDecimal entry = curr_price;
-
-            //if ((symbol.contains("BTC") || symbol.contains("ETH") || symbol.contains("BNB"))) {
-            //} else {
-            //    entry = entry.multiply(BigDecimal.valueOf(0.99));
-            //}
-
             BigDecimal ma_slow = calcMA(list_entry, slow_index, 0);
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP = BigDecimal.ZERO;
 
-            if (type.contains(TREND_LONG)) {
-                // check long
-                SL = low_heigh_sl.get(0);
-                SL = SL.multiply(BigDecimal.valueOf(0.9995));
-                TP = low_heigh_tp.get(1);
-            } else if (type.contains(TREND_SHORT)) {
-                // check short
-                SL = low_heigh_sl.get(1);
-                SL = SL.multiply(BigDecimal.valueOf(1.0005));
-                TP = low_heigh_tp.get(0);
-            }
+            // check long
+            SL = low_heigh_sl.get(0);
+            SL = SL.multiply(BigDecimal.valueOf(0.9995));
+            TP = low_heigh_tp.get(1);
 
             entry = roundDefault(entry);
             SL = roundDefault(SL);
@@ -1522,10 +1497,8 @@ public class Utils {
             BigDecimal earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn = formatPrice(vol.multiply(earn), 1);
 
-            String result = "SL(" + type + symbol + "): " + getPercentToEntry(entry, SL, false);
-
+            String result = "SL(Long:" + chart + "): " + getPercentToEntry(entry, SL, false);
             result += ",E: " + removeLastZero(entry);
-            result += " E(ma" + slow_index + "): " + getPercentToEntry(curr_price, ma_slow, true);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
 
@@ -1533,7 +1506,7 @@ public class Utils {
                 result += "(Danger)";
             }
 
-            System.out.println(result);
+            System.out.println(list_entry.get(0).getId() + ":" + result);
             return result;
 
         } catch (Exception e) {
@@ -2191,6 +2164,27 @@ public class Utils {
         return result;
     }
 
+    public static boolean isStopLong(List<BtcFutures> list) {
+        int cur = 1;
+        int pre = 2;
+        int fastIndex = 3;
+        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
+        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
+
+        BigDecimal ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG, cur);
+        BigDecimal ma_slow_p = calcMA(list, MA_INDEX_STOP_LONG, pre);
+
+        if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
+            return true;
+        }
+
+        if (ma_fast_c.compareTo(ma_slow_c) < 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static boolean maIsUptrend(List<BtcFutures> list, int maIndex) {
         BigDecimal ma_slow_c = calcMA(list, maIndex, 1);
         BigDecimal ma_slow_p = calcMA(list, maIndex, 2);
@@ -2344,8 +2338,12 @@ public class Utils {
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
             vol = formatPrice(vol.multiply(entry).abs(), 0);
 
+            BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
+            earn1 = formatPrice(vol.multiply(earn1), 1);
+
             result += ",SL__: " + getPercentToEntry(entry, SL, true);
             result += ",VOL: " + removeLastZero(vol).replace(".0", "") + "$...Loss:" + usd + "$";
+            result += ",TP1: " + getPercentToEntry(entry, TP1, isLong) + "..." + removeLastZero(earn1) + "$";
 
             if (showDetail) {
                 int start_index = 0;
@@ -2367,17 +2365,12 @@ public class Utils {
                 String timing1 = timingTarget(chart, start_index);
                 String timing2 = timingTarget(chart, start_index * 5);
 
-                BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-                earn1 = formatPrice(vol.multiply(earn1), 1);
-
                 BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
                 earn2 = formatPrice(vol.multiply(earn2), 1);
 
                 BigDecimal earn3 = TP3.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
                 earn3 = formatPrice(vol.multiply(earn3), 1);
 
-                result += ",E___: " + getPercentToEntry(currPrice, entry, isLong);
-                result += ",TP1: " + getPercentToEntry(entry, TP1, isLong) + "..." + removeLastZero(earn1) + "$";
                 result += ",TP2: " + getPercentToEntry(entry, TP2, isLong) + "..." + removeLastZero(earn2) + "$";
                 result += ",TP3: " + getPercentToEntry(entry, TP3, isLong) + "..." + removeLastZero(earn3) + "$";
                 if (isNotBlank(timing1 + timing2)) {

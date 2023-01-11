@@ -156,6 +156,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String TREND_LONG = "Long";
     private static final String TREND_SHORT = "Short";
     private static final String TREND_OPPOSITE = "Opposite";
+    private static final String TREND_STOP_LONG = "STOP:Long";
 
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
     private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-1";
@@ -977,36 +978,33 @@ public class BinanceServiceImpl implements BinanceService {
                             futu = futu.replace(sl2ma + "}sl2ma", "").replaceAll("  ", "");
                             sl2ma = sl2ma.replace("sl2ma{", "");
 
-                            if (sl2ma.contains(TREND_LONG)
-                                    || (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0)) {
-                                css.setStr_entry_price(sl2ma);
+                            css.setStr_entry_price(sl2ma);
 
-                                String[] sl_e_tp = sl2ma.split(",");
-                                if (sl_e_tp.length >= 4) {
+                            String[] sl_e_tp = sl2ma.split(",");
+                            if (sl_e_tp.length >= 4) {
+                                css.setRange_stoploss(sl_e_tp[0]);
+                                css.setRange_entry(sl_e_tp[1]);
+                                css.setRange_take_profit(sl_e_tp[2]);
+                                css.setRange_volume(sl_e_tp[3].replace("(Danger)", ""));
 
-                                    css.setRange_stoploss(sl_e_tp[0]);
-                                    css.setRange_entry(sl_e_tp[1]);
-                                    css.setRange_take_profit(sl_e_tp[2]);
-                                    css.setRange_volume(sl_e_tp[3].replace("(Danger)", ""));
-
-                                    if (sl_e_tp[3].contains("Danger")) {
-                                        css.setRange_volume_css("text-danger");
-                                    }
-
-                                    if (sl_e_tp[0].contains("SL(Short_")) {
-                                        css.setRange_stoploss_css("text-danger");
-                                        css.setRange_entry_css("text-danger");
-                                        css.setRange_take_profit_css("text-danger");
-                                        css.setRange_volume_css("text-danger");
-                                    } else if (sl_e_tp[0].contains("SL(Long_")) {
-                                        css.setRange_stoploss_css("text-primary");
-                                        css.setRange_entry_css("text-primary");
-                                        css.setRange_take_profit_css("text-primary");
-                                        css.setRange_volume_css("text-primary");
-                                    }
-                                } else {
-                                    css.setRange_stoploss(sl2ma);
+                                if (sl_e_tp[3].contains("Danger")) {
+                                    css.setRange_volume_css("text-danger");
                                 }
+
+                                if (sl_e_tp[0].contains("SL(Short_")) {
+                                    css.setRange_stoploss_css("text-danger");
+                                    css.setRange_entry_css("text-danger");
+                                    css.setRange_take_profit_css("text-danger");
+                                    css.setRange_volume_css("text-danger");
+                                } else if (sl_e_tp[0].contains("SL(Long_")) {
+                                    css.setRange_stoploss_css("text-primary");
+                                    css.setRange_entry_css("text-primary");
+                                    css.setRange_take_profit_css("text-primary");
+                                    css.setRange_volume_css("text-primary");
+                                }
+                            } else {
+                                css.setRange_stoploss(sl2ma);
+                                css.setRange_stoploss_css("text-danger");
                             }
                         } catch (Exception e) {
                             css.setRange_move("sl2ma exception");
@@ -2958,6 +2956,7 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
+    @SuppressWarnings("unused")
     private String sendMsgMonitorLongShort_BTC(String gecko_id, String symbol, List<BtcFutures> list_find_entry,
             List<BtcFutures> list_sl_tp, String trend) {
 
@@ -3127,9 +3126,10 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         type = type + Utils.analysisVolume(list_h4);
+
         String scapLongOrShortH4 = Utils.getScapLong(list_h4, list_h4, 10);
-        if (Utils.isBlank(scapLongOrShortH4)) {
-            scapLongOrShortH4 = Utils.getScapLong(list_days, list_days, 10);
+        if (Utils.isStopLong(list_h4)) {
+            scapLongOrShortH4 = TREND_STOP_LONG;
         }
 
         String checkMa3AndX = "";
@@ -3139,24 +3139,36 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
-
             if (Objects.equals("BTC", symbol)) {
                 TREND_H4_BTC_IS_LONG = Utils.maIsUptrend(list_h4, 21);
+
+                if (Utils.isStopLong(list_h4)) {
+                    TREND_H4_BTC_IS_LONG = false;
+                }
+
                 TREND_H4_BTC = TREND_H4_BTC_IS_LONG ? TREND_LONG : TREND_SHORT;
+            }
+            checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 50, false);
+            if (Utils.isBlank(checkMa3AndX)) {
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 21, false);
+                if (Utils.isBlank(checkMa3AndX)) {
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 13, false);
+                }
             }
 
             // H4: ma3 dong pha ma21, va ma21 dong pha ma21 cua BTC
             boolean IsUp_4h_ma21 = Utils.maIsUptrend(list_h4, 21);
             boolean IsUp_4h_ma3 = Utils.maIsUptrend(list_h4, 3);
             if ((TREND_H4_BTC_IS_LONG == IsUp_4h_ma21) && (IsUp_4h_ma21 == IsUp_4h_ma3)) {
-                String SUB_TREND = IsUp_4h_ma3 ? TREND_LONG : TREND_SHORT;
 
                 List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
 
-                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 50, false);
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 50, false);
                 if (Utils.isBlank(checkMa3AndX)) {
-                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 21, false);
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 21, false);
+                    if (Utils.isBlank(checkMa3AndX)) {
+                        checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 13, false);
+                    }
                 }
             }
         } else if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
