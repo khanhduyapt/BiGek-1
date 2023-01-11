@@ -3128,11 +3128,12 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             // if (Objects.equals("ETH", symbol) || Objects.equals("BTC", symbol)) {
-            boolean IsUp_1h_ma3 = Utils.maIsUptrend(list_h4, 3);
-            String SUB_TREND = IsUp_1h_ma3 ? TREND_LONG : TREND_SHORT;
+            boolean IsUp_4h_ma21 = Utils.maIsUptrend(list_h4, 21);
+            boolean IsUp_4h_ma3 = Utils.maIsUptrend(list_h4, 3);
+            String SUB_TREND = IsUp_4h_ma3 ? TREND_LONG : TREND_SHORT;
 
-            // ma3 dong pha ma21
-            if (TREND_BTC_IS_LONG == IsUp_1h_ma3) {
+            // H4: ma3 dong pha ma21, va ma21 dong pha ma21 cua BTC
+            if ((TREND_BTC_IS_LONG == IsUp_4h_ma21) && (IsUp_4h_ma21 == IsUp_4h_ma3)) {
 
                 List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
 
