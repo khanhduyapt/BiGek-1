@@ -174,7 +174,8 @@ public class BinanceServiceImpl implements BinanceService {
     private String TREND_AUD = TREND_LONG;
     private String TREND_EUR = TREND_LONG;
     private String TREND_GBP = TREND_LONG;
-
+    private String TREND_BTC = TREND_LONG;
+    private Boolean TREND_BTC_IS_LONG = true;
     private Boolean usd_is_uptrend_today = true;
 
     private String monitorBitcoinBalancesOnExchanges_temp = "";
@@ -3121,20 +3122,32 @@ public class BinanceServiceImpl implements BinanceService {
 
             sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
 
-            if (Objects.equals("ETH", symbol)) {
-                boolean IsUp_ETH = Utils.maIsUptrend(list_h4, 3);
-                String ETH_TREND = IsUp_ETH ? TREND_LONG : TREND_SHORT;
-                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+            if (Objects.equals("BTC", symbol)) {
+                TREND_BTC_IS_LONG = Utils.maIsUptrend(list_h4, 21);
+                TREND_BTC = TREND_BTC_IS_LONG ? TREND_LONG : TREND_SHORT;
+            }
 
-                String temp_result_btc = sendMsgMonitorFibo(gecko_id, symbol, list_h1, ETH_TREND, 50, false);
-                if (Utils.isBlank(temp_result_btc)) {
-                    sendMsgMonitorFibo(gecko_id, symbol, list_h1, ETH_TREND, 21, false);
+            if (Objects.equals("ETH", symbol) || Objects.equals("BTC", symbol)) {
+                boolean IsUp_1h_ma3 = Utils.maIsUptrend(list_h4, 3);
+                String SUB_TREND = IsUp_1h_ma3 ? TREND_LONG : TREND_SHORT;
+
+                //ma3 dong pha ma21
+                if (TREND_BTC_IS_LONG == IsUp_1h_ma3) {
+
+                    List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+
+                    String temp_result_btc = sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 50, false);
+                    if (Utils.isBlank(temp_result_btc)) {
+                        sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 21, false);
+                    }
                 }
             }
         } else if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
-            checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
-            if (Utils.isBlank(checkMa3AndX)) {
-                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21, false);
+            if (TREND_BTC_IS_LONG) {
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
+                if (Utils.isBlank(checkMa3AndX)) {
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21, false);
+                }
             }
         }
 
