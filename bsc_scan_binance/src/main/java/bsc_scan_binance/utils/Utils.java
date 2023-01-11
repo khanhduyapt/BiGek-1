@@ -1905,8 +1905,6 @@ public class Utils {
 
     public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String chart = getChartName(list_entry).toUpperCase();
-
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
             List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_tp);
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_entry.subList(0, 15));
@@ -1933,7 +1931,7 @@ public class Utils {
             BigDecimal earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn = formatPrice(vol.multiply(earn), 1);
 
-            String result = "SL(Long:" + chart + "): " + getPercentToEntry(entry, SL, false);
+            String result = "(Long) SL(" + getChartName(list_entry) + "): " + getPercentToEntry(entry, SL, false);
             result += ",E: " + removeLastZero(entry);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
@@ -1952,51 +1950,27 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check3and50 = checkMa3AndX(list_find_entry, getSlowIndex(list_find_entry), true, "");
+            String check3and8 = isStopLong(list_find_entry) ? TREND_SHORT : TREND_LONG;
 
-            if (Utils.isBlank(check3and50)) {
-                return "";
-            }
-            String symbol = list_find_entry.get(0).getId();
-
-            if (symbol.contains("_1h_")) {
-                BigDecimal ma3ofH1 = calcMA(list_find_entry, 3, 0);
-                BigDecimal ma21ofH4 = calcMA(list_tp, 21, 0);
-
-                if ((ma3ofH1.compareTo(ma21ofH4) > 0) && (check3and50.contains(TREND_SHORT))) {
-                    return "";
-                }
-
-                if ((ma3ofH1.compareTo(ma21ofH4) < 0) && (check3and50.contains(TREND_LONG))) {
-                    return "";
-                }
-            }
-
-            symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
-
-            List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp.subList(0, 20));
-            List<BigDecimal> low_heigh_tp2 = getLowHeightCandle(list_tp);
+            List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp);
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_find_entry.subList(0, 15));
 
             // BigDecimal ma10 = calcMA(list_entry, 10, 0);
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP1 = BigDecimal.ZERO;
-            BigDecimal TP2 = BigDecimal.ZERO;
             String type = "";
-            if (check3and50.contains(TREND_LONG)) {
+            if (check3and8.contains(TREND_LONG)) {
                 type = "(Long)";
                 // check long
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.9995));
                 TP1 = low_heigh_tp1.get(1);
-                TP2 = low_heigh_tp2.get(1);
-            } else if (check3and50.contains(TREND_SHORT)) {
+            } else if (check3and8.contains(TREND_SHORT)) {
                 // check short
                 type = "(Short)";
                 SL = low_heigh_sl.get(1);
                 SL = SL.multiply(BigDecimal.valueOf(1.0005));
                 TP1 = low_heigh_tp1.get(0);
-                TP2 = low_heigh_tp2.get(0);
             }
 
             BigDecimal curr_price = list_find_entry.get(0).getCurrPrice();
@@ -2005,7 +1979,6 @@ public class Utils {
             entry = roundDefault(entry);
             SL = roundDefault(SL);
             TP1 = roundDefault(TP1);
-            TP2 = roundDefault(TP2);
 
             BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
             vol = formatPrice(vol.multiply(entry).abs(), 0);
@@ -2013,16 +1986,11 @@ public class Utils {
             BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn1 = formatPrice(vol.multiply(earn1), 1);
 
-            BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            earn2 = formatPrice(vol.multiply(earn2), 1);
-
-            String result = type + symbol;
-            result += ",Now: " + removeLastZero(entry) + "$";
-            result += ",SL__: " + getPercentToEntry(entry, SL, false);
-            result += ",VOL: " + removeLastZero(vol).replace(".0", "") + "$...Loss: " + usd + "$";
-            result += ",TP1: " + getPercentToEntry(entry, TP1, false) + "..." + removeLastZero(earn1) + "$";
-            result += ",TP2: " + getPercentToEntry(entry, TP2, false) + "..." + removeLastZero(earn2) + "$";
-            result += ",," + check3and50;
+            String result = type;
+            result += " SL(" + getChartName(list_find_entry) + "): " + getPercentToEntry(entry, SL, false);
+            result += ",E: " + removeLastZero(entry) + "$";
+            result += ",TP: " + getPercentToEntry(entry, TP1, false);
+            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn1) + "$";
 
             if (earn1.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
                 result += TREND_DANGER;
@@ -2172,6 +2140,25 @@ public class Utils {
         return false;
     }
 
+    public static boolean isStartingLong(List<BtcFutures> list) {
+        int cur = 1;
+        int pre = 2;
+        int fastIndex = 3;
+
+        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
+        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
+
+        BigDecimal ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG, cur);
+        BigDecimal ma_slow_p = calcMA(list, MA_INDEX_STOP_LONG, pre);
+
+        if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
+                && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static boolean maIsUptrend(List<BtcFutures> list, int maIndex) {
         BigDecimal ma_slow_c = calcMA(list, maIndex, 1);
         BigDecimal ma_slow_p = calcMA(list, maIndex, 2);
@@ -2187,11 +2174,11 @@ public class Utils {
 
         if (slowIndex == MA_INDEX_STOP_LONG) {
             if (Objects.equals(trend, TREND_LONG) && isStopLong(list)) {
-                return "Stop long";
+                return "Stop Long";
             }
 
             if (Objects.equals(trend, TREND_SHORT) && !isStopLong(list)) {
-                return "Stop short";
+                return "Stop Short";
             }
 
             return "";
