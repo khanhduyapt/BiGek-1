@@ -62,6 +62,9 @@ public class Utils {
     public static final String PREPARE_ORDERS_DATA_TYPE_MIN14D = "4";
     public static final String PREPARE_ORDERS_DATA_TYPE_MAX14D = "5";
 
+    public static final String TREND_LONG = "Long";
+    public static final String TREND_SHORT = "Short";
+
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
             + "    SELECT                                                                                   \n"
@@ -1465,15 +1468,15 @@ public class Utils {
 
     public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String type = checkMa3AndX(list_entry, getSlowIndex(list_entry), false);
+            String type = checkMa3AndX(list_entry, getSlowIndex(list_entry), false, "");
             if (Utils.isBlank(type)) {
                 return "";
             }
 
-            if (type.contains("Long")) {
+            if (type.contains(TREND_LONG)) {
                 type = "Long_";
             }
-            if (type.contains("Short")) {
+            if (type.contains(TREND_SHORT)) {
                 type = "Short_";
             }
 
@@ -1496,12 +1499,12 @@ public class Utils {
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP = BigDecimal.ZERO;
 
-            if (type.contains("Long")) {
+            if (type.contains(TREND_LONG)) {
                 // check long
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.9995));
                 TP = low_heigh_tp.get(1);
-            } else if (type.contains("Short")) {
+            } else if (type.contains(TREND_SHORT)) {
                 // check short
                 SL = low_heigh_sl.get(1);
                 SL = SL.multiply(BigDecimal.valueOf(1.0005));
@@ -2032,7 +2035,7 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check3and50 = checkMa3AndX(list_find_entry, getSlowIndex(list_find_entry), true);
+            String check3and50 = checkMa3AndX(list_find_entry, getSlowIndex(list_find_entry), true, "");
 
             if (Utils.isBlank(check3and50)) {
                 return "";
@@ -2043,11 +2046,11 @@ public class Utils {
                 BigDecimal ma3ofH1 = calcMA(list_find_entry, 3, 0);
                 BigDecimal ma21ofH4 = calcMA(list_tp, 21, 0);
 
-                if ((ma3ofH1.compareTo(ma21ofH4) > 0) && (check3and50.contains("Short"))) {
+                if ((ma3ofH1.compareTo(ma21ofH4) > 0) && (check3and50.contains(TREND_SHORT))) {
                     return "";
                 }
 
-                if ((ma3ofH1.compareTo(ma21ofH4) < 0) && (check3and50.contains("Long"))) {
+                if ((ma3ofH1.compareTo(ma21ofH4) < 0) && (check3and50.contains(TREND_LONG))) {
                     return "";
                 }
             }
@@ -2063,14 +2066,14 @@ public class Utils {
             BigDecimal TP1 = BigDecimal.ZERO;
             BigDecimal TP2 = BigDecimal.ZERO;
             String type = "";
-            if (check3and50.contains("Long")) {
+            if (check3and50.contains(TREND_LONG)) {
                 type = "(Long)";
                 // check long
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.9995));
                 TP1 = low_heigh_tp1.get(1);
                 TP2 = low_heigh_tp2.get(1);
-            } else if (check3and50.contains("Short")) {
+            } else if (check3and50.contains(TREND_SHORT)) {
                 // check short
                 type = "(Short)";
                 SL = low_heigh_sl.get(1);
@@ -2256,7 +2259,7 @@ public class Utils {
         return false;
     }
 
-    public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail) {
+    public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail, String trend) {
         String symbol = list.get(0).getId();
         String chart = getChartName(list);
         int cur = 1;
@@ -2276,32 +2279,37 @@ public class Utils {
             isMaSlowUp = false;
         }
 
-        String str_ma_50 = "";
+        String str_ma_50 = checkMa3And50(list);
 
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
-        if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-            isCuttingUp = true;
+        if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
+            if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
+                isCuttingUp = true;
+            }
+
+            if (!isCuttingUp) {
+                isCuttingUp = is3CuttingUp50ForLong(list);
+            }
+            if (isCuttingUp && !isMa_fast_Up) {
+                isCuttingUp = false;
+            }
         }
 
-        if (slowIndex >= 35) {
-            str_ma_50 = checkMa3And50(list);
-            isCuttingUp = is3CuttingUp50ForLong(list);
-        }
-        if (isCuttingUp && !isMa_fast_Up) {
-            isCuttingUp = false;
-        }
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
-        if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
-            isCuttingDown = true;
+        if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
+            if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
+                isCuttingDown = true;
+            }
+            if (!isCuttingDown) {
+                isCuttingDown = is3CuttingDown50ForShort(list);
+            }
+            if (isCuttingDown && isMa_fast_Up) {
+                isCuttingDown = false;
+            }
         }
-        if (slowIndex >= 35) {
-            isCuttingDown = is3CuttingDown50ForShort(list);
-        }
-        if (isCuttingDown && isMa_fast_Up) {
-            isCuttingDown = false;
-        }
+
         // -----------------------------------------------
         String volume = Utils.analysisVolume(list);
         if (isNotBlank(volume)) {
@@ -2355,10 +2363,8 @@ public class Utils {
             type = "(Check)";
         }
         BigDecimal currPrice = list.get(0).getCurrPrice();
+
         String result = "";
-        if (isCuttingDown) {
-            result = type + "Short (Chart:" + chart.trim().toUpperCase() + "):" + roundDefault(currPrice);
-        }
         if (isCuttingUp) {
             result = type + "Long (Chart:" + chart.trim().toUpperCase() + "):" + roundDefault(currPrice);
 
@@ -2368,12 +2374,12 @@ public class Utils {
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
             if (ma_fast_c.compareTo(max_allow_long) > 0) {
-                // result += "(Range:Danger!!!!!!)";
-                return "";
+                result += "(Range:Danger!!!!!!)";
+                // return "";
             }
+        } else if (isCuttingDown) {
+            result = type + "Short (Chart:" + chart.trim().toUpperCase() + "):" + roundDefault(currPrice);
         }
-
-        // --------------------------------------------------
 
         // --------------------------------------------------
 
@@ -2381,7 +2387,7 @@ public class Utils {
             symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
             //
             if (showDetail) {
-                boolean isLong = result.contains("Long");
+                boolean isLong = result.contains(TREND_LONG);
                 List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
 
                 int start_index = 0;
@@ -2450,7 +2456,7 @@ public class Utils {
             result += ",," + note_long;
         }
 
-        if (!(result.contains("Long") || result.contains("Short"))) {
+        if (!(result.contains(TREND_LONG) || result.contains(TREND_SHORT))) {
             result = "";
         }
         if (isNotBlank(result)) {
