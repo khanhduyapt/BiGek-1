@@ -1466,9 +1466,9 @@ public class Utils {
         return result;
     }
 
-    public static String getScapLongOrShort(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
+    public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String type = checkMa3AndX(list_entry, getSlowIndex(list_entry), false, "");
+            String type = checkMa3AndX(list_entry, getSlowIndex(list_entry), false, Utils.TREND_LONG);
             if (Utils.isBlank(type)) {
                 return "";
             }

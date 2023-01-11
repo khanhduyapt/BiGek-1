@@ -3127,9 +3127,9 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         type = type + Utils.analysisVolume(list_h4);
-        String scapLongOrShortH4 = Utils.getScapLongOrShort(list_h4, list_h4, 10);
+        String scapLongOrShortH4 = Utils.getScapLong(list_h4, list_h4, 10);
         if (Utils.isBlank(scapLongOrShortH4)) {
-            scapLongOrShortH4 = Utils.getScapLongOrShort(list_days, list_days, 10);
+            scapLongOrShortH4 = Utils.getScapLong(list_days, list_days, 10);
         }
 
         String checkMa3AndX = "";
