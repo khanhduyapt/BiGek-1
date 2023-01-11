@@ -3042,39 +3042,33 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             boolean IsUpAUD_3 = Utils.maIsUptrend(list_H4_AUD, 3);
-            boolean IsUpAUD_8 = Utils.maIsUptrend(list_H4_AUD, Utils.MA_INDEX_CURRENCY);
-            boolean IsUpAUD = IsUpAUD_8;
-            if (IsUpAUD_3 == IsUpAUD_8) {
-                TREND_H4_AUD = IsUpAUD_8 ? TREND_LONG : TREND_SHORT;
-                IsUpAUD = IsUpAUD_8;
+            boolean IsUpAUD_S = Utils.maIsUptrend(list_H4_AUD, Utils.MA_INDEX_CURRENCY);
+            if (IsUpAUD_3 == IsUpAUD_S) {
+                TREND_H4_AUD = IsUpAUD_S ? TREND_LONG : TREND_SHORT;
             } else {
                 TREND_H4_AUD = TREND_OPPOSITE;
             }
 
             boolean IsUpEUR_3 = Utils.maIsUptrend(list_H4_EUR, 3);
-            boolean IsUpEUR_8 = Utils.maIsUptrend(list_H4_EUR, Utils.MA_INDEX_CURRENCY);
-            boolean IsUpEUR = IsUpEUR_8;
-            if (IsUpEUR_3 == IsUpEUR_8) {
-                TREND_H4_EUR = IsUpEUR_8 ? TREND_LONG : TREND_SHORT;
-                IsUpEUR = IsUpEUR_8;
+            boolean IsUpEUR_S = Utils.maIsUptrend(list_H4_EUR, Utils.MA_INDEX_CURRENCY);
+            if (IsUpEUR_3 == IsUpEUR_S) {
+                TREND_H4_EUR = IsUpEUR_S ? TREND_LONG : TREND_SHORT;
             } else {
                 TREND_H4_EUR = TREND_OPPOSITE;
             }
 
             boolean IsUpGBP_3 = Utils.maIsUptrend(list_H4_GBP, 3);
-            boolean IsUpGBP_8 = Utils.maIsUptrend(list_H4_GBP, Utils.MA_INDEX_CURRENCY);
-            boolean IsUpGBP = IsUpGBP_8;
-            if (IsUpGBP_3 == IsUpGBP_8) {
-                TREND_H4_GBP = IsUpGBP_8 ? TREND_LONG : TREND_SHORT;
-                IsUpGBP = IsUpGBP_8;
+            boolean IsUpGBP_S = Utils.maIsUptrend(list_H4_GBP, Utils.MA_INDEX_CURRENCY);
+            if (IsUpGBP_3 == IsUpGBP_S) {
+                TREND_H4_GBP = IsUpGBP_S ? TREND_LONG : TREND_SHORT;
             } else {
                 TREND_H4_GBP = TREND_OPPOSITE;
             }
 
             int count_usd_uptrend = 3;
-            count_usd_uptrend -= IsUpAUD ? 1 : 0;
-            count_usd_uptrend -= IsUpEUR ? 1 : 0;
-            count_usd_uptrend -= IsUpGBP ? 1 : 0;
+            count_usd_uptrend -= IsUpAUD_S ? 1 : 0;
+            count_usd_uptrend -= IsUpEUR_S ? 1 : 0;
+            count_usd_uptrend -= IsUpGBP_S ? 1 : 0;
             usd_is_uptrend_today = (count_usd_uptrend > 1) ? true : false;
             if (usd_is_uptrend_today) {
                 TREND_CURRENCY_TODAY = TREND_SHORT;
