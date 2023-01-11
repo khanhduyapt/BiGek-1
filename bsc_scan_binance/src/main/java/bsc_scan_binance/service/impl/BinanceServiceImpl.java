@@ -171,11 +171,11 @@ public class BinanceServiceImpl implements BinanceService {
     private int pre_HH_CheckUSD = 0;
     private String pre_Blog4H_CheckUSD = "";
     private String TREND_CURRENCY_TODAY = TREND_LONG;
-    private String TREND_AUD = TREND_LONG;
-    private String TREND_EUR = TREND_LONG;
-    private String TREND_GBP = TREND_LONG;
-    private String TREND_BTC = TREND_LONG;
-    private Boolean TREND_BTC_IS_LONG = true;
+    private String TREND_H4_AUD = TREND_LONG;
+    private String TREND_H4_EUR = TREND_LONG;
+    private String TREND_H4_GBP = TREND_LONG;
+    private String TREND_H4_BTC = TREND_LONG;
+    private Boolean TREND_H4_BTC_IS_LONG = true;
     private Boolean usd_is_uptrend_today = true;
 
     private String monitorBitcoinBalancesOnExchanges_temp = "";
@@ -3019,16 +3019,45 @@ public class BinanceServiceImpl implements BinanceService {
         if (Objects.equals("BTC", symbol) && (pre_HH_CheckUSD != Utils.getCurrentHH())) {
 
             if (!Objects.equals(pre_Blog4H_CheckUSD, Utils.getCurrentYyyyMmDd_Blog4h())) {
-                List<BtcFutures> list_AUD = Utils.loadData("AUD", TIME_4h, 5);
-                List<BtcFutures> list_EUR = Utils.loadData("EUR", TIME_4h, 5);
-                List<BtcFutures> list_GBP = Utils.loadData("GBP", TIME_4h, 5);
-                boolean IsUpAUD = Utils.maIsUptrend(list_AUD, 3);
-                boolean IsUpEUR = Utils.maIsUptrend(list_EUR, 3);
-                boolean IsUpGBP = Utils.maIsUptrend(list_GBP, 3);
+                List<BtcFutures> list_H4_AUD = Utils.loadData("AUD", TIME_4h, 15);
+                List<BtcFutures> list_H4_EUR = Utils.loadData("EUR", TIME_4h, 15);
+                List<BtcFutures> list_H4_GBP = Utils.loadData("GBP", TIME_4h, 15);
 
-                TREND_AUD = IsUpAUD ? TREND_LONG : TREND_SHORT;
-                TREND_EUR = IsUpEUR ? TREND_LONG : TREND_SHORT;
-                TREND_GBP = IsUpGBP ? TREND_LONG : TREND_SHORT;
+                boolean IsUpAUD_3 = Utils.maIsUptrend(list_H4_AUD, 3);
+                boolean IsUpAUD_8 = Utils.maIsUptrend(list_H4_AUD, 8);
+                boolean IsUpAUD_13 = Utils.maIsUptrend(list_H4_AUD, 13);
+                boolean IsUpAUD = IsUpAUD_3;
+                if (IsUpAUD_3 = IsUpAUD_8) {
+                    TREND_H4_AUD = IsUpAUD_8 ? TREND_LONG : TREND_SHORT;
+                    IsUpAUD = IsUpAUD_8;
+                } else {
+                    TREND_H4_AUD = IsUpAUD_13 ? TREND_LONG : TREND_SHORT;
+                    IsUpAUD = IsUpAUD_13;
+                }
+
+                boolean IsUpEUR_3 = Utils.maIsUptrend(list_H4_EUR, 3);
+                boolean IsUpEUR_8 = Utils.maIsUptrend(list_H4_EUR, 8);
+                boolean IsUpEUR_13 = Utils.maIsUptrend(list_H4_EUR, 13);
+                boolean IsUpEUR = IsUpEUR_3;
+                if (IsUpEUR_3 = IsUpEUR_8) {
+                    TREND_H4_EUR = IsUpEUR_8 ? TREND_LONG : TREND_SHORT;
+                    IsUpEUR = IsUpEUR_8;
+                } else {
+                    TREND_H4_EUR = IsUpEUR_13 ? TREND_LONG : TREND_SHORT;
+                    IsUpEUR = IsUpEUR_13;
+                }
+
+                boolean IsUpGBP_3 = Utils.maIsUptrend(list_H4_GBP, 3);
+                boolean IsUpGBP_8 = Utils.maIsUptrend(list_H4_GBP, 8);
+                boolean IsUpGBP_13 = Utils.maIsUptrend(list_H4_GBP, 13);
+                boolean IsUpGBP = IsUpGBP_3;
+                if (IsUpGBP_3 = IsUpGBP_8) {
+                    TREND_H4_GBP = IsUpGBP_8 ? TREND_LONG : TREND_SHORT;
+                    IsUpGBP = IsUpGBP_8;
+                } else {
+                    TREND_H4_GBP = IsUpGBP_13 ? TREND_LONG : TREND_SHORT;
+                    IsUpGBP = IsUpGBP_13;
+                }
 
                 int count_usd_uptrend = 3;
                 count_usd_uptrend -= IsUpAUD ? 1 : 0;
@@ -3048,11 +3077,11 @@ public class BinanceServiceImpl implements BinanceService {
                 String ID = CURR + "_USDT";
                 String trend = TREND_LONG;
                 if (Objects.equals("AUD", CURR)) {
-                    trend = TREND_AUD;
+                    trend = TREND_H4_AUD;
                 } else if (Objects.equals("EUR", CURR)) {
-                    trend = TREND_EUR;
+                    trend = TREND_H4_EUR;
                 } else if (Objects.equals("GBP", CURR)) {
-                    trend = TREND_GBP;
+                    trend = TREND_H4_GBP;
                 }
 
                 String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
@@ -3109,16 +3138,15 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgMonitorLongShort_BTC(gecko_id, symbol, list_h4, list_days, "");
 
             if (Objects.equals("BTC", symbol)) {
-                TREND_BTC_IS_LONG = Utils.maIsUptrend(list_h4, 21);
-                TREND_BTC = TREND_BTC_IS_LONG ? TREND_LONG : TREND_SHORT;
+                TREND_H4_BTC_IS_LONG = Utils.maIsUptrend(list_h4, 21);
+                TREND_H4_BTC = TREND_H4_BTC_IS_LONG ? TREND_LONG : TREND_SHORT;
             }
 
+            // H4: ma3 dong pha ma21, va ma21 dong pha ma21 cua BTC
             boolean IsUp_4h_ma21 = Utils.maIsUptrend(list_h4, 21);
             boolean IsUp_4h_ma3 = Utils.maIsUptrend(list_h4, 3);
-            String SUB_TREND = IsUp_4h_ma3 ? TREND_LONG : TREND_SHORT;
-
-            // H4: ma3 dong pha ma21, va ma21 dong pha ma21 cua BTC
-            if ((TREND_BTC_IS_LONG == IsUp_4h_ma21) && (IsUp_4h_ma21 == IsUp_4h_ma3)) {
+            if ((TREND_H4_BTC_IS_LONG == IsUp_4h_ma21) && (IsUp_4h_ma21 == IsUp_4h_ma3)) {
+                String SUB_TREND = IsUp_4h_ma3 ? TREND_LONG : TREND_SHORT;
 
                 List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
 
@@ -3128,7 +3156,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } else if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
-            if (TREND_BTC_IS_LONG) {
+            if (TREND_H4_BTC_IS_LONG) {
                 checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
                 if (Utils.isBlank(checkMa3AndX)) {
                     checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21, false);
@@ -3141,7 +3169,7 @@ public class BinanceServiceImpl implements BinanceService {
         try {
             String note = "";
             if (MAIN_TOKEN.contains("_" + symbol + "_")) {
-                note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_BTC).replace(" ", "");
+                note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_H4_BTC).replace(" ", "");
             } else {
                 note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG).replace(" ", "");
             }
