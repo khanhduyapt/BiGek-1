@@ -396,37 +396,45 @@ public class BinanceServiceImpl implements BinanceService {
 
             int weekUp = 0;
             int cutUp = 0;
+            int count_stop_long = 0;
             for (CandidateTokenResponse dto : results) {
-                if (dto.getFutures().contains("W↑")) {
+                String futu = Utils.getStringValue(dto.getFutures());
+
+                if (futu.contains("W↑")) {
                     weekUp += 1;
                 }
 
-                if (dto.getFutures().contains("move↑")) {
+                if (futu.contains("move↑")) {
                     cutUp += 1;
                 }
+
+                if (futu.contains(TREND_STOP_LONG)) {
+                    count_stop_long += 1;
+                }
             }
-            String totalMarket = " Total W↑=" + weekUp + "(" + Utils
+            String totalMarket = "W↑=" + weekUp + "(" + Utils
                     .getPercentStr(BigDecimal.valueOf(results.size() - weekUp), BigDecimal.valueOf(results.size()))
                     .replace("-", "") + ")";
             totalMarket += ", W↓=" + (results.size() - weekUp) + "(" + Utils
                     .getPercentStr(BigDecimal.valueOf(weekUp), BigDecimal.valueOf(results.size())).replace("-", "")
                     + ")";
 
-            totalMarket += ", D↑Ma10=" + cutUp + "(" + Utils
+            totalMarket += ", ↑D(ma8)=" + cutUp + "(" + Utils
                     .getPercentStr(BigDecimal.valueOf(results.size() - cutUp), BigDecimal.valueOf(results.size()))
                     .replace("-", "") + ")";
 
-            totalMarket += ", AUD_EUR_GBP/USDT: " + TREND_CURRENCY_TODAY;
+            totalMarket += " AUD_EUR_GBP:" + (Objects.equals(TREND_CURRENCY_TODAY, TREND_LONG) ? "↑" : "↓") + " USDT:"
+                    + (Objects.equals(TREND_CURRENCY_TODAY, TREND_LONG) ? "↓" : "↑");
+            totalMarket += " Stop(" + count_stop_long + "/" + results.size() + ")";
 
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
-
             ModelMapper mapper = new ModelMapper();
             Integer index = 1;
             String dd = Utils.getToday_dd();
             String ddAdd1 = Utils.getDdFromToday(1);
             String ddAdd2 = Utils.getDdFromToday(2);
             String msg_position = "";
-            int count_stop_long = 0;
+
             // monitorTokenSales(results);
             for (CandidateTokenResponse dto : results) {
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
@@ -999,9 +1007,6 @@ public class BinanceServiceImpl implements BinanceService {
                             } else {
                                 css.setRange_stoploss(sl2ma);
                                 css.setRange_stoploss_css("text-danger font-weight-bold");
-                                if (sl2ma.contains(TREND_STOP_LONG)) {
-                                    count_stop_long += 1;
-                                }
                             }
                         } catch (Exception e) {
                             css.setRange_move("sl2ma exception");
@@ -1134,7 +1139,9 @@ public class BinanceServiceImpl implements BinanceService {
                     css.setNote("");
 
                     css.setRange_total_w(totalMarket);
-                    if (weekUp < (results.size() / 3)) {
+                    if (count_stop_long > (results.size() / 3)) {
+                        css.setRange_total_w_css("text-white bg-danger rounded-lg px-2");
+                    } else if (weekUp < (results.size() / 3)) {
                         css.setRange_total_w_css("text-white bg-danger rounded-lg px-2");
                     } else if (weekUp > (2 * results.size() / 3)) {
                         css.setRange_total_w_css("text-white bg-success rounded-lg px-2");
@@ -1154,8 +1161,8 @@ public class BinanceServiceImpl implements BinanceService {
             if ((count_stop_long > 0) || Utils.isNotBlank(msg_position)) {
                 String EVENT_ID = EVENT_COMPRESSED_CHART + "_POSITION_" + Utils.getCurrentYyyyMmDd_Blog4h();
 
-                sendMsgPerHour(EVENT_ID, "(Long) " + TREND_STOP_LONG + ":" + count_stop_long + "/total(" + list.size()
-                        + ")" + Utils.new_line_from_service + "Position:" + Utils.new_line_from_service + msg_position);
+                sendMsgPerHour(EVENT_ID, Utils.new_line_from_service + TREND_STOP_LONG + "(" + count_stop_long
+                        + "):Total(" + list.size() + ")" + Utils.new_line_from_service + "Position:" + msg_position);
             }
 
             return list;
