@@ -2631,14 +2631,14 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     public String getBtcBalancesOnExchanges() {
         return "";
-        //        int HH = Utils.getCurrentHH();
-        //        if (HH != pre_monitorBitcoinBalancesOnExchanges_HH) {
-        //            monitorBitcoinBalancesOnExchanges_temp = monitorBitcoinBalancesOnExchanges();
-        //            pre_monitorBitcoinBalancesOnExchanges_HH = HH;
-        //            return monitorBitcoinBalancesOnExchanges_temp;
-        //        } else {
-        //            return monitorBitcoinBalancesOnExchanges_temp;
-        //        }
+        // int HH = Utils.getCurrentHH();
+        // if (HH != pre_monitorBitcoinBalancesOnExchanges_HH) {
+        // monitorBitcoinBalancesOnExchanges_temp = monitorBitcoinBalancesOnExchanges();
+        // pre_monitorBitcoinBalancesOnExchanges_HH = HH;
+        // return monitorBitcoinBalancesOnExchanges_temp;
+        // } else {
+        // return monitorBitcoinBalancesOnExchanges_temp;
+        // }
     }
 
     @Override
@@ -3127,21 +3127,21 @@ public class BinanceServiceImpl implements BinanceService {
                 TREND_BTC = TREND_BTC_IS_LONG ? TREND_LONG : TREND_SHORT;
             }
 
-            if (Objects.equals("ETH", symbol) || Objects.equals("BTC", symbol)) {
-                boolean IsUp_1h_ma3 = Utils.maIsUptrend(list_h4, 3);
-                String SUB_TREND = IsUp_1h_ma3 ? TREND_LONG : TREND_SHORT;
+            // if (Objects.equals("ETH", symbol) || Objects.equals("BTC", symbol)) {
+            boolean IsUp_1h_ma3 = Utils.maIsUptrend(list_h4, 3);
+            String SUB_TREND = IsUp_1h_ma3 ? TREND_LONG : TREND_SHORT;
 
-                //ma3 dong pha ma21
-                if (TREND_BTC_IS_LONG == IsUp_1h_ma3) {
+            // ma3 dong pha ma21
+            if (TREND_BTC_IS_LONG == IsUp_1h_ma3) {
 
-                    List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
 
-                    String temp_result_btc = sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 50, false);
-                    if (Utils.isBlank(temp_result_btc)) {
-                        sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 21, false);
-                    }
+                String temp_result_btc = sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 50, false);
+                if (Utils.isBlank(temp_result_btc)) {
+                    sendMsgMonitorFibo(gecko_id, symbol, list_h1, SUB_TREND, 21, false);
                 }
             }
+            // }
         } else if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
             if (TREND_BTC_IS_LONG) {
                 checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
