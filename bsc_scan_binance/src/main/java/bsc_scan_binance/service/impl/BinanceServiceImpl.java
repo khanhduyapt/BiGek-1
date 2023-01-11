@@ -175,7 +175,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String TREND_H4_AUD = TREND_LONG;
     private String TREND_H4_EUR = TREND_LONG;
     private String TREND_H4_GBP = TREND_LONG;
-    private String TREND_H4_BTC = TREND_LONG;
+    private String TREND_H4_BTC = "";
     private Boolean TREND_H4_BTC_IS_LONG = true;
     private Boolean usd_is_uptrend_today = true;
 
@@ -3140,34 +3140,30 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
             if (Objects.equals("BTC", symbol)) {
+                sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, Utils.MA_INDEX_STOP_LONG, false);
+
                 TREND_H4_BTC_IS_LONG = Utils.maIsUptrend(list_h4, 21);
-
-                if (Utils.isStopLong(list_h4)) {
-                    TREND_H4_BTC_IS_LONG = false;
-                }
-
                 TREND_H4_BTC = TREND_H4_BTC_IS_LONG ? TREND_LONG : TREND_SHORT;
             }
-            checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 50, false);
+
             if (Utils.isBlank(checkMa3AndX)) {
-                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 21, false);
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 50, false);
                 if (Utils.isBlank(checkMa3AndX)) {
-                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 13, false);
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 21, false);
                 }
             }
 
-            // H4: ma3 dong pha ma21, va ma21 dong pha ma21 cua BTC
-            boolean IsUp_4h_ma21 = Utils.maIsUptrend(list_h4, 21);
-            boolean IsUp_4h_ma3 = Utils.maIsUptrend(list_h4, 3);
-            if ((TREND_H4_BTC_IS_LONG == IsUp_4h_ma21) && (IsUp_4h_ma21 == IsUp_4h_ma3)) {
+            if (Utils.isBlank(checkMa3AndX)) {
+                // H4: ma3 dong pha ma21, va ma21 dong pha ma21 cua BTC
+                boolean IsUp_4h_ma21 = Utils.maIsUptrend(list_h4, 21);
+                boolean IsUp_4h_ma3 = Utils.maIsUptrend(list_h4, 3);
+                if ((TREND_H4_BTC_IS_LONG == IsUp_4h_ma21) && (IsUp_4h_ma21 == IsUp_4h_ma3)) {
 
-                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+                    List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
 
-                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 50, false);
-                if (Utils.isBlank(checkMa3AndX)) {
-                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 21, false);
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 50, false);
                     if (Utils.isBlank(checkMa3AndX)) {
-                        checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 13, false);
+                        checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 21, false);
                     }
                 }
             }

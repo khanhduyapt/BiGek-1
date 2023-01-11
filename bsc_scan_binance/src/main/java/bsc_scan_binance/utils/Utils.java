@@ -2197,6 +2197,19 @@ public class Utils {
 
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail, String trend) {
         String symbol = list.get(0).getId();
+
+        if ((slowIndex == MA_INDEX_STOP_LONG) && symbol.contains("BTC")) {
+            if (Objects.equals(trend, TREND_LONG) && isStopLong(list)) {
+                return "Stop long";
+            }
+
+            if (Objects.equals(trend, TREND_SHORT) && !isStopLong(list)) {
+                return "Stop short";
+            }
+
+            return "";
+        }
+
         String chart = getChartName(list);
         int cur = 1;
         int pre = 2;
@@ -2220,6 +2233,7 @@ public class Utils {
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
+
             if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
                 isCuttingUp = true;
             }
@@ -2235,6 +2249,7 @@ public class Utils {
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
+
             if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
                 isCuttingDown = true;
             }
