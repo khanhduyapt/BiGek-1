@@ -2326,11 +2326,11 @@ public class Utils {
             note_long += " Ma" + slowIndex + ":Down,";
         }
         if (!list.get(0).isUptrend()) {
-            note_long += " Candle:Down.";
+            note_long += " Candle:Down,";
         }
 
         if (isNotBlank(note_long)) {
-            note_long = " (Remark)," + note_long + ", " + str_ma_50 + volume;
+            note_long = " (Remark)," + note_long + "," + str_ma_50 + volume;
         } else {
             note_long = " (Remark)," + str_ma_50 + volume;
         }
@@ -2347,7 +2347,7 @@ public class Utils {
         }
 
         if (isNotBlank(note_short)) {
-            note_short = " (Remark)," + note_short + ", " + str_ma_50 + volume;
+            note_short = " (Remark)," + note_short + "," + str_ma_50 + volume;
         } else {
             note_short = " (Remark)," + str_ma_50 + volume;
         }
