@@ -3157,7 +3157,7 @@ public class BinanceServiceImpl implements BinanceService {
             if (TREND_H4_BTC_IS_LONG) {
                 checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
                 if (Utils.isBlank(checkMa3AndX)) {
-                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, "", 21, false);
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 21, false);
                 }
             }
         }
