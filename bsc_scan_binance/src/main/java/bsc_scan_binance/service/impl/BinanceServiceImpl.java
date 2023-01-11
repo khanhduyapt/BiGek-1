@@ -1160,6 +1160,10 @@ public class BinanceServiceImpl implements BinanceService {
 
             if ((count_stop_long > 0) || Utils.isNotBlank(msg_position)) {
                 String EVENT_ID = EVENT_COMPRESSED_CHART + "_POSITION_" + Utils.getCurrentYyyyMmDd_Blog4h();
+                msg_position = msg_position.replace(" ", "");
+                if (msg_position.length() > 100) {
+                    msg_position = msg_position.substring(0, 100) + "...";
+                }
 
                 sendMsgPerHour(EVENT_ID, Utils.new_line_from_service + TREND_STOP_LONG + "(" + count_stop_long
                         + "):Total(" + list.size() + ")" + Utils.new_line_from_service + "Position:" + msg_position);
