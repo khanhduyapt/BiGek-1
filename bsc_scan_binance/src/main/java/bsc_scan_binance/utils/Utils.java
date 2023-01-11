@@ -2166,17 +2166,9 @@ public class Utils {
 
     public static boolean isStopLong(List<BtcFutures> list) {
         int cur = 1;
-        int pre = 2;
         int fastIndex = 3;
         BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
-        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
-
         BigDecimal ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG, cur);
-        BigDecimal ma_slow_p = calcMA(list, MA_INDEX_STOP_LONG, pre);
-
-        if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
-            return true;
-        }
 
         if (ma_fast_c.compareTo(ma_slow_c) < 0) {
             return true;
@@ -2198,7 +2190,7 @@ public class Utils {
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail, String trend) {
         String symbol = list.get(0).getId();
 
-        if ((slowIndex == MA_INDEX_STOP_LONG) && symbol.contains("BTC")) {
+        if (slowIndex == MA_INDEX_STOP_LONG) {
             if (Objects.equals(trend, TREND_LONG) && isStopLong(list)) {
                 return "Stop long";
             }
