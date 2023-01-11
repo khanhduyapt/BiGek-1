@@ -942,9 +942,11 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
-                    css.setRange_backer(Utils.getStringValue(dto.getBacker()).replace("_", " ").replace(",,", ",")
+                    String history = Utils.getStringValue(dto.getBacker()).replace("_", " ").replace(",,", ",")
                             .replace("   :", ":").replace(" :", ":").replace("...", " ").replace(",", ", ")
-                            .replace("  ", " "));
+                            .replace("  ", " ").replace("Chart:", "");
+                    history = Utils.isNotBlank(history) ? "History:" + history : "";
+                    css.setRange_backer(history);
 
                     String m2ma = "";
                     if (futu.contains("m2ma{") && futu.contains("}m2ma")) {
