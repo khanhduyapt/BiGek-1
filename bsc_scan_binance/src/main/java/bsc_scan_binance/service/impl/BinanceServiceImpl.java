@@ -3124,9 +3124,16 @@ public class BinanceServiceImpl implements BinanceService {
             checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
 
             if (Utils.isBlank(checkMa3AndX)) {
-                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
-                String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, "", 50, false);
-                scapLongD1 += SEPARATE_D1_AND_H1 + temp_h1;
+
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 21, false);
+
+                if (Utils.isBlank(checkMa3AndX)) {
+
+                    List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+                    String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, "", 50, false);
+                    scapLongD1 += SEPARATE_D1_AND_H1 + temp_h1;
+
+                }
             }
 
         } else if (Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !TREND_H4_BTC_IS_DANGER) {
