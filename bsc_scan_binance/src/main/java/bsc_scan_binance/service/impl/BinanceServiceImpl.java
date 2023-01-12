@@ -3067,12 +3067,14 @@ public class BinanceServiceImpl implements BinanceService {
             if (Objects.equals("BTC", symbol)) {
 
                 boolean trend_h4 = Utils.maIsUptrend(list_h4, 3); // Utils.isMa3AboveMa8_Long(list_h4);
+                boolean trend_h8 = Utils.maIsUptrend(list_h4, 8);
                 boolean trend_day = Utils.maIsUptrend(list_h4, 21);// Utils.isMa3AboveMa8_Long(list_days);
 
+                TREND_OF_BTC = Utils.TREND_OPPOSITE;
                 if (trend_h4 == trend_day) {
                     TREND_OF_BTC = trend_day ? Utils.TREND_LONG : Utils.TREND_SHORT;
-                } else {
-                    TREND_OF_BTC = Utils.TREND_OPPOSITE;
+                } else if (trend_h4 == trend_h8) {
+                    TREND_OF_BTC = trend_h8 ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 }
 
                 List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_h4);
