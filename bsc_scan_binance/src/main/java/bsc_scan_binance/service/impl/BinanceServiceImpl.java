@@ -2930,17 +2930,26 @@ public class BinanceServiceImpl implements BinanceService {
                 String temp = "";
                 temp = sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 50, false);
                 if (Utils.isBlank(temp)) {
-                    sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 21, false);
+                    temp = sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 21, false);
+                    if (Utils.isBlank(temp)) {
+                        temp = sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 13, false);
+                    }
                 }
 
                 temp = sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 50, false);
                 if (Utils.isBlank(temp)) {
-                    sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 21, false);
+                    temp = sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 21, false);
+                    if (Utils.isBlank(temp)) {
+                        temp = sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 13, false);
+                    }
                 }
 
                 temp = sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 50, false);
                 if (Utils.isBlank(temp)) {
-                    sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 21, false);
+                    temp = sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 21, false);
+                    if (Utils.isBlank(temp)) {
+                        temp = sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 13, false);
+                    }
                 }
 
                 boolean IsUpAUD_3 = Utils.maIsUptrend(list_H4_AUD, 3);
@@ -2980,48 +2989,47 @@ public class BinanceServiceImpl implements BinanceService {
                 pre_Blog4H_CheckUSD = Utils.getCurrentYyyyMmDd_Blog4h();
             }
 
-            List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
-            for (String CURR : list_currency) {
-                String ID = CURR + "_USDT";
-                String trend = Utils.TREND_LONG;
-                if (Objects.equals("AUD", CURR)) {
-                    trend = TREND_H4_AUD;
-                } else if (Objects.equals("EUR", CURR)) {
-                    trend = TREND_H4_EUR;
-                } else if (Objects.equals("GBP", CURR)) {
-                    trend = TREND_H4_GBP;
-                }
-
-                if (Objects.equals(trend, Utils.TREND_OPPOSITE)) {
-                    continue;
-                }
-
-                String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
-                if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
-
-                    List<BtcFutures> list_cur = Utils.loadData(CURR, TIME_1h, 60);
-                    String cur_h1_result = Utils.checkMa3AndX(list_cur, 50, false, trend);
-
-                    if (Utils.isBlank(cur_h1_result)) {
-                        cur_h1_result = Utils.checkMa3AndX(list_cur, 21, false, trend);
-                    }
-
-                    if (Utils.isBlank(cur_h1_result)) {
-                        cur_h1_result = Utils.checkMa3AndX(list_cur, 13, false, trend);
-                    }
-
-                    if (Utils.isNotBlank(cur_h1_result)) {
-                        String msg = Utils.getMmDD_TimeHHmm()
-                                + list_cur.get(0).getId().replace("_00", "").replace("_", "_USDT_")
-                                + Utils.new_line_from_service + cur_h1_result.replace(",", Utils.new_line_from_service);
-
-                        fundingHistoryRepository
-                                .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
-
-                        Utils.sendToMyTelegram(msg);
-                    }
-                }
-            }
+            //List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
+            //for (String CURR : list_currency) {
+            //    String ID = CURR + "_USDT";
+            //    String trend = Utils.TREND_LONG;
+            //    if (Objects.equals("AUD", CURR)) {
+            //        trend = TREND_H4_AUD;
+            //    } else if (Objects.equals("EUR", CURR)) {
+            //        trend = TREND_H4_EUR;
+            //    } else if (Objects.equals("GBP", CURR)) {
+            //        trend = TREND_H4_GBP;
+            //    }
+            //
+            //    if (Objects.equals(trend, Utils.TREND_OPPOSITE)) {
+            //        continue;
+            //    }
+            //
+            //    String EVENT_LONG_SHORT_CURRENCY = EVENT_FIBO_LONG_SHORT + ID + Utils.getCurrentYyyyMmDd_Blog2h();
+            //    if (!fundingHistoryRepository.existsPumDump(ID, EVENT_LONG_SHORT_CURRENCY)) {
+            //
+            //        String cur_h1_result = Utils.checkMa3AndX(list_cur, 50, false, trend);
+            //
+            //        if (Utils.isBlank(cur_h1_result)) {
+            //            cur_h1_result = Utils.checkMa3AndX(list_cur, 21, false, trend);
+            //        }
+            //
+            //        if (Utils.isBlank(cur_h1_result)) {
+            //            cur_h1_result = Utils.checkMa3AndX(list_cur, 13, false, trend);
+            //        }
+            //
+            //        if (Utils.isNotBlank(cur_h1_result)) {
+            //            String msg = Utils.getMmDD_TimeHHmm()
+            //                    + list_cur.get(0).getId().replace("_00", "").replace("_", "_USDT_")
+            //                    + Utils.new_line_from_service + cur_h1_result.replace(",", Utils.new_line_from_service);
+            //
+            //            fundingHistoryRepository
+            //                    .save(createPumpDumpEntity(EVENT_LONG_SHORT_CURRENCY, ID, ID, "", true));
+            //
+            //            Utils.sendToMyTelegram(msg);
+            //        }
+            //    }
+            //}
             pre_HH_CheckUSD = Utils.getCurrentHH();
 
         } catch (Exception e) {
@@ -3049,6 +3057,9 @@ public class BinanceServiceImpl implements BinanceService {
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
+        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+        sendMsgMonitorFibo(gecko_id, symbol, list_h1, "", 50, false);
+
         type = type + Utils.analysisVolume(list_h4);
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
@@ -3105,7 +3116,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
             if (Utils.isBlank(checkMa3AndX)) {
-                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+
                 sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_OF_BTC, 50, false);
 
                 if ((scapLongH4.contains(Utils.TREND_DANGER) || scapLongD1.contains(Utils.TREND_DANGER))) {
