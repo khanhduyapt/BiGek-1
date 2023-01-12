@@ -65,7 +65,8 @@ public class Utils {
     public static final String TREND_LONG = "Long";
     public static final String TREND_SHORT = "Short";
     public static final String TREND_DANGER = "(Danger)";
-    public static final int MA_INDEX_STOP_LONG = 8;
+    public static final int MA_INDEX_STOP_LONG_H4 = 8;
+    public static final int MA_INDEX_STOP_LONG_D1 = 5;
     public static final int MA_INDEX_CURRENCY = 21;
 
     public static String sql_OrdersProfitResponse = ""
@@ -1950,7 +1951,7 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check3and8 = isStopLong(list_find_entry) ? TREND_SHORT : TREND_LONG;
+            String check3and8 = isMa3AboveMa8_Long(list_find_entry) ? TREND_SHORT : TREND_LONG;
 
             List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp);
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_find_entry.subList(0, 15));
@@ -2127,36 +2128,55 @@ public class Utils {
         return result;
     }
 
-    public static boolean isStopLong(List<BtcFutures> list) {
+    public static boolean isMa3AboveMa8_Long(List<BtcFutures> list) {
         int cur = 1;
         int fastIndex = 3;
+        String symbol = list.get(0).getId();
         BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
-        BigDecimal ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG, cur);
+        BigDecimal ma_slow_c;
 
-        if (ma_fast_c.compareTo(ma_slow_c) < 0) {
+        if (symbol.contains("_1d_")) {
+            ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG_D1, cur);
+        } else {
+            ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG_H4, cur);
+        }
+
+        if (ma_fast_c.compareTo(ma_slow_c) > 0) {
             return true;
         }
 
         return false;
     }
 
-    public static boolean isStartingLong(List<BtcFutures> list) {
+    public static String checkMa3AndMa8_ForChangeStatus(List<BtcFutures> list) {
         int cur = 1;
         int pre = 2;
         int fastIndex = 3;
-
+        String symbol = list.get(0).getId().replace("_00", "");
         BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
         BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
+        BigDecimal ma_slow_c;
+        BigDecimal ma_slow_p;
 
-        BigDecimal ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG, cur);
-        BigDecimal ma_slow_p = calcMA(list, MA_INDEX_STOP_LONG, pre);
+        if (symbol.contains("_1d_")) {
+            ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG_D1, cur);
+            ma_slow_p = calcMA(list, MA_INDEX_STOP_LONG_D1, pre);
+        } else {
+            ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG_H4, cur);
+            ma_slow_p = calcMA(list, MA_INDEX_STOP_LONG_H4, pre);
+        }
 
         if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
                 && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-            return true;
+            return "(" + symbol + ") Stop:Short, Prepare Long.";
         }
 
-        return false;
+        if ((ma_fast_c.compareTo(ma_fast_p) < 0) && (ma_fast_c.compareTo(ma_slow_c) < 0)
+                && (ma_slow_p.compareTo(ma_fast_p) < 0)) {
+            return "(" + symbol + ") Stop:Long, Prepare Short.";
+        }
+
+        return "";
     }
 
     public static boolean maIsUptrend(List<BtcFutures> list, int maIndex) {
@@ -2171,18 +2191,6 @@ public class Utils {
 
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail, String trend) {
         String symbol = list.get(0).getId();
-
-        if (slowIndex == MA_INDEX_STOP_LONG) {
-            if (Objects.equals(trend, TREND_LONG) && isStopLong(list)) {
-                return "Stop Long";
-            }
-
-            if (Objects.equals(trend, TREND_SHORT) && !isStopLong(list)) {
-                return "Stop Short";
-            }
-
-            return "";
-        }
 
         String chart = getChartName(list);
         int cur = 1;

@@ -947,8 +947,8 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     String history = Utils.getStringValue(dto.getBacker()).replace("_", " ").replace(",,", ",")
-                            .replace("   :", ":").replace(" :", ":").replace("...", " ").replace(",", ", ")
-                            .replace("  ", " ").replace("Chart:", "");
+                            .replace("...", " ").replace(",", ", ")
+                            .replace("  ", " ").replace("Chart:", "").replaceAll(" +", " ").replace(" :", ":");
                     history = Utils.isNotBlank(history) ? "History:" + history : "";
                     css.setRange_backer(history);
 
@@ -3081,9 +3081,14 @@ public class BinanceServiceImpl implements BinanceService {
             scapLongOrShortH4 = Utils.getScapLongOrShort_BTC(list_h4, list_days, 10);
 
             if (Objects.equals("BTC", symbol)) {
-                sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, Utils.MA_INDEX_STOP_LONG, false);
 
                 TREND_H4_BTC_IS_LONG = Utils.maIsUptrend(list_h4, 21);
+                if (!Utils.isMa3AboveMa8_Long(list_h4)) {
+                    TREND_H4_BTC_IS_LONG = false;
+                }
+                if (!Utils.isMa3AboveMa8_Long(list_days)) {
+                    TREND_H4_BTC_IS_LONG = false;
+                }
                 TREND_H4_BTC = TREND_H4_BTC_IS_LONG ? TREND_LONG : TREND_SHORT;
 
                 List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_h4);
@@ -3093,9 +3098,16 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (current_price.compareTo(max_allow_long) > 0) {
                     TREND_H4_BTC_IS_DANGER = true;
-                    // return "";
                 }
 
+                String msg = Utils.checkMa3AndMa8_ForChangeStatus(list_h4);
+                if (Utils.isBlank(msg)) {
+                    msg = Utils.checkMa3AndMa8_ForChangeStatus(list_days);
+                }
+                if (Utils.isNotBlank(msg)) {
+                    String EVENT_CHECK_ID = EVENT_COMPRESSED_CHART + "_STATUS_" + Utils.getCurrentYyyyMmDd_Blog4h();
+                    sendMsgPerHour(EVENT_CHECK_ID, msg);
+                }
             }
 
             if (Utils.isBlank(checkMa3AndX)) {
@@ -3114,10 +3126,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                     List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
                     checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 50, false);
-
-                    if (Utils.isBlank(checkMa3AndX)) {
-                        checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 21, false);
-                    }
                 }
             }
         } else if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
@@ -3128,7 +3136,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         }
-        if (Utils.isStopLong(list_h4)) {
+        if (!Utils.isMa3AboveMa8_Long(list_h4)) {
             scapLongOrShortH4 = TREND_STOP_LONG;
         }
 
@@ -3169,7 +3177,7 @@ public class BinanceServiceImpl implements BinanceService {
         note += ",L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
         note += ",H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
         note += ",L10w:" + Utils.getPercentToEntry(current_price, min_week, true) + ",";
-        if (Utils.isStartingLong(list_h4)) {
+        if (Utils.isNotBlank(Utils.checkMa3AndMa8_ForChangeStatus(list_h4))) {
             note += "_Position";
         }
 
@@ -3201,7 +3209,12 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}m2ma";
-        String checkMa50 = "_ma7(" + Utils.checkMa3And50(list_h4) + ")~";
+
+        String scapLongOrShortD1 = Utils.checkMa3AndX(list_days, Utils.getSlowIndex(list_days), false, TREND_H4_BTC);
+        if (!Utils.isMa3AboveMa8_Long(list_days)) {
+            scapLongOrShortD1 = TREND_STOP_LONG;
+        }
+        String checkD1 = "_ma7(" + scapLongOrShortD1 + ")~";
 
         // H4 sl2ma
         String entry = "";
@@ -3211,7 +3224,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
         // ---------------------------------------------------------
 
-        String result = note + type + m2ma + checkMa50 + entry;
+        String result = note + type + m2ma + checkD1 + entry;
         if (result.length() > 255) {
             // result = result.substring(0, 250) + "...";
         }
