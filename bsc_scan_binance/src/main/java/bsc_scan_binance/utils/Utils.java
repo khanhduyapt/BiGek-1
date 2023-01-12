@@ -2392,6 +2392,8 @@ public class Utils {
             if (isCuttingUp && isNotBlank(note_long)) {
                 result += ",," + note_long;
             }
+        } else {
+            result += "," + volume;
         }
 
         if (!(result.contains(TREND_LONG) || result.contains(TREND_SHORT))) {
