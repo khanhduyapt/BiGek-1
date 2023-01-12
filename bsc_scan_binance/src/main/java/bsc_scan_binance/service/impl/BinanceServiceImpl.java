@@ -931,11 +931,13 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
-                    String history = Utils.getStringValue(dto.getBacker()).replace("_", " ").replace(",,", ",")
-                            .replace("...", " ").replace(",", ", ").replace("  ", " ").replace("Chart:", "")
-                            .replaceAll(" +", " ").replace(" :", ":");
-                    history = Utils.isNotBlank(history) ? "History:" + history : "";
-                    css.setRange_backer(history);
+                    // String history = Utils.getStringValue(dto.getBacker()).replace("_", "
+                    // ").replace(",,", ",")
+                    // .replace("...", " ").replace(",", ", ").replace(" ", " ").replace("Chart:",
+                    // "")
+                    // .replaceAll(" +", " ").replace(" :", ":");
+                    // history = Utils.isNotBlank(history) ? "History:" + history : "";
+                    // css.setRange_backer(history);
 
                     String m2ma = "";
                     if (futu.contains("m2ma{") && futu.contains("}m2ma")) {
@@ -2937,7 +2939,7 @@ public class BinanceServiceImpl implements BinanceService {
                 // return;
             }
 
-            if (!Objects.equals(pre_Blog4H_CheckUSD, Utils.getCurrentYyyyMmDd_Blog2h())) {
+            if (!Objects.equals(pre_Blog4H_CheckUSD, Utils.getCurrentYyyyMmDd_Blog4h())) {
                 List<BtcFutures> list_H4_AUD = Utils.loadData("AUD", TIME_4h, 60);
                 List<BtcFutures> list_H4_EUR = Utils.loadData("EUR", TIME_4h, 60);
                 List<BtcFutures> list_H4_GBP = Utils.loadData("GBP", TIME_4h, 60);
@@ -3160,19 +3162,20 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         try {
-            if (Utils.is3CuttingUp50ForLong(list_h4)) {
-                String history = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, Utils.TREND_LONG);
-
-                PriorityCoinHistory his = new PriorityCoinHistory();
-                his.setGeckoid(gecko_id);
-                his.setSymbol(Utils.getMmDD_TimeHHmm());
-                if (history.length() > 255) {
-                    history = history.substring(0, 250) + "...";
-                }
-                his.setName(history);
-
-                priorityCoinHistoryRepository.save(his);
-            }
+            // if (Utils.is3CuttingUp50ForLong(list_days)) {
+            // String history = Utils.checkMa3AndX(list_days, Utils.getSlowIndex(list_days),
+            // true, Utils.TREND_LONG);
+            //
+            // PriorityCoinHistory his = new PriorityCoinHistory();
+            // his.setGeckoid(gecko_id);
+            // his.setSymbol(Utils.getMmDD_TimeHHmm());
+            // if (history.length() > 255) {
+            // history = history.substring(0, 250) + "...";
+            // }
+            // his.setName(history);
+            //
+            // priorityCoinHistoryRepository.save(his);
+            // }
 
             CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
             if (!Objects.equals(null, entity)) {

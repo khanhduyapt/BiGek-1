@@ -2362,7 +2362,7 @@ public class Utils {
 
         String result = "";
         if (isCuttingUp) {
-            result = type + "Long(" + chart.trim().toUpperCase() + ") E:" + roundDefault(currPrice);
+            result = type + "Long(" + chart.trim().toUpperCase() + ")";
 
             List<BigDecimal> low_heigh = getLowHeightCandle(list);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
@@ -2374,7 +2374,11 @@ public class Utils {
                 // return "";
             }
         } else if (isCuttingDown) {
-            result = type + "Short(" + chart.trim().toUpperCase() + ") E:" + roundDefault(currPrice);
+            result = type + "Short(" + chart.trim().toUpperCase() + ")";
+        }
+
+        if (symbol.contains("AUD_") || symbol.contains("AUD_") || symbol.contains("AUD_")) {
+            return result;
         }
 
         // --------------------------------------------------
