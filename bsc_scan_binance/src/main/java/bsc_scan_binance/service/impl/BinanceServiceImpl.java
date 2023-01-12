@@ -153,11 +153,6 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_COMPRESSED_CHART = "Ma3_10_20_";
     private static final String EVENT_PUMP = "Pump_1";
 
-    private static final String TREND_LONG = "Long";
-    private static final String TREND_SHORT = "Short";
-    private static final String TREND_OPPOSITE = "Opposite";
-    private static final String TREND_STOP_LONG = "Stop:Long";
-
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
     private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-1";
     private static final String CSS_PRICE_FOCUS = "border-bottom border-dark";
@@ -170,12 +165,11 @@ public class BinanceServiceImpl implements BinanceService {
 
     private int pre_HH_CheckUSD = 0;
     private String pre_Blog4H_CheckUSD = "";
-    private String TREND_CURRENCY_TODAY = TREND_LONG;
-    private String TREND_H4_AUD = TREND_LONG;
-    private String TREND_H4_EUR = TREND_LONG;
-    private String TREND_H4_GBP = TREND_LONG;
-    private String TREND_H4_BTC = "";
-    private Boolean TREND_H4_BTC_IS_LONG = true;
+    private String TREND_CURRENCY_TODAY = Utils.TREND_LONG;
+    private String TREND_H4_AUD = Utils.TREND_LONG;
+    private String TREND_H4_EUR = Utils.TREND_LONG;
+    private String TREND_H4_GBP = Utils.TREND_LONG;
+    private String TREND_OF_BTC = "";
     private Boolean TREND_H4_BTC_IS_DANGER = true;
     private Boolean usd_is_uptrend_today = true;
 
@@ -409,7 +403,7 @@ public class BinanceServiceImpl implements BinanceService {
                     cutUp += 1;
                 }
 
-                if (futu.contains(TREND_STOP_LONG)) {
+                if (futu.contains(Utils.TREND_STOP_LONG) || futu.contains(Utils.TREND_DANGER)) {
                     count_stop_long += 1;
                 }
             }
@@ -424,8 +418,9 @@ public class BinanceServiceImpl implements BinanceService {
                     .getPercentStr(BigDecimal.valueOf(results.size() - cutUp), BigDecimal.valueOf(results.size()))
                     .replace("-", "") + ")";
 
-            totalMarket += " AUD_EUR_GBP:" + (Objects.equals(TREND_CURRENCY_TODAY, TREND_LONG) ? "↑" : "↓") + " USDT:"
-                    + (Objects.equals(TREND_CURRENCY_TODAY, TREND_LONG) ? "↓" : "↑");
+            totalMarket += " AUD_EUR_GBP:" + (Objects.equals(TREND_CURRENCY_TODAY, Utils.TREND_LONG) ? "↑" : "↓")
+                    + " USDT:"
+                    + (Objects.equals(TREND_CURRENCY_TODAY, Utils.TREND_LONG) ? "↓" : "↑");
             totalMarket += " Stop(" + count_stop_long + "/" + results.size() + ")";
 
             List<CandidateTokenCssResponse> list = new ArrayList<CandidateTokenCssResponse>();
@@ -898,9 +893,9 @@ public class BinanceServiceImpl implements BinanceService {
                             scap = scap.replace("scap{", "");
                             css.setRange_scap(scap);
 
-                            if (scap.contains(TREND_LONG)) {
+                            if (scap.contains(Utils.TREND_LONG)) {
                                 css.setRange_scap_css(CSS_PRICE_SUCCESS);
-                            } else if (scap.contains(TREND_SHORT)) {
+                            } else if (scap.contains(Utils.TREND_SHORT)) {
                                 css.setRange_scap_css(CSS_PRICE_WARNING);
                             }
                         } catch (Exception e) {
@@ -1153,7 +1148,7 @@ public class BinanceServiceImpl implements BinanceService {
             //        msg_position = msg_position.substring(0, 100) + "...";
             //    }
             //
-            //    sendMsgPerHour(EVENT_ID, Utils.new_line_from_service + TREND_STOP_LONG + "(" + count_stop_long
+            //    sendMsgPerHour(EVENT_ID, Utils.new_line_from_service + Utils.TREND_STOP_LONG + "(" + count_stop_long
             //            + "):Total(" + list.size() + ")" + Utils.new_line_from_service + "Position:" + msg_position);
             //}
 
@@ -1872,11 +1867,11 @@ public class BinanceServiceImpl implements BinanceService {
 
                         String cur_Bitfinex_status = "";
                         if (longRate.compareTo(BigDecimal.valueOf(60)) > 0) {
-                            cur_Bitfinex_status = TREND_LONG;
+                            cur_Bitfinex_status = Utils.TREND_LONG;
 
                         }
                         if (shortRate.compareTo(BigDecimal.valueOf(60)) > 0) {
-                            cur_Bitfinex_status = TREND_SHORT;
+                            cur_Bitfinex_status = Utils.TREND_SHORT;
                         }
 
                         if (!Objects.equals(cur_Bitfinex_status, pre_Bitfinex_status)
@@ -2951,25 +2946,25 @@ public class BinanceServiceImpl implements BinanceService {
                 boolean IsUpAUD_3 = Utils.maIsUptrend(list_H4_AUD, 3);
                 boolean IsUpAUD_S = Utils.maIsUptrend(list_H4_AUD, Utils.MA_INDEX_CURRENCY);
                 if (IsUpAUD_3 == IsUpAUD_S) {
-                    TREND_H4_AUD = IsUpAUD_S ? TREND_LONG : TREND_SHORT;
+                    TREND_H4_AUD = IsUpAUD_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {
-                    TREND_H4_AUD = TREND_OPPOSITE;
+                    TREND_H4_AUD = Utils.TREND_OPPOSITE;
                 }
 
                 boolean IsUpEUR_3 = Utils.maIsUptrend(list_H4_EUR, 3);
                 boolean IsUpEUR_S = Utils.maIsUptrend(list_H4_EUR, Utils.MA_INDEX_CURRENCY);
                 if (IsUpEUR_3 == IsUpEUR_S) {
-                    TREND_H4_EUR = IsUpEUR_S ? TREND_LONG : TREND_SHORT;
+                    TREND_H4_EUR = IsUpEUR_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {
-                    TREND_H4_EUR = TREND_OPPOSITE;
+                    TREND_H4_EUR = Utils.TREND_OPPOSITE;
                 }
 
                 boolean IsUpGBP_3 = Utils.maIsUptrend(list_H4_GBP, 3);
                 boolean IsUpGBP_S = Utils.maIsUptrend(list_H4_GBP, Utils.MA_INDEX_CURRENCY);
                 if (IsUpGBP_3 == IsUpGBP_S) {
-                    TREND_H4_GBP = IsUpGBP_S ? TREND_LONG : TREND_SHORT;
+                    TREND_H4_GBP = IsUpGBP_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {
-                    TREND_H4_GBP = TREND_OPPOSITE;
+                    TREND_H4_GBP = Utils.TREND_OPPOSITE;
                 }
 
                 int count_usd_uptrend = 3;
@@ -2978,9 +2973,9 @@ public class BinanceServiceImpl implements BinanceService {
                 count_usd_uptrend -= IsUpGBP_S ? 1 : 0;
                 usd_is_uptrend_today = (count_usd_uptrend > 1) ? true : false;
                 if (usd_is_uptrend_today) {
-                    TREND_CURRENCY_TODAY = TREND_SHORT;
+                    TREND_CURRENCY_TODAY = Utils.TREND_SHORT;
                 } else {
-                    TREND_CURRENCY_TODAY = TREND_LONG;
+                    TREND_CURRENCY_TODAY = Utils.TREND_LONG;
                 }
                 pre_Blog4H_CheckUSD = Utils.getCurrentYyyyMmDd_Blog4h();
             }
@@ -2988,7 +2983,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<String> list_currency = new ArrayList<String>(Arrays.asList("AUD", "EUR", "GBP"));
             for (String CURR : list_currency) {
                 String ID = CURR + "_USDT";
-                String trend = TREND_LONG;
+                String trend = Utils.TREND_LONG;
                 if (Objects.equals("AUD", CURR)) {
                     trend = TREND_H4_AUD;
                 } else if (Objects.equals("EUR", CURR)) {
@@ -2997,7 +2992,7 @@ public class BinanceServiceImpl implements BinanceService {
                     trend = TREND_H4_GBP;
                 }
 
-                if (Objects.equals(trend, TREND_OPPOSITE)) {
+                if (Objects.equals(trend, Utils.TREND_OPPOSITE)) {
                     continue;
                 }
 
@@ -3059,7 +3054,6 @@ public class BinanceServiceImpl implements BinanceService {
 
         String scapLongH4 = "";
         String scapLongD1 = Utils.getScapLong(list_days, list_days, 10);
-        String checkD1 = "_ma7(" + scapLongD1.replace(",", " ") + ")~";
 
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
@@ -3072,14 +3066,14 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (Objects.equals("BTC", symbol)) {
 
-                TREND_H4_BTC_IS_LONG = Utils.maIsUptrend(list_h4, 21);
-                if (!Utils.isMa3AboveMa8_Long(list_h4)) {
-                    TREND_H4_BTC_IS_LONG = false;
+                boolean trend_h4 = Utils.maIsUptrend(list_h4, 3); // Utils.isMa3AboveMa8_Long(list_h4);
+                boolean trend_day = Utils.maIsUptrend(list_h4, 21);// Utils.isMa3AboveMa8_Long(list_days);
+
+                if (trend_h4 == trend_day) {
+                    TREND_OF_BTC = trend_day ? Utils.TREND_LONG : Utils.TREND_SHORT;
+                } else {
+                    TREND_OF_BTC = Utils.TREND_OPPOSITE;
                 }
-                if (!Utils.isMa3AboveMa8_Long(list_days)) {
-                    TREND_H4_BTC_IS_LONG = false;
-                }
-                TREND_H4_BTC = TREND_H4_BTC_IS_LONG ? TREND_LONG : TREND_SHORT;
 
                 List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_h4);
                 BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
@@ -3100,40 +3094,29 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
+            checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
             if (Utils.isBlank(checkMa3AndX)) {
-                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 50, false);
-                if (Utils.isBlank(checkMa3AndX)) {
-                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_H4_BTC, 21, false);
-                }
+                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_OF_BTC, 50, false);
             }
 
-            if (Utils.isBlank(checkMa3AndX)) {
-                // H4: ma3 dong pha ma21, va ma21 dong pha ma21 cua BTC
-                boolean IsUp_4h_ma21 = Utils.maIsUptrend(list_h4, 21);
-                boolean IsUp_4h_ma3 = Utils.maIsUptrend(list_h4, 3);
-
-                if ((TREND_H4_BTC_IS_LONG == IsUp_4h_ma21) && (IsUp_4h_ma21 == IsUp_4h_ma3)) {
-
-                    List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
-                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_H4_BTC, 50, false);
-                }
-            }
-        } else if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
+        } else if (Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !TREND_H4_BTC_IS_DANGER) {
             scapLongH4 = Utils.getScapLong(list_h4, list_days, 10);
 
-            if (TREND_H4_BTC_IS_LONG && !TREND_H4_BTC_IS_DANGER) {
-                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
+            if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
+                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
                 if (Utils.isBlank(checkMa3AndX)) {
-                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 21, false);
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 21, false);
                 }
             }
         } else {
-            scapLongH4 = Utils.getScapLong(list_h4, list_days, 10);
+            scapLongH4 = Utils.TREND_DANGER;
+            scapLongD1 = Utils.TREND_DANGER;
         }
 
         try {
             if (Utils.is3CuttingUp50ForLong(list_h4)) {
-                String history = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG);
+                String history = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, Utils.TREND_LONG);
 
                 PriorityCoinHistory his = new PriorityCoinHistory();
                 his.setGeckoid(gecko_id);
@@ -3172,10 +3155,9 @@ public class BinanceServiceImpl implements BinanceService {
         note += ",L10w:" + Utils.getPercentToEntry(current_price, min_week, true) + ",";
         // ---------------------------------------------------------
         String position = "";
-        if (Utils.checkMa3AndMa8_ForChangeStatus(list_h4).contains("Prepare Long")) {
-            position = "_PositionH4";
-        }
-
+        //if (Utils.checkMa3AndMa8_ForChangeStatus(list_h4).contains("Prepare Long")) {
+        //    position = "_PositionH4";
+        //}
         if (Utils.checkMa3AndMa8_ForChangeStatus(list_days).contains("Prepare Long")) {
             position = "_PositionD1";
         }
@@ -3213,14 +3195,19 @@ public class BinanceServiceImpl implements BinanceService {
         String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}m2ma";
 
         // H4 sl2ma
-        String entry = "";
+        String sl2ma = "";
         if (Utils.isNotBlank(scapLongH4)) {
             scapLongH4 = scapLongH4.replace("_" + symbol.toUpperCase() + "_", "_");
-            entry = " sl2ma{" + scapLongH4 + "}sl2ma";
+            sl2ma = " sl2ma{" + scapLongH4 + "}sl2ma";
+        }
+
+        String ma7 = "";
+        if (Utils.isNotBlank(scapLongD1)) {
+            ma7 = "_ma7(" + scapLongD1.replace(",", " ") + ")~";
         }
         // ---------------------------------------------------------
 
-        String result = note + type + m2ma + checkD1 + entry;
+        String result = note + type + m2ma + ma7 + sl2ma;
         if (result.length() > 255) {
             // result = result.substring(0, 250) + "...";
         }
@@ -3228,7 +3215,7 @@ public class BinanceServiceImpl implements BinanceService {
         // -------------------------------------------------------------
 
         result = Utils.getTimeHHmm() + " " + symbol.toUpperCase() + " " + Utils.removeLastZero(current_price) + m2ma
-                + entry;
+                + sl2ma;
 
         result += Utils.new_line_from_bot;
         result += W1 + D1 + Utils.new_line_from_bot;

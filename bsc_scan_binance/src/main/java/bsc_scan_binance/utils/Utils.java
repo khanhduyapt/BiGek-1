@@ -65,6 +65,7 @@ public class Utils {
     public static final String TREND_LONG = "Long";
     public static final String TREND_SHORT = "Short";
     public static final String TREND_DANGER = "(Danger)";
+    public static final String TREND_OPPOSITE = "Opposite";
     public static final String TREND_STOP_LONG = "Stop:Long";
 
     public static final int MA_INDEX_STOP_LONG_H4 = 8;
@@ -1961,7 +1962,7 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check3and8 = isMa3AboveMa8_Long(list_find_entry) ? TREND_SHORT : TREND_LONG;
+            String check3and8 = isMa3AboveMa8_Long(list_find_entry) ? TREND_LONG : TREND_SHORT;
 
             List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp);
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_find_entry.subList(0, 15));
@@ -2190,9 +2191,9 @@ public class Utils {
     }
 
     public static boolean maIsUptrend(List<BtcFutures> list, int maIndex) {
-        BigDecimal ma_slow_c = calcMA(list, maIndex, 1);
-        BigDecimal ma_slow_p = calcMA(list, maIndex, 2);
-        if (ma_slow_c.compareTo(ma_slow_p) > 0) {
+        BigDecimal ma_c = calcMA(list, maIndex, 1);
+        BigDecimal ma_p = calcMA(list, maIndex, 2);
+        if (ma_c.compareTo(ma_p) > 0) {
             return true;
         }
 
