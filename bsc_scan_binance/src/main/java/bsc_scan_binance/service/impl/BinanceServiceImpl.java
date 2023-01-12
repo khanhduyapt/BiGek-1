@@ -974,7 +974,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 css.setRange_volume(sl_e_tp[3]);
 
                                 if (sl_e_tp[3].contains(Utils.TREND_DANGER)) {
-                                    css.setRange_volume_css("text-danger font-weight-bold");
+                                    css.setRange_volume_css("text-danger");
                                 }
 
                                 if (sl_e_tp[0].contains("SL(Short_")) {
