@@ -2037,6 +2037,50 @@ public class Utils {
         return str_ma_size;
     }
 
+    public static boolean is3CuttingUp50ForLongH1(List<BtcFutures> list) {
+        if (list.size() < 50) {
+            return false;
+        }
+
+        if (maIsUptrend(list, 3) && maIsUptrend(list, 8)) {
+            List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(1, 2));
+            BigDecimal low = low_heigh.get(1);
+            BigDecimal ma_3_c = calcMA(list, 3, 1);
+            BigDecimal ma_8_c = calcMA(list, 8, 1);
+            BigDecimal ma_50_c = calcMA(list, 50, 1);
+
+            if ((ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(low) > 0)
+                    && (ma_3_c.compareTo(ma_8_c) > 0) && (ma_8_c.compareTo(low) > 0)) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean is3CuttingDown50ForShortH1(List<BtcFutures> list) {
+        if (list.size() < 50) {
+            return false;
+        }
+
+        if (!(maIsUptrend(list, 3) && maIsUptrend(list, 8))) {
+            List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(1, 2));
+            BigDecimal heigh = low_heigh.get(1);
+            BigDecimal ma_3_c = calcMA(list, 3, 1);
+            BigDecimal ma_8_c = calcMA(list, 8, 1);
+            BigDecimal ma_50_c = calcMA(list, 50, 1);
+
+            if ((ma_3_c.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(heigh) < 0)
+                    && (ma_3_c.compareTo(ma_8_c) < 0) && (ma_8_c.compareTo(heigh) < 0)) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static boolean is3CuttingUp50ForLong(List<BtcFutures> list) {
         if (list.size() < 50) {
             return false;
@@ -2230,7 +2274,9 @@ public class Utils {
             if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
                 isCuttingUp = true;
             }
-
+            if (!isCuttingUp) {
+                isCuttingUp = is3CuttingUp50ForLongH1(list);
+            }
             if (!isCuttingUp) {
                 isCuttingUp = is3CuttingUp50ForLong(list);
             }
@@ -2245,6 +2291,9 @@ public class Utils {
 
             if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
                 isCuttingDown = true;
+            }
+            if (!isCuttingDown) {
+                isCuttingDown = is3CuttingDown50ForShortH1(list);
             }
             if (!isCuttingDown) {
                 isCuttingDown = is3CuttingDown50ForShort(list);
