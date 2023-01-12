@@ -2890,6 +2890,10 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgPerHour(String EVENT_ID, String msg_content) {
+        if (!Utils.isBusinessTime()) {
+            return;
+        }
+
         String msg = Utils.getMmDD_TimeHHmm();
         msg += msg_content;
 
@@ -3070,7 +3074,6 @@ public class BinanceServiceImpl implements BinanceService {
             return "";
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
-
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
 
         Boolean today_is_uptrend = Utils.isMa3AboveMa8_Long(list_days);
@@ -3119,11 +3122,11 @@ public class BinanceServiceImpl implements BinanceService {
                     TREND_H4_BTC_IS_DANGER = true;
                 }
 
-                String msg = Utils.checkMa3AndMa8_ForChangeStatus(list_days);
-                msg += Utils.checkMa3AndMa8_ForChangeStatus(list_h4);
+                String msg = Utils.checkMa3AndMa8_ForChangeStatus(list_h4);
 
                 if (Utils.isNotBlank(msg)) {
-                    String EVENT_CHECK_ID = EVENT_COMPRESSED_CHART + "_STATUS_" + Utils.getCurrentYyyyMmDd_Blog4h();
+                    String EVENT_CHECK_ID = EVENT_COMPRESSED_CHART + "_CHANGE_STATUS_H4_"
+                            + Utils.getCurrentYyyyMmDd_Blog4h();
                     sendMsgPerHour(EVENT_CHECK_ID, msg);
                 }
             }
@@ -3197,14 +3200,19 @@ public class BinanceServiceImpl implements BinanceService {
         note += ",L10w:" + Utils.getPercentToEntry(current_price, min_week, true) + ",";
         // ---------------------------------------------------------
         String position = "";
-        // if (Utils.checkMa3AndMa8_ForChangeStatus(list_h4).contains("Prepare Long")) {
-        // position = "_PositionH4";
-        // }
-        if (Utils.checkMa3AndMa8_ForChangeStatus(list_days).contains("Prepare Long")) {
+        String msg_D1_change = Utils.checkMa3AndMa8_ForChangeStatus(list_days);
+        if (msg_D1_change.contains("Prepare Long")) {
             position = "_PositionD1";
+
+            if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
+                String EVENT_CHECK_ID = EVENT_COMPRESSED_CHART + "_CHANGE_STATUS_D1_"
+                        + Utils.getYyyyMmDdHH_ChangeDailyChart();
+
+                sendMsgPerHour(EVENT_CHECK_ID, msg_D1_change);
+            }
         }
         if (scapLongD1.contains(Utils.TREND_DANGER) || scapLongH4.contains(Utils.TREND_DANGER)) {
-            position = "";
+            // position = "";
         }
         note += position;
         // ---------------------------------------------------------
