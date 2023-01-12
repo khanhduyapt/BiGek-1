@@ -2305,7 +2305,7 @@ public class Utils {
 
         String result = "";
         if (isCuttingUp) {
-            result = type + "Long (Chart:" + chart.trim().toUpperCase() + "):" + roundDefault(currPrice);
+            result = type + "Long(" + chart.trim().toUpperCase() + ") E:" + roundDefault(currPrice);
 
             List<BigDecimal> low_heigh = getLowHeightCandle(list);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
@@ -2313,11 +2313,11 @@ public class Utils {
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
             if (ma_fast_c.compareTo(max_allow_long) > 0) {
-                result += "(Range:Danger!!!!!!)";
+                result += TREND_DANGER;
                 // return "";
             }
         } else if (isCuttingDown) {
-            result = type + "Short (Chart:" + chart.trim().toUpperCase() + "):" + roundDefault(currPrice);
+            result = type + "Short(" + chart.trim().toUpperCase() + ") E:" + roundDefault(currPrice);
         }
 
         // --------------------------------------------------
@@ -2329,8 +2329,8 @@ public class Utils {
             List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
             BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
                     : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
-            BigDecimal ma_13 = calcMA(list, 13, 1);
-            List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, ma_13);
+
+            List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, currPrice);
 
             BigDecimal SL = fiboList.get(0);
             BigDecimal entry = fiboList.get(1);

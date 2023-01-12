@@ -1024,15 +1024,18 @@ public class BinanceServiceImpl implements BinanceService {
                     if (futu.contains("_Position")) {
                         if (futu.contains("_PositionH4")) {
                             futu = futu.replace("_PositionH4", "");
+
                             css.setRange_position("Long(H4)");
+                            css.setRange_position_css(CSS_PRICE_SUCCESS + " bg-success");
                         } else if (futu.contains("_PositionD1")) {
-                            css.setRange_position("Long(D1)");
+
                             futu = futu.replace("_PositionD1", "");
+
+                            css.setRange_position("Long(D1)");
+                            css.setRange_position_css(CSS_PRICE_SUCCESS + " bg-success");
                         }
 
                         msg_position += Utils.getStringValue(dto.getSymbol()) + ", ";
-
-                        css.setRange_position_css(CSS_PRICE_SUCCESS + " bg-success");
 
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
@@ -3147,15 +3150,15 @@ public class BinanceServiceImpl implements BinanceService {
 
         try {
             if (Utils.is3CuttingUp50ForLong(list_h4)) {
-                String note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG);
+                String history = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG);
 
                 PriorityCoinHistory his = new PriorityCoinHistory();
                 his.setGeckoid(gecko_id);
                 his.setSymbol(Utils.getMmDD_TimeHHmm());
-                if (note.length() > 255) {
-                    note = note.substring(0, 250) + "...";
+                if (history.length() > 255) {
+                    history = history.substring(0, 250) + "...";
                 }
-                his.setName(note);
+                his.setName(history);
 
                 priorityCoinHistoryRepository.save(his);
             }
@@ -3186,15 +3189,15 @@ public class BinanceServiceImpl implements BinanceService {
         note += ",L10w:" + Utils.getPercentToEntry(current_price, min_week, true) + ",";
         // ---------------------------------------------------------
         String position = "";
-        if (!scapLongOrShortH4.contains(Utils.TREND_DANGER)) {
-            if (Utils.checkMa3AndMa8_ForChangeStatus(list_h4).contains("Prepare Long")) {
-                position = "_PositionH4";
-            }
+        if (Utils.checkMa3AndMa8_ForChangeStatus(list_h4).contains("Prepare Long")) {
+            position = "_PositionH4";
         }
-        if (!scapLongOrShortD1.contains(Utils.TREND_DANGER)) {
-            if (Utils.checkMa3AndMa8_ForChangeStatus(list_days).contains("Prepare Long")) {
-                position = "_PositionD1";
-            }
+
+        if (Utils.checkMa3AndMa8_ForChangeStatus(list_days).contains("Prepare Long")) {
+            position = "_PositionD1";
+        }
+        if (scapLongOrShortD1.contains(Utils.TREND_DANGER) || scapLongOrShortH4.contains(Utils.TREND_DANGER)) {
+            position = "";
         }
         note += position;
         // ---------------------------------------------------------
