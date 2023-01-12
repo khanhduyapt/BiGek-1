@@ -914,32 +914,14 @@ public class BinanceServiceImpl implements BinanceService {
                             futu = futu.replace(ma7, "");
                             ma7 = ma7.replace("_ma7(", "").replace(")~", "");
 
-                            if (Utils.isNotBlank(ma7)) {
-                                if (ma7.contains("Above")) {
-                                    css.setDt_range_css("text-primary");
-                                    ma7 = ma7.replace("Above_", "");
-                                } else if (ma7.contains("Below")) {
-                                    css.setDt_range_css("text-danger");
-                                    ma7 = ma7.replace("Below_", "");
-                                }
+                            if (ma7.contains(Utils.TREND_DANGER)) {
+                                css.setDt_range_css("text-danger");
                             }
+                            if (ma7.contains(Utils.TREND_STOP_LONG)) {
+                                css.setDt_range_css("text-danger font-weight-bold");
+                            }
+
                             css.setOco_opportunity(ma7);
-
-                            if (ma7.contains(TREND_LONG)
-                                    || (market_cap.compareTo(BigDecimal.valueOf(1000000000)) > 0)) {
-
-                                if (ma7.contains("Long_1h")) {
-                                    css.setDt_range_css("text-primary");
-                                }
-                                if (ma7.contains("Short_1h")) {
-                                    css.setDt_range_css("text-danger");
-                                }
-                                if (ma7.contains(Utils.TREND_DANGER)) {
-                                    css.setDt_range_css("text-danger");
-                                }
-
-                                css.setOco_opportunity(ma7);
-                            }
 
                         } catch (Exception e) {
                             css.setRange_move("ma7 exception");
@@ -960,19 +942,16 @@ public class BinanceServiceImpl implements BinanceService {
 
                             m2ma = m2ma.replace("m2ma{", "").replace("move", "");
 
-                            if (m2ma.contains("↑D")) {
+                            if (m2ma.contains("↑")) {
                                 css.setRange_move_css(CSS_PRICE_WHITE);
-                            } else if (m2ma.contains("↑W")) {
-                                css.setRange_move_css(CSS_PRICE_SUCCESS);
                             } else if (m2ma.contains("↓")) {
                                 css.setRange_move_css(CSS_PRICE_WARNING);
                             }
-                            css.setRange_move(m2ma);
+                            css.setRange_move(m2ma.replace("↑", "").replace("↓", ""));
 
                         } catch (Exception e) {
                             css.setRange_move("m2ma exception");
                         }
-
                     }
 
                     if (futu.contains("sl2ma{") && futu.contains("}sl2ma")) {
@@ -3077,10 +3056,10 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         type = type + Utils.analysisVolume(list_h4);
         BigDecimal current_price = list_days.get(0).getCurrPrice();
-        String scapLongOrShortH4 = Utils.getScapLong(list_h4, list_days, 10);
 
-        String scapLongOrShortD1 = Utils.getScapLong(list_days, list_days, 10);
-        String checkD1 = "_ma7(" + scapLongOrShortD1 + ")~";
+        String scapLongH4 = "";
+        String scapLongD1 = Utils.getScapLong(list_days, list_days, 10);
+        String checkD1 = "_ma7(" + scapLongD1 + ")~";
 
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
@@ -3089,7 +3068,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            scapLongOrShortH4 = Utils.getScapLongOrShort_BTC(list_h4, list_days, 10);
+            scapLongH4 = Utils.getScapLongOrShort_BTC(list_h4, list_days, 10);
 
             if (Objects.equals("BTC", symbol)) {
 
@@ -3140,12 +3119,16 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } else if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
+            scapLongH4 = Utils.getScapLong(list_h4, list_days, 10);
+
             if (TREND_H4_BTC_IS_LONG && !TREND_H4_BTC_IS_DANGER) {
                 checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 50, false);
                 if (Utils.isBlank(checkMa3AndX)) {
                     checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_LONG, 21, false);
                 }
             }
+        } else {
+            scapLongH4 = Utils.getScapLong(list_h4, list_days, 10);
         }
 
         try {
@@ -3196,7 +3179,7 @@ public class BinanceServiceImpl implements BinanceService {
         if (Utils.checkMa3AndMa8_ForChangeStatus(list_days).contains("Prepare Long")) {
             position = "_PositionD1";
         }
-        if (scapLongOrShortD1.contains(Utils.TREND_DANGER) || scapLongOrShortH4.contains(Utils.TREND_DANGER)) {
+        if (scapLongD1.contains(Utils.TREND_DANGER) || scapLongH4.contains(Utils.TREND_DANGER)) {
             position = "";
         }
         note += position;
@@ -3210,14 +3193,14 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
         String mUpMa = "";
         boolean chartDUpMa10 = Utils.isAboveMALine(list_days, Utils.getSlowIndex(list_days), 0);
-        mUpMa += chartDUpMa10 ? "↑D(Long) " : " ";
+        String today = Utils.getToday_MMdd();
+        mUpMa += chartDUpMa10 ? "↑" + today + "(Long) " : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move" + mUpMa.trim();
         }
 
         String mDownMa = "";
-        // boolean chartDTodayCutDown = Utils.isBelowMALine(list_days, 10, 0);
-        mDownMa += !chartDUpMa10 ? "↓D(Short) " : "";
+        mDownMa += !chartDUpMa10 ? "↓" + today + "(Short) " : "";
 
         if (Utils.isNotBlank(mDownMa)) {
             if (Utils.isNotBlank(mUpMa)) {
@@ -3231,9 +3214,9 @@ public class BinanceServiceImpl implements BinanceService {
 
         // H4 sl2ma
         String entry = "";
-        if (Utils.isNotBlank(scapLongOrShortH4)) {
-            scapLongOrShortH4 = scapLongOrShortH4.replace("_" + symbol.toUpperCase() + "_", "_");
-            entry = " sl2ma{" + scapLongOrShortH4 + "}sl2ma";
+        if (Utils.isNotBlank(scapLongH4)) {
+            scapLongH4 = scapLongH4.replace("_" + symbol.toUpperCase() + "_", "_");
+            entry = " sl2ma{" + scapLongH4 + "}sl2ma";
         }
         // ---------------------------------------------------------
 

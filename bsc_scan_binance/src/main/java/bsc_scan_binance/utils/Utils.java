@@ -670,6 +670,10 @@ public class Utils {
         return Utils.convertDateToString("yyyy.MM.dd", Calendar.getInstance().getTime());
     }
 
+    public static String getToday_MMdd() {
+        return Utils.convertDateToString("MM.dd", Calendar.getInstance().getTime());
+    }
+
     public static String getToday_dd() {
         return Utils.convertDateToString("dd", Calendar.getInstance().getTime());
     }
