@@ -938,7 +938,7 @@ public class BinanceServiceImpl implements BinanceService {
                                     css.setDt_range_css("text-danger");
                                 }
 
-                                css.setOco_opportunity(ma7.replace(Utils.TREND_DANGER, ""));
+                                css.setOco_opportunity(ma7);
                             }
 
                         } catch (Exception e) {
@@ -1022,11 +1022,16 @@ public class BinanceServiceImpl implements BinanceService {
                     }
 
                     if (futu.contains("_Position")) {
-                        futu = futu.replace("_Position", "");
+                        if (futu.contains("_PositionH4")) {
+                            futu = futu.replace("_PositionH4", "");
+                            css.setRange_position("Long(H4)");
+                        } else if (futu.contains("_PositionD1")) {
+                            css.setRange_position("Long(D1)");
+                            futu = futu.replace("_PositionD1", "");
+                        }
 
                         msg_position += Utils.getStringValue(dto.getSymbol()) + ", ";
 
-                        css.setRange_position("Long(H4)");
                         css.setRange_position_css(CSS_PRICE_SUCCESS + " bg-success");
 
                         css.setRange_wdh_css("text-primary");
@@ -1159,16 +1164,16 @@ public class BinanceServiceImpl implements BinanceService {
                 index += 1;
             }
 
-            if ((count_stop_long > 0) || Utils.isNotBlank(msg_position)) {
-                String EVENT_ID = EVENT_COMPRESSED_CHART + "_POSITION_" + Utils.getCurrentYyyyMmDd_Blog4h();
-                msg_position = msg_position.replace(" ", "");
-                if (msg_position.length() > 100) {
-                    msg_position = msg_position.substring(0, 100) + "...";
-                }
-
-                sendMsgPerHour(EVENT_ID, Utils.new_line_from_service + TREND_STOP_LONG + "(" + count_stop_long
-                        + "):Total(" + list.size() + ")" + Utils.new_line_from_service + "Position:" + msg_position);
-            }
+            //if ((count_stop_long > 0) || Utils.isNotBlank(msg_position)) {
+            //    String EVENT_ID = EVENT_COMPRESSED_CHART + "_POSITION_" + Utils.getCurrentYyyyMmDd_Blog4h();
+            //    msg_position = msg_position.replace(" ", "");
+            //    if (msg_position.length() > 100) {
+            //        msg_position = msg_position.substring(0, 100) + "...";
+            //    }
+            //
+            //    sendMsgPerHour(EVENT_ID, Utils.new_line_from_service + TREND_STOP_LONG + "(" + count_stop_long
+            //            + "):Total(" + list.size() + ")" + Utils.new_line_from_service + "Position:" + msg_position);
+            //}
 
             return list;
 
@@ -3071,6 +3076,9 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
         String scapLongOrShortH4 = Utils.getScapLong(list_h4, list_days, 10);
 
+        String scapLongOrShortD1 = Utils.getScapLong(list_days, list_days, 10);
+        String checkD1 = "_ma7(" + scapLongOrShortD1 + ")~";
+
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         String SPOT_TOKEN = "_HOOK_HFT_APT_GMX_TWT_";
@@ -3176,10 +3184,19 @@ public class BinanceServiceImpl implements BinanceService {
         note += ",L10d:" + Utils.getPercentToEntry(current_price, min_days, true);
         note += ",H10d:" + Utils.getPercentToEntry(current_price, max_days, false);
         note += ",L10w:" + Utils.getPercentToEntry(current_price, min_week, true) + ",";
-        if (Utils.isNotBlank(Utils.checkMa3AndMa8_ForChangeStatus(list_h4))) {
-            note += "_Position";
+        // ---------------------------------------------------------
+        String position = "";
+        if (!scapLongOrShortH4.contains(Utils.TREND_DANGER)) {
+            if (Utils.checkMa3AndMa8_ForChangeStatus(list_h4).contains("Prepare Long")) {
+                position = "_PositionH4";
+            }
         }
-
+        if (!scapLongOrShortD1.contains(Utils.TREND_DANGER)) {
+            if (Utils.checkMa3AndMa8_ForChangeStatus(list_days).contains("Prepare Long")) {
+                position = "_PositionD1";
+            }
+        }
+        note += position;
         // ---------------------------------------------------------
         String curr_week_day_trending = W1 + D1;
         if (Objects.equals("BTC", symbol)) {
@@ -3190,14 +3207,14 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
         String mUpMa = "";
         boolean chartDUpMa10 = Utils.isAboveMALine(list_days, Utils.getSlowIndex(list_days), 0);
-        mUpMa += chartDUpMa10 ? "↑D(ma" + Utils.getSlowIndex(list_days) + ") " : " ";
+        mUpMa += chartDUpMa10 ? "↑D(Long) " : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move" + mUpMa.trim();
         }
 
         String mDownMa = "";
         // boolean chartDTodayCutDown = Utils.isBelowMALine(list_days, 10, 0);
-        mDownMa += !chartDUpMa10 ? "↓D(ma" + Utils.getSlowIndex(list_days) + ") " : "";
+        mDownMa += !chartDUpMa10 ? "↓D(Short) " : "";
 
         if (Utils.isNotBlank(mDownMa)) {
             if (Utils.isNotBlank(mUpMa)) {
@@ -3208,9 +3225,6 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}m2ma";
-
-        String scapLongOrShortD1 = Utils.getScapLong(list_days, list_days, 10);
-        String checkD1 = "_ma7(" + scapLongOrShortD1 + ")~";
 
         // H4 sl2ma
         String entry = "";
