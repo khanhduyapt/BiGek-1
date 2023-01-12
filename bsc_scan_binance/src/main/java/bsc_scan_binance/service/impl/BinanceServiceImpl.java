@@ -925,7 +925,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 css.setDt_range_css("text-danger");
                             }
                             if (ma7.contains(Utils.TREND_STOP_LONG)) {
-                                css.setDt_range_css("text-danger font-weight-bold");
+                                css.setDt_range_css("text-danger");
                             }
                         } catch (Exception e) {
                             css.setRange_move("ma7 exception");
@@ -990,7 +990,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 }
                             } else {
                                 css.setRange_stoploss(sl2ma);
-                                css.setRange_stoploss_css("text-danger font-weight-bold");
+                                css.setRange_stoploss_css("text-danger");
                             }
                         } catch (Exception e) {
                             css.setRange_move("sl2ma exception");
