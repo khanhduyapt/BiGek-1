@@ -2732,7 +2732,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     @Transactional
     public String wallToday() {
-        String key = Utils.getTimeChangeDailyChart();
+        String key = Utils.getYyyyMmDdHH_ChangeDailyChart();
 
         BigDecimal WALL_3 = BigDecimal.valueOf(4);
 
@@ -3058,9 +3058,16 @@ public class BinanceServiceImpl implements BinanceService {
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         String SPOT_TOKEN = "_HOOK_HFT_APT_GMX_TWT_";
+
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, "15m", 1);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
+
+            String msg_day = Utils.checkMa3AndX(list_days, Utils.getSlowIndex(list_days), false, "");
+            if (Utils.isNotBlank(msg_day)) {
+                String DAY_EVENT_ID = EVENT_BTC_RANGE + "_" + symbol + "_" + Utils.getYyyyMmDdHH_ChangeDailyChart();
+                sendMsgPerHour(DAY_EVENT_ID, msg_day);
+            }
 
             scapLongH4 = Utils.getScapLongOrShort_BTC(list_h4, list_days, 10);
 

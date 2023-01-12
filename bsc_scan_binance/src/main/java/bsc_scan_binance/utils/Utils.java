@@ -647,7 +647,7 @@ public class Utils {
         return value;
     }
 
-    public static String getTimeChangeDailyChart() {
+    public static String getYyyyMmDdHH_ChangeDailyChart() {
         Calendar calendar = Calendar.getInstance();
 
         int hh = Utils.getIntValue(Utils.convertDateToString("HH", calendar.getTime()));
