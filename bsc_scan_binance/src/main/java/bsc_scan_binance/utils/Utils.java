@@ -2049,8 +2049,8 @@ public class Utils {
             BigDecimal ma_8_c = calcMA(list, 8, 1);
             BigDecimal ma_50_c = calcMA(list, 50, 1);
 
-            if ((ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(low) > 0)
-                    && (ma_3_c.compareTo(ma_8_c) > 0) && (ma_8_c.compareTo(low) > 0)) {
+            if ((ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(low) > 0) && (ma_3_c.compareTo(ma_8_c) > 0)
+                    && (ma_8_c.compareTo(low) > 0)) {
 
                 return true;
             }
@@ -2071,8 +2071,8 @@ public class Utils {
             BigDecimal ma_8_c = calcMA(list, 8, 1);
             BigDecimal ma_50_c = calcMA(list, 50, 1);
 
-            if ((ma_3_c.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(heigh) < 0)
-                    && (ma_3_c.compareTo(ma_8_c) < 0) && (ma_8_c.compareTo(heigh) < 0)) {
+            if ((ma_3_c.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(heigh) < 0) && (ma_3_c.compareTo(ma_8_c) < 0)
+                    && (ma_8_c.compareTo(heigh) < 0)) {
 
                 return true;
             }
@@ -2223,12 +2223,12 @@ public class Utils {
 
         if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
                 && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-            return "(" + symbol + ") Stop:Short, Prepare Long.";
+            return "(" + getChartName(list) + ") (" + symbol + ") Stop:Short, Prepare Long.";
         }
 
         if ((ma_fast_c.compareTo(ma_fast_p) < 0) && (ma_fast_c.compareTo(ma_slow_c) < 0)
                 && (ma_slow_p.compareTo(ma_fast_p) < 0)) {
-            return "(" + symbol + ") Stop:Long, Prepare Short.";
+            return "(" + getChartName(list) + ") (" + symbol + ") Stop:Long, Prepare Short.";
         }
 
         return "";
@@ -2378,69 +2378,79 @@ public class Utils {
         }
 
         // --------------------------------------------------
+        try {
 
-        if (isNotBlank(result)) {
-            symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
-            int usd = 10;
-            boolean isLong = result.contains(TREND_LONG);
-            List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
-            BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
-                    : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
+            if (isNotBlank(result)) {
+                symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
+                int usd = 10;
+                boolean isLong = result.contains(TREND_LONG);
+                List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
+                BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
+                        : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
 
-            List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, currPrice);
+                List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, currPrice);
 
-            BigDecimal SL = fiboList.get(0);
-            BigDecimal entry = fiboList.get(1);
-            BigDecimal TP1 = fiboList.get(2);
-            BigDecimal TP2 = fiboList.get(3);
-            BigDecimal TP3 = fiboList.get(4);
+                BigDecimal SL = fiboList.get(0);
+                BigDecimal entry = fiboList.get(1);
+                // BigDecimal TP1 = fiboList.get(2);
+                // BigDecimal TP2 = fiboList.get(3);
+                BigDecimal TP3 = fiboList.get(4);
 
-            BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-            vol = formatPrice(vol.multiply(entry).abs(), 0);
-
-            BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-            earn1 = formatPrice(vol.multiply(earn1), 1);
-
-            result += ",SL(" + getChartName(list) + "): " + getPercentToEntry(entry, SL, true);
-            result += ",E: " + removeLastZero(entry) + "$";
-            result += ",TP: " + getPercentToEntry(entry, TP1, isLong);
-            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn1) + "$";
-
-            if (showDetail) {
-                int start_index = 0;
-                BigDecimal temp = isLong ? low_heigh.get(0) : low_heigh.get(1);
-                for (int index = 0; index <= 13; index++) {
-                    if (index < list.size()) {
-                        BtcFutures dto = list.get(index);
-                        if (isLong) {
-                            if (temp.compareTo(dto.getLow_price()) >= 0) {
-                                start_index = index;
-                            }
-                        } else {
-                            if (temp.compareTo(dto.getHight_price()) <= 0) {
-                                start_index = index;
-                            }
-                        }
-                    }
-                }
-                String timing1 = timingTarget(chart, start_index);
-                String timing2 = timingTarget(chart, start_index * 5);
-
-                BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-                earn2 = formatPrice(vol.multiply(earn2), 1);
+                BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
+                vol = formatPrice(vol.multiply(entry).abs(), 0);
 
                 BigDecimal earn3 = TP3.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
                 earn3 = formatPrice(vol.multiply(earn3), 1);
 
-                result += ",TP2: " + getPercentToEntry(entry, TP2, isLong) + "..." + removeLastZero(earn2) + "$";
-                result += ",TP3: " + getPercentToEntry(entry, TP3, isLong) + "..." + removeLastZero(earn3) + "$";
-                if (isNotBlank(timing1 + timing2)) {
-                    result += ",STOP(-): " + timing1 + ",END:" + timing2;
-                }
-            }
+                result += ",SL(" + getChartName(list) + "): " + getPercentToEntry(entry, SL, true);
+                result += ",E: " + removeLastZero(entry) + "$";
+                result += ",TP: " + getPercentToEntry(entry, TP3, isLong);
+                result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn3)
+                        + "$";
 
-            // String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
-            // System.out.println(log);
+                if (showDetail) {
+                    int start_index = 0;
+                    BigDecimal temp = isLong ? low_heigh.get(0) : low_heigh.get(1);
+                    for (int index = 0; index <= 13; index++) {
+                        if (index < list.size()) {
+                            BtcFutures dto = list.get(index);
+                            if (isLong) {
+                                if (temp.compareTo(dto.getLow_price()) >= 0) {
+                                    start_index = index;
+                                }
+                            } else {
+                                if (temp.compareTo(dto.getHight_price()) <= 0) {
+                                    start_index = index;
+                                }
+                            }
+                        }
+                    }
+                    String timing2 = timingTarget(chart, start_index * 5);
+                    // BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10,
+                    // RoundingMode.CEILING);
+                    // earn1 = formatPrice(vol.multiply(earn1), 1);
+
+                    // BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10,
+                    // RoundingMode.CEILING);
+                    // earn2 = formatPrice(vol.multiply(earn2), 1);
+
+                    // BigDecimal earn3 = TP3.subtract(entry).abs().divide(entry, 10,
+                    // RoundingMode.CEILING);
+                    // earn3 = formatPrice(vol.multiply(earn3), 1);
+
+                    // result += ",TP2: " + getPercentToEntry(entry, TP2, isLong) + ":" +
+                    // removeLastZero(earn2) + "$";
+                    // result += ",TP2: " + getPercentToEntry(entry, TP3, isLong) + ":" +
+                    // removeLastZero(earn3) + "$";
+                    if (isNotBlank(timing2)) {
+                        result += ",END:" + timing2;
+                    }
+                }
+
+                // String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
+                // System.out.println(log);
+            }
+        } catch (Exception e) {
         }
 
         if (!showDetail) {
