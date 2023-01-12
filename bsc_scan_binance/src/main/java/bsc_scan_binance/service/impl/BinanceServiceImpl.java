@@ -3115,7 +3115,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } else {
             scapLongH4 = Utils.TREND_DANGER;
-            scapLongD1 = Utils.TREND_DANGER;
         }
 
         try {
