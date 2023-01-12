@@ -152,6 +152,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_TREND_1W1D = "1W1D";
     private static final String EVENT_COMPRESSED_CHART = "Ma3_10_20_";
     private static final String EVENT_PUMP = "Pump_1";
+    private static final String SEPARATE_D1_AND_H1 = "1DH1";
 
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
     private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-1";
@@ -909,15 +910,23 @@ public class BinanceServiceImpl implements BinanceService {
                             futu = futu.replace(ma7, "");
                             ma7 = ma7.replace("_ma7(", "").replace(")~", "");
 
+                            String[] arr_ma7 = ma7.split(SEPARATE_D1_AND_H1);
+                            if (arr_ma7.length == 2) {
+                                String range_entry_d1 = arr_ma7[0];
+                                String range_entry_h1 = arr_ma7[1];
+
+                                css.setOco_opportunity(range_entry_d1);
+                                css.setRange_entry_h1(range_entry_h1);
+                            } else {
+                                css.setOco_opportunity(ma7.replace(SEPARATE_D1_AND_H1, ""));
+                            }
+
                             if (ma7.contains(Utils.TREND_DANGER)) {
                                 css.setDt_range_css("text-danger");
                             }
                             if (ma7.contains(Utils.TREND_STOP_LONG)) {
                                 css.setDt_range_css("text-danger font-weight-bold");
                             }
-
-                            css.setOco_opportunity(ma7);
-
                         } catch (Exception e) {
                             css.setRange_move("ma7 exception");
                         }
@@ -3064,7 +3073,8 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         String scapLongH4 = "";
-        String scapLongD1 = Utils.getScapLong(list_days, list_days, 10);
+        String scapLongD1 = Utils.getScapLong(list_days, list_days, 10) + SEPARATE_D1_AND_H1
+                + Utils.checkMa3AndX(list_h1, 50, false, "");
 
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
