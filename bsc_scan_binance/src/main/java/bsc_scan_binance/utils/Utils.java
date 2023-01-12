@@ -2271,36 +2271,39 @@ public class Utils {
         boolean isCuttingUp = false;// Long
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
 
-            if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-                isCuttingUp = true;
-            }
-            if (!isCuttingUp) {
+            if (symbol.contains("_1h_")) {
                 isCuttingUp = is3CuttingUp50ForLongH1(list);
+            } else {
+                if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
+                    isCuttingUp = true;
+                }
+                if (!isCuttingUp) {
+                    isCuttingUp = is3CuttingUp50ForLong(list);
+                }
+                if (isCuttingUp && !isMa_fast_Up) {
+                    isCuttingUp = false;
+                }
             }
-            if (!isCuttingUp) {
-                isCuttingUp = is3CuttingUp50ForLong(list);
-            }
-            if (isCuttingUp && !isMa_fast_Up) {
-                isCuttingUp = false;
-            }
+
         }
 
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
-
-            if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
-                isCuttingDown = true;
-            }
-            if (!isCuttingDown) {
-                isCuttingDown = is3CuttingDown50ForShortH1(list);
-            }
-            if (!isCuttingDown) {
+            if (symbol.contains("_1h_")) {
                 isCuttingDown = is3CuttingDown50ForShort(list);
+            } else {
+                if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
+                    isCuttingDown = true;
+                }
+                if (!isCuttingDown) {
+                    isCuttingDown = is3CuttingDown50ForShortH1(list);
+                }
+                if (isCuttingDown && isMa_fast_Up) {
+                    isCuttingDown = false;
+                }
             }
-            if (isCuttingDown && isMa_fast_Up) {
-                isCuttingDown = false;
-            }
+
         }
 
         // -----------------------------------------------
