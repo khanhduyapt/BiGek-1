@@ -3136,19 +3136,18 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         }
-        if (!Utils.isMa3AboveMa8_Long(list_h4)) {
-            scapLongOrShortH4 = TREND_STOP_LONG;
-        }
 
         try {
-            if (Utils.isNotBlank(checkMa3AndX)) {
+            if (Utils.is3CuttingUp50ForLong(list_h4)) {
+                String note = Utils.checkMa3AndX(list_h4, Utils.getSlowIndex(list_h4), true, TREND_LONG);
+
                 PriorityCoinHistory his = new PriorityCoinHistory();
                 his.setGeckoid(gecko_id);
                 his.setSymbol(Utils.getMmDD_TimeHHmm());
-                if (checkMa3AndX.length() > 255) {
-                    checkMa3AndX = checkMa3AndX.substring(0, 250) + "...";
+                if (note.length() > 255) {
+                    note = note.substring(0, 250) + "...";
                 }
-                his.setName(checkMa3AndX);
+                his.setName(note);
 
                 priorityCoinHistoryRepository.save(his);
             }
@@ -3210,10 +3209,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String m2ma = " m2ma{" + (mUpMa.trim() + " " + mDownMa.trim()).trim() + "}m2ma";
 
-        String scapLongOrShortD1 = Utils.checkMa3AndX(list_days, Utils.getSlowIndex(list_days), false, TREND_H4_BTC);
-        if (!Utils.isMa3AboveMa8_Long(list_days)) {
-            scapLongOrShortD1 = TREND_STOP_LONG;
-        }
+        String scapLongOrShortD1 = Utils.getScapLong(list_days, list_days, 10);
         String checkD1 = "_ma7(" + scapLongOrShortD1 + ")~";
 
         // H4 sl2ma

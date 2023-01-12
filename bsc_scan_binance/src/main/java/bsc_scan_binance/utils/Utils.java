@@ -65,6 +65,8 @@ public class Utils {
     public static final String TREND_LONG = "Long";
     public static final String TREND_SHORT = "Short";
     public static final String TREND_DANGER = "(Danger)";
+    public static final String TREND_STOP_LONG = "Stop:Long";
+
     public static final int MA_INDEX_STOP_LONG_H4 = 8;
     public static final int MA_INDEX_STOP_LONG_D1 = 5;
     public static final int MA_INDEX_CURRENCY = 21;
@@ -1906,6 +1908,10 @@ public class Utils {
 
     public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
+            if (!Utils.isMa3AboveMa8_Long(list_entry)) {
+                return "(" + getChartName(list_entry) + ")" + TREND_STOP_LONG;
+            }
+
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
             List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_tp);
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_entry.subList(0, 15));
@@ -1941,7 +1947,7 @@ public class Utils {
                 result += TREND_DANGER;
             }
 
-            System.out.println(list_entry.get(0).getId() + ":" + result);
+            System.out.println("getScapLong= " + list_entry.get(0).getId() + ":" + result);
             return result;
 
         } catch (Exception e) {
@@ -1997,7 +2003,7 @@ public class Utils {
                 result += TREND_DANGER;
             }
 
-            System.out.println("getScapLongOrShort_BTC: " + result);
+            System.out.println("getScapLongOrShort_BTC= " + result);
 
             return result;
 
@@ -2379,11 +2385,13 @@ public class Utils {
             // System.out.println(log);
         }
 
-        if (isCuttingDown && isNotBlank(note_short)) {
-            result += ",," + note_short;
-        }
-        if (isCuttingUp && isNotBlank(note_long)) {
-            result += ",," + note_long;
+        if (!showDetail) {
+            if (isCuttingDown && isNotBlank(note_short)) {
+                result += ",," + note_short;
+            }
+            if (isCuttingUp && isNotBlank(note_long)) {
+                result += ",," + note_long;
+            }
         }
 
         if (!(result.contains(TREND_LONG) || result.contains(TREND_SHORT))) {
