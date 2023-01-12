@@ -3100,6 +3100,13 @@ public class BinanceServiceImpl implements BinanceService {
             if (Utils.isBlank(checkMa3AndX)) {
                 List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
                 checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_OF_BTC, 50, false);
+
+                //if (Utils.isBlank(checkMa3AndX)) {
+                //    String trend = Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) ? Utils.TREND_SHORT
+                //            : Utils.TREND_LONG;
+                //    String temp = sendMsgMonitorFibo(gecko_id, symbol, list_h1, trend, 50, false);
+                //}
+
             }
 
         } else if (Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !TREND_H4_BTC_IS_DANGER) {
@@ -3114,7 +3121,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } else {
-            scapLongH4 = Utils.TREND_DANGER;
+            scapLongH4 = "(H4)" + Utils.TREND_DANGER;
         }
 
         try {
