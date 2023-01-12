@@ -3066,15 +3066,12 @@ public class BinanceServiceImpl implements BinanceService {
         }
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
-        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
-        sendMsgMonitorFibo(gecko_id, symbol, list_h1, "", 50, false);
 
         type = type + Utils.analysisVolume(list_h4);
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         String scapLongH4 = "";
-        String scapLongD1 = Utils.getScapLong(list_days, list_days, 10) + SEPARATE_D1_AND_H1
-                + Utils.checkMa3AndX(list_h1, 50, false, "");
+        String scapLongD1 = Utils.getScapLong(list_days, list_days, 10);
 
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
@@ -3125,19 +3122,11 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
+
             if (Utils.isBlank(checkMa3AndX)) {
-
-                sendMsgMonitorFibo(gecko_id, symbol, list_h1, TREND_OF_BTC, 50, false);
-
-                if ((scapLongH4.contains(Utils.TREND_DANGER) || scapLongD1.contains(Utils.TREND_DANGER))) {
-                    String trend = Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) ? Utils.TREND_SHORT
-                            : Utils.TREND_LONG;
-
-                    String temp = sendMsgMonitorFibo(gecko_id, symbol, list_h1, trend, 50, false);
-                    if (Utils.isNotBlank(temp)) {
-                        scapLongD1 = temp;
-                    }
-                }
+                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+                String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, "", 50, false);
+                scapLongD1 += SEPARATE_D1_AND_H1 + temp_h1;
             }
 
         } else if (Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !TREND_H4_BTC_IS_DANGER) {
