@@ -1346,13 +1346,13 @@ public class Utils {
             return "m15";
         }
         if (symbol.contains("_1h_")) {
-            return "h1";
+            return "H1";
         }
         if (symbol.contains("_2h_")) {
-            return "h2";
+            return "H2";
         }
         if (symbol.contains("_4h_")) {
-            return "4h";
+            return "H4";
         }
         if (symbol.contains("_1d_")) {
             return "D1";

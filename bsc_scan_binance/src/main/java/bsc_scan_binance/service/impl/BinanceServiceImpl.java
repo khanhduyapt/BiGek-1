@@ -3059,7 +3059,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String scapLongH4 = "";
         String scapLongD1 = Utils.getScapLong(list_days, list_days, 10);
-        String checkD1 = "_ma7(" + scapLongD1 + ")~";
+        String checkD1 = "_ma7(" + scapLongD1.replace(",", " ") + ")~";
 
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
