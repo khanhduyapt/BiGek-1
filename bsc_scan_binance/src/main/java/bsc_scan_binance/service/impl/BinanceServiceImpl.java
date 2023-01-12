@@ -3105,10 +3105,12 @@ public class BinanceServiceImpl implements BinanceService {
         } else if (Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !TREND_H4_BTC_IS_DANGER) {
             scapLongH4 = Utils.getScapLong(list_h4, list_days, 10);
 
-            if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
-                checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
-                if (Utils.isBlank(checkMa3AndX)) {
-                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 21, false);
+            if (Utils.isBusinessTime()) {
+                if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
+                    checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
+                    if (Utils.isBlank(checkMa3AndX)) {
+                        checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 21, false);
+                    }
                 }
             }
         } else {
