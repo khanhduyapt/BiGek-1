@@ -2928,10 +2928,10 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (pre_HH_CheckUSD == Utils.getCurrentHH()) {
-                return;
+                //return;
             }
 
-            if (!Objects.equals(pre_Blog4H_CheckUSD, Utils.getCurrentYyyyMmDd_Blog4h())) {
+            if (!Objects.equals(pre_Blog4H_CheckUSD, Utils.getCurrentYyyyMmDd_Blog2h())) {
                 List<BtcFutures> list_H4_AUD = Utils.loadData("AUD", TIME_4h, 60);
                 List<BtcFutures> list_H4_EUR = Utils.loadData("EUR", TIME_4h, 60);
                 List<BtcFutures> list_H4_GBP = Utils.loadData("GBP", TIME_4h, 60);

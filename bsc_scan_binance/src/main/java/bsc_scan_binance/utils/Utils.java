@@ -2401,9 +2401,10 @@ public class Utils {
             BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn1 = formatPrice(vol.multiply(earn1), 1);
 
-            result += ",SL__: " + getPercentToEntry(entry, SL, true);
-            result += ",VOL: " + removeLastZero(vol).replace(".0", "") + "$...Loss:" + usd + "$";
-            result += ",TP1: " + getPercentToEntry(entry, TP1, isLong) + "..." + removeLastZero(earn1) + "$";
+            result += ",SL(" + getChartName(list) + "): " + getPercentToEntry(entry, SL, true);
+            result += ",E: " + removeLastZero(entry) + "$";
+            result += ",TP: " + getPercentToEntry(entry, TP1, isLong);
+            result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn1) + "$";
 
             if (showDetail) {
                 int start_index = 0;
