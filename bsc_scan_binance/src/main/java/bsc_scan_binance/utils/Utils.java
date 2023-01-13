@@ -68,8 +68,11 @@ public class Utils {
     public static final String TREND_OPPOSITE = "Opposite";
     public static final String TREND_STOP_LONG = "Stop:Long";
 
-    public static final int MA_INDEX_STOP_LONG_H4 = 8;
-    public static final int MA_INDEX_STOP_LONG_D1 = 5;
+    public static final int MA_INDEX_H4_STOP_LONG = 8;
+    public static final int MA_INDEX_H4_START_LONG = 21;
+    public static final int MA_INDEX_D1_STOP_LONG = 5;
+    public static final int MA_INDEX_D1_START_LONG = 5;
+
     public static final int MA_INDEX_CURRENCY = 21;
 
     public static String sql_OrdersProfitResponse = ""
@@ -1418,16 +1421,6 @@ public class Utils {
     }
 
     public static String analysisVolume(List<BtcFutures> list) {
-        int time_count = 0;
-        if (list.get(0).getId().contains("_4h_")) {
-            time_count = -4;
-        } else if (list.get(0).getId().contains("_2h_")) {
-            time_count = -2;
-        } else if (list.get(0).getId().contains("_1h_")) {
-            time_count = -1;
-        } else {
-            return "";
-        }
         BigDecimal avg_qty = BigDecimal.ZERO;
         int length = list.size();
         if (length > 13) {
@@ -1444,30 +1437,24 @@ public class Utils {
         if (count > 0) {
             avg_qty = avg_qty.divide(BigDecimal.valueOf(count), 0, RoundingMode.CEILING);
         }
-        BigDecimal tem_qty = avg_qty.multiply(BigDecimal.valueOf(1.2));
+        BigDecimal tem_qty = avg_qty.multiply(BigDecimal.valueOf(1));
         BigDecimal cur_qty_0 = list.get(0).getTrading_qty();
         BigDecimal pre_qty_1 = list.get(1).getTrading_qty();
+        BigDecimal pre_qty_2 = list.get(2).getTrading_qty();
+        String chart = " " + getChartName(list).replace("1", "");
 
         String result = "";
         if (cur_qty_0.compareTo(tem_qty) > 0) {
-            result += " " + getHH(0) + "h x" + formatPrice(cur_qty_0.divide(avg_qty, 2, RoundingMode.CEILING), 1);
-            if (list.get(0).isUptrend()) {
-                result += " pump!";
-            } else {
-                result += " dump!";
-            }
+            result += chart + "0x" + formatPrice(cur_qty_0.divide(avg_qty, 2, RoundingMode.CEILING), 1);
         }
 
         if (pre_qty_1.compareTo(tem_qty) > 0) {
-            result += " " + getHH(time_count) + "h x"
-                    + formatPrice(pre_qty_1.divide(avg_qty, 2, RoundingMode.CEILING), 1);
-            if (list.get(1).isUptrend()) {
-                result += " pump!";
-            } else {
-                result += " dump!";
-            }
+            result += chart + "1x" + formatPrice(pre_qty_1.divide(avg_qty, 2, RoundingMode.CEILING), 1);
         }
 
+        if (pre_qty_2.compareTo(tem_qty) > 0) {
+            result += chart + "2x" + formatPrice(pre_qty_2.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+        }
         result = result.trim().replace(".0", "");
 
         if (isNotBlank(result)) {
@@ -2042,7 +2029,7 @@ public class Utils {
             return false;
         }
 
-        if (maIsUptrend(list, 3) && maIsUptrend(list, 8)) {
+        if (isUptrendByMaIndex(list, 3) && isUptrendByMaIndex(list, 8)) {
             List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(1, 2));
             BigDecimal low = low_heigh.get(1);
             BigDecimal ma_3_c = calcMA(list, 3, 1);
@@ -2064,7 +2051,7 @@ public class Utils {
             return false;
         }
 
-        if (!(maIsUptrend(list, 3) && maIsUptrend(list, 8))) {
+        if (!(isUptrendByMaIndex(list, 3) && isUptrendByMaIndex(list, 8))) {
             List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(1, 2));
             BigDecimal heigh = low_heigh.get(1);
             BigDecimal ma_3_c = calcMA(list, 3, 1);
@@ -2191,9 +2178,9 @@ public class Utils {
         BigDecimal ma_slow_c;
 
         if (symbol.contains("_1d_")) {
-            ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG_D1, cur);
+            ma_slow_c = calcMA(list, MA_INDEX_D1_STOP_LONG, cur);
         } else {
-            ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG_H4, cur);
+            ma_slow_c = calcMA(list, MA_INDEX_H4_STOP_LONG, cur);
         }
 
         if (ma_fast_c.compareTo(ma_slow_c) > 0) {
@@ -2214,11 +2201,11 @@ public class Utils {
         BigDecimal ma_slow_p;
 
         if (symbol.contains("_1d_")) {
-            ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG_D1, cur);
-            ma_slow_p = calcMA(list, MA_INDEX_STOP_LONG_D1, pre);
+            ma_slow_c = calcMA(list, MA_INDEX_D1_STOP_LONG, cur);
+            ma_slow_p = calcMA(list, MA_INDEX_D1_STOP_LONG, pre);
         } else {
-            ma_slow_c = calcMA(list, MA_INDEX_STOP_LONG_H4, cur);
-            ma_slow_p = calcMA(list, MA_INDEX_STOP_LONG_H4, pre);
+            ma_slow_c = calcMA(list, MA_INDEX_H4_STOP_LONG, cur);
+            ma_slow_p = calcMA(list, MA_INDEX_H4_STOP_LONG, pre);
         }
 
         if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
@@ -2234,10 +2221,28 @@ public class Utils {
         return "";
     }
 
-    public static boolean maIsUptrend(List<BtcFutures> list, int maIndex) {
+    public static boolean isUptrendByMaIndex(List<BtcFutures> list, int maIndex) {
         BigDecimal ma_c = calcMA(list, maIndex, 1);
         BigDecimal ma_p = calcMA(list, maIndex, 2);
         if (ma_c.compareTo(ma_p) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isMa3CuttingUpX(List<BtcFutures> list, int slowIndex) {
+        int cur = 1;
+        int pre = 2;
+        int fastIndex = 3;
+        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
+        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
+
+        BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
+        BigDecimal ma_slow_p = calcMA(list, slowIndex, pre);
+
+        if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
+                && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
             return true;
         }
 

@@ -171,7 +171,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String TREND_H4_EUR = Utils.TREND_LONG;
     private String TREND_H4_GBP = Utils.TREND_LONG;
     private String TREND_OF_BTC = "";
-    private Boolean TREND_H4_BTC_IS_DANGER = true;
+    private Boolean RANGE_H4_BTC_IS_DANGER = true;
     private Boolean usd_is_uptrend_today = true;
 
     private String monitorBitcoinBalancesOnExchanges_temp = "";
@@ -931,13 +931,12 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
-                    // String history = Utils.getStringValue(dto.getBacker()).replace("_", "
-                    // ").replace(",,", ",")
-                    // .replace("...", " ").replace(",", ", ").replace(" ", " ").replace("Chart:",
-                    // "")
-                    // .replaceAll(" +", " ").replace(" :", ":");
-                    // history = Utils.isNotBlank(history) ? "History:" + history : "";
-                    // css.setRange_backer(history);
+                    String history = Utils.getStringValue(dto.getBacker()).replace("_", " ").replace(",,", ",")
+                            .replace("...", " ").replace(",", ", ").replace(" ", " ").replace("Chart:",
+                                    "")
+                            .replaceAll(" +", " ").replace(" :", ":");
+                    history = Utils.isNotBlank(history) ? "History:" + history : "";
+                    css.setRange_backer(history);
 
                     String m2ma = "";
                     if (futu.contains("m2ma{") && futu.contains("}m2ma")) {
@@ -2969,24 +2968,24 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
 
-                boolean IsUpAUD_3 = Utils.maIsUptrend(list_H4_AUD, 3);
-                boolean IsUpAUD_S = Utils.maIsUptrend(list_H4_AUD, Utils.MA_INDEX_CURRENCY);
+                boolean IsUpAUD_3 = Utils.isUptrendByMaIndex(list_H4_AUD, 3);
+                boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H4_AUD, Utils.MA_INDEX_CURRENCY);
                 if (IsUpAUD_3 == IsUpAUD_S) {
                     TREND_H4_AUD = IsUpAUD_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {
                     TREND_H4_AUD = Utils.TREND_OPPOSITE;
                 }
 
-                boolean IsUpEUR_3 = Utils.maIsUptrend(list_H4_EUR, 3);
-                boolean IsUpEUR_S = Utils.maIsUptrend(list_H4_EUR, Utils.MA_INDEX_CURRENCY);
+                boolean IsUpEUR_3 = Utils.isUptrendByMaIndex(list_H4_EUR, 3);
+                boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H4_EUR, Utils.MA_INDEX_CURRENCY);
                 if (IsUpEUR_3 == IsUpEUR_S) {
                     TREND_H4_EUR = IsUpEUR_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {
                     TREND_H4_EUR = Utils.TREND_OPPOSITE;
                 }
 
-                boolean IsUpGBP_3 = Utils.maIsUptrend(list_H4_GBP, 3);
-                boolean IsUpGBP_S = Utils.maIsUptrend(list_H4_GBP, Utils.MA_INDEX_CURRENCY);
+                boolean IsUpGBP_3 = Utils.isUptrendByMaIndex(list_H4_GBP, 3);
+                boolean IsUpGBP_S = Utils.isUptrendByMaIndex(list_H4_GBP, Utils.MA_INDEX_CURRENCY);
                 if (IsUpGBP_3 == IsUpGBP_S) {
                     TREND_H4_GBP = IsUpGBP_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {
@@ -3078,9 +3077,9 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
 
-        Boolean today_is_uptrend = Utils.isMa3AboveMa8_Long(list_days);
+        Boolean trend_today = Utils.isUptrendByMaIndex(list_days, Utils.MA_INDEX_D1_START_LONG);
 
-        type = type + Utils.analysisVolume(list_h4);
+        type = type + Utils.analysisVolume(list_days);
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         String scapLongH4 = "";
@@ -3104,16 +3103,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             if (Objects.equals("BTC", symbol)) {
 
-                boolean trend_h4 = Utils.maIsUptrend(list_h4, 3); // Utils.isMa3AboveMa8_Long(list_h4);
-                boolean trend_h8 = Utils.maIsUptrend(list_h4, 8);
-                boolean trend_day = Utils.maIsUptrend(list_h4, 21);// Utils.isMa3AboveMa8_Long(list_days);
-
-                TREND_OF_BTC = Utils.TREND_OPPOSITE;
-                if (trend_h4 == trend_day) {
-                    TREND_OF_BTC = trend_day ? Utils.TREND_LONG : Utils.TREND_SHORT;
-                } else if (trend_h4 == trend_h8) {
-                    TREND_OF_BTC = trend_h8 ? Utils.TREND_LONG : Utils.TREND_SHORT;
-                }
+                TREND_OF_BTC = trend_today ? Utils.TREND_LONG : Utils.TREND_SHORT;
 
                 List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_h4);
                 BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
@@ -3121,7 +3111,7 @@ public class BinanceServiceImpl implements BinanceService {
                 BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
                 if (current_price.compareTo(max_allow_long) > 0) {
-                    TREND_H4_BTC_IS_DANGER = true;
+                    RANGE_H4_BTC_IS_DANGER = true;
                 }
 
                 String msg = Utils.checkMa3AndMa8_ForChangeStatus(list_h4);
@@ -3141,7 +3131,7 @@ public class BinanceServiceImpl implements BinanceService {
                 scapLongD1 += SEPARATE_D1_AND_H1 + temp_h1;
             }
 
-        } else if (today_is_uptrend && Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !TREND_H4_BTC_IS_DANGER) {
+        } else if (trend_today && Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !RANGE_H4_BTC_IS_DANGER) {
             scapLongH4 = Utils.getScapLong(list_h4, list_days, 10);
 
             if (Utils.isBusinessTime()) {
@@ -3157,25 +3147,25 @@ public class BinanceServiceImpl implements BinanceService {
             scapLongH4 = "";// "(H4)" + Utils.TREND_DANGER;
         }
 
-        if (Objects.equals(TREND_OF_BTC, Utils.TREND_SHORT) || !today_is_uptrend) {
+        if (Objects.equals(TREND_OF_BTC, Utils.TREND_SHORT) || !trend_today) {
             scapLongD1 = "";
         }
 
         try {
-            // if (Utils.is3CuttingUp50ForLong(list_days)) {
-            // String history = Utils.checkMa3AndX(list_days, Utils.getSlowIndex(list_days),
-            // true, Utils.TREND_LONG);
-            //
-            // PriorityCoinHistory his = new PriorityCoinHistory();
-            // his.setGeckoid(gecko_id);
-            // his.setSymbol(Utils.getMmDD_TimeHHmm());
-            // if (history.length() > 255) {
-            // history = history.substring(0, 250) + "...";
-            // }
-            // his.setName(history);
-            //
-            // priorityCoinHistoryRepository.save(his);
-            // }
+            if (Utils.isMa3CuttingUpX(list_days, Utils.MA_INDEX_D1_START_LONG)) {
+                String history = Utils.checkMa3AndX(list_days, Utils.getSlowIndex(list_days),
+                        true, Utils.TREND_LONG).replace(" ", "");
+
+                PriorityCoinHistory his = new PriorityCoinHistory();
+                his.setGeckoid(gecko_id);
+                his.setSymbol(Utils.getMmDD_TimeHHmm());
+                if (history.length() > 255) {
+                    history = history.substring(0, 250) + "...";
+                }
+                his.setName(history);
+
+                priorityCoinHistoryRepository.save(his);
+            }
 
             CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
             if (!Objects.equals(null, entity)) {
@@ -3228,13 +3218,13 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
         String mUpMa = "";
         String today = Utils.getToday_MMdd();
-        mUpMa += today_is_uptrend ? "↑" + today + "(Up) " : " ";
+        mUpMa += trend_today ? "↑" + today + "(Up) " : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move" + mUpMa.trim();
         }
 
         String mDownMa = "";
-        mDownMa += !today_is_uptrend ? "↓" + today + "(Down) " : "";
+        mDownMa += !trend_today ? "↓" + today + "(Down) " : "";
 
         if (Utils.isNotBlank(mDownMa)) {
             if (Utils.isNotBlank(mUpMa)) {
