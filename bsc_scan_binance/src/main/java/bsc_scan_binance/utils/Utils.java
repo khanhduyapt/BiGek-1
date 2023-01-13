@@ -684,14 +684,13 @@ public class Utils {
 
     public static String getDD(int add) {
         if (add == 0) {
-            return "today";
-
+            return " Today ";
         }
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, add);
         String dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
-        String value = " (" + dayOfWeek + "." + Utils.convertDateToString("dd", calendar.getTime()) + ")";
+        String value = " (" + dayOfWeek + "." + Utils.convertDateToString("dd", calendar.getTime()) + ") ";
 
         return value;
     }
