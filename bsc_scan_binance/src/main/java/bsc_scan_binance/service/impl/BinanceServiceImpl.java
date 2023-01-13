@@ -3143,8 +3143,9 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
             }
-        } else {
-            scapLongH4 = "";// "(H4)" + Utils.TREND_DANGER;
+        } else if (trend_today) {
+            // scapLongH4 = "";// "(H4)" + Utils.TREND_DANGER;
+            // scapLongH4 = Utils.getScapLong(list_h4, list_days, 10);
         }
 
         if (Objects.equals(TREND_OF_BTC, Utils.TREND_SHORT) || !trend_today) {

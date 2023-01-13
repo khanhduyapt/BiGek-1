@@ -682,6 +682,20 @@ public class Utils {
         return Utils.convertDateToString("dd", Calendar.getInstance().getTime());
     }
 
+    public static String getDD(int add) {
+        if (add == 0) {
+            return "today";
+
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, add);
+        String dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
+        String value = " (" + dayOfWeek + "." + Utils.convertDateToString("dd", calendar.getTime()) + ")";
+
+        return value;
+    }
+
     public static String getDdFromToday(int dateadd) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, dateadd);
@@ -1421,6 +1435,11 @@ public class Utils {
     }
 
     public static String analysisVolume(List<BtcFutures> list) {
+        String symbol = list.get(0).getId();
+        if (!symbol.contains("_1d_")) {
+            return "";
+        }
+
         BigDecimal avg_qty = BigDecimal.ZERO;
         int length = list.size();
         if (length > 13) {
@@ -1441,24 +1460,24 @@ public class Utils {
         BigDecimal cur_qty_0 = list.get(0).getTrading_qty();
         BigDecimal pre_qty_1 = list.get(1).getTrading_qty();
         BigDecimal pre_qty_2 = list.get(2).getTrading_qty();
-        String chart = " " + getChartName(list).replace("1", "");
 
         String result = "";
         if (cur_qty_0.compareTo(tem_qty) > 0) {
-            result += chart + "0x" + formatPrice(cur_qty_0.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            result += getDD(0) + "x" + formatPrice(cur_qty_0.divide(avg_qty, 2, RoundingMode.CEILING), 1);
         }
 
         if (pre_qty_1.compareTo(tem_qty) > 0) {
-            result += chart + "1x" + formatPrice(pre_qty_1.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            result += getDD(-1) + "x" + formatPrice(pre_qty_1.divide(avg_qty, 2, RoundingMode.CEILING), 1);
         }
 
         if (pre_qty_2.compareTo(tem_qty) > 0) {
-            result += chart + "2x" + formatPrice(pre_qty_2.divide(avg_qty, 2, RoundingMode.CEILING), 1);
+            result += getDD(-2) + "x" + formatPrice(pre_qty_2.divide(avg_qty, 2, RoundingMode.CEILING), 1);
         }
+
         result = result.trim().replace(".0", "");
 
         if (isNotBlank(result)) {
-            result = "volma{" + result + "}volma";
+            result = "volma{Qty " + result + "}volma";
         }
 
         return result;
