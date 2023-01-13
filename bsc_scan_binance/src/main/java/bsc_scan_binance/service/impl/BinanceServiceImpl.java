@@ -3077,7 +3077,7 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
 
-        Boolean trend_today = Utils.isUptrendByMaIndex(list_days, Utils.MA_INDEX_D1_START_LONG);
+        Boolean trend_today = Utils.isMa3AboveMa8_Long(list_days);
 
         type = type + Utils.analysisVolume(list_days);
         BigDecimal current_price = list_days.get(0).getCurrPrice();
@@ -3143,13 +3143,6 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
             }
-        } else if (trend_today) {
-            // scapLongH4 = "";// "(H4)" + Utils.TREND_DANGER;
-            // scapLongH4 = Utils.getScapLong(list_h4, list_days, 10);
-        }
-
-        if (Objects.equals(TREND_OF_BTC, Utils.TREND_SHORT) || !trend_today) {
-            scapLongD1 = "";
         }
 
         try {

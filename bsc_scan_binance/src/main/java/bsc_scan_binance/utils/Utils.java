@@ -1919,8 +1919,10 @@ public class Utils {
 
     public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            if (!Utils.isMa3AboveMa8_Long(list_entry)) {
-                return "(" + getChartName(list_entry) + ")" + TREND_STOP_LONG;
+            boolean isLong = Utils.isMa3AboveMa8_Long(list_entry);
+            String symbol = list_entry.get(0).getId().toLowerCase();
+            if (!isLong && symbol.contains("_4h_")) {
+                return "(H4)" + TREND_STOP_LONG;
             }
 
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
@@ -1932,11 +1934,20 @@ public class Utils {
             BigDecimal ma_slow = calcMA(list_entry, slow_index, 0);
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP = BigDecimal.ZERO;
+            String type = "";
+            if (isLong) {
+                type = "(Long) ";
+                SL = low_heigh_sl.get(0);
+                SL = SL.multiply(BigDecimal.valueOf(0.9995));
+                TP = low_heigh_tp.get(1);
 
-            // check long
-            SL = low_heigh_sl.get(0);
-            SL = SL.multiply(BigDecimal.valueOf(0.9995));
-            TP = low_heigh_tp.get(1);
+            } else {
+                type = "(Short) ";
+                SL = low_heigh_sl.get(1);
+                SL = SL.multiply(BigDecimal.valueOf(1.0005));
+                TP = low_heigh_tp.get(0);
+
+            }
 
             entry = roundDefault(entry);
             SL = roundDefault(SL);
@@ -1949,7 +1960,7 @@ public class Utils {
             BigDecimal earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn = formatPrice(vol.multiply(earn), 1);
 
-            String result = "(Long) SL(" + getChartName(list_entry) + "): " + getPercentToEntry(entry, SL, false);
+            String result = type + "SL(" + getChartName(list_entry) + "): " + getPercentToEntry(entry, SL, false);
             result += ",E: " + removeLastZero(entry);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
