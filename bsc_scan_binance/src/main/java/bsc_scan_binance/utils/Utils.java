@@ -66,10 +66,11 @@ public class Utils {
     public static final String TREND_SHORT = "Short";
     public static final String TREND_DANGER = "(Danger)";
     public static final String TREND_OPPOSITE = "Opposite";
+    public static final String TREND_START_LONG = "Start:Long";
     public static final String TREND_STOP_LONG = "Stop:Long";
 
-    public static final int MA_INDEX_H4_STOP_LONG = 8;
-    public static final int MA_INDEX_H4_START_LONG = 21;
+    public static final int MA_INDEX_H4_STOP_LONG = 5;
+    public static final int MA_INDEX_H4_START_LONG = 8;
     public static final int MA_INDEX_D1_STOP_LONG = 5;
     public static final int MA_INDEX_D1_START_LONG = 5;
 
@@ -1360,22 +1361,22 @@ public class Utils {
     public static String getChartName(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
         if (symbol.contains("_15m_")) {
-            return "m15";
+            return "(m15)";
         }
         if (symbol.contains("_1h_")) {
-            return "H1";
+            return "(H1)";
         }
         if (symbol.contains("_2h_")) {
-            return "H2";
+            return "(H2)";
         }
         if (symbol.contains("_4h_")) {
-            return "H4";
+            return "(H4)";
         }
         if (symbol.contains("_1d_")) {
-            return "D1";
+            return "(D1)";
         }
         if (symbol.contains("_1w_")) {
-            return "W";
+            return "(W)";
         }
 
         return symbol.replace("_00", "");
@@ -1918,11 +1919,7 @@ public class Utils {
 
     public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            boolean isLong = Utils.isMa3AboveMa8_Long(list_entry);
-            String symbol = list_entry.get(0).getId().toLowerCase();
-            if (!isLong && symbol.contains("_4h_")) {
-                return "(H4)" + TREND_STOP_LONG;
-            }
+            boolean isLong = Utils.checkClosePriceAndMa_StartFindLong(list_entry);
 
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
             List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_tp);
@@ -1939,13 +1936,11 @@ public class Utils {
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.9995));
                 TP = low_heigh_tp.get(1);
-
             } else {
                 type = "(Short) ";
                 SL = low_heigh_sl.get(1);
                 SL = SL.multiply(BigDecimal.valueOf(1.0005));
                 TP = low_heigh_tp.get(0);
-
             }
 
             entry = roundDefault(entry);
@@ -1959,7 +1954,7 @@ public class Utils {
             BigDecimal earn = TP.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
             earn = formatPrice(vol.multiply(earn), 1);
 
-            String result = type + "SL(" + getChartName(list_entry) + "): " + getPercentToEntry(entry, SL, false);
+            String result = type + "SL" + getChartName(list_entry) + ": " + getPercentToEntry(entry, SL, false);
             result += ",E: " + removeLastZero(entry);
             result += ",TP: " + getPercentToEntry(entry, TP, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
@@ -1978,7 +1973,7 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
-            String check3and8 = isMa3AboveMa8_Long(list_find_entry) ? TREND_LONG : TREND_SHORT;
+            String check3and8 = checkClosePriceAndMa_StartFindLong(list_find_entry) ? TREND_LONG : TREND_SHORT;
 
             List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp);
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_find_entry.subList(0, 15));
@@ -2015,7 +2010,7 @@ public class Utils {
             earn1 = formatPrice(vol.multiply(earn1), 1);
 
             String result = type;
-            result += " SL(" + getChartName(list_find_entry) + "): " + getPercentToEntry(entry, SL, false);
+            result += " SL" + getChartName(list_find_entry) + ": " + getPercentToEntry(entry, SL, false);
             result += ",E: " + removeLastZero(entry) + "$";
             result += ",TP: " + getPercentToEntry(entry, TP1, false);
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn1) + "$";
@@ -2045,9 +2040,9 @@ public class Utils {
         String chartName = getChartName(list);
         String per = getPercentToEntry(ma_fast_c, ma_size, true);
         if (ma_fast_c.compareTo(ma_size) > 0) {
-            str_ma_size += "Above_Ma" + size + "(" + chartName + "):" + per;
+            str_ma_size += "Above_Ma" + size + "" + chartName + ":" + per;
         } else {
-            str_ma_size += "Below_Ma" + size + "(" + chartName + "):" + per;
+            str_ma_size += "Below_Ma" + size + "" + chartName + ":" + per;
         }
 
         return str_ma_size;
@@ -2199,27 +2194,28 @@ public class Utils {
         return result;
     }
 
-    public static boolean isMa3AboveMa8_Long(List<BtcFutures> list) {
+    public static boolean checkClosePriceAndMa_StartFindLong(List<BtcFutures> list) {
         int cur = 1;
-        int fastIndex = 3;
         String symbol = list.get(0).getId();
-        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
-        BigDecimal ma_slow_c;
+        BigDecimal ma;
+        BigDecimal pre_close_price = list.get(1).getPrice_close_candle();
 
         if (symbol.contains("_1d_")) {
-            ma_slow_c = calcMA(list, MA_INDEX_D1_STOP_LONG, cur);
+            ma = calcMA(list, MA_INDEX_D1_START_LONG, cur);
+        } else if (symbol.contains("_4h_")) {
+            ma = calcMA(list, MA_INDEX_H4_START_LONG, cur);
         } else {
-            ma_slow_c = calcMA(list, MA_INDEX_H4_STOP_LONG, cur);
+            ma = calcMA(list, 10, cur);
         }
 
-        if (ma_fast_c.compareTo(ma_slow_c) > 0) {
+        if (pre_close_price.compareTo(ma) > 0) {
             return true;
         }
 
         return false;
     }
 
-    public static String checkMa3AndMa8_ForChangeStatus(List<BtcFutures> list) {
+    public static String getMsgMa3AndMa8_ForChangeStatus(List<BtcFutures> list) {
         int cur = 1;
         int pre = 2;
         int fastIndex = 3;
@@ -2239,12 +2235,12 @@ public class Utils {
 
         if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
                 && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-            return "(" + getChartName(list) + ") (" + symbol + ") Stop:Short, Prepare Long.";
+            return "" + getChartName(list) + " (" + symbol + ") Stop:Long/Short.";
         }
 
         if ((ma_fast_c.compareTo(ma_fast_p) < 0) && (ma_fast_c.compareTo(ma_slow_c) < 0)
                 && (ma_slow_p.compareTo(ma_fast_p) < 0)) {
-            return "(" + getChartName(list) + ") (" + symbol + ") Stop:Long, Prepare Short.";
+            return "" + getChartName(list) + " (" + symbol + ") Stop:Long/Short.";
         }
 
         return "";
@@ -2305,7 +2301,7 @@ public class Utils {
         boolean isCuttingUp = false;// Long
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
 
-            if (symbol.contains("_1h_")) {
+            if (symbol.contains("_1h_") || symbol.contains("_15m_")) {
                 isCuttingUp = is3CuttingUp50ForLongH1(list);
             } else {
                 if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
@@ -2318,13 +2314,12 @@ public class Utils {
                     isCuttingUp = false;
                 }
             }
-
         }
 
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
-            if (symbol.contains("_1h_")) {
+            if (symbol.contains("_1h_") || symbol.contains("_15m_")) {
                 isCuttingDown = is3CuttingDown50ForShort(list);
             } else {
                 if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
@@ -2341,57 +2336,58 @@ public class Utils {
         }
 
         // -----------------------------------------------
-        String volume = Utils.analysisVolume(list);
-        if (isNotBlank(volume)) {
-            volume = ",TradingQty: " + volume.replace("volma{", "").replace("}volma", "");
-        } else {
-            volume = ",TradingQty: Weak";
-        }
-
-        String note_long = "";
-        if (!isMa_fast_Up) {
-            note_long += " Ma" + fastIndex + ":Down,";
-        }
-        if (!isMaSlowUp) {
-            note_long += " Ma" + slowIndex + ":Down,";
-        }
-        if (!list.get(0).isUptrend()) {
-            note_long += " Candle:Down,";
-        }
-
-        if (isNotBlank(note_long)) {
-            note_long = " (Remark)," + note_long + "," + str_ma_50 + volume;
-        } else {
-            note_long = " (Remark)," + str_ma_50 + volume;
-        }
-
-        String note_short = "";
-        if (isMa_fast_Up) {
-            note_short += " Ma" + fastIndex + ":Up,";
-        }
-        if (isMaSlowUp) {
-            note_short += " Ma" + slowIndex + ":Up,";
-        }
-        if (list.get(0).isUptrend()) {
-            note_short += " Candle:Up,";
-        }
-
-        if (isNotBlank(note_short)) {
-            note_short = " (Remark)," + note_short + "," + str_ma_50 + volume;
-        } else {
-            note_short = " (Remark)," + str_ma_50 + volume;
-        }
+        // String volume = Utils.analysisVolume(list);
+        // if (isNotBlank(volume)) {
+        // volume = ",TradingQty: " + volume.replace("volma{", "").replace("}volma",
+        // "");
+        // } else {
+        // volume = ",TradingQty: Weak";
+        // }
+        //
+        // String note_long = "";
+        // if (!isMa_fast_Up) {
+        // note_long += " Ma" + fastIndex + ":Down,";
+        // }
+        // if (!isMaSlowUp) {
+        // note_long += " Ma" + slowIndex + ":Down,";
+        // }
+        // if (!list.get(0).isUptrend()) {
+        // note_long += " Candle:Down,";
+        // }
+        //
+        // if (isNotBlank(note_long)) {
+        // note_long = " (Remark)," + note_long + "," + str_ma_50 + volume;
+        // } else {
+        // note_long = " (Remark)," + str_ma_50 + volume;
+        // }
+        //
+        // String note_short = "";
+        // if (isMa_fast_Up) {
+        // note_short += " Ma" + fastIndex + ":Up,";
+        // }
+        // if (isMaSlowUp) {
+        // note_short += " Ma" + slowIndex + ":Up,";
+        // }
+        // if (list.get(0).isUptrend()) {
+        // note_short += " Candle:Up,";
+        // }
+        //
+        // if (isNotBlank(note_short)) {
+        // note_short = " (Remark)," + note_short + "," + str_ma_50 + volume;
+        // } else {
+        // note_short = " (Remark)," + str_ma_50 + volume;
+        // }
 
         // --------------------------------------------------
 
-        String type = "";
-        if (slowIndex >= 35) {
-            type = "";
-        } else if (slowIndex >= 20) {
-            type = "(Prepare)";
-        } else if (slowIndex >= 8) {
-            type = "(Check)";
-        }
+        String type = "(Check)";
+        // if (slowIndex >= 35) {
+        // type = "";
+        // } else if (slowIndex >= 20) {
+        // type = "(Prepare)";
+        // } else if (slowIndex >= 8) {
+        // type = "(Check)";
+        // }
         BigDecimal currPrice = list.get(0).getCurrPrice();
 
         String result = "";
@@ -2440,11 +2436,11 @@ public class Utils {
                 BigDecimal earn3 = TP3.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
                 earn3 = formatPrice(vol.multiply(earn3), 1);
 
-                result += ",SL(" + getChartName(list) + "): " + getPercentToEntry(entry, SL, true);
-                result += ",E: " + removeLastZero(entry) + "$";
-                result += ",TP: " + getPercentToEntry(entry, TP3, isLong);
-                result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn3)
-                        + "$";
+                result += " SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL, true);
+                // result += ",E: " + removeLastZero(entry) + "$";
+                // result += ",TP: " + getPercentToEntry(entry, TP3, isLong);
+                result += " Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
+                // ":" + removeLastZero(earn3) +
 
                 if (showDetail) {
                     int start_index = 0;
@@ -2491,16 +2487,16 @@ public class Utils {
         } catch (Exception e) {
         }
 
-        if (!showDetail) {
-            if (isCuttingDown && isNotBlank(note_short)) {
-                result += ",," + note_short;
-            }
-            if (isCuttingUp && isNotBlank(note_long)) {
-                result += ",," + note_long;
-            }
-        } else {
-            result += "," + volume;
-        }
+        // if (!showDetail) {
+        // if (isCuttingDown && isNotBlank(note_short)) {
+        // result += ",," + note_short;
+        // }
+        // if (isCuttingUp && isNotBlank(note_long)) {
+        // result += ",," + note_long;
+        // }
+        // } else {
+        // result += "," + volume;
+        // }
 
         if (!(result.contains(TREND_LONG) || result.contains(TREND_SHORT))) {
             result = "";
