@@ -1920,6 +1920,10 @@ public class Utils {
     public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
         try {
             boolean isLong = Utils.checkClosePriceAndMa_StartFindLong(list_entry);
+            boolean isLongTp = Utils.checkClosePriceAndMa_StartFindLong(list_tp);
+            if (isLong != isLongTp) {
+                return "";
+            }
 
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
             List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_tp);
@@ -1973,6 +1977,12 @@ public class Utils {
 
     public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
+            boolean isLong = Utils.checkClosePriceAndMa_StartFindLong(list_find_entry);
+            boolean isLongTp = Utils.checkClosePriceAndMa_StartFindLong(list_tp);
+            if (isLong != isLongTp) {
+                return "";
+            }
+
             String check3and8 = checkClosePriceAndMa_StartFindLong(list_find_entry) ? TREND_LONG : TREND_SHORT;
 
             List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp);
