@@ -3093,13 +3093,17 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
             if (trend_today && trend_h4) {
-                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
-
+                sendMsgMonitorFibo(gecko_id, symbol, list_h4, Utils.TREND_LONG, 50, false);
                 sendMsgMonitorFibo(gecko_id, symbol, list_15m, Utils.TREND_LONG, 50, false);
 
-                String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, Utils.TREND_LONG, 50, false);
-                if (Utils.isNotBlank(temp_h1)) {
-                    scapLongD1 += SEPARATE_D1_AND_H1 + temp_h1;
+                List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
+                Boolean trend_h1 = Utils.checkClosePriceAndMa_StartFindLong(list_h4);
+
+                if (trend_h1) {
+                    String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, Utils.TREND_LONG, 50, false);
+                    if (Utils.isNotBlank(temp_h1)) {
+                        scapLongD1 += SEPARATE_D1_AND_H1 + temp_h1;
+                    }
                 }
             }
 
@@ -3131,8 +3135,6 @@ public class BinanceServiceImpl implements BinanceService {
                     sendMsgPerHour(EVENT_CHECK_ID, msg);
                 }
             }
-
-            sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
 
         } else if (trend_today && Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !RANGE_H4_BTC_IS_DANGER) {
             if (Utils.isBusinessTime()) {
