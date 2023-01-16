@@ -1946,7 +1946,7 @@ public class Utils {
         }
     }
 
-    public static String getScapLongOrShort_BTC(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
+    public static String getScapLongOrShort(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
         try {
             boolean isLong = Utils.checkClosePriceAndMa_StartFindLong(list_find_entry);
             boolean isLongTp = Utils.checkClosePriceAndMa_StartFindLong(list_tp);
@@ -2000,7 +2000,7 @@ public class Utils {
                 result += TREND_DANGER;
             }
 
-            System.out.println("getScapLongOrShort_BTC= " + result);
+            System.out.println("getScapLongOrShort= " + result);
 
             return result;
 

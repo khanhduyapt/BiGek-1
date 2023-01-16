@@ -2906,8 +2906,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Utils.isBusinessTime()) {
             boolean hasPumpDump = false;
-            List<BtcFutures> sub_list = list_15m.subList(0, 10);
-            for (BtcFutures dto : sub_list) {
+            for (BtcFutures dto : list_15m) {
                 if (dto.isBtcKillLongCandle() || dto.isBtcKillShortCandle()) {
                     hasPumpDump = true;
                 }
@@ -2916,7 +2915,6 @@ public class BinanceServiceImpl implements BinanceService {
                 return;
             }
 
-            Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
             String percentMa3to50 = Utils.percentMa3to50(list_15m);
 
             if (Utils.is3CuttingUp50ForLongH1(list_15m)) {
@@ -2944,8 +2942,8 @@ public class BinanceServiceImpl implements BinanceService {
                 // Utils.calcSL(list_5m, true);
                 // Utils.calcSL(list_5m, false);
 
+                Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
                 if (allow_long_m15 && Utils.is3CuttingUp50ForLongH1(list_5m)) {
-
                     String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
                             + Utils.getCurrentYyyyMmDdHH();
 
@@ -3030,7 +3028,7 @@ public class BinanceServiceImpl implements BinanceService {
                 sendMsgPerHour(DAY_EVENT_ID, msg_day, true);
             }
 
-            scapLongH4 = Utils.getScapLongOrShort_BTC(list_h4, list_days, 10);
+            scapLongH4 = Utils.getScapLongOrShort(list_h4, list_days, 10);
 
             if (Objects.equals("BTC", symbol)) {
                 TREND_OF_BTC = allow_long_d1 ? Utils.TREND_LONG : Utils.TREND_SHORT;
