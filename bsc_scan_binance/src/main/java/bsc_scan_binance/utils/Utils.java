@@ -2214,6 +2214,8 @@ public class Utils {
             ma = calcMA(list, MA_INDEX_D1_START_LONG, cur);
         } else if (symbol.contains("_4h_")) {
             ma = calcMA(list, MA_INDEX_H4_START_LONG, cur);
+        } else if (symbol.contains("_15m_")) {
+            ma = calcMA(list, 50, cur);
         } else {
             ma = calcMA(list, 10, cur);
         }
@@ -2300,12 +2302,6 @@ public class Utils {
 
         BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
         BigDecimal ma_slow_p = calcMA(list, slowIndex, pre);
-        boolean isMaSlowUp = true;
-        if (ma_slow_p.compareTo(ma_slow_c) > 0) {
-            isMaSlowUp = false;
-        }
-
-        String str_ma_50 = checkMa3And50(list);
 
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long

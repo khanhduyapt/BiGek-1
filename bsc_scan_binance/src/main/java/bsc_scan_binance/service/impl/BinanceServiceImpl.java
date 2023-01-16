@@ -2904,14 +2904,24 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
+    //    💰 #BTC 💹 $20,883
+    //    +212 USDT +1.03 % 🕢 2h, 30m
+    //    24h +7.34% ↑21,258$ ↓19,376$ Vol 8.96 Β
+    //    Moves (11h, 40m ago)📉🔻💹💹💹🔻🔻💹📉💹(Now) ↑5 ↓5 +1.18%
     private void sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
+        String type = "kill Short 💔";
+        boolean allow_long = Utils.is3CuttingUp50ForLongH1(list_15m);
+        if (allow_long) {
+            type = "Pump";
+        }
+
         BtcFutures ido = list_15m.get(0);
         if (ido.isBtcKillLongCandle() || ido.isBtcKillShortCandle()) {
-            String msg = Utils.getTimeHHmm() + " 💔 " + symbol + " 15m kill Long. "
+            String msg = Utils.getTimeHHmm() + " 📉 " + symbol + " 15m dump/kill Long. "
                     + Utils.removeLastZero(ido.getCurrPrice());
 
-            if (ido.isBtcKillShortCandle()) {
-                msg = Utils.getTimeHHmm() + " 💔 " + symbol + " 15m kill Short. "
+            if (ido.isBtcKillShortCandle() || allow_long) {
+                msg = Utils.getTimeHHmm() + " 💹 " + symbol + " 15m " + type + ". "
                         + Utils.removeLastZero(ido.getCurrPrice());
             }
 
@@ -3075,8 +3085,8 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
 
-        Boolean trend_today = Utils.checkClosePriceAndMa_StartFindLong(list_days);
-        Boolean trend_h4 = Utils.checkClosePriceAndMa_StartFindLong(list_h4);
+        Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
+        Boolean allow_long_h4 = Utils.checkClosePriceAndMa_StartFindLong(list_h4);
 
         type = type + Utils.analysisVolume(list_days);
         BigDecimal current_price = list_days.get(0).getCurrPrice();
@@ -3091,19 +3101,26 @@ public class BinanceServiceImpl implements BinanceService {
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
+            Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
 
-            if (trend_today && trend_h4) {
-                sendMsgMonitorFibo(gecko_id, symbol, list_h4, Utils.TREND_LONG, 50, false);
-                sendMsgMonitorFibo(gecko_id, symbol, list_15m, Utils.TREND_LONG, 50, false);
+            if (Utils.isBusinessTime() && allow_long_m15) {
+                List<BtcFutures> list_1m = Utils.loadData(symbol, "1m", 50);
+                sendMsgMonitorFibo(gecko_id, symbol, list_1m, Utils.TREND_LONG, 50, false);
+            }
+
+            if (allow_long_h4) {
+                if (allow_long_d1) {
+                    sendMsgMonitorFibo(gecko_id, symbol, list_h4, Utils.TREND_LONG, 50, false);
+                }
 
                 List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
-                Boolean trend_h1 = Utils.checkClosePriceAndMa_StartFindLong(list_h4);
-
-                if (trend_h1) {
+                Boolean allow_long_h1 = Utils.checkClosePriceAndMa_StartFindLong(list_h1);
+                if (allow_long_h1) {
                     String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, Utils.TREND_LONG, 50, false);
                     if (Utils.isNotBlank(temp_h1)) {
                         scapLongD1 += SEPARATE_D1_AND_H1 + temp_h1;
                     }
+                    sendMsgMonitorFibo(gecko_id, symbol, list_15m, Utils.TREND_LONG, 50, false);
                 }
             }
 
@@ -3116,7 +3133,7 @@ public class BinanceServiceImpl implements BinanceService {
             scapLongH4 = Utils.getScapLongOrShort_BTC(list_h4, list_days, 10);
 
             if (Objects.equals("BTC", symbol)) {
-                TREND_OF_BTC = trend_today ? Utils.TREND_LONG : Utils.TREND_SHORT;
+                TREND_OF_BTC = allow_long_d1 ? Utils.TREND_LONG : Utils.TREND_SHORT;
 
                 List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_h4);
                 BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
@@ -3136,7 +3153,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
 
-        } else if (trend_today && Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !RANGE_H4_BTC_IS_DANGER) {
+        } else if (allow_long_d1 && Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !RANGE_H4_BTC_IS_DANGER) {
             if (Utils.isBusinessTime()) {
                 if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
                     checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4, TREND_OF_BTC, 50, false);
@@ -3206,13 +3223,13 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
         String mUpMa = "";
         String today = Utils.getToday_MMdd();
-        mUpMa += trend_today ? "↑" + today + "(Up) " : " ";
+        mUpMa += allow_long_d1 ? "↑" + today + "(Up) " : " ";
         if (Utils.isNotBlank(mUpMa.trim())) {
             mUpMa = " move" + mUpMa.trim();
         }
 
         String mDownMa = "";
-        mDownMa += !trend_today ? "↓" + today + "(Down) " : "";
+        mDownMa += !allow_long_d1 ? "↓" + today + "(Down) " : "";
 
         if (Utils.isNotBlank(mDownMa)) {
             if (Utils.isNotBlank(mUpMa)) {
