@@ -2779,10 +2779,6 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgPerHour(String EVENT_ID, String msg_content, boolean isOnlyMe) {
-        if (!Utils.isBusinessTime()) {
-            return;
-        }
-
         String msg = Utils.getMmDD_TimeHHmm();
         msg += msg_content;
         msg = msg.replace(" ", "").replace(",", ", ");
@@ -2804,7 +2800,7 @@ public class BinanceServiceImpl implements BinanceService {
         String msg = "";
         String chartname = Utils.getChartName(list_15m);
         BtcFutures ido = list_15m.get(0);
-        String percentMa3to50 = Utils.percentMa3to50(list_15m) + Utils.new_line_from_service;
+        String percentMa3to50 = Utils.new_line_from_service + Utils.percentMa3to50(list_15m);
 
         if (ido.isBtcKillLongCandle()) {
             msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " kill Long 💔 "
@@ -2914,7 +2910,7 @@ public class BinanceServiceImpl implements BinanceService {
             kill = sendMsgKillLongShort(gecko_id, symbol, list_15m);
         }
 
-        if (Utils.isBusinessTime()) {
+        if (Utils.isBusinessTime() || true) {
             boolean hasPumpDump = false;
             for (BtcFutures dto : list_15m) {
                 if (dto.isBtcKillLongCandle() || dto.isBtcKillShortCandle()) {
@@ -2935,6 +2931,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + Utils.new_line_from_service + percentMa3to50;
 
                 sendMsgPerHour(EVENT_ID_15m, msg, true);
+                return;
             }
 
             if (Utils.is3CuttingDown50ForShortH1(list_15m, 50)) {
@@ -2942,6 +2939,7 @@ public class BinanceServiceImpl implements BinanceService {
                         + Utils.new_line_from_service + percentMa3to50;
 
                 sendMsgPerHour(EVENT_ID_15m, msg, true);
+                return;
             }
 
             if (Objects.equals("BTC", symbol)) {
@@ -2966,6 +2964,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 + Utils.new_line_from_service + percentMa3to50;
 
                         sendMsgPerHour(EVENT_ID_1m, msg, true);
+                        return;
                     }
 
                     if (Utils.is3CuttingDown50ForShortH1(list_5m, 50)) {
@@ -2974,6 +2973,7 @@ public class BinanceServiceImpl implements BinanceService {
                                 + Utils.new_line_from_service + percentMa3to50;
 
                         sendMsgPerHour(EVENT_ID_1m, msg, true);
+                        return;
                     }
                 }
 
