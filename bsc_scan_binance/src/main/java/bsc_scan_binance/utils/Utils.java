@@ -2045,7 +2045,7 @@ public class Utils {
         BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
-        String result = ",SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL_real, true);
+        String result = "SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL_real, true);
         result += ",SL(1%): " + removeLastZero(entry);
         result += ",Vol(1%): " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 

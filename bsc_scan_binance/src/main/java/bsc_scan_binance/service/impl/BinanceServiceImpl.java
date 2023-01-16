@@ -2786,7 +2786,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String msg = Utils.getMmDD_TimeHHmm();
         msg += msg_content;
-        msg = msg.replace(" ", "");
+        msg = msg.replace(" ", "").replace(",", ", ");
 
         if (!fundingHistoryRepository.existsPumDump(EVENT_MSG_PER_HOUR, EVENT_ID)) {
 
@@ -2895,13 +2895,14 @@ public class BinanceServiceImpl implements BinanceService {
     private void sendMsgChart15m(String gecko_id, String symbol) {
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (!MAIN_TOKEN.contains("_" + symbol + "_")) {
-            return;
+            // return; // attack mode
         }
 
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-        Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
 
-        sendMsgKillLongShort(gecko_id, symbol, list_15m);
+        if (MAIN_TOKEN.contains("_" + symbol + "_")) {
+            sendMsgKillLongShort(gecko_id, symbol, list_15m);
+        }
 
         if (Utils.isBusinessTime()) {
             boolean hasPumpDump = false;
@@ -2915,6 +2916,7 @@ public class BinanceServiceImpl implements BinanceService {
                 return;
             }
 
+            Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
             if (allow_long_m15) {
                 if (Utils.is3CuttingUp50ForLongH1(list_15m)) {
                     String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
