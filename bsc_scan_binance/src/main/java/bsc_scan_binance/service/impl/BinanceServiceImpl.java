@@ -2920,6 +2920,8 @@ public class BinanceServiceImpl implements BinanceService {
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
+        } else {
+            return;
         }
 
         if (Utils.isBusinessTime()) {
@@ -2984,11 +2986,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
-        boolean attack_mode = true;
-        if (attack_mode) {
-            sendMsgChart15m(gecko_id, symbol);
-            return "";
-        }
+        sendMsgChart15m(gecko_id, symbol);
 
         // AUD_EUR_GBP_USDT
         if (Objects.equals("BTC", symbol)) {
