@@ -65,7 +65,7 @@ public class BscScanBinanceApplication {
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-                int sleep_ms = 6000;
+                int sleep_ms = 12000;
                 int size = list.size();
                 int idx = 0;
                 boolean startup = true;
@@ -83,21 +83,16 @@ public class BscScanBinanceApplication {
                             }
                         }
 
+                        if (idx % 3 == 0) {
+                            binance_service.getChartWD("bitcoin", "BTC");
+                            wait(sleep_ms);
+                        }
+
                         if (idx % 10 == 0) {
-                            // binance_service.loadBinanceData("bitcoin", "BTC", startup);
-                            // binance_service.loadDataVolumeHour("bitcoin", "BTC");
-                            // binance_service.monitorBtcPrice();
-
-                            String msg = binance_service.getChartWD("bitcoin", "BTC");
-                            System.out.println(msg);
+                            binance_service.getChartWD("ethereum", "ETH");
                             wait(sleep_ms);
 
-                            msg = binance_service.getChartWD("ethereum", "ETH");
-                            System.out.println(msg);
-                            wait(sleep_ms);
-
-                            msg = binance_service.getChartWD("binancecoin", "BNB");
-                            System.out.println(msg);
+                            binance_service.getChartWD("binancecoin", "BNB");
                             wait(sleep_ms);
                         }
 
@@ -114,18 +109,9 @@ public class BscScanBinanceApplication {
                     wait(sleep_ms);
 
                     if (Objects.equals(idx, size - 1)) {
+                        binance_service.getList(false);
 
-                        int minus = Utils
-                                .getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
-                        if ((minus > 5) && (minus < 59)) {
-                            binance_service.monitorProfit();
-                            binance_service.monitorBollingerBandwidth(false);
-                        }
-
-                        binance_service.getList(false); // ~3p 1 lan
-
-                        System.out.println("reload: "
-                                + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()));
+                        System.out.println("reload: " + Utils.getCurrentYyyyMmDdHH());
                         idx = 0;
                         list.clear();
                         list = gecko_service.getList(callFormBinance);

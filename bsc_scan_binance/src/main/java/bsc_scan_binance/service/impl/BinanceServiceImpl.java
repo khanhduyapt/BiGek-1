@@ -151,7 +151,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_FIBO_LONG_SHORT = "FIBO_";
     private static final String EVENT_TREND_1W1D = "1W1D";
     private static final String EVENT_COMPRESSED_CHART = "Ma3_10_20_";
-    private static final String EVENT_PUMP = "Pump_1";
+    private static final String EVENT_PUMP = "Pump_";
     private static final String SEPARATE_D1_AND_H1 = "1DH1";
 
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
@@ -2888,7 +2888,7 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
-    private void sendMsgPerHour(String EVENT_ID, String msg_content) {
+    private void sendMsgPerHour(String EVENT_ID, String msg_content, boolean isOnlyMe) {
         if (!Utils.isBusinessTime()) {
             return;
         }
@@ -2900,7 +2900,11 @@ public class BinanceServiceImpl implements BinanceService {
 
             fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, "MSG_PER_HOUR", "MSG_PER_HOUR", "", false));
 
-            Utils.sendToMyTelegram(msg);
+            if (isOnlyMe) {
+                Utils.sendToMyTelegram(msg);
+            } else {
+                Utils.sendToTelegram(msg);
+            }
         }
     }
 
@@ -3103,9 +3107,18 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
             Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
 
-            if (Utils.isBusinessTime() && allow_long_m15) {
+            if (allow_long_m15 && Objects.equals("BTC", symbol) && Utils.isBusinessTime()) {
                 List<BtcFutures> list_1m = Utils.loadData(symbol, "1m", 50);
-                sendMsgMonitorFibo(gecko_id, symbol, list_1m, Utils.TREND_LONG, 50, false);
+
+                if (Utils.rangeOfLowHeigh(list_1m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
+                    String EVENT_ID_15M = EVENT_PUMP + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
+                    Boolean allow_long_1m = Utils.is3CuttingUp50ForLongH1(list_1m);
+                    if (allow_long_1m) {
+                        sendMsgPerHour(EVENT_ID_15M,
+                                "(1m) 💹 " + symbol + " Pump." + Utils.removeLastZero(current_price), false);
+                    }
+                    sendMsgMonitorFibo(gecko_id, symbol, list_1m, Utils.TREND_LONG, 50, false);
+                }
             }
 
             if (allow_long_h4) {
@@ -3127,7 +3140,7 @@ public class BinanceServiceImpl implements BinanceService {
             String msg_day = Utils.checkMa3AndX(list_days, Utils.getSlowIndex(list_days), false, "");
             if (Utils.isNotBlank(msg_day)) {
                 String DAY_EVENT_ID = EVENT_BTC_RANGE + "_" + symbol + "_" + Utils.getYyyyMmDdHH_ChangeDailyChart();
-                sendMsgPerHour(DAY_EVENT_ID, msg_day);
+                sendMsgPerHour(DAY_EVENT_ID, msg_day, true);
             }
 
             scapLongH4 = Utils.getScapLongOrShort_BTC(list_h4, list_days, 10);
@@ -3137,7 +3150,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_h4);
                 BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
-                range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+                range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
                 BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
                 if (current_price.compareTo(max_allow_long) > 0) {
@@ -3149,7 +3162,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Utils.isNotBlank(msg)) {
                     String EVENT_CHECK_ID = EVENT_COMPRESSED_CHART + "_CHANGE_STATUS_H4_"
                             + Utils.getCurrentYyyyMmDd_Blog4h();
-                    sendMsgPerHour(EVENT_CHECK_ID, msg);
+                    sendMsgPerHour(EVENT_CHECK_ID, msg, true);
                 }
             }
 

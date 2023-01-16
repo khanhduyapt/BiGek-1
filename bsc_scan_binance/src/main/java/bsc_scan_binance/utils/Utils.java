@@ -1530,6 +1530,12 @@ public class Utils {
         return sum;
     }
 
+    public static BigDecimal rangeOfLowHeigh(List<BtcFutures> list) {
+        List<BigDecimal> LowHeight = getLowHeightCandle(list);
+
+        return getPercent(LowHeight.get(1), LowHeight.get(0));
+    }
+
     public static List<BigDecimal> getLowHeightCandle(List<BtcFutures> list) {
         List<BigDecimal> result = new ArrayList<BigDecimal>();
 
@@ -2064,7 +2070,11 @@ public class Utils {
         }
 
         if (isUptrendByMaIndex(list, 3) && isUptrendByMaIndex(list, 8)) {
-            List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(1, 2));
+            int last = 2;
+            if (list.get(0).getId().contains("_1m_")) {
+                last = 5;
+            }
+            List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(1, last));
             BigDecimal low = low_heigh.get(1);
             BigDecimal ma_3_c = calcMA(list, 3, 1);
             BigDecimal ma_8_c = calcMA(list, 8, 1);
@@ -2307,7 +2317,7 @@ public class Utils {
         boolean isCuttingUp = false;// Long
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
 
-            if (symbol.contains("_1h_") || symbol.contains("_15m_")) {
+            if (symbol.contains("_1h_") || symbol.contains("_15m_") || symbol.contains("_1m_")) {
                 isCuttingUp = is3CuttingUp50ForLongH1(list);
             } else {
                 if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
@@ -2325,7 +2335,7 @@ public class Utils {
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
-            if (symbol.contains("_1h_") || symbol.contains("_15m_")) {
+            if (symbol.contains("_1h_") || symbol.contains("_15m_") || symbol.contains("_1m_")) {
                 isCuttingDown = is3CuttingDown50ForShort(list);
             } else {
                 if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
@@ -2338,7 +2348,6 @@ public class Utils {
                     isCuttingDown = false;
                 }
             }
-
         }
 
         // -----------------------------------------------
