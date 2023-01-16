@@ -2801,7 +2801,9 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private void sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
+    private String sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
+        String msg = "";
+
         String type = "kill Short 💔";
         boolean allow_long = Utils.is3CuttingUp50ForLongH1(list_15m);
         if (allow_long) {
@@ -2812,7 +2814,7 @@ public class BinanceServiceImpl implements BinanceService {
         BtcFutures ido = list_15m.get(0);
         if (ido.isBtcKillLongCandle() || ido.isBtcKillShortCandle()) {
 
-            String msg = Utils.getTimeHHmm() + " 📉 " + symbol + " 15m dump/kill Long. "
+            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " 15m dump/kill Long. "
                     + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
 
             if (ido.isBtcKillShortCandle() || allow_long) {
@@ -2828,6 +2830,8 @@ public class BinanceServiceImpl implements BinanceService {
                 Utils.sendToTelegram(msg);
             }
         }
+
+        return msg;
     }
 
     // AUD_EUR_GBP_USDT
@@ -2902,7 +2906,7 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
 
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
-            sendMsgKillLongShort(gecko_id, symbol, list_15m);
+            String kill = sendMsgKillLongShort(gecko_id, symbol, list_15m);
         }
 
         if (Utils.isBusinessTime()) {

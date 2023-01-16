@@ -2059,29 +2059,13 @@ public class Utils {
             return false;
         }
 
-        if (isUptrendByMaIndex(list, 3) && isUptrendByMaIndex(list, 8)) {
-            int last = 2;
-            if (list.get(0).getId().contains("_1m_")) {
-                last = 5;
-            }
-            List<BigDecimal> low_heigh = getOpenCloseCandle(list.subList(1, last));
-            BigDecimal low = low_heigh.get(1);
-            BigDecimal ma_3_c = calcMA(list, 3, 1);
-            BigDecimal ma_8_c = calcMA(list, 8, 1);
-            BigDecimal ma_50_c = calcMA(list, 50, 1);
+        BigDecimal close1 = list.get(1).getPrice_open_candle();
+        BigDecimal close2 = list.get(2).getPrice_open_candle();
 
-            if ((ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(low) > 0) && (ma_3_c.compareTo(ma_8_c) > 0)
-                    && (ma_8_c.compareTo(low) > 0)) {
+        BigDecimal ma_50_c = calcMA(list, 50, 1);
 
-                return true;
-            }
-
-            BigDecimal open = list.get(1).getPrice_open_candle();
-            BigDecimal close = list.get(1).getPrice_close_candle();
-            if ((open.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0)) {
-                return true;
-            }
-
+        if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close2) > 0)) {
+            return true;
         }
 
         return false;
@@ -2092,18 +2076,13 @@ public class Utils {
             return false;
         }
 
-        if (!(isUptrendByMaIndex(list, 3) && isUptrendByMaIndex(list, 8))) {
-            List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(1, 2));
-            BigDecimal heigh = low_heigh.get(1);
-            BigDecimal ma_3_c = calcMA(list, 3, 1);
-            BigDecimal ma_8_c = calcMA(list, 8, 1);
-            BigDecimal ma_50_c = calcMA(list, 50, 1);
+        BigDecimal close1 = list.get(1).getPrice_open_candle();
+        BigDecimal close2 = list.get(2).getPrice_open_candle();
 
-            if ((ma_3_c.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(heigh) < 0) && (ma_3_c.compareTo(ma_8_c) < 0)
-                    && (ma_8_c.compareTo(heigh) < 0)) {
+        BigDecimal ma_50_c = calcMA(list, 50, 1);
 
-                return true;
-            }
+        if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close2) < 0)) {
+            return true;
         }
 
         return false;
