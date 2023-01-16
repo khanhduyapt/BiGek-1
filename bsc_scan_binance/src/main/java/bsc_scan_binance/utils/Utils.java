@@ -1380,7 +1380,7 @@ public class Utils {
         }
 
         symbol = symbol.replace("_00", "");
-        symbol = symbol.substring(symbol.indexOf("_"), symbol.length());
+        symbol = symbol.substring(symbol.indexOf("_"), symbol.length()).replace("_", "");
 
         return "(" + symbol.replace("_00", "") + ")";
     }
@@ -2028,12 +2028,25 @@ public class Utils {
         return str_ma_size;
     }
 
-    public static String calcSL(List<BtcFutures> list) {
-
-        List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
-        BigDecimal SL = low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995));
-
+    public static String calcSL(List<BtcFutures> list, boolean isLong) {
         BigDecimal entry = list.get(0).getCurrPrice();
+        List<BigDecimal> low_heigh = getLowHeightCandle(list);
+        BigDecimal SL = entry;
+
+        if (isLong) {
+            SL = low_heigh.get(0);
+            BigDecimal percent = getPercent(SL, entry);
+            if (percent.compareTo(BigDecimal.valueOf(1)) < 0) {
+                SL = SL.multiply(BigDecimal.valueOf(0.995));
+            }
+        } else {
+            SL = low_heigh.get(1);
+            BigDecimal percent = getPercent(SL, entry);
+            if (percent.compareTo(BigDecimal.valueOf(1)) < 0) {
+                SL = SL.multiply(BigDecimal.valueOf(1.005));
+            }
+        }
+
         int usd = 5;
         BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
@@ -2211,10 +2224,8 @@ public class Utils {
             ma = calcMA(list, MA_INDEX_D1_START_LONG, cur);
         } else if (symbol.contains("_4h_")) {
             ma = calcMA(list, MA_INDEX_H4_START_LONG, cur);
-        } else if (symbol.contains("_15m_")) {
-            ma = calcMA(list, 20, cur);
         } else {
-            ma = calcMA(list, 50, cur);
+            ma = calcMA(list, 10, cur);
         }
 
         if (pre_close_price.compareTo(ma) > 0) {
