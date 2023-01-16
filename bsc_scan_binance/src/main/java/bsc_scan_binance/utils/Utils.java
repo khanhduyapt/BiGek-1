@@ -2030,28 +2030,24 @@ public class Utils {
 
     public static String calcSL(List<BtcFutures> list, boolean isLong) {
         BigDecimal entry = list.get(0).getCurrPrice();
+        BigDecimal SL = BigDecimal.ZERO;
+        BigDecimal SL_real = BigDecimal.ZERO;
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
-        BigDecimal SL = entry;
 
         if (isLong) {
-            SL = low_heigh.get(0);
-            BigDecimal percent = getPercent(SL, entry);
-            if (percent.compareTo(BigDecimal.valueOf(1)) < 0) {
-                SL = SL.multiply(BigDecimal.valueOf(0.995));
-            }
+            SL = entry.multiply(BigDecimal.valueOf(0.99));
+            SL_real = low_heigh.get(0);
         } else {
-            SL = low_heigh.get(1);
-            BigDecimal percent = getPercent(SL, entry);
-            if (percent.compareTo(BigDecimal.valueOf(1)) < 0) {
-                SL = SL.multiply(BigDecimal.valueOf(1.005));
-            }
+            SL = entry.multiply(BigDecimal.valueOf(1.01));
+            SL_real = low_heigh.get(1);
         }
 
         int usd = 5;
         BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
-        String result = ",SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL, true);
+        String result = ",SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL_real, true);
+        result += ",SL: " + getPercentToEntry(entry, SL, true);
         result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
         return result;

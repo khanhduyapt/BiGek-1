@@ -2947,7 +2947,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Objects.equals("BTC", symbol)) {
                     List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
 
-                    // Utils.calcSL(list_5m, true);
+                    //Utils.calcSL(list_5m, true);
 
                     if (Utils.rangeOfLowHeigh(list_5m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
 
@@ -2966,7 +2966,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Objects.equals("BTC", symbol)) {
                     List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
 
-                    // Utils.calcSL(list_5m, false);
+                    //Utils.calcSL(list_5m, false);
 
                     if (Utils.is3CuttingDown50ForShortH1(list_5m)) {
                         String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
