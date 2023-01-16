@@ -132,6 +132,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String SYMBOL_BTC = "BTC";
 
     private static final String TIME_15m = "15m";
+    private static final String TIME_5m = "5m";
 
     private static final String TIME_1h = "1h";
     private static final String TIME_2h = "2h";
@@ -152,6 +153,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_TREND_1W1D = "1W1D";
     private static final String EVENT_COMPRESSED_CHART = "Ma3_10_20_";
     private static final String EVENT_PUMP = "Pump_";
+    private static final String EVENT_MSG_PER_HOUR = "MSG_PER_HOUR";
     private static final String SEPARATE_D1_AND_H1 = "1DH1";
 
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
@@ -2784,10 +2786,12 @@ public class BinanceServiceImpl implements BinanceService {
 
         String msg = Utils.getMmDD_TimeHHmm();
         msg += msg_content;
+        msg = msg.replace(" ", "");
 
-        if (!fundingHistoryRepository.existsPumDump("MSG_PER_HOUR", EVENT_ID)) {
+        if (!fundingHistoryRepository.existsPumDump(EVENT_MSG_PER_HOUR, EVENT_ID)) {
 
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, "MSG_PER_HOUR", "MSG_PER_HOUR", "", false));
+            fundingHistoryRepository
+                    .save(createPumpDumpEntity(EVENT_ID, EVENT_MSG_PER_HOUR, EVENT_MSG_PER_HOUR, "", false));
 
             if (isOnlyMe) {
                 Utils.sendToMyTelegram(msg);
@@ -2797,10 +2801,6 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    //    💰 #BTC 💹 $20,883
-    //    +212 USDT +1.03 % 🕢 2h, 30m
-    //    24h +7.34% ↑21,258$ ↓19,376$ Vol 8.96 Β
-    //    Moves (11h, 40m ago)📉🔻💹💹💹🔻🔻💹📉💹(Now) ↑5 ↓5 +1.18%
     private void sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
         String type = "kill Short 💔";
         boolean allow_long = Utils.is3CuttingUp50ForLongH1(list_15m);
@@ -2810,8 +2810,9 @@ public class BinanceServiceImpl implements BinanceService {
 
         BtcFutures ido = list_15m.get(0);
         if (ido.isBtcKillLongCandle() || ido.isBtcKillShortCandle()) {
+
             String msg = Utils.getTimeHHmm() + " 📉 " + symbol + " 15m dump/kill Long. "
-                    + Utils.removeLastZero(ido.getCurrPrice());
+                    + Utils.removeLastZero(ido.getCurrPrice()) + ")";
 
             if (ido.isBtcKillShortCandle() || allow_long) {
                 msg = Utils.getTimeHHmm() + " 💹 " + symbol + " 15m " + type + ". "
@@ -2914,36 +2915,50 @@ public class BinanceServiceImpl implements BinanceService {
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-        BigDecimal current_price = list_15m.get(0).getCurrPrice();
+        Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
 
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
         }
 
-        Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
-
         if (allow_long_m15 && Utils.isBusinessTime()) {
-            sendMsgMonitorFibo(gecko_id, symbol, list_15m, TREND_OF_BTC, 50, false);
+            if (Utils.is3CuttingUp50ForLongH1(list_15m)) {
+                String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
+                        + Utils.getCurrentYyyyMmDdHH();
 
-            List<BtcFutures> list_1m = Utils.loadData(symbol, "1m", 50);
+                String msg = "(15m) 💹💹💹 " + symbol + " (Pump)." + Utils.calcSL(list_15m);
 
-            if (Utils.rangeOfLowHeigh(list_1m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
-
-                Boolean allow_long_1m = Utils.is3CuttingUp50ForLongH1(list_1m);
-                if (allow_long_1m) {
-
-                    String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getCurrentYyyyMmDdHH();
-                    sendMsgPerHour(EVENT_ID_1m,
-                            "(1m) 💹 " + symbol + " Pump." + Utils.removeLastZero(current_price), true);
-                }
-                sendMsgMonitorFibo(gecko_id, symbol, list_1m, Utils.TREND_LONG, 50, false);
+                sendMsgPerHour(EVENT_ID_15m, msg, true);
             }
+
+            if (Objects.equals("BTC", symbol)) {
+                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+                if (Utils.rangeOfLowHeigh(list_5m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
+
+                    if (Utils.is3CuttingUp50ForLongH1(list_5m)) {
+
+                        String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
+                                + Utils.getCurrentYyyyMmDdHH();
+
+                        String msg = "(" + TIME_5m + ") 💹 " + symbol + " (Pump)." + Utils.calcSL(list_5m);
+
+                        sendMsgPerHour(EVENT_ID_1m, msg, true);
+                    }
+                }
+            }
+
         }
     }
 
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
+        boolean attack_mode = true;
+        if (attack_mode) {
+            sendMsgChart15m(gecko_id, symbol);
+            return "";
+        }
+
         // AUD_EUR_GBP_USDT
         if (Objects.equals("BTC", symbol)) {
             checkCurrency();
@@ -2976,13 +2991,9 @@ public class BinanceServiceImpl implements BinanceService {
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         String SPOT_TOKEN = "";// "_HOOK_HFT_APT_GMX_TWT_";
 
-        if (allow_long_h4 && Objects.equals(TREND_OF_BTC, Utils.TREND_LONG)) {
-            sendMsgChart15m(gecko_id, symbol);
-        }
-
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             if (Objects.equals(TREND_OF_BTC, Utils.TREND_LONG)) {
-                //    sendMsgChart15m(gecko_id, symbol);
+                sendMsgChart15m(gecko_id, symbol);
             }
 
             if (allow_long_h4) {

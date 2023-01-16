@@ -65,7 +65,7 @@ public class BscScanBinanceApplication {
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-                int sleep_ms = 12000;
+                int sleep_ms = 6000;
                 int size = list.size();
                 int idx = 0;
                 boolean startup = true;
@@ -118,7 +118,6 @@ public class BscScanBinanceApplication {
                         size = list.size();
 
                         startup = false;
-                        sleep_ms = 12000;
                     } else {
                         idx += 1;
                     }

@@ -1379,7 +1379,10 @@ public class Utils {
             return "(W)";
         }
 
-        return symbol.replace("_00", "");
+        symbol = symbol.replace("_00", "");
+        symbol = symbol.substring(symbol.indexOf("_"), symbol.length());
+
+        return "(" + symbol.replace("_00", "") + ")";
     }
 
     public static List<BigDecimal> calcFiboTakeProfit(BigDecimal low_heigh, BigDecimal entry) {
@@ -2025,6 +2028,22 @@ public class Utils {
         return str_ma_size;
     }
 
+    public static String calcSL(List<BtcFutures> list) {
+
+        List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
+        BigDecimal SL = low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995));
+
+        BigDecimal entry = list.get(0).getCurrPrice();
+        int usd = 5;
+        BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
+        vol = formatPrice(vol.multiply(entry).abs(), 0);
+
+        String result = ",SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL, true);
+        result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
+
+        return result;
+    }
+
     public static boolean is3CuttingUp50ForLongH1(List<BtcFutures> list) {
         if (list.size() < 50) {
             return false;
@@ -2035,7 +2054,7 @@ public class Utils {
             if (list.get(0).getId().contains("_1m_")) {
                 last = 5;
             }
-            List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(1, last));
+            List<BigDecimal> low_heigh = getOpenCloseCandle(list.subList(1, last));
             BigDecimal low = low_heigh.get(1);
             BigDecimal ma_3_c = calcMA(list, 3, 1);
             BigDecimal ma_8_c = calcMA(list, 8, 1);
@@ -2046,6 +2065,13 @@ public class Utils {
 
                 return true;
             }
+
+            BigDecimal open = list.get(1).getPrice_open_candle();
+            BigDecimal close = list.get(1).getPrice_close_candle();
+            if ((open.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0)) {
+                return true;
+            }
+
         }
 
         return false;
@@ -2186,9 +2212,9 @@ public class Utils {
         } else if (symbol.contains("_4h_")) {
             ma = calcMA(list, MA_INDEX_H4_START_LONG, cur);
         } else if (symbol.contains("_15m_")) {
-            ma = calcMA(list, 50, cur);
+            ma = calcMA(list, 20, cur);
         } else {
-            ma = calcMA(list, 10, cur);
+            ma = calcMA(list, 50, cur);
         }
 
         if (pre_close_price.compareTo(ma) > 0) {
