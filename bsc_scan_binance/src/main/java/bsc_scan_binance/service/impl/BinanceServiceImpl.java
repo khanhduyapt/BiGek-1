@@ -2807,16 +2807,17 @@ public class BinanceServiceImpl implements BinanceService {
         if (allow_long) {
             type = "Pump";
         }
+        String percentMa3to50 = Utils.percentMa3to50(list_15m);
 
         BtcFutures ido = list_15m.get(0);
         if (ido.isBtcKillLongCandle() || ido.isBtcKillShortCandle()) {
 
             String msg = Utils.getTimeHHmm() + " 📉 " + symbol + " 15m dump/kill Long. "
-                    + Utils.removeLastZero(ido.getCurrPrice()) + ")";
+                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
 
             if (ido.isBtcKillShortCandle() || allow_long) {
                 msg = Utils.getTimeHHmm() + " 💹 " + symbol + " 15m " + type + ". "
-                        + Utils.removeLastZero(ido.getCurrPrice());
+                        + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
             }
 
             String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
