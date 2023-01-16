@@ -46,7 +46,7 @@ public class BinanceController {
     public String getListDepthData(@PathVariable("symbol") String symbol, Model model) {
         List<List<DepthResponse>> list = new ArrayList<List<DepthResponse>>();
         String SYMBOL = symbol.toUpperCase();
-        
+
         list = service.getListDepthData(SYMBOL);
         List<DepthResponse> list_bids = new ArrayList<DepthResponse>();
         List<DepthResponse> list_asks = new ArrayList<DepthResponse>();
@@ -80,35 +80,6 @@ public class BinanceController {
         } else {
             model.addAttribute("exchanges_24h", exchanges.get(0));
             model.addAttribute("exchanges_7d", exchanges.get(1));
-        }
-
-        List<String> long_short = service.monitorBtcPrice();
-        if (CollectionUtils.isEmpty(long_short)) {
-            model.addAttribute("long_short_header", "Btc sideway.");
-            model.addAttribute("long_short_list_perfect", new ArrayList<String>());
-            model.addAttribute("long_short_list_curr_price", new ArrayList<String>());
-
-            model.addAttribute("long_list_perfect2", new ArrayList<String>());
-            model.addAttribute("short_list_perfect2", new ArrayList<String>());
-
-        } else {
-            List<String> headers = new ArrayList<String>(
-                    Arrays.asList(long_short.get(0).split(Utils.new_line_from_service)));
-
-            model.addAttribute("long_short_header", headers.get(0));
-            model.addAttribute("btc_48h", headers.subList(1, headers.size()));
-
-            model.addAttribute("long_short_list_perfect",
-                    new ArrayList<String>(Arrays.asList(long_short.get(1).split(Utils.new_line_from_service))));
-
-            model.addAttribute("long_short_list_curr_price",
-                    new ArrayList<String>(Arrays.asList(long_short.get(2).split(Utils.new_line_from_service))));
-
-            model.addAttribute("long_list_perfect2",
-                    new ArrayList<String>(Arrays.asList(long_short.get(3).split(Utils.new_line_from_service))));
-
-            model.addAttribute("short_list_perfect2",
-                    new ArrayList<String>(Arrays.asList(long_short.get(4).split(Utils.new_line_from_service))));
         }
 
         List<EntryCssResponse> scapling_list = service.findAllScalpingToday();

@@ -1816,45 +1816,6 @@ public class Utils {
         return msg;
     }
 
-    public static String getMsgShort(BigDecimal entry, BtcFuturesResponse dto) {
-        String msg = "";
-        BigDecimal stop_loss = Utils.getStopLossForShort(dto.getHight_price_h(), dto.getClose_candle_h());
-
-        BigDecimal candle_height = dto.getClose_candle_h().subtract(dto.getOpen_candle_h());
-        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 0, RoundingMode.CEILING);
-        BigDecimal take_porfit_1 = dto.getOpen_candle_h().add(mid_candle);
-        BigDecimal take_porfit_2 = dto.getOpen_candle_h().add(BigDecimal.valueOf(10));
-
-        BigDecimal fee = BigDecimal.valueOf(2);
-        BigDecimal loss = BigDecimal.valueOf(1000).multiply(entry.subtract(stop_loss))
-                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
-        BigDecimal tp1 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_1))
-                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
-        BigDecimal tp2 = BigDecimal.valueOf(1000).multiply(entry.subtract(take_porfit_2))
-                .divide(entry, 0, RoundingMode.CEILING).subtract(fee);
-
-        msg += "E: " + Utils.removeLastZero(entry.toString()) + "$" + Utils.new_line_from_service;
-
-        msg += "SL: " + Utils.removeLastZero(stop_loss) + "(" + Utils.toPercent(entry, stop_loss) + "%) 1000$/" + loss
-                + "$";
-
-        msg += Utils.new_line_from_service;
-
-        msg += "H: " + dto.getHight_price_h() + "(" + Utils.toPercent(entry, dto.getHight_price_h()) + "%)";
-
-        msg += Utils.new_line_from_service;
-
-        msg += "TP1: " + Utils.removeLastZero(take_porfit_1) + "(" + Utils.toPercent(entry, take_porfit_1) + "%) 1000$/"
-                + tp1 + "$";
-
-        msg += Utils.new_line_from_service;
-
-        msg += "TP2: " + Utils.removeLastZero(take_porfit_2) + "(" + Utils.toPercent(entry, take_porfit_2) + "%) 1000$/"
-                + tp2 + "$";
-
-        return msg;
-    }
-
     public static FundingResponse loadFundingRate(String symbol) {
         FundingResponse dto = new FundingResponse();
         int limit = 4;
@@ -2299,7 +2260,6 @@ public class Utils {
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail, String trend) {
         String symbol = list.get(0).getId();
 
-        String chart = getChartName(list);
         int cur = 1;
         int pre = 2;
         int fastIndex = 3;
@@ -2407,7 +2367,7 @@ public class Utils {
 
         String result = "";
         if (isCuttingUp) {
-            result = type + "Long(" + chart.trim().toUpperCase() + ")";
+            result = type + "Long" + getChartName(list) + "";
 
             List<BigDecimal> low_heigh = getLowHeightCandle(list);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
@@ -2419,7 +2379,7 @@ public class Utils {
                 // return "";
             }
         } else if (isCuttingDown) {
-            result = type + "Short(" + chart.trim().toUpperCase() + ")";
+            result = type + "Short" + getChartName(list);
         }
 
         if (symbol.contains("AUD_") || symbol.contains("AUD_") || symbol.contains("AUD_")) {
@@ -2474,7 +2434,7 @@ public class Utils {
                             }
                         }
                     }
-                    String timing2 = timingTarget(chart, start_index * 5);
+                    String timing2 = timingTarget(getChartName(list), start_index * 5);
                     // BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10,
                     // RoundingMode.CEILING);
                     // earn1 = formatPrice(vol.multiply(earn1), 1);

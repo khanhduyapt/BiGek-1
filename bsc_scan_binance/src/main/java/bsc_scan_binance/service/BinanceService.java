@@ -27,8 +27,6 @@ public interface BinanceService {
 
     public List<List<DepthResponse>> getListDepthData(String symbol);
 
-    public List<String> monitorBtcPrice();
-
     public String loadPremarketSp500();
 
     public String getBtcBalancesOnExchanges();

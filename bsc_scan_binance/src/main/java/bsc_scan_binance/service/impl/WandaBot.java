@@ -2,7 +2,6 @@ package bsc_scan_binance.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -33,7 +32,6 @@ import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
 import bsc_scan_binance.repository.CandidateCoinRepository;
 import bsc_scan_binance.repository.OrdersRepository;
 import bsc_scan_binance.repository.TakeProfitRepository;
-import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.utils.Utils;
@@ -83,30 +81,7 @@ public class WandaBot extends TelegramLongPollingBot {
             System.out.println(command);
 
             if (command.contains("/btc")) {
-
-                List<String> long_short = binance_service.monitorBtcPrice();
-
-                String btcrange = "";
-                if (!CollectionUtils.isEmpty(long_short)) {
-
-                    btcrange += long_short.get(0).replace(Utils.new_line_from_service, Utils.new_line_from_bot)
-                            .replace("10d", Utils.new_line_from_bot + "10d");
-
-                    btcrange += Utils.new_line_from_bot + Utils.new_line_from_bot;
-                } else {
-                    btcrange = "BTC:" + Utils.removeLastZero(Utils.getStringValue(Utils.getBinancePrice("BTC")))
-                            + Utils.new_line_from_bot;
-
-                    btcrange += "Btc sideway." + Utils.new_line_from_bot + Utils.new_line_from_bot;
-                }
-
-                String depth = createBidsAsks("BTC") + Utils.new_line_from_bot + Utils.new_line_from_bot;
-
-                String premarket = binance_service.loadPremarket();
-
-                message.setText(btcrange + depth + premarket);
-
-                execute(message);
+                checkCommand(message, "BTC");
 
             } else if (command.contains("/buy")) {
                 Calendar calendar = Calendar.getInstance();
@@ -455,29 +430,4 @@ public class WandaBot extends TelegramLongPollingBot {
         execute(message);
     }
 
-    private String createBidsAsks(String SYMBOL) {
-        List<List<DepthResponse>> list_depth = new ArrayList<List<DepthResponse>>();
-        list_depth = binance_service.getListDepthData(SYMBOL);
-        List<DepthResponse> list_bids = new ArrayList<DepthResponse>();
-        List<DepthResponse> list_asks = new ArrayList<DepthResponse>();
-
-        if (!CollectionUtils.isEmpty(list_depth)) {
-            list_bids = list_depth.get(0);
-            list_asks = list_depth.get(1);
-        }
-
-        BigDecimal price_at_binance = Utils.getBinancePrice(SYMBOL);
-        String bids = Utils.getNextBidsOrAsksWall(price_at_binance, list_bids).replaceAll(">", "<");
-        String asks = Utils.getNextBidsOrAsksWall(price_at_binance, list_asks).replaceAll(">", ">");
-
-        String msg = "";
-        msg += binance_service.wallToday() + Utils.new_line_from_bot + Utils.new_line_from_bot;
-        msg += "Bids: " + bids + Utils.new_line_from_bot;
-        msg += "Asks: " + asks;
-
-        if (Objects.equal("BTC", SYMBOL)) {
-            msg += Utils.new_line_from_bot + Utils.new_line_from_bot + binance_service.getBitfinexLongShortBtc();
-        }
-        return msg;
-    }
 }
