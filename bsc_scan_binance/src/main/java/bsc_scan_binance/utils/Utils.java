@@ -1532,6 +1532,8 @@ public class Utils {
         return sum;
     }
 
+    //if (Utils.rangeOfLowHeigh(list_5m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
+
     public static BigDecimal rangeOfLowHeigh(List<BtcFutures> list) {
         List<BigDecimal> LowHeight = getLowHeightCandle(list);
 
@@ -2007,7 +2009,7 @@ public class Utils {
         }
     }
 
-    public static String checkMa3And50(List<BtcFutures> list) {
+    public static String percentMa3to50(List<BtcFutures> list) {
         int cur = 0;
         BigDecimal ma_fast_c = calcMA(list, 3, cur);
         int size = list.size();
@@ -2220,7 +2222,7 @@ public class Utils {
         } else if (symbol.contains("_4h_")) {
             ma = calcMA(list, MA_INDEX_H4_START_LONG, cur);
         } else {
-            ma = calcMA(list, 10, cur);
+            ma = calcMA(list, 20, cur);
         }
 
         if (pre_close_price.compareTo(ma) > 0) {

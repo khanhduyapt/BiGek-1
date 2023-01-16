@@ -2895,7 +2895,7 @@ public class BinanceServiceImpl implements BinanceService {
     private void sendMsgChart15m(String gecko_id, String symbol) {
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (!MAIN_TOKEN.contains("_" + symbol + "_")) {
-            // return; // attack mode
+            return; // attack mode
         }
 
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
@@ -2917,50 +2917,51 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
-            if (allow_long_m15) {
-                if (Utils.is3CuttingUp50ForLongH1(list_15m)) {
-                    String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
+            String percentMa3to50 = Utils.percentMa3to50(list_15m);
+
+            if (Utils.is3CuttingUp50ForLongH1(list_15m)) {
+                String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
+                        + Utils.getCurrentYyyyMmDdHH() + Utils.new_line_from_service + percentMa3to50;
+
+                String msg = "(15m)(Pump)" + symbol + "" + Utils.new_line_from_service
+                        + Utils.calcSL(list_15m, true);
+
+                sendMsgPerHour(EVENT_ID_15m, msg, true);
+            }
+            if (Utils.is3CuttingDown50ForShortH1(list_15m)) {
+                String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
+                        + Utils.getCurrentYyyyMmDdHH();
+
+                String msg = "(15m)(Dump)" + symbol + "" + Utils.new_line_from_service
+                        + Utils.calcSL(list_15m, false) + Utils.new_line_from_service + percentMa3to50;
+
+                sendMsgPerHour(EVENT_ID_15m, msg, true);
+            }
+
+            if (Objects.equals("BTC", symbol)) {
+                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+
+                // Utils.calcSL(list_5m, true);
+                // Utils.calcSL(list_5m, false);
+
+                if (allow_long_m15 && Utils.is3CuttingUp50ForLongH1(list_5m)) {
+
+                    String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
                             + Utils.getCurrentYyyyMmDdHH();
 
-                    String msg = "(15m) 💹💹💹 " + symbol + " (Pump)." + Utils.new_line_from_service
-                            + Utils.calcSL(list_15m, true);
+                    String msg = "(" + TIME_5m + ")(Pump)" + symbol + Utils.new_line_from_service
+                            + Utils.calcSL(list_5m, true);
 
-                    sendMsgPerHour(EVENT_ID_15m, msg, true);
+                    sendMsgPerHour(EVENT_ID_1m, msg, true);
                 }
 
-                if (Objects.equals("BTC", symbol)) {
-                    List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+                if (!allow_long_m15 && Utils.is3CuttingDown50ForShortH1(list_5m)) {
+                    String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
+                            + Utils.getCurrentYyyyMmDdHH();
 
-                    // Utils.calcSL(list_5m, true);
+                    String msg = "(" + TIME_5m + ")(Dump)" + symbol + Utils.calcSL(list_5m, false);
 
-                    if (Utils.rangeOfLowHeigh(list_5m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
-
-                        if (Utils.is3CuttingUp50ForLongH1(list_5m)) {
-
-                            String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
-                                    + Utils.getCurrentYyyyMmDdHH();
-
-                            String msg = "(" + TIME_5m + ") 💹 " + symbol + " (Pump)." + Utils.new_line_from_service
-                                    + Utils.calcSL(list_5m, true);
-
-                            sendMsgPerHour(EVENT_ID_1m, msg, true);
-                        }
-                    }
-                }
-            } else {
-                if (Objects.equals("BTC", symbol)) {
-                    List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-
-                    // Utils.calcSL(list_5m, false);
-
-                    if (Utils.is3CuttingDown50ForShortH1(list_5m)) {
-                        String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
-                                + Utils.getCurrentYyyyMmDdHH();
-
-                        String msg = "(" + TIME_5m + ") 💹 " + symbol + " (Dump)." + Utils.calcSL(list_5m, false);
-
-                        sendMsgPerHour(EVENT_ID_1m, msg, true);
-                    }
+                    sendMsgPerHour(EVENT_ID_1m, msg, true);
                 }
             }
         }
