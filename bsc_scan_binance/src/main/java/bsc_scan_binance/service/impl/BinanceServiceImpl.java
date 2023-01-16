@@ -2914,15 +2914,15 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
+        String MAIN_TOKEN = "_BTC_ETH_BNB_";
+        if (!MAIN_TOKEN.contains("_" + symbol + "_")) {
+            return;
+        }
+
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
         Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
 
-        String MAIN_TOKEN = "_BTC_ETH_BNB_";
-        if (MAIN_TOKEN.contains("_" + symbol + "_")) {
-            sendMsgKillLongShort(gecko_id, symbol, list_15m);
-        } else {
-            return;
-        }
+        sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
         if (Utils.isBusinessTime()) {
             boolean hasPumpDump = false;
@@ -2941,7 +2941,8 @@ public class BinanceServiceImpl implements BinanceService {
                     String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
                             + Utils.getCurrentYyyyMmDdHH();
 
-                    String msg = "(15m) 💹💹💹 " + symbol + " (Pump)." + Utils.calcSL(list_15m, true);
+                    String msg = "(15m) 💹💹💹 " + symbol + " (Pump)." + Utils.new_line_from_service
+                            + Utils.calcSL(list_15m, true);
 
                     sendMsgPerHour(EVENT_ID_15m, msg, true);
                 }
@@ -2949,7 +2950,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Objects.equals("BTC", symbol)) {
                     List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
 
-                    //Utils.calcSL(list_5m, true);
+                    // Utils.calcSL(list_5m, true);
 
                     if (Utils.rangeOfLowHeigh(list_5m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
 
@@ -2958,7 +2959,8 @@ public class BinanceServiceImpl implements BinanceService {
                             String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
                                     + Utils.getCurrentYyyyMmDdHH();
 
-                            String msg = "(" + TIME_5m + ") 💹 " + symbol + " (Pump)." + Utils.calcSL(list_5m, true);
+                            String msg = "(" + TIME_5m + ") 💹 " + symbol + " (Pump)." + Utils.new_line_from_service
+                                    + Utils.calcSL(list_5m, true);
 
                             sendMsgPerHour(EVENT_ID_1m, msg, true);
                         }
@@ -2968,7 +2970,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Objects.equals("BTC", symbol)) {
                     List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
 
-                    //Utils.calcSL(list_5m, false);
+                    // Utils.calcSL(list_5m, false);
 
                     if (Utils.is3CuttingDown50ForShortH1(list_5m)) {
                         String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
