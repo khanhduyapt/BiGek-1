@@ -24,6 +24,7 @@ public class BscScanBinanceApplication {
     public static int app_flag = Utils.const_app_flag_all_coin; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin; 5:
                                                                 // all_and_msg
     public static String callFormBinance = "";
+    public static int SLEEP_MINISECONDS = 8000;
 
     public static void main(String[] args) {
         try {
@@ -65,7 +66,7 @@ public class BscScanBinanceApplication {
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-                int sleep_ms = 6000;
+
                 int size = list.size();
                 int idx = 0;
                 boolean startup = true;
@@ -85,15 +86,15 @@ public class BscScanBinanceApplication {
 
                         if (idx % 3 == 0) {
                             binance_service.getChartWD("bitcoin", "BTC");
-                            wait(sleep_ms);
+                            wait(SLEEP_MINISECONDS);
                         }
 
                         if (idx % 10 == 0) {
                             binance_service.getChartWD("ethereum", "ETH");
-                            wait(sleep_ms);
+                            wait(SLEEP_MINISECONDS);
 
                             binance_service.getChartWD("binancecoin", "BNB");
-                            wait(sleep_ms);
+                            wait(SLEEP_MINISECONDS);
                         }
 
                         binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
@@ -106,7 +107,7 @@ public class BscScanBinanceApplication {
                         System.out.println("dkd error LoadData:" + e.getMessage());
                     }
 
-                    wait(sleep_ms);
+                    wait(SLEEP_MINISECONDS);
 
                     if (Objects.equals(idx, size - 1)) {
                         binance_service.getList(false);
