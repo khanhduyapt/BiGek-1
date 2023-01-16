@@ -2841,53 +2841,32 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (!Objects.equals(pre_Blog4H_CheckUSD, Utils.getCurrentYyyyMmDd_Blog4h())) {
-                List<BtcFutures> list_H4_AUD = Utils.loadData("AUD", TIME_4h, 60);
-                List<BtcFutures> list_H4_EUR = Utils.loadData("EUR", TIME_4h, 60);
-                List<BtcFutures> list_H4_GBP = Utils.loadData("GBP", TIME_4h, 60);
+                List<BtcFutures> list_H1_AUD = Utils.loadData("AUD", TIME_1h, 60);
+                List<BtcFutures> list_H1_EUR = Utils.loadData("EUR", TIME_1h, 60);
+                List<BtcFutures> list_H1_GBP = Utils.loadData("GBP", TIME_1h, 60);
 
-                String temp = "";
-                temp = sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 50, false);
-                if (Utils.isBlank(temp)) {
-                    temp = sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 21, false);
-                    if (Utils.isBlank(temp)) {
-                        temp = sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H4_AUD, "", 13, false);
-                    }
-                }
+                sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H1_AUD, "", 50, false);
+                sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H1_EUR, "", 50, false);
+                sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H1_GBP, "", 50, false);
 
-                temp = sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 50, false);
-                if (Utils.isBlank(temp)) {
-                    temp = sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 21, false);
-                    if (Utils.isBlank(temp)) {
-                        temp = sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H4_EUR, "", 13, false);
-                    }
-                }
-
-                temp = sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 50, false);
-                if (Utils.isBlank(temp)) {
-                    temp = sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 21, false);
-                    if (Utils.isBlank(temp)) {
-                        temp = sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H4_GBP, "", 13, false);
-                    }
-                }
-
-                boolean IsUpAUD_3 = Utils.isUptrendByMaIndex(list_H4_AUD, 3);
-                boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H4_AUD, Utils.MA_INDEX_CURRENCY);
+                boolean IsUpAUD_3 = Utils.isUptrendByMaIndex(list_H1_AUD, 3);
+                boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H1_AUD, Utils.MA_INDEX_CURRENCY);
                 if (IsUpAUD_3 == IsUpAUD_S) {
                     TREND_H4_AUD = IsUpAUD_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {
                     TREND_H4_AUD = Utils.TREND_OPPOSITE;
                 }
 
-                boolean IsUpEUR_3 = Utils.isUptrendByMaIndex(list_H4_EUR, 3);
-                boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H4_EUR, Utils.MA_INDEX_CURRENCY);
+                boolean IsUpEUR_3 = Utils.isUptrendByMaIndex(list_H1_EUR, 3);
+                boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H1_EUR, Utils.MA_INDEX_CURRENCY);
                 if (IsUpEUR_3 == IsUpEUR_S) {
                     TREND_H4_EUR = IsUpEUR_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {
                     TREND_H4_EUR = Utils.TREND_OPPOSITE;
                 }
 
-                boolean IsUpGBP_3 = Utils.isUptrendByMaIndex(list_H4_GBP, 3);
-                boolean IsUpGBP_S = Utils.isUptrendByMaIndex(list_H4_GBP, Utils.MA_INDEX_CURRENCY);
+                boolean IsUpGBP_3 = Utils.isUptrendByMaIndex(list_H1_GBP, 3);
+                boolean IsUpGBP_S = Utils.isUptrendByMaIndex(list_H1_GBP, Utils.MA_INDEX_CURRENCY);
                 if (IsUpGBP_3 == IsUpGBP_S) {
                     TREND_H4_GBP = IsUpGBP_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 } else {

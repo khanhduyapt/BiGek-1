@@ -73,7 +73,6 @@ public class Utils {
     public static final int MA_INDEX_H4_START_LONG = 8;
     public static final int MA_INDEX_D1_STOP_LONG = 5;
     public static final int MA_INDEX_D1_START_LONG = 5;
-
     public static final int MA_INDEX_CURRENCY = 21;
 
     public static String sql_OrdersProfitResponse = ""
