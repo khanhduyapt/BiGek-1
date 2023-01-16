@@ -2804,21 +2804,28 @@ public class BinanceServiceImpl implements BinanceService {
     private String sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
         String msg = "";
 
-        String type = "kill Short 💔";
-        boolean allow_long = Utils.is3CuttingUp50ForLongH1(list_15m);
+        String type_short = "kill Short 💔";
+        boolean allow_long = Utils.is3CuttingUp50ForLongH1(list_15m, 50);
         if (allow_long) {
-            type = "Pump";
+            type_short = "Pump.";
         }
+
+        String type_long = "kill Long 💔";
+        boolean allow_short = Utils.is3CuttingDown50ForShortH1(list_15m, 50);
+        if (allow_short) {
+            type_long = "Dump.";
+        }
+
         String percentMa3to50 = Utils.percentMa3to50(list_15m);
 
         BtcFutures ido = list_15m.get(0);
         if (ido.isBtcKillLongCandle() || ido.isBtcKillShortCandle()) {
 
-            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " 15m dump/kill Long. "
+            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " 15m " + type_long
                     + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
 
             if (ido.isBtcKillShortCandle() || allow_long) {
-                msg = Utils.getTimeHHmm() + " 💹 " + symbol + " 15m " + type + ". "
+                msg = Utils.getTimeHHmm() + " 💹 " + symbol + " 15m " + type_short
                         + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
             }
 
@@ -2922,7 +2929,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             String percentMa3to50 = Utils.percentMa3to50(list_15m);
 
-            if (Utils.is3CuttingUp50ForLongH1(list_15m)) {
+            if (Utils.is3CuttingUp50ForLongH1(list_15m, 50)) {
                 String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
                         + Utils.getCurrentYyyyMmDdHH() + Utils.new_line_from_service + percentMa3to50;
 
@@ -2931,7 +2938,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 sendMsgPerHour(EVENT_ID_15m, msg, true);
             }
-            if (Utils.is3CuttingDown50ForShortH1(list_15m)) {
+            if (Utils.is3CuttingDown50ForShortH1(list_15m, 50)) {
                 String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
                         + Utils.getCurrentYyyyMmDdHH();
 
@@ -2948,7 +2955,7 @@ public class BinanceServiceImpl implements BinanceService {
                 // Utils.calcSL(list_5m, false);
 
                 Boolean allow_long_m15 = Utils.checkClosePriceAndMa_StartFindLong(list_15m);
-                if (allow_long_m15 && Utils.is3CuttingUp50ForLongH1(list_5m)) {
+                if (allow_long_m15 && Utils.is3CuttingUp50ForLongH1(list_5m, 50)) {
                     String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
                             + Utils.getCurrentYyyyMmDdHH();
 
@@ -2958,11 +2965,12 @@ public class BinanceServiceImpl implements BinanceService {
                     sendMsgPerHour(EVENT_ID_1m, msg, true);
                 }
 
-                if (!allow_long_m15 && Utils.is3CuttingDown50ForShortH1(list_5m)) {
+                if (!allow_long_m15 && Utils.is3CuttingDown50ForShortH1(list_5m, 50)) {
                     String EVENT_ID_1m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
                             + Utils.getCurrentYyyyMmDdHH();
 
-                    String msg = "(" + TIME_5m + ")(Dump)" + symbol + Utils.calcSL(list_5m, false);
+                    String msg = "(" + TIME_5m + ")(Dump)" + symbol + Utils.new_line_from_service
+                            + Utils.calcSL(list_5m, false);
 
                     sendMsgPerHour(EVENT_ID_1m, msg, true);
                 }

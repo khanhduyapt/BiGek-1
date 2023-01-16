@@ -2054,7 +2054,7 @@ public class Utils {
         return result;
     }
 
-    public static boolean is3CuttingUp50ForLongH1(List<BtcFutures> list) {
+    public static boolean is3CuttingUp50ForLongH1(List<BtcFutures> list, int maSlowIndex) {
         if (list.size() < 50) {
             return false;
         }
@@ -2071,7 +2071,7 @@ public class Utils {
         return false;
     }
 
-    public static boolean is3CuttingDown50ForShortH1(List<BtcFutures> list) {
+    public static boolean is3CuttingDown50ForShortH1(List<BtcFutures> list, int maSlowIndex) {
         if (list.size() < 50) {
             return false;
         }
@@ -2079,7 +2079,7 @@ public class Utils {
         BigDecimal close1 = list.get(1).getPrice_open_candle();
         BigDecimal close2 = list.get(2).getPrice_open_candle();
 
-        BigDecimal ma_50_c = calcMA(list, 50, 1);
+        BigDecimal ma_50_c = calcMA(list, maSlowIndex, 1);
 
         if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close2) < 0)) {
             return true;
@@ -2291,7 +2291,7 @@ public class Utils {
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
 
             if (symbol.contains("_1h_") || symbol.contains("_15m_") || symbol.contains("_1m_")) {
-                isCuttingUp = is3CuttingUp50ForLongH1(list);
+                isCuttingUp = is3CuttingUp50ForLongH1(list, 50);
             } else {
                 if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
                     isCuttingUp = true;
@@ -2315,7 +2315,7 @@ public class Utils {
                     isCuttingDown = true;
                 }
                 if (!isCuttingDown) {
-                    isCuttingDown = is3CuttingDown50ForShortH1(list);
+                    isCuttingDown = is3CuttingDown50ForShortH1(list, 50);
                 }
                 if (isCuttingDown && isMa_fast_Up) {
                     isCuttingDown = false;
