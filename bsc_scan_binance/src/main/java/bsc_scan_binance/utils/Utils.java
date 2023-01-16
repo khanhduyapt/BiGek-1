@@ -1532,7 +1532,7 @@ public class Utils {
         return sum;
     }
 
-    //if (Utils.rangeOfLowHeigh(list_5m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
+    // if (Utils.rangeOfLowHeigh(list_5m).compareTo(BigDecimal.valueOf(0.5)) > 0) {
 
     public static BigDecimal rangeOfLowHeigh(List<BtcFutures> list) {
         List<BigDecimal> LowHeight = getLowHeightCandle(list);
@@ -2034,21 +2034,24 @@ public class Utils {
         BigDecimal SL = BigDecimal.ZERO;
         BigDecimal SL_real = BigDecimal.ZERO;
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
-
+        List<BigDecimal> low_heigh_entry = getLowHeightCandle(list.subList(0, 15));
+        BigDecimal g_entry = BigDecimal.ZERO;
         if (isLong) {
             SL = entry.multiply(BigDecimal.valueOf(0.99));
             SL_real = low_heigh.get(0);
+            g_entry = low_heigh_entry.get(0);
         } else {
             SL = entry.multiply(BigDecimal.valueOf(1.01));
             SL_real = low_heigh.get(1);
+            g_entry = low_heigh_entry.get(1);
         }
 
         int usd = 5;
-        BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
+        BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL_real), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
         String result = "SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL_real, true);
-        result += ",SL(1%): " + removeLastZero(entry);
+        result += ",SL(1%): " + removeLastZero(SL) + ", E: " + getPercentToEntry(entry, g_entry, true);
         result += ",Vol(1%): " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
         return result;
@@ -2201,7 +2204,7 @@ public class Utils {
         } else if (symbol.contains("_4h_")) {
             ma = calcMA(list, MA_INDEX_H4_START_LONG, cur);
         } else {
-            ma = calcMA(list, 20, cur);
+            ma = calcMA(list, 50, cur);
         }
 
         if (pre_close_price.compareTo(ma) > 0) {
