@@ -1359,9 +1359,6 @@ public class Utils {
 
     public static String getChartName(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
-        if (symbol.contains("_15m_")) {
-            return "(m15)";
-        }
         if (symbol.contains("_1h_")) {
             return "(H1)";
         }
@@ -2057,7 +2054,7 @@ public class Utils {
         return result;
     }
 
-    public static boolean is3CuttingUp50ForLongH1(List<BtcFutures> list, int maSlowIndex) {
+    public static boolean is3CuttingUpXForLongH1(List<BtcFutures> list, int maSlowIndex) {
         if (list.size() < 50) {
             return false;
         }
@@ -2074,7 +2071,7 @@ public class Utils {
         return false;
     }
 
-    public static boolean is3CuttingDown50ForShortH1(List<BtcFutures> list, int maSlowIndex) {
+    public static boolean is3CuttingDownXForShortH1(List<BtcFutures> list, int maSlowIndex) {
         if (list.size() < 50) {
             return false;
         }
@@ -2294,7 +2291,7 @@ public class Utils {
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
 
             if (symbol.contains("_1h_") || symbol.contains("_15m_") || symbol.contains("_1m_")) {
-                isCuttingUp = is3CuttingUp50ForLongH1(list, 50);
+                isCuttingUp = is3CuttingUpXForLongH1(list, 50);
             } else {
                 if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
                     isCuttingUp = true;
@@ -2318,7 +2315,7 @@ public class Utils {
                     isCuttingDown = true;
                 }
                 if (!isCuttingDown) {
-                    isCuttingDown = is3CuttingDown50ForShortH1(list, 50);
+                    isCuttingDown = is3CuttingDownXForShortH1(list, 50);
                 }
                 if (isCuttingDown && isMa_fast_Up) {
                     isCuttingDown = false;
