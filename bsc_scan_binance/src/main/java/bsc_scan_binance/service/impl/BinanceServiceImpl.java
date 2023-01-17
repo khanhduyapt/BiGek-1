@@ -2849,33 +2849,27 @@ public class BinanceServiceImpl implements BinanceService {
         String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDd_Blog4h();
         String sl = "";
 
-        String trend_m15 = Utils.check3CuttingXforH1(list, 20);
+        String trend_m15 = Utils.check3CuttingXforH1(list, maIndex);
+
         if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
+
             msg = " 💹... " + symbol + chartname + ":Ma3CutUpMa" + maIndex + ".";
             sl = Utils.calcSL(list, true);
+
         } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
+
             msg = " 📉... " + symbol + chartname + ":Ma3CutDownMa" + maIndex + ".";
             sl = Utils.calcSL(list, false);
+
         }
+
         if (Utils.isNotBlank(msg)) {
             msg += Utils.new_line_from_service + sl;
-
-            //if (Objects.equals("(H4)", chartname)) {
-            //if (Objects.equals("BTC", symbol)) {
-            //    sendMsgPerHour(EVENT_ID_15m, msg, false);
-            //} else {
-            //    sendMsgPerHour(EVENT_ID_15m, msg, true);
-            //}
             sendMsgPerHour(EVENT_ID_15m, msg, true);
         }
     }
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
-        String MAIN_TOKEN = "_BTC_ETH_BNB_";
-        if (!MAIN_TOKEN.contains("_" + symbol + "_")) {
-            return; // attack mode
-        }
-
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
         sendMsgByTrendMaX(symbol, list_15m, 20);
         //-----------------------------------------------//
@@ -2893,7 +2887,6 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
-        sendMsgChart15m(gecko_id, symbol);
 
         // AUD_EUR_GBP_USDT
         if (Objects.equals("BTC", symbol)) {
@@ -2917,7 +2910,7 @@ public class BinanceServiceImpl implements BinanceService {
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures) ";
-            sendMsgByTrendMaX(symbol, list_h4, 10);
+            //sendMsgByTrendMaX(symbol, list_h4, 10);
         } else {
             type = " (Spot) ";
         }
@@ -2931,6 +2924,7 @@ public class BinanceServiceImpl implements BinanceService {
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
+            sendMsgChart15m(gecko_id, symbol);
 
             List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
             String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, Utils.TREND_LONG, 50, false);
