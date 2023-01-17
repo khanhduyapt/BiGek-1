@@ -2803,9 +2803,6 @@ public class BinanceServiceImpl implements BinanceService {
         BtcFutures ido = list_15m.get(0);
         String percentMa3to50 = Utils.new_line_from_service + Utils.percentMa3to50(list_15m);
 
-        BigDecimal ma20 = Utils.calcMA(list_15m, 20, 1);
-        BigDecimal ma50 = Utils.calcMA(list_15m, 50, 1);
-
         if (ido.isBtcKillLongCandle()) {
             msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " kill Long 💔 "
                     + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
@@ -2813,27 +2810,6 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (ido.isBtcKillShortCandle()) {
             msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " kill Short 💔 "
-                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
-        }
-
-        //if ("_BTC_ETH_".contains("_" + symbol + "_")) {
-        if (Objects.equals("BTC", symbol)) {
-            if ((ma20.compareTo(ma50) < 0) && Utils.is3CuttingUpXForLongH1(list_15m, 20)) {
-                msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " Ma3CutUpMa20.";
-            }
-
-            if ((ma20.compareTo(ma50) > 0) && Utils.is3CuttingDownXForShortH1(list_15m, 20)) {
-                msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Ma3CutDownMa20.";
-            }
-        }
-
-        if (Utils.is3CuttingUpXForLongH1(list_15m, 50)) {
-            msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " kill Short 💔 "
-                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
-        }
-
-        if (Utils.is3CuttingDownXForShortH1(list_15m, 50)) {
-            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Dump."
                     + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
         }
 
@@ -2925,7 +2901,7 @@ public class BinanceServiceImpl implements BinanceService {
             kill = sendMsgKillLongShort(gecko_id, symbol, list_15m);
         }
 
-        if ((Objects.equals("BTC", symbol) && Utils.isBusinessTime())) {
+        if ((Objects.equals("BTC", symbol))) {
             boolean hasPumpDump = false;
             for (BtcFutures dto : list_15m) {
                 if (dto.isBtcKillLongCandle() || dto.isBtcKillShortCandle()) {
@@ -2936,47 +2912,56 @@ public class BinanceServiceImpl implements BinanceService {
                 return;
             }
 
-            BigDecimal close = list_15m.get(1).getPrice_close_candle();
-            BigDecimal ma50_15m = Utils.calcMA(list_15m, 50, 1);
+            String msg = "";
+            String chartname = Utils.getChartName(list_15m);
+            BigDecimal ma20 = Utils.calcMA(list_15m, 20, 1);
+            BigDecimal ma50 = Utils.calcMA(list_15m, 50, 1);
 
-            String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_15m)
-                    + Utils.getCurrentYyyyMmDdHH();
+            String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
 
-            if ((close.compareTo(ma50_15m) < 0) && Utils.is3CuttingUpXForLongH1(list_15m, 10)) {
-                String msg = "(15m)(Check Long)" + symbol;
+            if (Objects.equals("BTC", symbol)) {
+                if ((ma20.compareTo(ma50) < 0) && Utils.is3CuttingUpXForLongH1(list_15m, 20)) {
+                    msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " Ma3CutUpMa20.";
+                }
 
-                sendMsgPerHour(EVENT_ID_15m, msg, true);
-                return;
-            }
+                if ((ma20.compareTo(ma50) > 0) && Utils.is3CuttingDownXForShortH1(list_15m, 20)) {
+                    msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Ma3CutDownMa20.";
+                }
 
-            if ((close.compareTo(ma50_15m) > 0) && Utils.is3CuttingDownXForShortH1(list_15m, 10)) {
-                String msg = "(15m)(Check Short)" + symbol;
+                if (Utils.is3CuttingUpXForLongH1(list_15m, 50)) {
+                    msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " Ma3CutUpMa50 ";
+                }
 
-                sendMsgPerHour(EVENT_ID_15m, msg, true);
-                return;
+                if (Utils.is3CuttingDownXForShortH1(list_15m, 50)) {
+                    msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Ma3CutDownMa50.";
+                }
+
+                if (Utils.isNotBlank(msg)) {
+                    sendMsgPerHour(EVENT_ID_15m, msg, true);
+                }
             }
 
             // ---------------------------------------------------------------------//
 
-            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-            BigDecimal close_5m = list_5m.get(1).getPrice_close_candle();
-            BigDecimal ma50_5m = Utils.calcMA(list_5m, 50, 1);
-
-            if (Utils.isBlank(kill)) {
-                sendMsgKillLongShort(gecko_id, symbol, list_5m);
-            }
-
-            String EVENT_ID_5m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_5m) + Utils.getCurrentYyyyMmDdHH();
-
-            if ((close_5m.compareTo(ma50_5m) < 0) && Utils.is3CuttingUpXForLongH1(list_5m, 10)) {
-                sendMsgPerHour(EVENT_ID_5m, "(" + TIME_5m + ")(Check Long)" + symbol, true);
-                return;
-            }
-
-            if ((close_5m.compareTo(ma50_5m) > 0) && Utils.is3CuttingDownXForShortH1(list_5m, 10)) {
-                sendMsgPerHour(EVENT_ID_5m, "(" + TIME_5m + ")(Check Short)" + symbol, true);
-                return;
-            }
+            //List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+            //BigDecimal close_5m = list_5m.get(1).getPrice_close_candle();
+            //BigDecimal ma50_5m = Utils.calcMA(list_5m, 50, 1);
+            //
+            //if (Utils.isBlank(kill)) {
+            //    sendMsgKillLongShort(gecko_id, symbol, list_5m);
+            //}
+            //
+            //String EVENT_ID_5m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_5m) + Utils.getCurrentYyyyMmDdHH();
+            //
+            //if ((close_5m.compareTo(ma50_5m) < 0) && Utils.is3CuttingUpXForLongH1(list_5m, 10)) {
+            //    sendMsgPerHour(EVENT_ID_5m, "(" + TIME_5m + ")(Check Long)" + symbol, true);
+            //    return;
+            //}
+            //
+            //if ((close_5m.compareTo(ma50_5m) > 0) && Utils.is3CuttingDownXForShortH1(list_5m, 10)) {
+            //    sendMsgPerHour(EVENT_ID_5m, "(" + TIME_5m + ")(Check Short)" + symbol, true);
+            //    return;
+            //}
 
         }
     }
