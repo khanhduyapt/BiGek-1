@@ -73,7 +73,7 @@ public class Utils {
     public static final int MA_INDEX_H4_START_LONG = 8;
     public static final int MA_INDEX_D1_STOP_LONG = 5;
     public static final int MA_INDEX_D1_START_LONG = 5;
-    public static final int MA_INDEX_CURRENCY = 21;
+    public static final int MA_INDEX_CURRENCY = 10;
 
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
@@ -2007,6 +2007,9 @@ public class Utils {
     }
 
     public static String percentMa3to50(List<BtcFutures> list) {
+        if (list.size() < 50) {
+            return "";
+        }
         int cur = 0;
         BigDecimal ma_fast_c = calcMA(list, 3, cur);
         int size = list.size();
@@ -2028,17 +2031,14 @@ public class Utils {
 
     public static String calcSL(List<BtcFutures> list, boolean isLong) {
         BigDecimal entry = list.get(0).getCurrPrice();
-        BigDecimal SL = BigDecimal.ZERO;
         BigDecimal SL_real = BigDecimal.ZERO;
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
         List<BigDecimal> low_heigh_entry = getLowHeightCandle(list.subList(0, 15));
         BigDecimal g_entry = BigDecimal.ZERO;
         if (isLong) {
-            SL = entry.multiply(BigDecimal.valueOf(0.99));
             SL_real = low_heigh.get(0);
             g_entry = low_heigh_entry.get(0);
         } else {
-            SL = entry.multiply(BigDecimal.valueOf(1.01));
             SL_real = low_heigh.get(1);
             g_entry = low_heigh_entry.get(1);
         }
@@ -2048,8 +2048,8 @@ public class Utils {
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
         String result = "SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL_real, true);
-        result += ",SL(1%): " + removeLastZero(SL) + ", E: " + getPercentToEntry(entry, g_entry, true);
-        result += ",Vol(1%): " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
+        result += ", E: " + getPercentToEntry(entry, g_entry, true);
+        result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
         return result;
     }
@@ -2059,12 +2059,17 @@ public class Utils {
             return false;
         }
 
+        BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
+        BigDecimal ma50 = Utils.calcMA(list, 50, 1);
+
+        if (ma_X_c.compareTo(ma50) > 0) {
+            return false;
+        }
+
         BigDecimal close1 = calcMA(list, 3, 1);// list.get(1).getPrice_open_candle();
         BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
-        BigDecimal ma_50_c = calcMA(list, maSlowIndex, 1);
-
-        if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close2) > 0)) {
+        if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
             return true;
         }
 
@@ -2075,119 +2080,21 @@ public class Utils {
         if (list.size() < maSlowIndex) {
             return false;
         }
+        BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
+        BigDecimal ma50 = Utils.calcMA(list, 50, 1);
+
+        if (ma_X_c.compareTo(ma50) < 0) {
+            return false;
+        }
 
         BigDecimal close1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
         BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
-        BigDecimal ma_50_c = calcMA(list, maSlowIndex, 1);
-
-        if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close2) < 0)) {
+        if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(close2) < 0)) {
             return true;
         }
 
         return false;
-    }
-
-    public static boolean is3CuttingUp50ForLong(List<BtcFutures> list) {
-        if (list.size() < 50) {
-            return false;
-        }
-        boolean result = false;
-
-        BigDecimal open2 = list.get(2).getPrice_open_candle();
-        BigDecimal open = list.get(1).getPrice_open_candle();
-        BigDecimal close = list.get(1).getPrice_close_candle();
-
-        BigDecimal ma_3_c = calcMA(list, 3, 1);
-        BigDecimal ma_3_p = calcMA(list, 3, 2);
-
-        BigDecimal ma_13_c = calcMA(list, 13, 1);
-        BigDecimal ma_21_c = calcMA(list, 21, 1);
-
-        BigDecimal ma_50_c = calcMA(list, 50, 1);
-        BigDecimal ma_50_p = calcMA(list, 50, 2);
-
-        if ((open.compareTo(close) < 0) && (ma_3_c.compareTo(ma_3_p) > 0)) {
-            if ((open.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0) && (open.compareTo(ma_3_c) < 0)
-                    && (ma_3_c.compareTo(close) < 0)) {
-                result = true;
-            }
-
-            if ((open.compareTo(ma_21_c) < 0) && (ma_21_c.compareTo(close) < 0) && (open.compareTo(ma_13_c) < 0)
-                    && (ma_13_c.compareTo(close) < 0) && (open.compareTo(ma_3_c) < 0)
-                    && (ma_3_c.compareTo(close) < 0)) {
-                result = true;
-            }
-        }
-
-        if ((open2.compareTo(close) < 0) && (ma_3_c.compareTo(ma_3_p) > 0)) {
-            if ((open2.compareTo(ma_50_c) < 0) && (ma_50_c.compareTo(close) < 0) && (open2.compareTo(ma_21_c) < 0)
-                    && (ma_21_c.compareTo(close) < 0) && (open2.compareTo(ma_13_c) < 0)
-                    && (ma_13_c.compareTo(close) < 0) && (open2.compareTo(ma_3_c) < 0)
-                    && (ma_3_c.compareTo(close) < 0)) {
-
-                result = true;
-            }
-        }
-
-        if ((ma_3_c.compareTo(ma_3_p) > 0) && (ma_3_c.compareTo(ma_50_c) > 0) && (ma_50_p.compareTo(ma_3_p) > 0)) {
-            result = true;
-        }
-
-        if (ma_3_c.compareTo(ma_21_c) < 0) {
-            result = false;
-        }
-
-        return result;
-    }
-
-    public static boolean is3CuttingDown50ForShort(List<BtcFutures> list) {
-        if (list.size() < 50) {
-            return false;
-        }
-        boolean result = false;
-
-        BigDecimal ma_3_c = calcMA(list, 3, 1);
-        BigDecimal ma_3_p = calcMA(list, 3, 2);
-
-        BigDecimal ma_13_c = calcMA(list, 13, 1);
-        BigDecimal ma_21_c = calcMA(list, 21, 1);
-
-        BigDecimal ma_50_c = calcMA(list, 50, 1);
-        BigDecimal ma_50_p = calcMA(list, 50, 2);
-
-        BigDecimal open2 = list.get(2).getPrice_open_candle();
-        BigDecimal open = list.get(1).getPrice_open_candle();
-        BigDecimal close = list.get(1).getPrice_close_candle();
-
-        if ((open.compareTo(close) > 0) && (ma_3_c.compareTo(ma_3_p) < 0)) {
-            if ((open.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close) > 0) && (open.compareTo(ma_21_c) > 0)
-                    && (ma_21_c.compareTo(close) > 0) && (open.compareTo(ma_13_c) > 0) && (ma_13_c.compareTo(close) > 0)
-                    && (open.compareTo(ma_3_c) > 0) && (ma_3_c.compareTo(close) > 0)) {
-
-                result = true;
-            }
-        }
-
-        if ((open2.compareTo(close) > 0) && (ma_3_c.compareTo(ma_3_p) < 0)) {
-            if ((open2.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close) > 0) && (open2.compareTo(ma_21_c) > 0)
-                    && (ma_21_c.compareTo(close) > 0) && (open2.compareTo(ma_13_c) > 0)
-                    && (ma_13_c.compareTo(close) > 0) && (open2.compareTo(ma_3_c) > 0)
-                    && (ma_3_c.compareTo(close) > 0)) {
-
-                result = true;
-            }
-        }
-
-        if ((ma_3_c.compareTo(ma_3_p) < 0) && (ma_3_c.compareTo(ma_50_c) < 0) && (ma_50_p.compareTo(ma_3_p) < 0)) {
-            result = true;
-        }
-
-        if (ma_3_c.compareTo(ma_21_c) > 0) {
-            result = false;
-        }
-
-        return result;
     }
 
     public static boolean checkClosePriceAndMa_StartFindLong(List<BtcFutures> list) {
@@ -2283,99 +2190,27 @@ public class Utils {
             isMa_fast_Up = false;
         }
 
-        BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
-        BigDecimal ma_slow_p = calcMA(list, slowIndex, pre);
-
         // -----------------------------------------------
         boolean isCuttingUp = false;// Long
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
-
-            if (symbol.contains("_1h_") || symbol.contains("_15m_") || symbol.contains("_1m_")) {
-                isCuttingUp = is3CuttingUpXForLongH1(list, 50);
-            } else {
-                if ((ma_fast_c.compareTo(ma_slow_c) > 0) && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-                    isCuttingUp = true;
-                }
-                if (!isCuttingUp) {
-                    isCuttingUp = is3CuttingUp50ForLong(list);
-                }
-                if (isCuttingUp && !isMa_fast_Up) {
-                    isCuttingUp = false;
-                }
+            isCuttingUp = is3CuttingUpXForLongH1(list, slowIndex);
+            if (isCuttingUp && !isMa_fast_Up) {
+                isCuttingUp = false;
             }
         }
 
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
-            if (symbol.contains("_1h_") || symbol.contains("_15m_") || symbol.contains("_1m_")) {
-                isCuttingDown = is3CuttingDown50ForShort(list);
-            } else {
-                if ((ma_fast_p.compareTo(ma_slow_p) > 0) && (ma_slow_c.compareTo(ma_fast_c) > 0)) {
-                    isCuttingDown = true;
-                }
-                if (!isCuttingDown) {
-                    isCuttingDown = is3CuttingDownXForShortH1(list, 50);
-                }
-                if (isCuttingDown && isMa_fast_Up) {
-                    isCuttingDown = false;
-                }
+            isCuttingDown = is3CuttingDownXForShortH1(list, slowIndex);
+            if (isCuttingDown && isMa_fast_Up) {
+                isCuttingDown = false;
             }
         }
 
-        // -----------------------------------------------
-        // String volume = Utils.analysisVolume(list);
-        // if (isNotBlank(volume)) {
-        // volume = ",TradingQty: " + volume.replace("volma{", "").replace("}volma",
-        // "");
-        // } else {
-        // volume = ",TradingQty: Weak";
-        // }
-        //
-        // String note_long = "";
-        // if (!isMa_fast_Up) {
-        // note_long += " Ma" + fastIndex + ":Down,";
-        // }
-        // if (!isMaSlowUp) {
-        // note_long += " Ma" + slowIndex + ":Down,";
-        // }
-        // if (!list.get(0).isUptrend()) {
-        // note_long += " Candle:Down,";
-        // }
-        //
-        // if (isNotBlank(note_long)) {
-        // note_long = " (Remark)," + note_long + "," + str_ma_50 + volume;
-        // } else {
-        // note_long = " (Remark)," + str_ma_50 + volume;
-        // }
-        //
-        // String note_short = "";
-        // if (isMa_fast_Up) {
-        // note_short += " Ma" + fastIndex + ":Up,";
-        // }
-        // if (isMaSlowUp) {
-        // note_short += " Ma" + slowIndex + ":Up,";
-        // }
-        // if (list.get(0).isUptrend()) {
-        // note_short += " Candle:Up,";
-        // }
-        //
-        // if (isNotBlank(note_short)) {
-        // note_short = " (Remark)," + note_short + "," + str_ma_50 + volume;
-        // } else {
-        // note_short = " (Remark)," + str_ma_50 + volume;
-        // }
-
         // --------------------------------------------------
 
-        String type = "(Check)";
-        // if (slowIndex >= 35) {
-        // type = "";
-        // } else if (slowIndex >= 20) {
-        // type = "(Prepare)";
-        // } else if (slowIndex >= 8) {
-        // type = "(Check)";
-        // }
+        String type = "Check(Ma" + getStringValue(slowIndex) + ")";
         BigDecimal currPrice = list.get(0).getCurrPrice();
 
         String result = "";
@@ -2414,8 +2249,6 @@ public class Utils {
 
                 BigDecimal SL = fiboList.get(0);
                 BigDecimal entry = fiboList.get(1);
-                // BigDecimal TP1 = fiboList.get(2);
-                // BigDecimal TP2 = fiboList.get(3);
                 BigDecimal TP3 = fiboList.get(4);
 
                 BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
@@ -2425,10 +2258,7 @@ public class Utils {
                 earn3 = formatPrice(vol.multiply(earn3), 1);
 
                 result += " SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL, true);
-                // result += ",E: " + removeLastZero(entry) + "$";
-                // result += ",TP: " + getPercentToEntry(entry, TP3, isLong);
                 result += " Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
-                // ":" + removeLastZero(earn3) +
 
                 if (showDetail) {
                     int start_index = 0;
@@ -2448,43 +2278,13 @@ public class Utils {
                         }
                     }
                     String timing2 = timingTarget(getChartName(list), start_index * 5);
-                    // BigDecimal earn1 = TP1.subtract(entry).abs().divide(entry, 10,
-                    // RoundingMode.CEILING);
-                    // earn1 = formatPrice(vol.multiply(earn1), 1);
-
-                    // BigDecimal earn2 = TP2.subtract(entry).abs().divide(entry, 10,
-                    // RoundingMode.CEILING);
-                    // earn2 = formatPrice(vol.multiply(earn2), 1);
-
-                    // BigDecimal earn3 = TP3.subtract(entry).abs().divide(entry, 10,
-                    // RoundingMode.CEILING);
-                    // earn3 = formatPrice(vol.multiply(earn3), 1);
-
-                    // result += ",TP2: " + getPercentToEntry(entry, TP2, isLong) + ":" +
-                    // removeLastZero(earn2) + "$";
-                    // result += ",TP2: " + getPercentToEntry(entry, TP3, isLong) + ":" +
-                    // removeLastZero(earn3) + "$";
                     if (isNotBlank(timing2)) {
                         result += ",END:" + timing2;
                     }
                 }
-
-                // String log = "checkMa3And13: " + list.get(0).getId() + ": " + result;
-                // System.out.println(log);
             }
         } catch (Exception e) {
         }
-
-        // if (!showDetail) {
-        // if (isCuttingDown && isNotBlank(note_short)) {
-        // result += ",," + note_short;
-        // }
-        // if (isCuttingUp && isNotBlank(note_long)) {
-        // result += ",," + note_long;
-        // }
-        // } else {
-        // result += "," + volume;
-        // }
 
         if (!(result.contains(TREND_LONG) || result.contains(TREND_SHORT))) {
             result = "";
