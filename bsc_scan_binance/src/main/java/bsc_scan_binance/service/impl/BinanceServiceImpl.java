@@ -474,7 +474,7 @@ public class BinanceServiceImpl implements BinanceService {
                 } else if (getValue(css.getVolumn_div_marketcap()) >= Long.valueOf(20)) {
                     css.setVolumn_div_marketcap_css("highlight rounded-lg");
                 } else {
-                    css.setVolumn_div_marketcap_css("text-danger bg-light");
+                    //css.setVolumn_div_marketcap_css("text-danger bg-light");
                 }
 
                 if (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(30)) > 0) {
@@ -1109,7 +1109,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if ((Utils.getBigDecimalValue(dto.getVolumn_div_marketcap()).compareTo(BigDecimal.valueOf(20)) < 0)
                         && (volumn_binance_div_marketcap.compareTo(BigDecimal.valueOf(10)) < 0)) {
-                    css.setVolumn_binance_div_marketcap_css("text-danger");
+                    //css.setVolumn_binance_div_marketcap_css("text-danger");
                 }
 
                 if (Objects.equals("BTC", dto.getSymbol().toUpperCase())) {
@@ -2887,13 +2887,18 @@ public class BinanceServiceImpl implements BinanceService {
 
             String chart_5m = Utils.getChartName(list_5m);
             String EVENT_ID_5m = EVENT_PUMP + symbol + "_" + chart_5m + Utils.getCurrentYyyyMmDdHH();
-            if (Utils.is3CuttingUpXForLongH1(list_15m, 20)) {
+
+            String trend_m5 = Utils.check3CuttingXforH1(list_5m, 20);
+            if (Objects.equals(Utils.TREND_LONG, trend_m5)) {
+
                 String msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chart_5m + " Ma3CutUpMa20.";
                 sendMsgPerHour(EVENT_ID_5m, msg, true);
-            }
-            if (Utils.is3CuttingDownXForShortH1(list_5m, 20)) {
+
+            } else if (Objects.equals(Utils.TREND_SHORT, trend_m5)) {
+
                 String msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chart_5m + " Ma3CutDownMa20.";
                 sendMsgPerHour(EVENT_ID_5m, msg, true);
+
             }
 
             //-----------------------------------------------//
@@ -2903,24 +2908,33 @@ public class BinanceServiceImpl implements BinanceService {
 
             String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
             String sl = "";
-            if (Utils.is3CuttingUpXForLongH1(list_15m, 20)) {
-                msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " Ma3CutUpMa20.";
-                sl = Utils.calcSL(list_15m, true);
-            }
 
-            if (Utils.is3CuttingUpXForLongH1(list_15m, 50)) {
+            String trend_m15 = Utils.check3CuttingXforH1(list_15m, 50);
+            if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
+
                 msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " Ma3CutUpMa50 ";
                 sl = Utils.calcSL(list_15m, true);
-            }
 
-            if (Utils.is3CuttingDownXForShortH1(list_15m, 20)) {
-                msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Ma3CutDownMa20.";
-                sl = Utils.calcSL(list_15m, false);
-            }
+            } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
 
-            if (Utils.is3CuttingDownXForShortH1(list_15m, 50)) {
                 msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Ma3CutDownMa50.";
                 sl = Utils.calcSL(list_15m, false);
+
+            } else {
+
+                trend_m15 = Utils.check3CuttingXforH1(list_15m, 20);
+
+                if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
+
+                    msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " Ma3CutUpMa20.";
+                    sl = Utils.calcSL(list_15m, true);
+
+                } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
+
+                    msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Ma3CutDownMa20.";
+                    sl = Utils.calcSL(list_15m, false);
+
+                }
             }
 
             if (Utils.isNotBlank(msg)) {
@@ -3005,14 +3019,6 @@ public class BinanceServiceImpl implements BinanceService {
 
                 if (current_price.compareTo(max_allow_long) > 0) {
                     RANGE_H4_BTC_IS_DANGER = true;
-                }
-
-                String msg = Utils.getMsgMa3AndMa8_ForChangeStatus(list_h4);
-
-                if (Utils.isNotBlank(msg)) {
-                    String EVENT_CHECK_ID = EVENT_COMPRESSED_CHART + "_CHANGE_STATUS_H4_"
-                            + Utils.getCurrentYyyyMmDd_Blog4h();
-                    sendMsgPerHour(EVENT_CHECK_ID, msg, true);
                 }
             }
 

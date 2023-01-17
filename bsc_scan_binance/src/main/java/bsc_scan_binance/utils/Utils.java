@@ -1932,7 +1932,7 @@ public class Utils {
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
 
             if (earn.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
-                result += TREND_DANGER;
+                //result += TREND_DANGER;
             }
 
             return result;
@@ -1993,7 +1993,7 @@ public class Utils {
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn1) + "$";
 
             if (earn1.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
-                result += TREND_DANGER;
+                //result += TREND_DANGER;
             }
 
             return result;
@@ -2051,47 +2051,28 @@ public class Utils {
         return result;
     }
 
-    public static boolean is3CuttingUpXForLongH1(List<BtcFutures> list, int maSlowIndex) {
+    public static String check3CuttingXforH1(List<BtcFutures> list, int maSlowIndex) {
         if (list.size() < maSlowIndex) {
-            return false;
+            return "";
         }
 
         BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
         BigDecimal ma50 = Utils.calcMA(list, 50, 1);
-
-        if (ma_X_c.compareTo(ma50) > 0) {
-            return false;
-        }
 
         BigDecimal close1 = calcMA(list, 3, 1);// list.get(1).getPrice_open_candle();
         BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
-        if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
-            return true;
+        if ((ma_X_c.compareTo(ma50) < 0) && (close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
+                && (ma_X_c.compareTo(close2) > 0)) {
+            return TREND_LONG;
         }
 
-        return false;
-    }
-
-    public static boolean is3CuttingDownXForShortH1(List<BtcFutures> list, int maSlowIndex) {
-        if (list.size() < maSlowIndex) {
-            return false;
-        }
-        BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
-        BigDecimal ma50 = Utils.calcMA(list, 50, 1);
-
-        if (ma_X_c.compareTo(ma50) < 0) {
-            return false;
+        if ((ma_X_c.compareTo(ma50) > 0) && (close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0)
+                && (ma_X_c.compareTo(close2) < 0)) {
+            return TREND_SHORT;
         }
 
-        BigDecimal close1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
-        BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
-
-        if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(close2) < 0)) {
-            return true;
-        }
-
-        return false;
+        return "";
     }
 
     public static boolean checkClosePriceAndMa_StartFindLong(List<BtcFutures> list) {
@@ -2113,37 +2094,6 @@ public class Utils {
         }
 
         return false;
-    }
-
-    public static String getMsgMa3AndMa8_ForChangeStatus(List<BtcFutures> list) {
-        int cur = 1;
-        int pre = 2;
-        int fastIndex = 3;
-        String symbol = list.get(0).getId().replace("_00", "");
-        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
-        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
-        BigDecimal ma_slow_c;
-        BigDecimal ma_slow_p;
-
-        if (symbol.contains("_1d_")) {
-            ma_slow_c = calcMA(list, MA_INDEX_D1_STOP_LONG, cur);
-            ma_slow_p = calcMA(list, MA_INDEX_D1_STOP_LONG, pre);
-        } else {
-            ma_slow_c = calcMA(list, MA_INDEX_H4_STOP_LONG, cur);
-            ma_slow_p = calcMA(list, MA_INDEX_H4_STOP_LONG, pre);
-        }
-
-        if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
-                && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-            return "" + getChartName(list) + " (" + symbol + ") Stop:Long/Short.";
-        }
-
-        if ((ma_fast_c.compareTo(ma_fast_p) < 0) && (ma_fast_c.compareTo(ma_slow_c) < 0)
-                && (ma_slow_p.compareTo(ma_fast_p) < 0)) {
-            return "" + getChartName(list) + " (" + symbol + ") Stop:Long/Short.";
-        }
-
-        return "";
     }
 
     public static boolean isUptrendByMaIndex(List<BtcFutures> list, int maIndex) {
@@ -2188,9 +2138,10 @@ public class Utils {
         }
 
         // -----------------------------------------------
+        String trend_slow = check3CuttingXforH1(list, slowIndex);
         boolean isCuttingUp = false;// Long
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
-            isCuttingUp = is3CuttingUpXForLongH1(list, slowIndex);
+            isCuttingUp = Objects.equals(trend_slow, TREND_LONG);
             if (isCuttingUp && !isMa_fast_Up) {
                 isCuttingUp = false;
             }
@@ -2199,7 +2150,7 @@ public class Utils {
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
-            isCuttingDown = is3CuttingDownXForShortH1(list, slowIndex);
+            isCuttingDown = Objects.equals(trend_slow, TREND_SHORT);
             if (isCuttingDown && isMa_fast_Up) {
                 isCuttingDown = false;
             }
@@ -2220,7 +2171,7 @@ public class Utils {
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
             if (ma_fast_c.compareTo(max_allow_long) > 0) {
-                result += TREND_DANGER;
+                //result += TREND_DANGER;
                 // return "";
             }
         } else if (isCuttingDown) {
@@ -2257,28 +2208,28 @@ public class Utils {
                 result += " SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL, true);
                 result += " Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
-                if (showDetail) {
-                    int start_index = 0;
-                    BigDecimal temp = isLong ? low_heigh.get(0) : low_heigh.get(1);
-                    for (int index = 0; index <= 13; index++) {
-                        if (index < list.size()) {
-                            BtcFutures dto = list.get(index);
-                            if (isLong) {
-                                if (temp.compareTo(dto.getLow_price()) >= 0) {
-                                    start_index = index;
-                                }
-                            } else {
-                                if (temp.compareTo(dto.getHight_price()) <= 0) {
-                                    start_index = index;
-                                }
-                            }
-                        }
-                    }
-                    String timing2 = timingTarget(getChartName(list), start_index * 5);
-                    if (isNotBlank(timing2)) {
-                        result += ",END:" + timing2;
-                    }
-                }
+                //if (showDetail) {
+                //    int start_index = 0;
+                //    BigDecimal temp = isLong ? low_heigh.get(0) : low_heigh.get(1);
+                //    for (int index = 0; index <= 13; index++) {
+                //        if (index < list.size()) {
+                //            BtcFutures dto = list.get(index);
+                //            if (isLong) {
+                //                if (temp.compareTo(dto.getLow_price()) >= 0) {
+                //                    start_index = index;
+                //                }
+                //            } else {
+                //                if (temp.compareTo(dto.getHight_price()) <= 0) {
+                //                    start_index = index;
+                //                }
+                //            }
+                //        }
+                //    }
+                //    String timing2 = timingTarget(getChartName(list), start_index * 5);
+                //    if (isNotBlank(timing2)) {
+                //        result += ",END:" + timing2;
+                //    }
+                //}
             }
         } catch (Exception e) {
         }
