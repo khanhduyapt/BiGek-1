@@ -2868,6 +2868,27 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
+    private void sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex) {
+        String msg = "";
+        String chartname = Utils.getChartName(list);
+
+        String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
+        String sl = "";
+
+        String trend_m15 = Utils.check3CuttingXforH1(list, 20);
+        if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
+            msg = Utils.getTimeHHmm() + " 💹: " + symbol + " " + chartname + " Ma3CutUpMa" + maIndex + ".";
+            sl = Utils.calcSL(list, true);
+        } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
+            msg = Utils.getTimeHHmm() + " 📉: " + symbol + " " + chartname + " Ma3CutDownMa" + maIndex + ".";
+            sl = Utils.calcSL(list, false);
+        }
+        if (Utils.isNotBlank(msg)) {
+            msg += Utils.new_line_from_service + sl;
+            sendMsgPerHour(EVENT_ID_15m, msg, true);
+        }
+    }
+
     private void sendMsgChart15m(String gecko_id, String symbol) {
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (!MAIN_TOKEN.contains("_" + symbol + "_")) {
@@ -2875,26 +2896,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-
-        //-----------------------------------------------//
-        String msg = "";
-        String chartname = Utils.getChartName(list_15m);
-
-        String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
-        String sl = "";
-
-        String trend_m15 = Utils.check3CuttingXforH1(list_15m, 20);
-        if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
-            msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " Ma3CutUpMa20.";
-            sl = Utils.calcSL(list_15m, true);
-        } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
-            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Ma3CutDownMa20.";
-            sl = Utils.calcSL(list_15m, false);
-        }
-        if (Utils.isNotBlank(msg)) {
-            msg += Utils.new_line_from_service + sl;
-            sendMsgPerHour(EVENT_ID_15m, msg, true);
-        }
+        sendMsgByTrendMaX(symbol, list_15m, 20);
         //-----------------------------------------------//
 
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
@@ -2904,24 +2906,7 @@ public class BinanceServiceImpl implements BinanceService {
         if ((Objects.equals("BTC", symbol))) {
             List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_5m);
-
-            //-----------------------------------------------//
-
-            String chart_5m = Utils.getChartName(list_5m);
-            String EVENT_ID_5m = EVENT_PUMP + symbol + "_" + chart_5m + Utils.getCurrentYyyyMmDdHH();
-
-            String trend_m5 = Utils.check3CuttingXforH1(list_5m, 20);
-            if (Objects.equals(Utils.TREND_LONG, trend_m5)) {
-
-                msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chart_5m + " Ma3CutUpMa20.";
-                sendMsgPerHour(EVENT_ID_5m, msg, true);
-
-            } else if (Objects.equals(Utils.TREND_SHORT, trend_m5)) {
-
-                msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chart_5m + " Ma3CutDownMa20.";
-                sendMsgPerHour(EVENT_ID_5m, msg, true);
-
-            }
+            sendMsgByTrendMaX(symbol, list_5m, 20);
         }
     }
 
@@ -2935,12 +2920,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
-        String type = "";
-        if (binanceFuturesRepository.existsById(gecko_id)) {
-            type = " (Futures) ";
-        } else {
-            type = " (Spot) ";
-        }
+
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
         if (CollectionUtils.isEmpty(list_weeks)) {
             return "";
@@ -2952,7 +2932,16 @@ public class BinanceServiceImpl implements BinanceService {
         if (Objects.equals("BTC", symbol)) {
             TREND_OF_BTC = allow_long_d1 ? Utils.TREND_LONG : Utils.TREND_SHORT;
         }
+
+        String type = "";
+        if (binanceFuturesRepository.existsById(gecko_id)) {
+            type = " (Futures) ";
+            sendMsgByTrendMaX(symbol, list_h4, 10);
+        } else {
+            type = " (Spot) ";
+        }
         type = type + Utils.analysisVolume(list_days);
+
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         String scapLongH4 = Utils.getScapLong(list_h4, list_days, 10, allow_long_d1);
