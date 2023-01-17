@@ -2803,6 +2803,9 @@ public class BinanceServiceImpl implements BinanceService {
         BtcFutures ido = list_15m.get(0);
         String percentMa3to50 = Utils.new_line_from_service + Utils.percentMa3to50(list_15m);
 
+        BigDecimal ma20 = Utils.calcMA(list_15m, 20, 1);
+        BigDecimal ma50 = Utils.calcMA(list_15m, 50, 1);
+
         if (ido.isBtcKillLongCandle()) {
             msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " kill Long 💔 "
                     + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
@@ -2813,13 +2816,24 @@ public class BinanceServiceImpl implements BinanceService {
                     + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
         }
 
-        if (Utils.is3CuttingDownXForShortH1(list_15m, 50)) {
-            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Dump."
-                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
+        //if ("_BTC_ETH_".contains("_" + symbol + "_")) {
+        if (Objects.equals("BTC", symbol)) {
+            if ((ma20.compareTo(ma50) < 0) && Utils.is3CuttingUpXForLongH1(list_15m, 20)) {
+                msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " Ma3CutUpMa20.";
+            }
+
+            if ((ma20.compareTo(ma50) > 0) && Utils.is3CuttingDownXForShortH1(list_15m, 20)) {
+                msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Ma3CutDownMa20.";
+            }
         }
 
         if (Utils.is3CuttingUpXForLongH1(list_15m, 50)) {
             msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " kill Short 💔 "
+                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
+        }
+
+        if (Utils.is3CuttingDownXForShortH1(list_15m, 50)) {
+            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " Dump."
                     + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
         }
 
@@ -2929,14 +2943,14 @@ public class BinanceServiceImpl implements BinanceService {
                     + Utils.getCurrentYyyyMmDdHH();
 
             if ((close.compareTo(ma50_15m) < 0) && Utils.is3CuttingUpXForLongH1(list_15m, 10)) {
-                String msg = "(15m)(Check long)" + symbol;
+                String msg = "(15m)(Check Long)" + symbol;
 
                 sendMsgPerHour(EVENT_ID_15m, msg, true);
                 return;
             }
 
             if ((close.compareTo(ma50_15m) > 0) && Utils.is3CuttingDownXForShortH1(list_15m, 10)) {
-                String msg = "(15m)(Check short)" + symbol;
+                String msg = "(15m)(Check Short)" + symbol;
 
                 sendMsgPerHour(EVENT_ID_15m, msg, true);
                 return;
@@ -2955,12 +2969,12 @@ public class BinanceServiceImpl implements BinanceService {
             String EVENT_ID_5m = EVENT_PUMP + symbol + "_" + Utils.getChartName(list_5m) + Utils.getCurrentYyyyMmDdHH();
 
             if ((close_5m.compareTo(ma50_5m) < 0) && Utils.is3CuttingUpXForLongH1(list_5m, 10)) {
-                sendMsgPerHour(EVENT_ID_5m, "(" + TIME_5m + ")(Check long)" + symbol, true);
+                sendMsgPerHour(EVENT_ID_5m, "(" + TIME_5m + ")(Check Long)" + symbol, true);
                 return;
             }
 
             if ((close_5m.compareTo(ma50_5m) > 0) && Utils.is3CuttingDownXForShortH1(list_5m, 10)) {
-                sendMsgPerHour(EVENT_ID_5m, "(" + TIME_5m + ")(Check short)" + symbol, true);
+                sendMsgPerHour(EVENT_ID_5m, "(" + TIME_5m + ")(Check Short)" + symbol, true);
                 return;
             }
 

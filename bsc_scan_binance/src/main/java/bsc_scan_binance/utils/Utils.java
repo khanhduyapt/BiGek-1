@@ -2055,14 +2055,14 @@ public class Utils {
     }
 
     public static boolean is3CuttingUpXForLongH1(List<BtcFutures> list, int maSlowIndex) {
-        if (list.size() < 50) {
+        if (list.size() < maSlowIndex) {
             return false;
         }
 
-        BigDecimal close1 = list.get(1).getPrice_open_candle();
-        BigDecimal close2 = list.get(2).getPrice_open_candle();
+        BigDecimal close1 = calcMA(list, 3, 1);// list.get(1).getPrice_open_candle();
+        BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
-        BigDecimal ma_50_c = calcMA(list, 50, 1);
+        BigDecimal ma_50_c = calcMA(list, maSlowIndex, 1);
 
         if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_50_c) > 0) && (ma_50_c.compareTo(close2) > 0)) {
             return true;
@@ -2072,12 +2072,12 @@ public class Utils {
     }
 
     public static boolean is3CuttingDownXForShortH1(List<BtcFutures> list, int maSlowIndex) {
-        if (list.size() < 50) {
+        if (list.size() < maSlowIndex) {
             return false;
         }
 
-        BigDecimal close1 = list.get(1).getPrice_open_candle();
-        BigDecimal close2 = list.get(2).getPrice_open_candle();
+        BigDecimal close1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
+        BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
         BigDecimal ma_50_c = calcMA(list, maSlowIndex, 1);
 
