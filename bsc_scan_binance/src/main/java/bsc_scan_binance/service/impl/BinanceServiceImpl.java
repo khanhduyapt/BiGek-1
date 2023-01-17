@@ -168,11 +168,7 @@ public class BinanceServiceImpl implements BinanceService {
     private String btc_week_day_trending = "";
 
     private int pre_HH_CheckUSD = 0;
-    private String pre_Blog4H_CheckUSD = "";
     private String TREND_CURRENCY_TODAY = Utils.TREND_LONG;
-    private String TREND_H4_AUD = Utils.TREND_LONG;
-    private String TREND_H4_EUR = Utils.TREND_LONG;
-    private String TREND_H4_GBP = Utils.TREND_LONG;
     private String TREND_OF_BTC = "";
     private Boolean RANGE_H4_BTC_IS_DANGER = true;
     private Boolean usd_is_uptrend_today = true;
@@ -2813,54 +2809,32 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (pre_HH_CheckUSD == Utils.getCurrentHH()) {
-                // return;
+                return;
             }
 
-            if (!Objects.equals(pre_Blog4H_CheckUSD, Utils.getCurrentYyyyMmDd_Blog4h())) {
-                List<BtcFutures> list_H1_AUD = Utils.loadData("AUD", TIME_1h, 60);
-                List<BtcFutures> list_H1_EUR = Utils.loadData("EUR", TIME_1h, 60);
-                List<BtcFutures> list_H1_GBP = Utils.loadData("GBP", TIME_1h, 60);
+            List<BtcFutures> list_H1_AUD = Utils.loadData("AUD", TIME_15m, 60);
+            List<BtcFutures> list_H1_EUR = Utils.loadData("EUR", TIME_15m, 60);
+            List<BtcFutures> list_H1_GBP = Utils.loadData("GBP", TIME_15m, 60);
 
-                sendMsgMonitorFibo("AUD_USDT", "AUD_USDT", list_H1_AUD, "", Utils.MA_INDEX_CURRENCY, false);
-                sendMsgMonitorFibo("EUR_USDT", "EUR_USDT", list_H1_EUR, "", Utils.MA_INDEX_CURRENCY, false);
-                sendMsgMonitorFibo("GBP_USDT", "GBP_USDT", list_H1_GBP, "", Utils.MA_INDEX_CURRENCY, false);
+            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 10);
+            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 10);
+            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 10);
 
-                boolean IsUpAUD_3 = Utils.isUptrendByMaIndex(list_H1_AUD, 3);
-                boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H1_AUD, Utils.MA_INDEX_CURRENCY);
-                if (IsUpAUD_3 == IsUpAUD_S) {
-                    TREND_H4_AUD = IsUpAUD_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
-                } else {
-                    TREND_H4_AUD = Utils.TREND_OPPOSITE;
-                }
+            boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H1_AUD, 50);
+            boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H1_EUR, 50);
+            boolean IsUpGBP_S = Utils.isUptrendByMaIndex(list_H1_GBP, 50);
 
-                boolean IsUpEUR_3 = Utils.isUptrendByMaIndex(list_H1_EUR, 3);
-                boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H1_EUR, Utils.MA_INDEX_CURRENCY);
-                if (IsUpEUR_3 == IsUpEUR_S) {
-                    TREND_H4_EUR = IsUpEUR_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
-                } else {
-                    TREND_H4_EUR = Utils.TREND_OPPOSITE;
-                }
-
-                boolean IsUpGBP_3 = Utils.isUptrendByMaIndex(list_H1_GBP, 3);
-                boolean IsUpGBP_S = Utils.isUptrendByMaIndex(list_H1_GBP, Utils.MA_INDEX_CURRENCY);
-                if (IsUpGBP_3 == IsUpGBP_S) {
-                    TREND_H4_GBP = IsUpGBP_S ? Utils.TREND_LONG : Utils.TREND_SHORT;
-                } else {
-                    TREND_H4_GBP = Utils.TREND_OPPOSITE;
-                }
-
-                int count_usd_uptrend = 3;
-                count_usd_uptrend -= IsUpAUD_S ? 1 : 0;
-                count_usd_uptrend -= IsUpEUR_S ? 1 : 0;
-                count_usd_uptrend -= IsUpGBP_S ? 1 : 0;
-                usd_is_uptrend_today = (count_usd_uptrend > 1) ? true : false;
-                if (usd_is_uptrend_today) {
-                    TREND_CURRENCY_TODAY = Utils.TREND_SHORT;
-                } else {
-                    TREND_CURRENCY_TODAY = Utils.TREND_LONG;
-                }
-                pre_Blog4H_CheckUSD = Utils.getCurrentYyyyMmDd_Blog4h();
+            int count_usd_uptrend = 3;
+            count_usd_uptrend -= IsUpAUD_S ? 1 : 0;
+            count_usd_uptrend -= IsUpEUR_S ? 1 : 0;
+            count_usd_uptrend -= IsUpGBP_S ? 1 : 0;
+            usd_is_uptrend_today = (count_usd_uptrend > 1) ? true : false;
+            if (usd_is_uptrend_today) {
+                TREND_CURRENCY_TODAY = Utils.TREND_SHORT;
+            } else {
+                TREND_CURRENCY_TODAY = Utils.TREND_LONG;
             }
+
             pre_HH_CheckUSD = Utils.getCurrentHH();
 
         } catch (Exception e) {
