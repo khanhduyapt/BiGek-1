@@ -2872,7 +2872,7 @@ public class BinanceServiceImpl implements BinanceService {
         String msg = "";
         String chartname = Utils.getChartName(list);
 
-        String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
+        String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDd_Blog4h();
         String sl = "";
 
         String trend_m15 = Utils.check3CuttingXforH1(list, 20);
@@ -2885,6 +2885,13 @@ public class BinanceServiceImpl implements BinanceService {
         }
         if (Utils.isNotBlank(msg)) {
             msg += Utils.new_line_from_service + sl;
+
+            //if (Objects.equals("(H4)", chartname)) {
+            //if (Objects.equals("BTC", symbol)) {
+            //    sendMsgPerHour(EVENT_ID_15m, msg, false);
+            //} else {
+            //    sendMsgPerHour(EVENT_ID_15m, msg, true);
+            //}
             sendMsgPerHour(EVENT_ID_15m, msg, true);
         }
     }
