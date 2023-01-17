@@ -203,7 +203,6 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public List<CandidateTokenCssResponse> getList(Boolean isBynaceUrl) {
         try {
-            System.out.println("Start getList ---->");
             String sql = " select                                                                                 \n"
                     + "   can.gecko_id,                                                                           \n"
                     + "   can.symbol,                                                                             \n"
@@ -1165,8 +1164,6 @@ public class BinanceServiceImpl implements BinanceService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Get list Inquiry Consigned Delivery error ------->");
-            System.out.println(e.getMessage());
             return new ArrayList<CandidateTokenCssResponse>();
         }
     }
@@ -1350,8 +1347,6 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public void monitorProfit() {
         try {
-            System.out.println("Start monitorProfit ---->");
-
             Query query = entityManager.createNativeQuery(Utils.sql_OrdersProfitResponse, "OrdersProfitResponse");
 
             List<OrdersProfitResponse> results = query.getResultList();
@@ -1394,7 +1389,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("monitorProfit error ------->");
             System.out.println(e.getMessage());
         }
     }
@@ -1403,7 +1397,6 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public void monitorBollingerBandwidth(Boolean isCallFormBot) {
         try {
-            System.out.println("Start monitorBollingerBandwidth ---->");
             {
                 String sql = "" + " select                                                              \n"
                         + "     boll.gecko_id,                                                          \n"
@@ -1513,8 +1506,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("monitorBollingerBandwidth error ------->");
-            System.out.println(e.getMessage());
         }
     }
 
@@ -1595,9 +1586,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
             return sp500;
         } catch (Exception e) {
-            System.out.println("BinanceServiceImpl.loadPremarket error --->");
-            // e.printStackTrace();
-            System.out.println(e.getMessage());
         }
         return "S&P 500 xxx (xxx%), Futures yyy (yyy%)";
     }
@@ -1661,7 +1649,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
             btcVolumeDayRepository.saveAll(list_day);
         } catch (Exception e) {
-            System.out.println("Error loadDataVolumeHour  ----->");
             e.printStackTrace();
         }
     }
@@ -1794,7 +1781,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
         } catch (Exception e) {
-            System.out.println("Error loadBinanceData  ----->");
             e.printStackTrace();
         }
         return "";
@@ -1892,7 +1878,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error getBitfinexLongShortBtc ---->" + e.getMessage());
             e.printStackTrace();
         }
 
@@ -2021,7 +2006,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error saveDepthData  ----->");
             e.printStackTrace();
         }
     }
@@ -2063,7 +2047,6 @@ public class BinanceServiceImpl implements BinanceService {
             return list;
 
         } catch (Exception e) {
-            System.out.println("Error getDepthDataBtc  ----->");
             e.printStackTrace();
         }
 
@@ -2154,7 +2137,6 @@ public class BinanceServiceImpl implements BinanceService {
 
             return result;
         } catch (Exception e) {
-            System.out.println("Error getListDepthData  ----->");
             e.printStackTrace();
         }
 
@@ -2510,7 +2492,6 @@ public class BinanceServiceImpl implements BinanceService {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error findAllScalpingToday ---->");
             e.printStackTrace();
         }
 
@@ -2572,7 +2553,6 @@ public class BinanceServiceImpl implements BinanceService {
         } catch (
 
         Exception e) {
-            System.out.println("Error monitorBtcFundingRate ---->");
             e.printStackTrace();
         }
     }
@@ -2620,7 +2600,6 @@ public class BinanceServiceImpl implements BinanceService {
 
             fundingHistoryRepository.save(entity);
         } catch (Exception e) {
-            System.out.println("Error loadFundingHistory ---->");
             e.printStackTrace();
         }
 
@@ -2948,8 +2927,7 @@ public class BinanceServiceImpl implements BinanceService {
                 msg += Utils.new_line_from_service + sl;
                 sendMsgPerHour(EVENT_ID_15m, msg, true);
             }
-
-            // ---------------------------------------------------------------------//
+            //-----------------------------------------------//
         }
     }
 

@@ -1935,7 +1935,6 @@ public class Utils {
                 result += TREND_DANGER;
             }
 
-            System.out.println("getScapLong= " + list_entry.get(0).getId() + ":" + result);
             return result;
 
         } catch (Exception e) {
@@ -1996,8 +1995,6 @@ public class Utils {
             if (earn1.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
                 result += TREND_DANGER;
             }
-
-            System.out.println("getScapLongOrShort= " + result);
 
             return result;
 
@@ -2288,9 +2285,6 @@ public class Utils {
 
         if (!(result.contains(TREND_LONG) || result.contains(TREND_SHORT))) {
             result = "";
-        }
-        if (isNotBlank(result)) {
-            System.out.println(result);
         }
         return result;
     }

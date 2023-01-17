@@ -24,7 +24,7 @@ public class BscScanBinanceApplication {
     public static int app_flag = Utils.const_app_flag_all_coin; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin; 5:
                                                                 // all_and_msg
     public static String callFormBinance = "";
-    public static int SLEEP_MINISECONDS = 8000;
+    public static int SLEEP_MINISECONDS = 6000;
 
     public static void main(String[] args) {
         try {
@@ -110,14 +110,8 @@ public class BscScanBinanceApplication {
                     wait(SLEEP_MINISECONDS);
 
                     if (Objects.equals(idx, size - 1)) {
-                        binance_service.getList(false);
-
                         System.out.println("reload: " + Utils.getCurrentYyyyMmDdHH());
                         idx = 0;
-                        list.clear();
-                        list = gecko_service.getList(callFormBinance);
-                        size = list.size();
-
                         startup = false;
                     } else {
                         idx += 1;
