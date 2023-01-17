@@ -2778,14 +2778,19 @@ public class BinanceServiceImpl implements BinanceService {
         BtcFutures ido = list_15m.get(0);
         String percentMa3to50 = Utils.new_line_from_service + Utils.percentMa3to50(list_15m);
 
+        List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_15m);
+        String atl = Utils.new_line_from_service;
+        atl += " ATL:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(0), true);
+        atl += ",ATH:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(1), true);
+
         if (ido.isBtcKillLongCandle()) {
             msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " kill Long 💔 "
-                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
+                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50 + atl;
         }
 
         if (ido.isBtcKillShortCandle()) {
             msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " kill Short 💔 "
-                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50;
+                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50 + atl;
         }
 
         if (Utils.isNotBlank(msg)) {
