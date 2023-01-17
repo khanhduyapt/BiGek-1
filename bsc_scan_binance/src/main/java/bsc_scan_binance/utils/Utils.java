@@ -1885,13 +1885,8 @@ public class Utils {
     // -15
     // 20
 
-    public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd) {
+    public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd, boolean isLong) {
         try {
-            boolean isLong = Utils.checkClosePriceAndMa_StartFindLong(list_entry);
-            boolean isLongTp = Utils.checkClosePriceAndMa_StartFindLong(list_tp);
-            if (isLong != isLongTp) {
-                return "";
-            }
 
             BigDecimal curr_price = list_entry.get(0).getCurrPrice();
             List<BigDecimal> low_heigh_tp = getLowHeightCandle(list_tp);
@@ -1942,16 +1937,9 @@ public class Utils {
         }
     }
 
-    public static String getScapLongOrShort(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd) {
+    public static String getScapLongOrShort(List<BtcFutures> list_find_entry, List<BtcFutures> list_tp, int usd,
+            boolean isLong) {
         try {
-            boolean isLong = Utils.checkClosePriceAndMa_StartFindLong(list_find_entry);
-            boolean isLongTp = Utils.checkClosePriceAndMa_StartFindLong(list_tp);
-            if (isLong != isLongTp) {
-                return "";
-            }
-
-            String check3and8 = checkClosePriceAndMa_StartFindLong(list_find_entry) ? TREND_LONG : TREND_SHORT;
-
             List<BigDecimal> low_heigh_tp1 = getLowHeightCandle(list_tp);
             List<BigDecimal> low_heigh_sl = getLowHeightCandle(list_find_entry.subList(0, 15));
 
@@ -1959,13 +1947,13 @@ public class Utils {
             BigDecimal SL = BigDecimal.ZERO;
             BigDecimal TP1 = BigDecimal.ZERO;
             String type = "";
-            if (check3and8.contains(TREND_LONG)) {
+            if (isLong) {
                 type = "(Long)";
                 // check long
                 SL = low_heigh_sl.get(0);
                 SL = SL.multiply(BigDecimal.valueOf(0.9995));
                 TP1 = low_heigh_tp1.get(1);
-            } else if (check3and8.contains(TREND_SHORT)) {
+            } else {
                 // check short
                 type = "(Short)";
                 SL = low_heigh_sl.get(1);
@@ -2208,28 +2196,28 @@ public class Utils {
                 result += " SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL, true);
                 result += " Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
-                //if (showDetail) {
-                //    int start_index = 0;
-                //    BigDecimal temp = isLong ? low_heigh.get(0) : low_heigh.get(1);
-                //    for (int index = 0; index <= 13; index++) {
-                //        if (index < list.size()) {
-                //            BtcFutures dto = list.get(index);
-                //            if (isLong) {
-                //                if (temp.compareTo(dto.getLow_price()) >= 0) {
-                //                    start_index = index;
-                //                }
-                //            } else {
-                //                if (temp.compareTo(dto.getHight_price()) <= 0) {
-                //                    start_index = index;
-                //                }
-                //            }
-                //        }
-                //    }
-                //    String timing2 = timingTarget(getChartName(list), start_index * 5);
-                //    if (isNotBlank(timing2)) {
-                //        result += ",END:" + timing2;
-                //    }
-                //}
+                if (showDetail) {
+                    int start_index = 0;
+                    BigDecimal temp = isLong ? low_heigh.get(0) : low_heigh.get(1);
+                    for (int index = 0; index <= 13; index++) {
+                        if (index < list.size()) {
+                            BtcFutures dto = list.get(index);
+                            if (isLong) {
+                                if (temp.compareTo(dto.getLow_price()) >= 0) {
+                                    start_index = index;
+                                }
+                            } else {
+                                if (temp.compareTo(dto.getHight_price()) <= 0) {
+                                    start_index = index;
+                                }
+                            }
+                        }
+                    }
+                    String timing2 = timingTarget(getChartName(list), start_index * 5);
+                    if (isNotBlank(timing2)) {
+                        result += ",END:" + timing2;
+                    }
+                }
             }
         } catch (Exception e) {
         }
