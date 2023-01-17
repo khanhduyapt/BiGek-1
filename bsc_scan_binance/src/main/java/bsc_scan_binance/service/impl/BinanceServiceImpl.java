@@ -2877,10 +2877,10 @@ public class BinanceServiceImpl implements BinanceService {
 
         String trend_m15 = Utils.check3CuttingXforH1(list, 20);
         if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
-            msg = Utils.getTimeHHmm() + " 💹: " + symbol + " " + chartname + " Ma3CutUpMa" + maIndex + ".";
+            msg = " 💹... " + symbol + chartname + ":Ma3CutUpMa" + maIndex + ".";
             sl = Utils.calcSL(list, true);
         } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
-            msg = Utils.getTimeHHmm() + " 📉: " + symbol + " " + chartname + " Ma3CutDownMa" + maIndex + ".";
+            msg = " 📉... " + symbol + chartname + ":Ma3CutDownMa" + maIndex + ".";
             sl = Utils.calcSL(list, false);
         }
         if (Utils.isNotBlank(msg)) {

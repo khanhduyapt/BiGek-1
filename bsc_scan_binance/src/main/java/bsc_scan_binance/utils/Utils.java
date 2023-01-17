@@ -2018,9 +2018,12 @@ public class Utils {
         BigDecimal entry = list.get(0).getCurrPrice();
         BigDecimal SL_real = BigDecimal.ZERO;
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
+        String LH = "";
         if (isLong) {
+            LH = "ATL:";
             SL_real = low_heigh.get(0);
         } else {
+            LH = "ATH:";
             SL_real = low_heigh.get(1);
         }
 
@@ -2028,7 +2031,7 @@ public class Utils {
         BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL_real), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
-        String result = "SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL_real, true);
+        String result = LH + getChartName(list) + ": " + getPercentToEntry(entry, SL_real, true);
         result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
         return result;
