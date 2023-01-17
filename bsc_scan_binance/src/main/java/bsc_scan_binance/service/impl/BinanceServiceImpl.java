@@ -2901,18 +2901,23 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if ((Objects.equals("BTC", symbol))) {
-            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 1);
+            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_5m);
 
-            boolean hasPumpDump = false;
-            for (BtcFutures dto : list_15m) {
-                if (dto.isBtcKillLongCandle() || dto.isBtcKillShortCandle()) {
-                    hasPumpDump = true;
-                }
+            //-----------------------------------------------//
+
+            String chart_5m = Utils.getChartName(list_5m);
+            String EVENT_ID_5m = EVENT_PUMP + symbol + "_" + chart_5m + Utils.getCurrentYyyyMmDdHH();
+            if (Utils.is3CuttingUpXForLongH1(list_15m, 20)) {
+                String msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chart_5m + " Ma3CutUpMa20.";
+                sendMsgPerHour(EVENT_ID_5m, msg, true);
             }
-            if (!hasPumpDump) {
-                return;
+            if (Utils.is3CuttingDownXForShortH1(list_5m, 20)) {
+                String msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chart_5m + " Ma3CutDownMa20.";
+                sendMsgPerHour(EVENT_ID_5m, msg, true);
             }
+
+            //-----------------------------------------------//
 
             String msg = "";
             String chartname = Utils.getChartName(list_15m);
