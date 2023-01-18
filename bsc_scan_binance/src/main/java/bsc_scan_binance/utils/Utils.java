@@ -477,7 +477,7 @@ public class Utils {
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
                 || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
 
-            sendToChatId(Utils.chatId_duydk, msg + " (only)");
+            sendToChatId(Utils.chatId_duydk, msg + " 💰 ");
         }
     }
 
