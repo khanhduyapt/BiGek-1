@@ -2849,7 +2849,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private void sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex) {
+    private String sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex) {
         String msg = "";
         String chartname = Utils.getChartName(list);
 
@@ -2874,6 +2874,8 @@ public class BinanceServiceImpl implements BinanceService {
             msg += Utils.new_line_from_service + sl;
             sendMsgPerHour(EVENT_ID_15m, msg, true);
         }
+
+        return msg;
     }
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
@@ -2886,10 +2888,18 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if ((Objects.equals("BTC", symbol))) {
-            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-            sendMsgKillLongShort(gecko_id, symbol, list_5m);
-            sendMsgByTrendMaX(symbol, list_5m, 10);
-            sendMsgByTrendMaX(symbol, list_15m, 10);
+            String msg = sendMsgByTrendMaX(symbol, list_15m, 10);
+
+            if (Utils.isBlank(msg)) {
+                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+                msg = sendMsgByTrendMaX(symbol, list_5m, 10);
+
+                if (Utils.isBlank(msg)) {
+                    List<BtcFutures> list_1m = Utils.loadData(symbol, TIME_1m, 50);
+                    sendMsgByTrendMaX(symbol, list_1m, 10);
+                }
+            }
+
         }
     }
 

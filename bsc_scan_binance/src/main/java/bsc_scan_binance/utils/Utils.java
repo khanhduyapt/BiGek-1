@@ -470,7 +470,7 @@ public class Utils {
 
     public static void sendToMyTelegram(String text) {
         String msg = text.replaceAll("↑", "^").replaceAll("↓", "v");
-        System.out.println(msg);
+        System.out.println("sendToMyTelegram: " + msg);
 
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
                 || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
@@ -481,7 +481,7 @@ public class Utils {
 
     public static void sendToTelegram(String text) {
         String msg = text.replaceAll("↑", "^").replaceAll("↓", "v");
-        System.out.println(msg);
+        System.out.println("sendToTelegram: " + msg);
 
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
                 || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
@@ -734,6 +734,12 @@ public class Utils {
 
     public static Integer getCurrentMinute() {
         int mm = Utils.getIntValue(Utils.convertDateToString("mm", Calendar.getInstance().getTime()));
+        return mm;
+    }
+
+    public static int getCurrentMinute_Blog10minutes() {
+        int mm = getCurrentMinute();
+        mm = mm / 5;
         return mm;
     }
 
@@ -2044,9 +2050,20 @@ public class Utils {
         BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
         BigDecimal ma50 = Utils.calcMA(list, 50, 1);
 
-        BigDecimal close1 = calcMA(list, 3, 1);// list.get(1).getPrice_open_candle();
+        BigDecimal close1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
         BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
+        if ((ma_X_c.compareTo(ma50) < 0) && (close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
+                && (ma_X_c.compareTo(close2) > 0)) {
+            return TREND_LONG;
+        }
+
+        if ((ma_X_c.compareTo(ma50) > 0) && (close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0)
+                && (ma_X_c.compareTo(close2) < 0)) {
+            return TREND_SHORT;
+        }
+
+        close2 = calcMA(list, 3, 3);
         if ((ma_X_c.compareTo(ma50) < 0) && (close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
                 && (ma_X_c.compareTo(close2) > 0)) {
             return TREND_LONG;

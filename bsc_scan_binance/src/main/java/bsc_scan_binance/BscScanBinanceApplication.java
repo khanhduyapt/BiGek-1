@@ -7,13 +7,11 @@ import java.util.Objects;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.CollectionUtils;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import bsc_scan_binance.entity.CandidateCoin;
-import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.service.BinanceService;
 import bsc_scan_binance.service.CoinGeckoService;
 import bsc_scan_binance.service.impl.WandaBot;
@@ -25,6 +23,7 @@ public class BscScanBinanceApplication {
                                                                 // all_and_msg
     public static String callFormBinance = "";
     public static int SLEEP_MINISECONDS = 6000;
+    public static boolean attack_mode = true;
 
     public static void main(String[] args) {
         try {
@@ -67,47 +66,54 @@ public class BscScanBinanceApplication {
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
 
+                String msg;
                 int size = list.size();
                 int idx = 0;
                 boolean startup = true;
+                int pre_minute = 0;
+                int cur_minute = 0;
+
+                int pre_blog10minute = 0;
+                int cur_blog10minute = 0;
+
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
                     try {
-                        if (idx == 0) {
-                            List<Orders> orders = binance_service.getOrderList();
-                            if (!CollectionUtils.isEmpty(orders)) {
-                                for (Orders order : orders) {
-                                    gecko_service.loadData(order.getId().getGeckoid());
-                                    System.out.println("Binance -> Gecko " + " id:" + order.getId().getGeckoid());
-                                }
-                            }
-                        }
+                        cur_minute = Utils.getCurrentMinute();
+                        cur_blog10minute = Utils.getCurrentMinute_Blog10minutes();
 
-                        if (idx % 3 == 0) {
+                        if (cur_minute != pre_minute) {
+                            pre_minute = cur_minute;
                             binance_service.getChartWD("bitcoin", "BTC");
                             wait(SLEEP_MINISECONDS);
+                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
                         }
 
-                        if (idx % 10 == 0) {
+                        if (pre_blog10minute != cur_blog10minute) {
+                            pre_blog10minute = cur_blog10minute;
+
                             binance_service.getChartWD("ethereum", "ETH");
                             wait(SLEEP_MINISECONDS);
+                            System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
 
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
+                            System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
                         }
 
-                        binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
-                        binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol().toUpperCase());
+                        if (!attack_mode) {
+                            binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
+                            binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol().toUpperCase());
+                            msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
+                                    + coin.getSymbol();
+                            System.out.println(msg);
+                        }
 
-                        System.out.println("Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
-                                + coin.getSymbol());
-
+                        wait(SLEEP_MINISECONDS);
                     } catch (Exception e) {
                         System.out.println("dkd error LoadData:" + e.getMessage());
                     }
-
-                    wait(SLEEP_MINISECONDS);
 
                     if (Objects.equals(idx, size - 1)) {
                         System.out.println("reload: " + Utils.getCurrentYyyyMmDdHH());
