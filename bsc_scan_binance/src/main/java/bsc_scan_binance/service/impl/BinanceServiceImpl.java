@@ -2896,7 +2896,7 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal close = list_15m.get(1).getPrice_close_candle();
             BigDecimal range = Utils.getPercent(close, ma50).abs();
 
-            if (range.compareTo(BigDecimal.valueOf(0.15)) < 0) {
+            if (range.compareTo(BigDecimal.valueOf(0.2)) < 0) {
                 return;
             }
 

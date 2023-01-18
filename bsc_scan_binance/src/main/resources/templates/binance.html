@@ -69,6 +69,12 @@ p {
   padding: 0.25rem !important;
   vertical-align: middle !important;
 }
+
+.css-1ifhear{
+  width: 16px;
+  height: 16px;
+}
+
 </style>
 <script type="text/javascript">
   $(function() {
@@ -80,7 +86,9 @@ p {
 
 <body style="display: flex;">
   <div class="table-responsive-sm">
-    <p>(Điều kiện 1) Tổng quan thị trường chart W, xu hướng D1 ntn?</p>
+    <p>(Điều kiện 1) Tổng quan thị trường chart W, xu hướng D1 ntn? <a th:target="_blank" th:href="${'https://www.coinglass.com/LongShortRatio'}">
+		  <img src="https://cdn.coinglasscdn.com/static/exchanges/bitfinex.jpg" class="css-1ifhear" style="margin-top: -3px;"> Bitfinex
+		</a></p>
     <p>(Điều kiện 2) Bơm thổi mạnh ngày: 20~30 (Long); Giá đi ngang rồi sập: 01~19, nghỉ lễ tết dài (Short).<a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://pro.coingen.net/analysis/market-overview/btc-performance'}">coingen</a></p>
     <p>(Điều kiện 3) Thời gian ổn định: 9:45~11:30, 13:30~16:30. Hạn chế phiên Mỹ (18:30~22:30).<a style="margin-left: 1rem;" th:target="_blank" th:href="${'https://sslecal2.forexprostools.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_centralBanks,_confidenceIndex,_balance&features=datepicker,timezone,timeselector,filters&countries=5&importance=3&calType=week&timeZone=27&lang=52'}">Investing.com</a></p>
     <table id="bnb_table" class="table table-bordered tableFixHead">
@@ -131,7 +139,7 @@ p {
             th:text="${#dates.format( #dates.create(#dates.year(#dates.createNow()), #dates.month(#dates.createNow()), #dates.day(#dates.createNow()) - 12), 'dd/MM')}">
           <th class="text-center" scope="col"
             th:text="${#dates.format( #dates.create(#dates.year(#dates.createNow()), #dates.month(#dates.createNow()), #dates.day(#dates.createNow()) - 13), 'dd/MM')}">
-          
+
           <th class="text-center" scope="col">Category</th>
         </tr>
       </thead>
@@ -170,7 +178,7 @@ p {
           <!-- v/mc -->
           <td style="font-size: 0.8rem !important; text-align: right; min-width: 100px !important; max-width: 100px !important;" th:classappend="${token.volumn_div_marketcap_css}">
             <div>
-              <span th:text="${token.volumn_div_marketcap} + '%'"></span> 
+              <span th:text="${token.volumn_div_marketcap} + '%'"></span>
               <span th:classappend="${token.volumn_binance_div_marketcap_css}" th:text="${token.volumn_binance_div_marketcap + '%'}"></span>
             </div>
             <p th:classappend="${token.volma_css}" th:text="${token.volma}" style="font-size: 0.6rem !important;">
@@ -328,7 +336,7 @@ p {
               th:classappend="${token.day_1_ema_css}"
               th:text="${token.day_1_ema}">
           </td>
-          
+
           <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_2_ema, 'v/mc') ? 'highlight' : 'bg-light'}">
             <div>
                 <span
@@ -379,7 +387,7 @@ p {
               th:classappend="${token.day_4_ema_css}"
               th:text="${token.day_4_ema}">
           </td>
-          
+
           <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_5_ema, 'v/mc') ? 'highlight' : 'bg-light'}">
             <div>
                 <span
@@ -396,7 +404,7 @@ p {
               th:classappend="${token.day_5_ema_css}"
               th:text="${token.day_5_ema}">
           </td>
-          
+
           <td class="fix_width" style="text-align: right;" th:classappend="${#strings.contains(token.day_6_ema, 'v/mc') ? 'highlight' : 'bg-light'}">
             <div>
                 <span
@@ -440,7 +448,7 @@ p {
                 <span th:classappend="${token.day_8_vol_css}"
                   th:text="${token.day_8_vol}"></span>
             </div>
-            
+
             <p th:classappend="${token.day_8_price_css}"
               th:text="${token.day_8_price}">
             <p style="font-size: 0.6rem !important;"
@@ -515,7 +523,7 @@ p {
               th:classappend="${token.day_12_ema_css}"
               th:text="${token.day_12_ema}">
           </td>
-          
+
           <!-- Name highlight rounded-lg px-1 -->
           <td></td>
 

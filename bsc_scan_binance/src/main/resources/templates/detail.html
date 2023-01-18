@@ -137,7 +137,6 @@ p {
     </div>
 
 	<div style="margin-top: 0.5rem; margin-left: 0.5rem; font-size: 0.75rem !important; display: flex;">
-		<span th:text="${long_short_header}" th:classappend="${#strings.contains(long_short_header, 'Downtrend') ? 'text-danger font-weight-bold' : #strings.contains(long_short_header, 'Uptrend') ? 'text-success font-weight-bold' : ''}"></span>
 		<span th:text="${wall_today}" style="margin-left: 1rem;" class="text-primary font-weight-bold"></span>
 	</div>
 
