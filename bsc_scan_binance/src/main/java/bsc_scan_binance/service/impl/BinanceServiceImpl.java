@@ -2878,7 +2878,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-        sendMsgByTrendMaX(symbol, list_15m, 10);
+        // sendMsgByTrendMaX(symbol, list_15m, 10);
         // -----------------------------------------------//
 
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
@@ -2889,7 +2889,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_5m);
             sendMsgByTrendMaX(symbol, list_5m, 10);
-
+            sendMsgByTrendMaX(symbol, list_15m, 10);
         }
     }
 
