@@ -2854,7 +2854,7 @@ public class BinanceServiceImpl implements BinanceService {
         String chartname = Utils.getChartName(list);
 
         String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
-        String sl = "";
+        // String sl = "";
 
         String current_trend = Utils.check3CuttingXforH1(list, maIndex);
 
@@ -2867,15 +2867,16 @@ public class BinanceServiceImpl implements BinanceService {
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
             msg = " 🚀 " + symbol + chartname + ":3Up" + maIndex + ".";
 
-            sl = Utils.calcSL(list, true);
+            // sl = Utils.calcSL(list, true);
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
             msg = " 🔻 " + symbol + chartname + ":3Down" + maIndex + ".";
 
-            sl = Utils.calcSL(list, false);
+            // sl = Utils.calcSL(list, false);
         }
 
         if (Utils.isNotBlank(msg)) {
-            msg += "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")" + Utils.new_line_from_service + sl;
+            msg += "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
+            // + Utils.new_line_from_service + sl;
             sendMsgPerHour(EVENT_ID, msg, true);
         }
 
