@@ -2894,7 +2894,7 @@ public class BinanceServiceImpl implements BinanceService {
         if ((Objects.equals("BTC", symbol))) {
             BigDecimal ma50 = Utils.calcMA(list_15m, 50, 1);
             BigDecimal close = list_15m.get(1).getPrice_close_candle();
-            BigDecimal range = Utils.getPercent(close, ma50);
+            BigDecimal range = Utils.getPercent(close, ma50).abs();
 
             if (range.compareTo(BigDecimal.valueOf(0.2)) < 0) {
                 return;
@@ -2903,14 +2903,14 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
             List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
 
+            boolean m15IsAboveMa10 = Utils.isAboveMALine(list_15m, 10, 1);
             boolean m15IsAboveMa50 = Utils.isAboveMALine(list_15m, 50, 1);
-            boolean m05IsAboveMa50 = Utils.isAboveMALine(list_05m, 50, 1);
             boolean m01IsAboveMa50 = Utils.isAboveMALine(list_01m, 50, 1);
 
             String trend = "";
-            if (m15IsAboveMa50 && m05IsAboveMa50 && m01IsAboveMa50) {
+            if (!m15IsAboveMa10 && m15IsAboveMa50) {
                 trend = Utils.TREND_SHORT;
-            } else if (!(m15IsAboveMa50 || m05IsAboveMa50 || m01IsAboveMa50)) {
+            } else if (m15IsAboveMa10 && !m15IsAboveMa50) {
                 trend = Utils.TREND_LONG;
             }
 
@@ -2922,15 +2922,6 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgByTrendMaX(symbol, list_15m, 10, trend);
             sendMsgByTrendMaX(symbol, list_05m, 10, trend);
             sendMsgByTrendMaX(symbol, list_01m, 10, trend);
-
-            //String msg = sendMsgByTrendMaX(symbol, list_15m, 10, trend);
-            //if (Utils.isBlank(msg)) {
-            //    msg = sendMsgByTrendMaX(symbol, list_05m, 10, trend);
-            //    if (Utils.isBlank(msg)) {
-            //        sendMsgByTrendMaX(symbol, list_01m, 10, trend);
-            //    }
-            //}
-
         }
     }
 
