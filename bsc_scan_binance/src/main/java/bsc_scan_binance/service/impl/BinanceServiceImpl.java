@@ -2823,9 +2823,9 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_H1_EUR = Utils.loadData("EUR", TIME_15m, 60);
             List<BtcFutures> list_H1_GBP = Utils.loadData("GBP", TIME_15m, 60);
 
-            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 10);
-            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 10);
-            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 10);
+            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 10, "");
+            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 10, "");
+            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 10, "");
 
             boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H1_AUD, 50);
             boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H1_EUR, 50);
@@ -2849,20 +2849,26 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private String sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex) {
+    private String sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex, String find_trend) {
         String msg = "";
         String chartname = Utils.getChartName(list);
 
         String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
         String sl = "";
 
-        String trend_m15 = Utils.check3CuttingXforH1(list, maIndex);
+        String current_trend = Utils.check3CuttingXforH1(list, maIndex);
 
-        if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
+        if (Utils.isNotBlank(find_trend)) {
+            if (!Objects.equals(current_trend, find_trend)) {
+                return "";
+            }
+        }
+
+        if (Objects.equals(Utils.TREND_LONG, current_trend)) {
             msg = " 💹 " + symbol + chartname + ":3Up" + maIndex + ".";
 
             sl = Utils.calcSL(list, true);
-        } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
+        } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
             msg = " 📉 " + symbol + chartname + ":3Down" + maIndex + ".";
 
             sl = Utils.calcSL(list, false);
@@ -2886,15 +2892,18 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if ((Objects.equals("BTC", symbol))) {
-            String msg = sendMsgByTrendMaX(symbol, list_15m, 10);
+            boolean isAboveMa50 = Utils.isAboveMALine(list_15m, 50, 1);
+            String trend_position = isAboveMa50 ? Utils.TREND_SHORT : Utils.TREND_LONG;
+
+            String msg = sendMsgByTrendMaX(symbol, list_15m, 10, trend_position);
 
             if (Utils.isBlank(msg)) {
                 List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-                msg = sendMsgByTrendMaX(symbol, list_5m, 10);
+                msg = sendMsgByTrendMaX(symbol, list_5m, 10, trend_position);
 
                 if (Utils.isBlank(msg)) {
                     List<BtcFutures> list_1m = Utils.loadData(symbol, TIME_1m, 50);
-                    sendMsgByTrendMaX(symbol, list_1m, 10);
+                    sendMsgByTrendMaX(symbol, list_1m, 10, trend_position);
                 }
             }
 
