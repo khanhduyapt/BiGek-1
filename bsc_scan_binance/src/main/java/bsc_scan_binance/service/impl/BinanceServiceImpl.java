@@ -2875,7 +2875,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Utils.isNotBlank(msg)) {
-            msg += Utils.new_line_from_service + sl;
+            msg += Utils.removeLastZero(list.get(0).getCurrPrice()) + Utils.new_line_from_service + sl;
             sendMsgPerHour(EVENT_ID, msg, true);
         }
 
@@ -2915,7 +2915,9 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             if (Utils.isBlank(trend)) {
-                sendMsgByTrendMaX(symbol, list_01m, 10, (m01IsAboveMa50 ? Utils.TREND_SHORT : Utils.TREND_LONG));
+                trend = (m01IsAboveMa50 ? Utils.TREND_SHORT : Utils.TREND_LONG);
+                trend = Utils.TREND_SHORT; //DEBUG
+                sendMsgByTrendMaX(symbol, list_01m, 10, trend);
                 return;
             }
 
