@@ -2784,7 +2784,7 @@ public class BinanceServiceImpl implements BinanceService {
         atl += ", ath:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(1), true);
 
         if (ido.isBtcKillLongCandle()) {
-            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " kill "
+            msg = Utils.getTimeHHmm() + " 🔻  " + symbol + " " + chartname + " kill "
                     + (!isShort ? "LONG 💔 !!! " : "Long 💔 ");
         }
 
@@ -2865,11 +2865,11 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
-            msg = " 💹 " + symbol + chartname + ":3Up" + maIndex + ".";
+            msg = " 🚀 " + symbol + chartname + ":3Up" + maIndex + ".";
 
             sl = Utils.calcSL(list, true);
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
-            msg = " 📉 " + symbol + chartname + ":3Down" + maIndex + ".";
+            msg = " 🔻 " + symbol + chartname + ":3Down" + maIndex + ".";
 
             sl = Utils.calcSL(list, false);
         }
