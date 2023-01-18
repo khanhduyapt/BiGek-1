@@ -132,7 +132,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String SYMBOL_BTC = "BTC";
 
     private static final String TIME_15m = "15m";
-    private static final String TIME_5m = "5m";
+    private static final String TIME_3m = "3m";
     private static final String TIME_1m = "1m";
 
     private static final String TIME_1h = "1h";
@@ -2865,11 +2865,11 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
-            msg = " 🚀 " + symbol + chartname + ":3Up" + maIndex + ".";
+            msg = " 💹 " + symbol + chartname + ":3Up" + maIndex + " 🚀.";
 
             // sl = Utils.calcSL(list, true);
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
-            msg = " 🔻 " + symbol + chartname + ":3Down" + maIndex + ".";
+            msg = " 📉 " + symbol + chartname + ":3Down" + maIndex + " 🥶.";
 
             // sl = Utils.calcSL(list, false);
         }
@@ -2884,7 +2884,6 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
-        String find_trend = "";// Utils.TREND_SHORT;
 
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
         // sendMsgByTrendMaX(symbol, list_15m, 10);
@@ -2903,30 +2902,30 @@ public class BinanceServiceImpl implements BinanceService {
                 return;
             }
 
-            List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
+            List<BtcFutures> list_03m = Utils.loadData(symbol, TIME_3m, 50);
             List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
 
             if (Utils.isBlank(kill_long_short_msg)) {
-                sendMsgKillLongShort(gecko_id, symbol, list_05m);
+                sendMsgKillLongShort(gecko_id, symbol, list_03m);
             }
 
-            sendMsgByTrendMaX(symbol, list_15m, 10, find_trend);
-            sendMsgByTrendMaX(symbol, list_05m, 10, find_trend);
+            // sendMsgByTrendMaX(symbol, list_15m, 10, find_trend);
+            sendMsgByTrendMaX(symbol, list_03m, 10, "");
             sendMsgByTrendMaX(symbol, list_01m, 10, "");
 
         } else if ((Objects.equals("ETH", symbol))) {
 
-            List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
+            List<BtcFutures> list_03m = Utils.loadData(symbol, TIME_3m, 50);
 
             if (Utils.isBlank(kill_long_short_msg)) {
-                sendMsgKillLongShort(gecko_id, symbol, list_05m);
+                sendMsgKillLongShort(gecko_id, symbol, list_03m);
             }
 
-            sendMsgByTrendMaX(symbol, list_05m, 10, "");
+            sendMsgByTrendMaX(symbol, list_03m, 10, "");
 
         } else {
 
-            sendMsgByTrendMaX(symbol, list_15m, 20, Utils.TREND_SHORT);
+            sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_SHORT);
 
         }
     }

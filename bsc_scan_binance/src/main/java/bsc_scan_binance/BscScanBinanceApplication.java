@@ -39,7 +39,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            app_flag = Utils.const_app_flag_msg_on;
+            // app_flag = Utils.const_app_flag_msg_on;
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -72,15 +72,19 @@ public class BscScanBinanceApplication {
                 int pre_minute = 0;
                 int cur_minute = 0;
 
-                int pre_blog10minute = 0;
-                int cur_blog10minute = 0;
+                int pre_blog3minute = 0;
+                int cur_blog3minute = 0;
+
+                int pre_blog15minute = 0;
+                int cur_blog15minute = 0;
 
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
                     try {
                         cur_minute = Utils.getCurrentMinute();
-                        cur_blog10minute = Utils.getCurrentMinute_Blog10minutes();
+                        cur_blog3minute = Utils.getCurrentMinute_Blog3minutes();
+                        cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
 
                         if (cur_minute != pre_minute) {
                             pre_minute = cur_minute;
@@ -89,12 +93,16 @@ public class BscScanBinanceApplication {
                             System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
                         }
 
-                        if (pre_blog10minute != cur_blog10minute) {
-                            pre_blog10minute = cur_blog10minute;
+                        if (pre_blog3minute != cur_blog3minute) {
+                            pre_blog3minute = cur_blog3minute;
 
                             binance_service.getChartWD("ethereum", "ETH");
                             wait(SLEEP_MINISECONDS);
                             System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
+                        }
+
+                        if (pre_blog15minute != cur_blog15minute) {
+                            pre_blog15minute = cur_blog15minute;
 
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
@@ -108,9 +116,10 @@ public class BscScanBinanceApplication {
                                     + coin.getSymbol();
 
                         } else {
-                            //binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
-                            //msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: " + coin.getSymbol();
-                            //System.out.println(msg);
+                            // binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
+                            // msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + ";
+                            // Symbol: " + coin.getSymbol();
+                            // System.out.println(msg);
                         }
 
                         wait(SLEEP_MINISECONDS);

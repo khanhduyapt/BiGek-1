@@ -739,9 +739,21 @@ public class Utils {
         return mm;
     }
 
-    public static int getCurrentMinute_Blog10minutes() {
+    public static int getCurrentMinute_Blog3minutes() {
+        int mm = getCurrentMinute();
+        mm = mm / 3;
+        return mm;
+    }
+
+    public static int getCurrentMinute_Blog5minutes() {
         int mm = getCurrentMinute();
         mm = mm / 5;
+        return mm;
+    }
+
+    public static int getCurrentMinute_Blog15minutes() {
+        int mm = getCurrentMinute();
+        mm = mm / 15;
         return mm;
     }
 
