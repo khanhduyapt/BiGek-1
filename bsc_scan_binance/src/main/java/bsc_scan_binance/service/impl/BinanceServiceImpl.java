@@ -2860,7 +2860,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
 
-            msg = " 💹... " + symbol + chartname + ":Ma3CutUpMa" + maIndex + ".";
+            msg = " 💹 " + symbol + chartname + ":3Up" + maIndex + ".";
 
             if (!Utils.attack_mode) {
                 sl = Utils.calcSL(list, true);
@@ -2868,7 +2868,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
 
-            msg = " 📉... " + symbol + chartname + ":Ma3CutDownMa" + maIndex + ".";
+            msg = " 📉 " + symbol + chartname + ":3Down" + maIndex + ".";
 
             if (!Utils.attack_mode) {
                 sl = Utils.calcSL(list, false);
