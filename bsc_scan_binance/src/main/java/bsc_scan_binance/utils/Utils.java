@@ -1927,7 +1927,7 @@ public class Utils {
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn) + "$";
 
             if (earn.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
-                //result += TREND_DANGER;
+                // result += TREND_DANGER;
             }
 
             return result;
@@ -1981,7 +1981,7 @@ public class Utils {
             result += ",Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + ":" + removeLastZero(earn1) + "$";
 
             if (earn1.compareTo(BigDecimal.valueOf(usd / 2)) < 0) {
-                //result += TREND_DANGER;
+                // result += TREND_DANGER;
             }
 
             return result;
@@ -2029,9 +2029,9 @@ public class Utils {
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
         String result = getChartName(list);
-        result += " ATL:" + getPercentToEntry(entry, low_heigh.get(0), true);
-        result += ",ATH:" + getPercentToEntry(entry, low_heigh.get(1), true);
-        result += ",VOL: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
+        result += " atl:" + getPercentToEntry(entry, low_heigh.get(0), true);
+        result += ", ath:" + getPercentToEntry(entry, low_heigh.get(1), true);
+        result += ", vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
         return result;
     }
@@ -2156,7 +2156,7 @@ public class Utils {
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
             if (ma_fast_c.compareTo(max_allow_long) > 0) {
-                //result += TREND_DANGER;
+                // result += TREND_DANGER;
                 // return "";
             }
         } else if (isCuttingDown) {
