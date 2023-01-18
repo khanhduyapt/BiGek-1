@@ -2892,20 +2892,45 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if ((Objects.equals("BTC", symbol))) {
-            boolean isAboveMa50 = Utils.isAboveMALine(list_15m, 50, 1);
-            String trend_position = isAboveMa50 ? Utils.TREND_SHORT : Utils.TREND_LONG;
+            BigDecimal ma50 = Utils.calcMA(list_15m, 50, 1);
+            BigDecimal close = list_15m.get(1).getPrice_close_candle();
+            BigDecimal range = Utils.getPercent(close, ma50);
 
-            String msg = sendMsgByTrendMaX(symbol, list_15m, 10, trend_position);
-
-            if (Utils.isBlank(msg)) {
-                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-                msg = sendMsgByTrendMaX(symbol, list_5m, 10, trend_position);
-
-                if (Utils.isBlank(msg)) {
-                    List<BtcFutures> list_1m = Utils.loadData(symbol, TIME_1m, 50);
-                    sendMsgByTrendMaX(symbol, list_1m, 10, trend_position);
-                }
+            if (range.compareTo(BigDecimal.valueOf(0.0)) > 0) {
+            } else {
+                return;
             }
+
+            List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
+            List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
+
+            boolean m15IsAboveMa50 = Utils.isAboveMALine(list_15m, 50, 1);
+            boolean m05IsAboveMa50 = Utils.isAboveMALine(list_05m, 50, 1);
+            boolean m01IsAboveMa50 = Utils.isAboveMALine(list_01m, 50, 1);
+
+            String trend = "";
+            if (m15IsAboveMa50 && m05IsAboveMa50 && m01IsAboveMa50) {
+                trend = Utils.TREND_SHORT;
+            } else if (!(m15IsAboveMa50 || m05IsAboveMa50 || m01IsAboveMa50)) {
+                trend = Utils.TREND_LONG;
+            }
+
+            if (Utils.isBlank(trend)) {
+                sendMsgByTrendMaX(symbol, list_01m, 10, (m01IsAboveMa50 ? Utils.TREND_SHORT : Utils.TREND_LONG));
+                return;
+            }
+
+            sendMsgByTrendMaX(symbol, list_15m, 10, trend);
+            sendMsgByTrendMaX(symbol, list_05m, 10, trend);
+            sendMsgByTrendMaX(symbol, list_01m, 10, trend);
+
+            //String msg = sendMsgByTrendMaX(symbol, list_15m, 10, trend);
+            //if (Utils.isBlank(msg)) {
+            //    msg = sendMsgByTrendMaX(symbol, list_05m, 10, trend);
+            //    if (Utils.isBlank(msg)) {
+            //        sendMsgByTrendMaX(symbol, list_01m, 10, trend);
+            //    }
+            //}
 
         }
     }

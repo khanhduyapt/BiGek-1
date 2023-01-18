@@ -2054,30 +2054,25 @@ public class Utils {
         }
 
         BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
-        BigDecimal ma50 = Utils.calcMA(list, 50, 1);
 
         BigDecimal close1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
         BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
-        if ((ma_X_c.compareTo(ma50) < 0) && (close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
-                && (ma_X_c.compareTo(close2) > 0)) {
+        if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
             return TREND_LONG;
         }
 
-        if ((ma_X_c.compareTo(ma50) > 0) && (close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0)
-                && (ma_X_c.compareTo(close2) < 0)) {
+        if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(close2) < 0)) {
             return TREND_SHORT;
         }
 
         if (list.get(0).getId().contains("_1m_")) {
             close2 = calcMA(list, 3, 3);
-            if ((ma_X_c.compareTo(ma50) < 0) && (close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
-                    && (ma_X_c.compareTo(close2) > 0)) {
+            if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
                 return TREND_LONG;
             }
 
-            if ((ma_X_c.compareTo(ma50) > 0) && (close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0)
-                    && (ma_X_c.compareTo(close2) < 0)) {
+            if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(close2) < 0)) {
                 return TREND_SHORT;
             }
         }
