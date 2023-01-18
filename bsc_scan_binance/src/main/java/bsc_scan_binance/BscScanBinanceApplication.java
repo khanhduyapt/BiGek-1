@@ -39,7 +39,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            // app_flag = Utils.const_app_flag_msg_on;
+            app_flag = Utils.const_app_flag_msg_on;
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -106,7 +106,11 @@ public class BscScanBinanceApplication {
                             binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol().toUpperCase());
                             msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
                                     + coin.getSymbol();
-                            System.out.println(msg);
+
+                        } else {
+                            //binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
+                            //msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: " + coin.getSymbol();
+                            //System.out.println(msg);
                         }
 
                         wait(SLEEP_MINISECONDS);

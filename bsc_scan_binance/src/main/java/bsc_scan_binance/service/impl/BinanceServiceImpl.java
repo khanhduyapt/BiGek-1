@@ -2755,7 +2755,7 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgPerHour(String EVENT_ID, String msg_content, boolean isOnlyMe) {
-        String msg = Utils.getMmDD_TimeHHmm();
+        String msg = Utils.getTimeHHmm();
         msg += msg_content;
         msg = msg.replace(" ", "").replace(",", ", ");
 
@@ -2796,7 +2796,7 @@ public class BinanceServiceImpl implements BinanceService {
         if (Utils.isNotBlank(msg)) {
             msg += Utils.removeLastZero(ido.getCurrPrice()) + atl;
 
-            String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
+            String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + ido.getId() + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
 
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID5, gecko_id, symbol, msg, true));
@@ -2907,9 +2907,17 @@ public class BinanceServiceImpl implements BinanceService {
 
             sendMsgByTrendMaX(symbol, list_15m, 10, find_trend);
             sendMsgByTrendMaX(symbol, list_05m, 10, find_trend);
-            sendMsgByTrendMaX(symbol, list_01m, 10, find_trend);
+            sendMsgByTrendMaX(symbol, list_01m, 10, "");
+
+        } else if ((Objects.equals("ETH", symbol))) {
+
+            List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
+            sendMsgByTrendMaX(symbol, list_05m, 10, "");
+
         } else {
+
             sendMsgByTrendMaX(symbol, list_15m, 20, Utils.TREND_SHORT);
+
         }
     }
 
@@ -2989,7 +2997,7 @@ public class BinanceServiceImpl implements BinanceService {
             // }
             // }
         } else if (type.contains("Futures") && Utils.isBusinessTime()) {
-            sendMsgChart15m(gecko_id, symbol);
+            // sendMsgChart15m(gecko_id, symbol);
         }
 
         CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
