@@ -2988,7 +2988,7 @@ public class BinanceServiceImpl implements BinanceService {
             // }
             // }
             // }
-        } else if (type.contains("Futures")) {
+        } else if (type.contains("Futures") && Utils.isBusinessTime()) {
             sendMsgChart15m(gecko_id, symbol);
         }
 
