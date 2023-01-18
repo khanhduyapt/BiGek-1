@@ -2853,26 +2853,19 @@ public class BinanceServiceImpl implements BinanceService {
         String msg = "";
         String chartname = Utils.getChartName(list);
 
-        String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDd_Blog4h();
+        String EVENT_ID_15m = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
         String sl = "";
 
         String trend_m15 = Utils.check3CuttingXforH1(list, maIndex);
 
         if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
-
             msg = " 💹 " + symbol + chartname + ":3Up" + maIndex + ".";
 
-            if (!Utils.attack_mode) {
-                sl = Utils.calcSL(list, true);
-            }
-
+            sl = Utils.calcSL(list, true);
         } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
-
             msg = " 📉 " + symbol + chartname + ":3Down" + maIndex + ".";
 
-            if (!Utils.attack_mode) {
-                sl = Utils.calcSL(list, false);
-            }
+            sl = Utils.calcSL(list, false);
         }
 
         if (Utils.isNotBlank(msg)) {
