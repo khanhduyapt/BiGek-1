@@ -2070,11 +2070,13 @@ public class Utils {
 
         if (list.get(0).getId().contains("_1m_")) {
             close2 = calcMA(list, 3, 3);
-            if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
+            if (!m15IsAboveMa50 && (close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
+                    && (ma_X_c.compareTo(close2) > 0)) {
                 return TREND_LONG;
             }
 
-            if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(close2) < 0)) {
+            if (m15IsAboveMa50 && (close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0)
+                    && (ma_X_c.compareTo(close2) < 0)) {
                 return TREND_SHORT;
             }
         }

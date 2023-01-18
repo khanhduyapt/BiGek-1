@@ -2901,13 +2901,13 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
-            List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
+            // List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
 
             String find_trend = Utils.TREND_SHORT;
 
             sendMsgByTrendMaX(symbol, list_15m, 10, find_trend);
             sendMsgByTrendMaX(symbol, list_05m, 10, find_trend);
-            sendMsgByTrendMaX(symbol, list_01m, 10, find_trend);
+            // sendMsgByTrendMaX(symbol, list_01m, 10, find_trend);
         }
     }
 
