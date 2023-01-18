@@ -2875,7 +2875,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Utils.isNotBlank(msg)) {
-            msg += Utils.removeLastZero(list.get(0).getCurrPrice()) + Utils.new_line_from_service + sl;
+            msg += "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")" + Utils.new_line_from_service + sl;
             sendMsgPerHour(EVENT_ID, msg, true);
         }
 
@@ -2883,6 +2883,8 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
+        String find_trend = "";// Utils.TREND_SHORT;
+
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
         // sendMsgByTrendMaX(symbol, list_15m, 10);
         // -----------------------------------------------//
@@ -2901,13 +2903,13 @@ public class BinanceServiceImpl implements BinanceService {
             }
 
             List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
-            // List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
-
-            String find_trend = Utils.TREND_SHORT;
+            List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
 
             sendMsgByTrendMaX(symbol, list_15m, 10, find_trend);
             sendMsgByTrendMaX(symbol, list_05m, 10, find_trend);
-            // sendMsgByTrendMaX(symbol, list_01m, 10, find_trend);
+            sendMsgByTrendMaX(symbol, list_01m, 10, find_trend);
+        } else {
+            sendMsgByTrendMaX(symbol, list_15m, 20, Utils.TREND_SHORT);
         }
     }
 
@@ -2986,6 +2988,8 @@ public class BinanceServiceImpl implements BinanceService {
             // }
             // }
             // }
+        } else if (type.contains("Futures")) {
+            sendMsgChart15m(gecko_id, symbol);
         }
 
         CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
