@@ -2888,9 +2888,9 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
         // sendMsgByTrendMaX(symbol, list_15m, 10);
         // -----------------------------------------------//
-
+        String kill_long_short_msg = "";
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-            sendMsgKillLongShort(gecko_id, symbol, list_15m);
+            kill_long_short_msg = sendMsgKillLongShort(gecko_id, symbol, list_15m);
         }
 
         if ((Objects.equals("BTC", symbol))) {
@@ -2905,6 +2905,10 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
             List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
 
+            if (Utils.isBlank(kill_long_short_msg)) {
+                sendMsgKillLongShort(gecko_id, symbol, list_05m);
+            }
+
             sendMsgByTrendMaX(symbol, list_15m, 10, find_trend);
             sendMsgByTrendMaX(symbol, list_05m, 10, find_trend);
             sendMsgByTrendMaX(symbol, list_01m, 10, "");
@@ -2912,6 +2916,11 @@ public class BinanceServiceImpl implements BinanceService {
         } else if ((Objects.equals("ETH", symbol))) {
 
             List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
+
+            if (Utils.isBlank(kill_long_short_msg)) {
+                sendMsgKillLongShort(gecko_id, symbol, list_05m);
+            }
+
             sendMsgByTrendMaX(symbol, list_05m, 10, "");
 
         } else {
