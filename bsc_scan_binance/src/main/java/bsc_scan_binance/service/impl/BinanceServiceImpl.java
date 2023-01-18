@@ -2779,9 +2779,9 @@ public class BinanceServiceImpl implements BinanceService {
         boolean isShort = Utils.isAboveMALine(list_15m, 50, 0);
 
         List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_15m);
-        String atl = Utils.new_line_from_service;
-        atl += "ATL:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(0), true);
-        atl += ",ATH:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(1), true);
+        String atl = Utils.new_line_from_service + chartname;
+        atl += "atl:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(0), true);
+        atl += ", ath:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(1), true);
 
         if (ido.isBtcKillLongCandle()) {
             msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " kill "
@@ -2889,6 +2889,7 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_5m);
             sendMsgByTrendMaX(symbol, list_5m, 10);
+
         }
     }
 
