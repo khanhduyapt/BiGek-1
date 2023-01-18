@@ -2896,33 +2896,18 @@ public class BinanceServiceImpl implements BinanceService {
             BigDecimal close = list_15m.get(1).getPrice_close_candle();
             BigDecimal range = Utils.getPercent(close, ma50).abs();
 
-            if (range.compareTo(BigDecimal.valueOf(0.2)) < 0) {
+            if (range.compareTo(BigDecimal.valueOf(0.15)) < 0) {
                 return;
             }
 
             List<BtcFutures> list_05m = Utils.loadData(symbol, TIME_5m, 50);
             List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
 
-            boolean m15IsAboveMa10 = Utils.isAboveMALine(list_15m, 10, 1);
-            boolean m15IsAboveMa50 = Utils.isAboveMALine(list_15m, 50, 1);
+            String find_trend = Utils.TREND_SHORT;
 
-            String trend = "";
-            if (!m15IsAboveMa10 && m15IsAboveMa50) {
-                trend = Utils.TREND_SHORT;
-            } else if (m15IsAboveMa10 && !m15IsAboveMa50) {
-                trend = Utils.TREND_LONG;
-            }
-
-            String main_trend = Utils.TREND_SHORT;
-            if (Utils.isBlank(trend)) {
-                sendMsgByTrendMaX(symbol, list_15m, 10, main_trend);
-                sendMsgByTrendMaX(symbol, list_05m, 10, main_trend);
-                sendMsgByTrendMaX(symbol, list_01m, 10, main_trend);
-            } else {
-                sendMsgByTrendMaX(symbol, list_15m, 10, trend);
-                sendMsgByTrendMaX(symbol, list_05m, 10, trend);
-                sendMsgByTrendMaX(symbol, list_01m, 10, trend);
-            }
+            sendMsgByTrendMaX(symbol, list_15m, 10, find_trend);
+            sendMsgByTrendMaX(symbol, list_05m, 10, find_trend);
+            sendMsgByTrendMaX(symbol, list_01m, 10, find_trend);
         }
     }
 

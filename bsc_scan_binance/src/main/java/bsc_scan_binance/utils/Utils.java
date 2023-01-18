@@ -2054,15 +2054,17 @@ public class Utils {
         }
 
         BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
-
         BigDecimal close1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
         BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
+        boolean m15IsAboveMa50 = Utils.isAboveMALine(list, 50, 1);
 
-        if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
+        if (!m15IsAboveMa50 && (close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
+                && (ma_X_c.compareTo(close2) > 0)) {
             return TREND_LONG;
         }
 
-        if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(close2) < 0)) {
+        if (m15IsAboveMa50 && (close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0)
+                && (ma_X_c.compareTo(close2) < 0)) {
             return TREND_SHORT;
         }
 
