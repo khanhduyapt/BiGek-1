@@ -2776,7 +2776,7 @@ public class BinanceServiceImpl implements BinanceService {
         String msg = "";
         String chartname = Utils.getChartName(list_15m);
         BtcFutures ido = list_15m.get(0);
-        String percentMa3to50 = Utils.new_line_from_service + Utils.percentMa3to50(list_15m);
+        boolean isShort = Utils.isAboveMALine(list_15m, 50, 0);
 
         List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_15m);
         String atl = Utils.new_line_from_service;
@@ -2784,16 +2784,18 @@ public class BinanceServiceImpl implements BinanceService {
         atl += ",ATH:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(1), true);
 
         if (ido.isBtcKillLongCandle()) {
-            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " kill Long 💔 "
-                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50 + atl;
+            msg = Utils.getTimeHHmm() + " 📉 " + symbol + " " + chartname + " kill "
+                    + (!isShort ? "LONG 💔 !!! " : "Long 💔 ");
         }
 
         if (ido.isBtcKillShortCandle()) {
-            msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " kill Short 💔 "
-                    + Utils.removeLastZero(ido.getCurrPrice()) + percentMa3to50 + atl;
+            msg = Utils.getTimeHHmm() + " 💹 " + symbol + " " + chartname + " kill "
+                    + (!isShort ? "SHORT 💔  !!!" : "Short 💔 ");
         }
 
         if (Utils.isNotBlank(msg)) {
+            msg += Utils.removeLastZero(ido.getCurrPrice()) + atl;
+
             String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + symbol + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
 
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_ID5)) {
@@ -2876,7 +2878,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-        sendMsgByTrendMaX(symbol, list_15m, 20);
+        sendMsgByTrendMaX(symbol, list_15m, 10);
         // -----------------------------------------------//
 
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
@@ -2886,7 +2888,7 @@ public class BinanceServiceImpl implements BinanceService {
         if ((Objects.equals("BTC", symbol))) {
             List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_5m);
-            sendMsgByTrendMaX(symbol, list_5m, 20);
+            sendMsgByTrendMaX(symbol, list_5m, 10);
         }
     }
 
