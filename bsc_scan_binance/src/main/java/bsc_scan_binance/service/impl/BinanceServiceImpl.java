@@ -2905,7 +2905,6 @@ public class BinanceServiceImpl implements BinanceService {
 
             boolean m15IsAboveMa10 = Utils.isAboveMALine(list_15m, 10, 1);
             boolean m15IsAboveMa50 = Utils.isAboveMALine(list_15m, 50, 1);
-            boolean m01IsAboveMa50 = Utils.isAboveMALine(list_01m, 50, 1);
 
             String trend = "";
             if (!m15IsAboveMa10 && m15IsAboveMa50) {
@@ -2914,16 +2913,16 @@ public class BinanceServiceImpl implements BinanceService {
                 trend = Utils.TREND_LONG;
             }
 
+            String main_trend = Utils.TREND_SHORT;
             if (Utils.isBlank(trend)) {
-                trend = (m01IsAboveMa50 ? Utils.TREND_SHORT : Utils.TREND_LONG);
-                trend = Utils.TREND_SHORT; //DEBUG
+                sendMsgByTrendMaX(symbol, list_15m, 10, main_trend);
+                sendMsgByTrendMaX(symbol, list_05m, 10, main_trend);
+                sendMsgByTrendMaX(symbol, list_01m, 10, main_trend);
+            } else {
+                sendMsgByTrendMaX(symbol, list_15m, 10, trend);
+                sendMsgByTrendMaX(symbol, list_05m, 10, trend);
                 sendMsgByTrendMaX(symbol, list_01m, 10, trend);
-                return;
             }
-
-            sendMsgByTrendMaX(symbol, list_15m, 10, trend);
-            sendMsgByTrendMaX(symbol, list_05m, 10, trend);
-            sendMsgByTrendMaX(symbol, list_01m, 10, trend);
         }
     }
 
