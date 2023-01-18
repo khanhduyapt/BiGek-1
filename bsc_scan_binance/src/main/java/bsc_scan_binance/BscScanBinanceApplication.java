@@ -23,7 +23,6 @@ public class BscScanBinanceApplication {
                                                                 // all_and_msg
     public static String callFormBinance = "";
     public static int SLEEP_MINISECONDS = 6000;
-    public static boolean attack_mode = true;
 
     public static void main(String[] args) {
         try {
@@ -40,7 +39,7 @@ public class BscScanBinanceApplication {
             }
 
             // Debug
-            // app_flag = Utils.const_app_flag_msg_on;
+            app_flag = Utils.const_app_flag_msg_on;
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -102,7 +101,7 @@ public class BscScanBinanceApplication {
                             System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
                         }
 
-                        if (!attack_mode) {
+                        if (!Utils.attack_mode) {
                             binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
                             binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol().toUpperCase());
                             msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "

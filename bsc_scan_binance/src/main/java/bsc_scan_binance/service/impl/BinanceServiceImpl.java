@@ -2861,13 +2861,18 @@ public class BinanceServiceImpl implements BinanceService {
         if (Objects.equals(Utils.TREND_LONG, trend_m15)) {
 
             msg = " 💹... " + symbol + chartname + ":Ma3CutUpMa" + maIndex + ".";
-            sl = Utils.calcSL(list, true);
+
+            if (!Utils.attack_mode) {
+                sl = Utils.calcSL(list, true);
+            }
 
         } else if (Objects.equals(Utils.TREND_SHORT, trend_m15)) {
 
             msg = " 📉... " + symbol + chartname + ":Ma3CutDownMa" + maIndex + ".";
-            sl = Utils.calcSL(list, false);
 
+            if (!Utils.attack_mode) {
+                sl = Utils.calcSL(list, false);
+            }
         }
 
         if (Utils.isNotBlank(msg)) {

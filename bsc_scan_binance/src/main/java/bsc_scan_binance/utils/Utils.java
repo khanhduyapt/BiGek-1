@@ -75,6 +75,8 @@ public class Utils {
     public static final int MA_INDEX_D1_START_LONG = 5;
     public static final int MA_INDEX_CURRENCY = 10;
 
+    public static boolean attack_mode = true;
+
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
             + "    SELECT                                                                                   \n"
