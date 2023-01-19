@@ -2866,11 +2866,11 @@ public class BinanceServiceImpl implements BinanceService {
 
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
             msg = " 💹 " + symbol + chartname + ":3Up" + maIndex + " 🚀.";
-
+            EVENT_ID += "_UP";
             // sl = Utils.calcSL(list, true);
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
             msg = " 📉 " + symbol + chartname + ":3Down" + maIndex + " 🥶.";
-
+            EVENT_ID += "_DOWN";
             // sl = Utils.calcSL(list, false);
         }
 
@@ -2925,7 +2925,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         } else {
 
-            sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_SHORT);
+            // sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_SHORT);
 
         }
     }
