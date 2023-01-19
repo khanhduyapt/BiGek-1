@@ -703,6 +703,21 @@ public class Utils {
         return Utils.convertDateToString("dd", calendar.getTime());
     }
 
+    public static String getCurrentYyyyMmDdHHByChart(List<BtcFutures> list) {
+        String id = list.get(0).getId();
+        String result = getCurrentYyyyMmDdHH() + "_";
+
+        if (id.contains("_3m_")) {
+            result += getCurrentMinute_Blog15minutes();
+        }
+
+        if (id.contains("_1m_")) {
+            result += getCurrentMinute_Blog5minutes();
+        }
+
+        return result;
+    }
+
     public static String getCurrentYyyyMmDdHH() {
         return Utils.convertDateToString("yyyy.MM.dd_HH", Calendar.getInstance().getTime()) + "h";
     }

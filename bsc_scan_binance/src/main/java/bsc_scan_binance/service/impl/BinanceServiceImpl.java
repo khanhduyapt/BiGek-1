@@ -2853,7 +2853,7 @@ public class BinanceServiceImpl implements BinanceService {
         String msg = "";
         String chartname = Utils.getChartName(list);
 
-        String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHH();
+        String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
         // String sl = "";
 
         String current_trend = Utils.check3CuttingXforH1(list, maIndex);
@@ -2865,11 +2865,13 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
-            msg = " 💹 " + symbol + chartname + ":3Up" + maIndex + " 🚀.";
+            msg = " 💹 " + symbol + chartname + ":3Up" + maIndex
+                    + (list.get(0).getId().contains("_3m_") ? " 🚀🚀🚀" : " 🚀");
             EVENT_ID += "_UP";
             // sl = Utils.calcSL(list, true);
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
-            msg = " 📉 " + symbol + chartname + ":3Down" + maIndex + " 🥶.";
+            msg = " 📉 " + symbol + chartname + ":3Down" + maIndex
+                    + (list.get(0).getId().contains("_3m_") ? " 🥶🥶🥶" : " 🥶");
             EVENT_ID += "_DOWN";
             // sl = Utils.calcSL(list, false);
         }
@@ -2925,7 +2927,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         } else {
 
-            // sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_SHORT);
+            sendMsgByTrendMaX(symbol, list_15m, 10, "");
 
         }
     }
@@ -2970,6 +2972,15 @@ public class BinanceServiceImpl implements BinanceService {
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
             sendMsgChart15m(gecko_id, symbol);
+
+            if (!Objects.equals(pre_HH_h4, Utils.getCurrentYyyyMmDdHH())) {
+                pre_HH_h4 = Utils.getCurrentYyyyMmDdHH();
+                sendMsgByTrendMaX(symbol, list_h4, 10, "");
+            }
+            if (!Objects.equals(pre_btc6days, Utils.getYyyyMmDdHH_ChangeDailyChart())) {
+                pre_btc6days = Utils.getYyyyMmDdHH_ChangeDailyChart();
+                sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, "");
+            }
 
             List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 50);
             String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, Utils.TREND_LONG, 50, false);
