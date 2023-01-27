@@ -2774,18 +2774,19 @@ public class BinanceServiceImpl implements BinanceService {
             type = " (Futures) ";
 
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-                sendMsgByTrendMaX(symbol, list_h1, Utils.MA_INDEX_H1_START_LONG, "");
-                sendMsgByTrendMaX(symbol, list_h4, Utils.MA_INDEX_H4_START_LONG, "");
-                sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, "");
+                sendMsgByTrendMaX(symbol, list_h1, 50, "");
+                sendMsgByTrendMaX(symbol, list_h4, 50, "");
+                sendMsgByTrendMaX(symbol, list_days, 50, "");
             } else {
-                sendMsgByTrendMaX(symbol, list_h1, Utils.MA_INDEX_H1_START_LONG, Utils.TREND_LONG);
-                sendMsgByTrendMaX(symbol, list_h4, Utils.MA_INDEX_H4_START_LONG, Utils.TREND_LONG);
-                sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, Utils.TREND_LONG);
+                sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG); // H4
+                sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG); // D
+                sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG);// W
             }
 
         } else {
             type = " (Spot) ";
-            sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG);
+            sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG); // D
+            sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG); // W
         }
         type = type + Utils.analysisVolume(list_days);
 
