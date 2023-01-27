@@ -2744,12 +2744,6 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
-
-        // AUD_EUR_GBP_USDT
-        if (Objects.equals("BTC", symbol)) {
-            checkCurrency();
-        }
-
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
@@ -2782,6 +2776,11 @@ public class BinanceServiceImpl implements BinanceService {
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
+
+            // AUD_EUR_GBP_USDT
+            if (Objects.equals("ETH", symbol)) {
+                checkCurrency();
+            }
 
             sendMsgChart15m(gecko_id, symbol);
 
