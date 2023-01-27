@@ -69,10 +69,11 @@ public class Utils {
     public static final String TREND_START_LONG = "Start:Long";
     public static final String TREND_STOP_LONG = "Stop:Long";
 
-    public static final int MA_INDEX_H4_STOP_LONG = 5;
-    public static final int MA_INDEX_H4_START_LONG = 8;
-    public static final int MA_INDEX_D1_STOP_LONG = 5;
-    public static final int MA_INDEX_D1_START_LONG = 5;
+    public static final int MA_INDEX_H1_START_LONG = 50;
+    public static final int MA_INDEX_H4_STOP_LONG = 10;
+    public static final int MA_INDEX_H4_START_LONG = 50;
+    public static final int MA_INDEX_D1_STOP_LONG = 8;
+    public static final int MA_INDEX_D1_START_LONG = 8;
     public static final int MA_INDEX_CURRENCY = 10;
 
     public static String sql_OrdersProfitResponse = ""
@@ -469,7 +470,7 @@ public class Utils {
     }
 
     public static void sendToMyTelegram(String text) {
-        String msg = text.replaceAll("↑", "^").replaceAll("↓", "v");
+        String msg = text.replaceAll("↑", "^").replaceAll("↓", "v").replaceAll(" ", "");
         System.out.println("sendToMyTelegram: " + msg);
 
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
@@ -480,7 +481,7 @@ public class Utils {
     }
 
     public static void sendToTelegram(String text) {
-        String msg = text.replaceAll("↑", "^").replaceAll("↓", "v");
+        String msg = text.replaceAll("↑", "^").replaceAll("↓", "v").replaceAll(" ", "");
         System.out.println("sendToTelegram: " + msg);
 
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
@@ -663,7 +664,7 @@ public class Utils {
     }
 
     public static String getMmDD_TimeHHmm() {
-        return Utils.convertDateToString("(MM-dd_HH:mm) ", Calendar.getInstance().getTime());
+        return Utils.convertDateToString("(MMdd_HH:mm) ", Calendar.getInstance().getTime());
     }
 
     public static String getTimeHHmm() {

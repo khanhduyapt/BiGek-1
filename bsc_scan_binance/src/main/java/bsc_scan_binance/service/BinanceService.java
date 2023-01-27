@@ -38,4 +38,6 @@ public interface BinanceService {
     public String getChartWD(String gecko_id, String symbol);
 
     public void clearTrash();
+
+    void sendMsgChart15m(String gecko_id, String symbol);
 }

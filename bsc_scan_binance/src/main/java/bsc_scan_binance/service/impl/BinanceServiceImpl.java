@@ -2573,6 +2573,7 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
+    @SuppressWarnings("unused")
     private String sendMsgMonitorFibo(String gecko_id, String symbol, List<BtcFutures> list, String only_trend,
             int maIndex, boolean showDetail) {
         String msg = Utils.getMmDD_TimeHHmm() + symbol + ",";
@@ -2602,7 +2603,7 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgPerHour(String EVENT_ID, String msg_content, boolean isOnlyMe) {
-        String msg = Utils.getTimeHHmm();
+        String msg = Utils.getMmDD_TimeHHmm();
         msg += msg_content;
         msg = msg.replace(" ", "").replace(",", ", ");
 
@@ -2733,17 +2734,29 @@ public class BinanceServiceImpl implements BinanceService {
         return msg;
     }
 
-    private void sendMsgChart15m(String gecko_id, String symbol) {
+    @Override
+    public void sendMsgChart15m(String gecko_id, String symbol) {
         // -----------------------------------------------//
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
             sendMsgByTrendMaX(symbol, list_15m, 50, "");
+
+            if (Objects.equals("BTC", symbol)) {
+                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+                sendMsgByTrendMaX(symbol, list_5m, 50, "");
+            }
         }
     }
 
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
+        // AUD_EUR_GBP_USDT
+        if (Objects.equals("ETH", symbol)) {
+            checkCurrency();
+        }
+        sendMsgChart15m(gecko_id, symbol);
+
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
@@ -2761,8 +2774,16 @@ public class BinanceServiceImpl implements BinanceService {
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures) ";
 
-            sendMsgByTrendMaX(symbol, list_h4, Utils.MA_INDEX_H4_START_LONG, Utils.TREND_LONG);
-            sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, Utils.TREND_LONG);
+            if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+                sendMsgByTrendMaX(symbol, list_h1, Utils.MA_INDEX_H1_START_LONG, "");
+                sendMsgByTrendMaX(symbol, list_h4, Utils.MA_INDEX_H4_START_LONG, "");
+                sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, "");
+            } else {
+                sendMsgByTrendMaX(symbol, list_h1, Utils.MA_INDEX_H1_START_LONG, Utils.TREND_LONG);
+                sendMsgByTrendMaX(symbol, list_h4, Utils.MA_INDEX_H4_START_LONG, Utils.TREND_LONG);
+                sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, Utils.TREND_LONG);
+            }
+
         } else {
             type = " (Spot) ";
         }
@@ -2774,23 +2795,6 @@ public class BinanceServiceImpl implements BinanceService {
         String scapLongD1 = Utils.getScapLong(list_days, list_days, 10, allow_long_d1);
 
         String checkMa3AndX = "";
-        String MAIN_TOKEN = "_BTC_ETH_BNB_";
-        if (MAIN_TOKEN.contains("_" + symbol + "_")) {
-
-            // AUD_EUR_GBP_USDT
-            if (Objects.equals("ETH", symbol)) {
-                checkCurrency();
-            }
-
-            sendMsgChart15m(gecko_id, symbol);
-
-            if (Objects.equals("BTC", symbol)) {
-                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-                sendMsgByTrendMaX(symbol, list_5m, 50, "");
-                sendMsgByTrendMaX(symbol, list_h1, 50, "");
-            }
-        } else if (type.contains("Futures") && Utils.isBusinessTime()) {
-        }
 
         CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
         if (!Objects.equals(null, entity)) {
