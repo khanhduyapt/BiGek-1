@@ -240,12 +240,15 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                     backer = "Binance";
                 }
                 coin.setTrend(trend + " (" + min_year + ")");
+                coin.setUsdt(String.valueOf(symbol).toUpperCase() + "_USDT");
                 coin.setBusd(String.valueOf(symbol).toUpperCase() + "_BUSD");
                 coin.setTotalSupply(Utils.getBigDecimal(total_supply));
                 coin.setMaxSupply(Utils.getBigDecimal(max_supply));
+                coin.setCirculatingSupply(Utils.getBigDecimal(circulating_supply));
+                coin.setBinanceTrade(str_trade_url);
+                coin.setCoinGeckoLink("https://www.coingecko.com/en/coins/" + String.valueOf(id));
                 coin.setBacker(backer);
             }
-
 
             candidateCoinRepository.save(coin);
 
