@@ -1,6 +1,7 @@
 package bsc_scan_binance;
 
 import java.util.Calendar;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,35 +65,21 @@ public class BscScanBinanceApplication {
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
+                Hashtable<String, String> keys_dict = new Hashtable<String, String>();
 
-                String msg;
                 int size = list.size();
                 int idx = 0;
-                boolean startup = true;
-                int pre_minute = 0;
-                int cur_minute = 0;
-
-                int pre_blog3minute = 0;
-                int cur_blog3minute = 0;
-
-                int pre_blog15minute = 0;
-                int cur_blog15minute = 0;
+                int pre_blog15minute = -1;
+                int cur_blog15minute = -1;
 
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
                     try {
-                        cur_minute = Utils.getCurrentMinute();
-                        cur_blog3minute = Utils.getCurrentMinute_Blog3minutes();
+
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
-
-                        if (cur_minute != pre_minute) {
-                            pre_minute = cur_minute;
-
-                        }
-
-                        if (pre_blog3minute != cur_blog3minute) {
-                            pre_blog3minute = cur_blog3minute;
+                        if (pre_blog15minute != cur_blog15minute) {
+                            pre_blog15minute = cur_blog15minute;
 
                             binance_service.getChartWD("bitcoin", "BTC");
                             wait(SLEEP_MINISECONDS);
@@ -101,27 +88,35 @@ public class BscScanBinanceApplication {
                             binance_service.getChartWD("ethereum", "ETH");
                             wait(SLEEP_MINISECONDS);
                             System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
-                        }
-
-                        if (pre_blog15minute != cur_blog15minute) {
-                            pre_blog15minute = cur_blog15minute;
 
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
                             System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
                         }
 
-                        if (!Utils.attack_mode) {
-                            binance_service.loadBinanceData(coin.getGeckoid(), coin.getSymbol().toUpperCase(), startup);
-                            binance_service.loadDataVolumeHour(coin.getGeckoid(), coin.getSymbol().toUpperCase());
-                            msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
+                        String key = Utils.getStringValue(coin.getGeckoid()) + "_";
+                        key += Utils.getStringValue(coin.getSymbol()) + "_";
+                        key += Utils.getCurrentYyyyMmDd_Blog4h();
+
+                        boolean reload = false;
+                        if (keys_dict.containsKey(key)) {
+                            if (!Objects.equals(key, keys_dict.get(key))) {
+                                keys_dict.put(key, key);
+
+                                reload = true;
+                            }
+                        } else {
+                            keys_dict.put(key, key);
+                            reload = true;
+                        }
+
+                        if (reload) {
+                            binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
+
+                            String msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
                                     + coin.getSymbol();
 
-                        } else {
-                            // binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
-                            // msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + ";
-                            // Symbol: " + coin.getSymbol();
-                            // System.out.println(msg);
+                            System.out.println(msg);
                         }
 
                         wait(SLEEP_MINISECONDS);
@@ -132,7 +127,6 @@ public class BscScanBinanceApplication {
                     if (Objects.equals(idx, size - 1)) {
                         System.out.println("reload: " + Utils.getCurrentYyyyMmDdHH());
                         idx = 0;
-                        startup = false;
                     } else {
                         idx += 1;
                     }
@@ -142,7 +136,9 @@ public class BscScanBinanceApplication {
                         + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
                         + " <----");
             }
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             System.out.println(e.getMessage());
         }
 

@@ -75,8 +75,6 @@ public class Utils {
     public static final int MA_INDEX_D1_START_LONG = 5;
     public static final int MA_INDEX_CURRENCY = 10;
 
-    public static boolean attack_mode = true;
-
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
             + "    SELECT                                                                                   \n"
@@ -738,10 +736,38 @@ public class Utils {
         return result;
     }
 
+    public static String getYYYYMMDD(int dateadd) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, dateadd);
+        return Utils.convertDateToString("yyyyMMdd", calendar.getTime());
+    }
+
+    public static String getYYYYMMDD2(int hoursadd) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY, hoursadd);
+        return Utils.convertDateToString("yyyyMMdd", calendar.getTime());
+    }
+
+    public static String getYYYYMM() {
+        Calendar calendar = Calendar.getInstance();
+        return Utils.convertDateToString("yyyyMM", calendar.getTime());
+    }
+
+    public static String getMM() {
+        Calendar calendar = Calendar.getInstance();
+        return Utils.convertDateToString("MM", calendar.getTime());
+    }
+
     public static String getHH(int add) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, add);
         return Utils.convertDateToString("HH", calendar.getTime());
+    }
+
+    public static Integer getHH24(int add) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY, add);
+        return calendar.get(Calendar.HOUR_OF_DAY);
     }
 
     public static Integer getCurrentHH() {
@@ -2068,10 +2094,7 @@ public class Utils {
         result += ", ath:" + getPercentToEntry(entry, low_heigh.get(1), true);
         result += ", vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
-        if (Utils.attack_mode) {
-            return "Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
-        }
-
+        result = "Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
         return result;
     }
 
