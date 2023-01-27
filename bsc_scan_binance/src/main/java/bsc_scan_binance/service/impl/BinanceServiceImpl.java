@@ -168,7 +168,6 @@ public class BinanceServiceImpl implements BinanceService {
 
     private int pre_HH_CheckUSD = 0;
     private String TREND_CURRENCY_TODAY = Utils.TREND_LONG;
-    private String TREND_OF_BTC = "";
     private Boolean RANGE_H4_BTC_IS_DANGER = true;
     private Boolean usd_is_uptrend_today = true;
 
@@ -1603,45 +1602,52 @@ public class BinanceServiceImpl implements BinanceService {
             String totay = Utils.getYYYYMMDD(0);
             for (int index = 0; index < list_h1.size(); index++) {
                 BtcFutures dto = list_h1.get(index);
-                BigDecimal total_volume = dto.getTrading_volume();
-                String hh = Utils.getHH(-index);
-                BinanceVolumnDayKey id = new BinanceVolumnDayKey(gecko_id, symbol, hh);
 
-                day.setId(id);
+                if (Objects.equals(totay, Utils.getYYYYMMDD2(-index))) {
+                    String hh = Utils.getHH(-index);
+                    {
+                        BinanceVolumnDayKey id = new BinanceVolumnDayKey(gecko_id, symbol, hh);
+                        day.setId(id);
+                        day.setTotalVolume(dto.getTrading_volume());
+                        day.setTotalTrasaction(BigDecimal.ZERO);
+                        day.setPriceAtBinance(Utils.getBinancePrice(symbol));
+                        day.setLow_price(dto.getLow_price());
+                        day.setHight_price(dto.getHight_price());
+                        day.setPrice_open_candle(dto.getPrice_open_candle());
+                        day.setPrice_close_candle(dto.getPrice_close_candle());
+                        day.setPoint(point);
 
-                day.setTotalVolume(total_volume);
-                day.setTotalTrasaction(BigDecimal.ZERO);
-                day.setPriceAtBinance(Utils.getBinancePrice(symbol));
-                day.setLow_price(dto.getLow_price());
-                day.setHight_price(dto.getHight_price());
-                day.setPrice_open_candle(dto.getPrice_open_candle());
-                day.setPrice_close_candle(dto.getPrice_close_candle());
-                day.setPoint(point);
+                        list_day.add(day);
+                    }
 
-                list_day.add(day);
+                    {
+                        BtcVolumeDay btc = new BtcVolumeDay();
+                        btc.setId(new BinanceVolumnDayKey(gecko_id, symbol, hh));
+                        btc.setAvg_price(dto.getPrice_close_candle());
+                        btc.setLow_price(dto.getLow_price());
+                        btc.setHight_price(dto.getHight_price());
+                        btc.setPrice_open_candle(dto.getPrice_open_candle());
+                        btc.setPrice_close_candle(dto.getPrice_close_candle());
+                        btc_vol_day.add(btc);
+                    }
 
-                String dd = Utils.getDdFromToday(0);
-                String today2 = Utils.getYYYYMMDD2(-index);
-                if (Objects.equals(totay, today2)) {
+                }
+
+                {
+                    String today2 = Utils.getYYYYMMDD2(-index);
+                    String dd2 = today2.substring(6, 8);
+                    String hh2 = Utils.getHH(-index);
                     BinanceVolumeDateTime ddhh = new BinanceVolumeDateTime();
                     BinanceVolumeDateTimeKey key = new BinanceVolumeDateTimeKey();
                     key.setGeckoid(gecko_id);
                     key.setSymbol(symbol);
-                    key.setDd(dd);
-                    key.setHh(hh);
+                    key.setDd(dd2);
+                    key.setHh(hh2);
                     ddhh.setId(key);
                     ddhh.setVolume(dto.getTrading_volume());
                     binanceVolumeDateTimeRepository.save(ddhh);
                 }
 
-                BtcVolumeDay btc = new BtcVolumeDay();
-                btc.setId(new BinanceVolumnDayKey(gecko_id, symbol, hh));
-                btc.setAvg_price(dto.getPrice_close_candle());
-                btc.setLow_price(dto.getLow_price());
-                btc.setHight_price(dto.getHight_price());
-                btc.setPrice_open_candle(dto.getPrice_open_candle());
-                btc.setPrice_close_candle(dto.getPrice_close_candle());
-                btc_vol_day.add(btc);
             }
 
             // https://www.omnicalculator.com/finance/rsi#:~:text=Calculate%20relative%20strength%20(RS)%20by,1%20%2D%20RS)%20from%20100.
@@ -2665,9 +2671,9 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_H1_EUR = Utils.loadData("EUR", TIME_15m, 60);
             List<BtcFutures> list_H1_GBP = Utils.loadData("GBP", TIME_15m, 60);
 
-            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 10, "");
-            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 10, "");
-            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 10, "");
+            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 50, "");
+            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 50, "");
+            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 50, "");
 
             boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H1_AUD, 50);
             boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H1_EUR, 50);
@@ -2728,12 +2734,11 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
-        List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-
         // -----------------------------------------------//
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+            List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
-            sendMsgByTrendMaX(symbol, list_15m, 10, "");
+            sendMsgByTrendMaX(symbol, list_15m, 50, "");
         }
     }
 
@@ -2754,19 +2759,16 @@ public class BinanceServiceImpl implements BinanceService {
 
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
-        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 24);
+        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
 
         Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
-        if (Objects.equals("BTC", symbol)) {
-            TREND_OF_BTC = allow_long_d1 ? Utils.TREND_LONG : Utils.TREND_SHORT;
-        }
 
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures) ";
 
-            sendMsgByTrendMaX(symbol, list_h4, Utils.MA_INDEX_D1_START_LONG, TREND_OF_BTC);
-            sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, TREND_OF_BTC);
+            sendMsgByTrendMaX(symbol, list_h4, Utils.MA_INDEX_H4_START_LONG, Utils.TREND_LONG);
+            sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, Utils.TREND_LONG);
         } else {
             type = " (Spot) ";
         }
@@ -2780,41 +2782,13 @@ public class BinanceServiceImpl implements BinanceService {
         String checkMa3AndX = "";
         String MAIN_TOKEN = "_BTC_ETH_BNB_";
         if (MAIN_TOKEN.contains("_" + symbol + "_")) {
+
             sendMsgChart15m(gecko_id, symbol);
 
-            if (!Objects.equals(pre_HH_h4, Utils.getCurrentYyyyMmDdHH())) {
-                pre_HH_h4 = Utils.getCurrentYyyyMmDdHH();
-                sendMsgByTrendMaX(symbol, list_h4, 10, "");
+            if (Objects.equals("BTC", symbol)) {
+                sendMsgByTrendMaX(symbol, list_h1, 10, Utils.TREND_LONG);
             }
-            if (!Objects.equals(pre_btc6days, Utils.getYyyyMmDdHH_ChangeDailyChart())) {
-                pre_btc6days = Utils.getYyyyMmDdHH_ChangeDailyChart();
-                sendMsgByTrendMaX(symbol, list_days, Utils.MA_INDEX_D1_START_LONG, "");
-            }
-
-            String temp_h1 = sendMsgMonitorFibo(gecko_id, symbol, list_h1, Utils.TREND_LONG, 50, false);
-            if (Utils.isNotBlank(temp_h1)) {
-                scapLongD1 += SEPARATE_D1_AND_H1 + temp_h1;
-            }
-
-            String msg_day = Utils.checkMa3AndX(list_days, Utils.getSlowIndex(list_days), false, "");
-            if (Utils.isNotBlank(msg_day)) {
-                String DAY_EVENT_ID = EVENT_BTC_RANGE + "_" + symbol + "_" + Utils.getYyyyMmDdHH_ChangeDailyChart();
-                sendMsgPerHour(DAY_EVENT_ID, msg_day, true);
-            }
-
-        } else if (allow_long_d1 && Objects.equals(TREND_OF_BTC, Utils.TREND_LONG) && !RANGE_H4_BTC_IS_DANGER) {
-            // if (Utils.isBusinessTime()) {
-            // if (type.contains("Futures") || SPOT_TOKEN.contains("_" + symbol + "_")) {
-            // checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4,
-            // Utils.TREND_LONG, 50, false);
-            // if (Utils.isBlank(checkMa3AndX)) {
-            // checkMa3AndX = sendMsgMonitorFibo(gecko_id, symbol, list_h4,
-            // Utils.TREND_LONG, 21, false);
-            // }
-            // }
-            // }
         } else if (type.contains("Futures") && Utils.isBusinessTime()) {
-            // sendMsgChart15m(gecko_id, symbol);
         }
 
         CandidateCoin entity = candidateCoinRepository.findById(gecko_id).orElse(null);
@@ -2840,10 +2814,10 @@ public class BinanceServiceImpl implements BinanceService {
         note += ",L10w:" + Utils.getPercentToEntry(current_price, min_week, true) + ",";
         // ---------------------------------------------------------
         String position = "";
-        if (Utils.isMa3CuttingUpX(list_h4, Utils.MA_INDEX_H4_START_LONG)) {
+        if (Objects.equals(Utils.TREND_LONG, Utils.check3CuttingXforH1(list_h4, Utils.MA_INDEX_H4_START_LONG))) {
             position = "_PositionH4";
         }
-        if (Utils.isMa3CuttingUpX(list_days, Utils.MA_INDEX_D1_START_LONG)) {
+        if (Objects.equals(Utils.TREND_LONG, Utils.check3CuttingXforH1(list_days, Utils.MA_INDEX_D1_START_LONG))) {
             position = "_PositionD1";
 
             PriorityCoinHistory his = new PriorityCoinHistory();
