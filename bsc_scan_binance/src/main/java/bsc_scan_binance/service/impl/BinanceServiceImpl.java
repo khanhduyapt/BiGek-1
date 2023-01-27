@@ -2886,50 +2886,45 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     private void sendMsgChart15m(String gecko_id, String symbol) {
-
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-        // sendMsgByTrendMaX(symbol, list_15m, 10);
+
         // -----------------------------------------------//
         String kill_long_short_msg = "";
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
             kill_long_short_msg = sendMsgKillLongShort(gecko_id, symbol, list_15m);
-        }
-
-        if ((Objects.equals("BTC", symbol))) {
-            BigDecimal ma50 = Utils.calcMA(list_15m, 50, 1);
-            BigDecimal close = list_15m.get(1).getPrice_close_candle();
-            BigDecimal range = Utils.getPercent(close, ma50).abs();
-
-            if (range.compareTo(BigDecimal.valueOf(0.15)) < 0) {
-                return;
-            }
-
-            List<BtcFutures> list_03m = Utils.loadData(symbol, TIME_3m, 50);
-            List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
-
-            if (Utils.isBlank(kill_long_short_msg)) {
-                sendMsgKillLongShort(gecko_id, symbol, list_03m);
-            }
-
-            // sendMsgByTrendMaX(symbol, list_15m, 10, find_trend);
-            sendMsgByTrendMaX(symbol, list_03m, 10, "");
-            sendMsgByTrendMaX(symbol, list_01m, 10, "");
-
-        } else if ((Objects.equals("ETH", symbol))) {
-
-            List<BtcFutures> list_03m = Utils.loadData(symbol, TIME_3m, 50);
-
-            if (Utils.isBlank(kill_long_short_msg)) {
-                sendMsgKillLongShort(gecko_id, symbol, list_03m);
-            }
-
-            sendMsgByTrendMaX(symbol, list_03m, 10, "");
-
-        } else {
-
             sendMsgByTrendMaX(symbol, list_15m, 10, "");
-
         }
+
+//        if ((Objects.equals("BTC", symbol))) {
+//            BigDecimal ma50 = Utils.calcMA(list_15m, 50, 1);
+//            BigDecimal close = list_15m.get(1).getPrice_close_candle();
+//            BigDecimal range = Utils.getPercent(close, ma50).abs();
+//
+//            if (range.compareTo(BigDecimal.valueOf(0.15)) < 0) {
+//                return;
+//            }
+//
+//            List<BtcFutures> list_03m = Utils.loadData(symbol, TIME_3m, 50);
+//            // List<BtcFutures> list_01m = Utils.loadData(symbol, TIME_1m, 50);
+//
+//            if (Utils.isBlank(kill_long_short_msg)) {
+//                sendMsgKillLongShort(gecko_id, symbol, list_03m);
+//            }
+//
+//            sendMsgByTrendMaX(symbol, list_15m, 10, "");
+//            sendMsgByTrendMaX(symbol, list_03m, 10, "");
+//            // sendMsgByTrendMaX(symbol, list_01m, 10, "");
+//
+//        } else if ((Objects.equals("ETH", symbol))) {
+//
+//            List<BtcFutures> list_03m = Utils.loadData(symbol, TIME_3m, 50);
+//
+//            if (Utils.isBlank(kill_long_short_msg)) {
+//                sendMsgKillLongShort(gecko_id, symbol, list_03m);
+//            }
+//
+//            sendMsgByTrendMaX(symbol, list_03m, 10, "");
+//        }
     }
 
     @Transactional

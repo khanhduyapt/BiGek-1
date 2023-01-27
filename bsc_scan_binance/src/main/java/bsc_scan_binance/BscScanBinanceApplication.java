@@ -88,13 +88,15 @@ public class BscScanBinanceApplication {
 
                         if (cur_minute != pre_minute) {
                             pre_minute = cur_minute;
-                            binance_service.getChartWD("bitcoin", "BTC");
-                            wait(SLEEP_MINISECONDS);
-                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
+
                         }
 
                         if (pre_blog3minute != cur_blog3minute) {
                             pre_blog3minute = cur_blog3minute;
+
+                            binance_service.getChartWD("bitcoin", "BTC");
+                            wait(SLEEP_MINISECONDS);
+                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
 
                             binance_service.getChartWD("ethereum", "ETH");
                             wait(SLEEP_MINISECONDS);
