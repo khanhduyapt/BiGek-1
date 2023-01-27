@@ -112,7 +112,8 @@ public class BscScanBinanceApplication {
                         if (reload) {
                             binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
 
-                            String msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
+                            String msg = Utils.getTimeHHmm() + "Binance " + idx + "/" + size + "; id:"
+                                    + coin.getGeckoid() + "; Symbol: "
                                     + coin.getSymbol();
 
                             try {
