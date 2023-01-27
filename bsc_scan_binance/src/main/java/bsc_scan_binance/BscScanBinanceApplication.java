@@ -81,15 +81,15 @@ public class BscScanBinanceApplication {
                         cur_blog5minute = Utils.getCurrentMinute_Blog5minutes();
                         if (pre_blog5minute != cur_blog5minute) {
                             pre_blog5minute = cur_blog5minute;
-
-                            binance_service.getChartWD("bitcoin", "BTC");
-                            wait(SLEEP_MINISECONDS);
-                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
                         }
 
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;
+
+                            binance_service.getChartWD("bitcoin", "BTC");
+                            wait(SLEEP_MINISECONDS);
+                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
 
                             binance_service.getChartWD("ethereum", "ETH");
                             wait(SLEEP_MINISECONDS);
@@ -102,7 +102,7 @@ public class BscScanBinanceApplication {
 
                         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
                         key += Utils.getStringValue(coin.getSymbol()) + "_";
-                        key += Utils.getCurrentYyyyMmDd_Blog2h();
+                        key += Utils.getCurrentYyyyMmDd_Blog4h();
 
                         boolean reload = false;
                         if (keys_dict.containsKey(key)) {

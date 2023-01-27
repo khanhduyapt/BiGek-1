@@ -2076,18 +2076,24 @@ public class Utils {
         return str_ma_size;
     }
 
-    public static String calcSL(List<BtcFutures> list, boolean isLong) {
+    public static String calcVol(List<BtcFutures> list, boolean isLong) {
         BigDecimal entry = list.get(0).getCurrPrice();
-        BigDecimal SL_real = BigDecimal.ZERO;
+        BigDecimal SL = BigDecimal.ZERO;
+        BigDecimal SL_10percent = BigDecimal.ZERO;
+        BigDecimal SL_LowHeigh = BigDecimal.ZERO;
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
         if (isLong) {
-            SL_real = low_heigh.get(0);
+            SL_LowHeigh = low_heigh.get(0);
+            SL_10percent = entry.multiply(BigDecimal.valueOf(0.9));
+            SL = (SL_LowHeigh.compareTo(SL_10percent) > 0) ? SL_10percent : SL_LowHeigh;
         } else {
-            SL_real = low_heigh.get(1);
+            SL_LowHeigh = low_heigh.get(1);
+            SL_10percent = entry.multiply(BigDecimal.valueOf(1.1));
+            SL = (SL_LowHeigh.compareTo(SL_10percent) < 0) ? SL_10percent : SL_LowHeigh;
         }
 
         int usd = 5;
-        BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL_real), 10, RoundingMode.CEILING);
+        BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
         String result = getChartName(list);
@@ -2096,6 +2102,63 @@ public class Utils {
         result += ", vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
 
         result = "Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
+        return result;
+    }
+
+    public static String analysisTradingVolume(List<BtcFutures> list, int maSlowIndex) {
+
+        String result = "";
+        int length = list.size() > maSlowIndex ? list.size() : maSlowIndex;
+        BigDecimal trading_volume = BigDecimal.ZERO;
+        BigDecimal taker_volume = BigDecimal.ZERO;
+        for (int index = 0; index < length; index++) {
+            BtcFutures dto = list.get(index);
+            trading_volume = trading_volume.add(dto.getTrading_volume());
+            taker_volume = taker_volume.add(dto.getTaker_volume());
+        }
+        BigDecimal ma50_trading_volume = trading_volume.divide(BigDecimal.valueOf(length), 5, RoundingMode.CEILING);
+        BigDecimal ma50_taker_volume = taker_volume.divide(BigDecimal.valueOf(length), 5, RoundingMode.CEILING);
+
+        BigDecimal ma3_trading_volume_1 = (list.get(1).getTrading_volume().add(list.get(2).getTrading_volume())
+                .add(list.get(3).getTrading_volume()));
+        ma3_trading_volume_1 = ma3_trading_volume_1.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        BigDecimal ma3_taker_volume_1 = (list.get(1).getTaker_volume().add(list.get(2).getTaker_volume())
+                .add(list.get(3).getTaker_volume()));
+        ma3_taker_volume_1 = ma3_taker_volume_1.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+
+        BigDecimal ma3_trading_volume_2 = (list.get(4).getTrading_volume().add(list.get(2).getTrading_volume())
+                .add(list.get(3).getTrading_volume()));
+        ma3_trading_volume_2 = ma3_trading_volume_2.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        BigDecimal ma3_taker_volume_2 = (list.get(4).getTaker_volume().add(list.get(2).getTaker_volume())
+                .add(list.get(3).getTaker_volume()));
+        ma3_taker_volume_2 = ma3_taker_volume_2.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+
+        if ((ma3_trading_volume_1.compareTo(ma50_trading_volume) > 0)
+                && (ma50_trading_volume.compareTo(ma3_trading_volume_2) > 0)) {
+            result += ",TradingVol3Up" + maSlowIndex;
+        }
+        if ((ma3_trading_volume_1.compareTo(ma50_trading_volume) < 0)
+                && (ma50_trading_volume.compareTo(ma3_trading_volume_2) < 0)) {
+            result += ",TradingVol3Down" + maSlowIndex;
+        }
+        if ((ma3_taker_volume_1.compareTo(ma50_taker_volume) > 0)
+                && (ma50_taker_volume.compareTo(ma3_taker_volume_2) > 0)) {
+            result += ",TakerVol3Up" + maSlowIndex;
+        }
+        if ((ma3_taker_volume_1.compareTo(ma50_taker_volume) < 0)
+                && (ma50_taker_volume.compareTo(ma3_taker_volume_2) < 0)) {
+            result += ",TakerVol3Down" + maSlowIndex;
+        }
+
+        if (ma3_trading_volume_1.compareTo(ma50_trading_volume.multiply(BigDecimal.valueOf(1.5))) > 0) {
+            result += ",TradingVol3=Vol" + maSlowIndex + "x"
+                    + ma3_trading_volume_1.divide(ma50_trading_volume, 2, RoundingMode.CEILING);
+        }
+        if (ma3_taker_volume_1.compareTo(ma50_taker_volume.multiply(BigDecimal.valueOf(1.5))) > 0) {
+            result += ",TakerVol3=Vol" + maSlowIndex + "x"
+                    + ma3_taker_volume_1.divide(ma50_taker_volume, 2, RoundingMode.CEILING);
+        }
+
         return result;
     }
 
@@ -2121,13 +2184,11 @@ public class Utils {
                 return TREND_SHORT;
             }
         } else {
-            if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
-                    && (ma_X_c.compareTo(close2) > 0)) {
+            if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
                 return TREND_LONG;
             }
 
-            if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0)
-                    && (ma_X_c.compareTo(close2) < 0)) {
+            if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(close2) < 0)) {
                 return TREND_SHORT;
             }
         }
