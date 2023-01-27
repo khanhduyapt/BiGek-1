@@ -2159,6 +2159,10 @@ public class Utils {
                     + ma3_taker_volume_1.divide(ma50_taker_volume, 2, RoundingMode.CEILING);
         }
 
+        if (isNotBlank(result)) {
+            result = result.substring(1);
+        }
+
         return result;
     }
 

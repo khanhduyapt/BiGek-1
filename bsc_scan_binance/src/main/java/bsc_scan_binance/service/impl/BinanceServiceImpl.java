@@ -2774,6 +2774,7 @@ public class BinanceServiceImpl implements BinanceService {
                 sendMsgByTrendMaX(symbol, list_h4, 50, "");
                 sendMsgByTrendMaX(symbol, list_days, 10, "");
             } else {
+                sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG); // H4
                 sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG); // D
                 sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG);// W
             }
