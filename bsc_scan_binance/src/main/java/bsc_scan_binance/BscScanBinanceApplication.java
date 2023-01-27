@@ -119,16 +119,14 @@ public class BscScanBinanceApplication {
                         if (reload) {
                             binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
 
-                            String msg = Utils.getTimeHHmm() + "Binance " + idx + "/" + size + "; id:"
-                                    + coin.getGeckoid() + "; Symbol: "
-                                    + coin.getSymbol();
+                            String msg = Utils.getTimeHHmm() + "Binance " + (idx + 1) + "/" + size + "; id:"
+                                    + coin.getGeckoid() + "; Symbol: " + coin.getSymbol();
 
                             try {
                                 gecko_service.loadData(coin.getGeckoid());
                             } catch (Exception e) {
-                                System.out.println(
-                                        "dkd error gecko_service.LoadData:[" + coin.getGeckoid() + "]"
-                                                + e.getMessage());
+                                System.out.println("dkd error gecko_service.LoadData:[" + coin.getGeckoid() + "]"
+                                        + e.getMessage());
                             }
 
                             System.out.println(msg);
