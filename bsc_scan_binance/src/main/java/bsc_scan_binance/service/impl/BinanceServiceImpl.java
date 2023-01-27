@@ -131,7 +131,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String SYMBOL_BTC = "BTC";
 
     private static final String TIME_15m = "15m";
-    private static final String TIME_3m = "3m";
+    private static final String TIME_5m = "5m";
     private static final String TIME_1m = "1m";
 
     private static final String TIME_1h = "1h";
@@ -2713,12 +2713,12 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
-            msg = " 💹 " + symbol + chartname + ":3Up" + maIndex
+            msg = " 💹. " + symbol + chartname + ":3Up" + maIndex
                     + (list.get(0).getId().contains("_3m_") ? " 🚀🚀🚀" : " 🚀");
             EVENT_ID += "_UP";
             // sl = Utils.calcSL(list, true);
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
-            msg = " 📉 " + symbol + chartname + ":3Down" + maIndex
+            msg = " 📉. " + symbol + chartname + ":3Down" + maIndex
                     + (list.get(0).getId().contains("_3m_") ? " 🥶🥶🥶" : " 🥶");
             EVENT_ID += "_DOWN";
             // sl = Utils.calcSL(list, false);
@@ -2786,7 +2786,9 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgChart15m(gecko_id, symbol);
 
             if (Objects.equals("BTC", symbol)) {
-                sendMsgByTrendMaX(symbol, list_h1, 10, Utils.TREND_LONG);
+                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+                sendMsgByTrendMaX(symbol, list_5m, 50, "");
+                sendMsgByTrendMaX(symbol, list_h1, 50, "");
             }
         } else if (type.contains("Futures") && Utils.isBusinessTime()) {
         }
