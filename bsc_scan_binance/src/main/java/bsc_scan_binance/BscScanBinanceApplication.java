@@ -47,7 +47,6 @@ public class BscScanBinanceApplication {
             ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
-            // binance_service.loadDataBtcVolumeDay("bitcoin", "BTC");
 
             if (app_flag == Utils.const_app_flag_msg_on || app_flag == Utils.const_app_flag_all_and_msg) {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
@@ -115,6 +114,14 @@ public class BscScanBinanceApplication {
 
                             String msg = "Binance " + idx + "/" + size + "; id:" + coin.getGeckoid() + "; Symbol: "
                                     + coin.getSymbol();
+
+                            try {
+                                gecko_service.loadData(coin.getGeckoid());
+                            } catch (Exception e) {
+                                System.out.println(
+                                        "dkd error gecko_service.LoadData:[" + coin.getGeckoid() + "]"
+                                                + e.getMessage());
+                            }
 
                             System.out.println(msg);
                         }

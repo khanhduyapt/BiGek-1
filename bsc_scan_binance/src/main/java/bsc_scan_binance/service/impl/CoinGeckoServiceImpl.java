@@ -15,16 +15,19 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import bsc_scan_binance.BscScanBinanceApplication;
 import bsc_scan_binance.entity.BinanceVolumnDay;
 import bsc_scan_binance.entity.BinanceVolumnDayKey;
 import bsc_scan_binance.entity.CandidateCoin;
+import bsc_scan_binance.entity.GeckoVolumeMonth;
+import bsc_scan_binance.entity.GeckoVolumeMonthKey;
 import bsc_scan_binance.entity.GeckoVolumnDay;
 import bsc_scan_binance.entity.GeckoVolumnDayKey;
-import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.CandidateCoinRepository;
+import bsc_scan_binance.repository.GeckoVolumeMonthRepository;
 import bsc_scan_binance.repository.GeckoVolumnDayRepository;
 import bsc_scan_binance.request.CoinGeckoTokenRequest;
 import bsc_scan_binance.service.CoinGeckoService;
@@ -43,7 +46,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     private CandidateCoinRepository candidateCoinRepository;
 
     @Autowired
-    private BinanceVolumnDayRepository binanceVolumnDayRepository;
+    private GeckoVolumeMonthRepository geckoVolumeMonthRepository;
 
     @Autowired
     private GeckoVolumnDayRepository geckoVolumnDayRepository;
@@ -64,84 +67,102 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
     }
 
     public CandidateCoin loadData(String gecko_id) {
-        final String url = "https://api.coingecko.com/api/v3/coins/" + gecko_id
-                + "?localization=false&tickers=true&market_data=true&community_data=false&developer_data=false&sparkline=false";
+        try {
+            final String url = "https://api.coingecko.com/api/v3/coins/" + gecko_id
+                    + "?localization=false&tickers=true&market_data=true&community_data=false&developer_data=false&sparkline=false";
 
-        RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = new RestTemplate();
 
-        @SuppressWarnings("unchecked")
-        LinkedHashMap<String, Object> result = restTemplate.getForObject(url, LinkedHashMap.class);
+            @SuppressWarnings("unchecked")
+            LinkedHashMap<String, Object> result = restTemplate.getForObject(url, LinkedHashMap.class);
 
-        CandidateCoin coin = new CandidateCoin();
-        GeckoVolumnDay geckoDay = new GeckoVolumnDay();
+            CandidateCoin coin = new CandidateCoin();
+            GeckoVolumnDay geckoDay = new GeckoVolumnDay();
 
-        Object id = Utils.getLinkedHashMapValue(result, Arrays.asList("id"));
-        Object symbol = Utils.getLinkedHashMapValue(result, Arrays.asList("symbol"));
-        Object name = Utils.getLinkedHashMapValue(result, Arrays.asList("name"));
+            Object id = Utils.getLinkedHashMapValue(result, Arrays.asList("id"));
+            Object symbol = Utils.getLinkedHashMapValue(result, Arrays.asList("symbol"));
+            Object name = Utils.getLinkedHashMapValue(result, Arrays.asList("name"));
 
-        coin.setGeckoid(String.valueOf(id).toLowerCase());
-        coin.setSymbol(String.valueOf(symbol).toUpperCase());
-        coin.setName(String.valueOf(name));
+            coin.setGeckoid(String.valueOf(id).toLowerCase());
+            coin.setSymbol(String.valueOf(symbol).toUpperCase());
+            coin.setName(String.valueOf(name));
 
-        BigDecimal market_cap = Utils
-                .getBigDecimal(Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "market_cap", "usd")));
-        BigDecimal total_volume = Utils.getBigDecimal(
-                Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "total_volume", "usd")));
-        Object current_price = Utils.getLinkedHashMapValue(result,
-                Arrays.asList("market_data", "current_price", "usd"));
-        Object priceChangePercentage24h = Utils.getLinkedHashMapValue(result,
-                Arrays.asList("market_data", "price_change_percentage_24h"));
-        Object priceChangePercentage7d = Utils.getLinkedHashMapValue(result,
-                Arrays.asList("market_data", "price_change_percentage_7d"));
-        Object priceChangePercentage14d = Utils.getLinkedHashMapValue(result,
-                Arrays.asList("market_data", "price_change_percentage_14d"));
-        Object priceChangePercentage30d = Utils.getLinkedHashMapValue(result,
-                Arrays.asList("market_data", "price_change_percentage_30d"));
+            BigDecimal market_cap = Utils
+                    .getBigDecimal(
+                            Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "market_cap", "usd")));
+            BigDecimal total_volume = Utils.getBigDecimal(
+                    Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "total_volume", "usd")));
+            Object current_price = Utils.getLinkedHashMapValue(result,
+                    Arrays.asList("market_data", "current_price", "usd"));
+            Object priceChangePercentage24h = Utils.getLinkedHashMapValue(result,
+                    Arrays.asList("market_data", "price_change_percentage_24h"));
+            Object priceChangePercentage7d = Utils.getLinkedHashMapValue(result,
+                    Arrays.asList("market_data", "price_change_percentage_7d"));
+            Object priceChangePercentage14d = Utils.getLinkedHashMapValue(result,
+                    Arrays.asList("market_data", "price_change_percentage_14d"));
+            Object priceChangePercentage30d = Utils.getLinkedHashMapValue(result,
+                    Arrays.asList("market_data", "price_change_percentage_30d"));
 
-        coin.setMarketCap(market_cap);
-        coin.setTotalVolume(total_volume);
-        coin.setCurrentPrice(Utils.getBigDecimal(current_price));
-        coin.setPriceChangePercentage24H(Utils.getBigDecimal(priceChangePercentage24h));
-        coin.setPriceChangePercentage7D(Utils.getBigDecimal(priceChangePercentage7d));
-        coin.setPriceChangePercentage14D(Utils.getBigDecimal(priceChangePercentage14d));
-        coin.setPriceChangePercentage30D(Utils.getBigDecimal(priceChangePercentage30d));
+            Object ath_date = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "ath_date"));
 
-        if (Objects.equals(BigDecimal.ZERO, market_cap)) {
-            coin.setVolumnDivMarketcap(BigDecimal.valueOf(0));
+            coin.setMarketCap(market_cap);
+            coin.setTotalVolume(total_volume);
+            coin.setCurrentPrice(Utils.getBigDecimal(current_price));
+            coin.setPriceChangePercentage24H(Utils.getBigDecimal(priceChangePercentage24h));
+            coin.setPriceChangePercentage7D(Utils.getBigDecimal(priceChangePercentage7d));
+            coin.setPriceChangePercentage14D(Utils.getBigDecimal(priceChangePercentage14d));
+            coin.setPriceChangePercentage30D(Utils.getBigDecimal(priceChangePercentage30d));
 
-        } else {
-            coin.setVolumnDivMarketcap(total_volume.divide(market_cap, 3, java.math.RoundingMode.CEILING));
-        }
+            @SuppressWarnings("unchecked")
+            LinkedHashMap<String, Object> ath_date_map = (LinkedHashMap<String, Object>) ath_date;
+            int min_year = 2022;
+            if (!Objects.equals(null, ath_date_map) && !CollectionUtils.isEmpty(ath_date_map)) {
+                for (Object key : ath_date_map.keySet()) {
+                    String value = String.valueOf(ath_date_map.get(key));
+                    int year = Utils.getIntValue(value.substring(0, 4));
+                    if (min_year > year && year > 0) {
+                        min_year = year;
+                    }
+                }
+            }
 
-        Calendar calendar = Calendar.getInstance();
-        String hh = Utils.convertDateToString("HH", calendar.getTime());
-        geckoDay.setId(
-                new GeckoVolumnDayKey(String.valueOf(id).toLowerCase(), String.valueOf(symbol).toUpperCase(), hh));
-        geckoDay.setTotalVolume(total_volume);
-        geckoVolumnDayRepository.save(geckoDay);
+            if (Objects.equals(BigDecimal.ZERO, market_cap)) {
+                coin.setVolumnDivMarketcap(BigDecimal.valueOf(0));
 
-        {
+            } else {
+                coin.setVolumnDivMarketcap(total_volume.divide(market_cap, 3, java.math.RoundingMode.CEILING));
+            }
 
-            Object total_supply = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "total_supply"));
-            Object max_supply = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "max_supply"));
-            Object circulating_supply = Utils.getLinkedHashMapValue(result,
-                    Arrays.asList("market_data", "circulating_supply"));
+            Calendar calendar = Calendar.getInstance();
+            String hh = Utils.convertDateToString("HH", calendar.getTime());
+            geckoDay.setId(
+                    new GeckoVolumnDayKey(String.valueOf(id).toLowerCase(), String.valueOf(symbol).toUpperCase(), hh));
+            geckoDay.setTotalVolume(total_volume);
+            geckoVolumnDayRepository.save(geckoDay);
 
-            Object categories = Utils.getLinkedHashMapValue(result, Arrays.asList("categories"));
-            String str_categories = "";
-            if (categories instanceof List) {
-                @SuppressWarnings("unchecked")
-                List<Object> ct = (List<Object>) categories;
-                for (Object obj : ct) {
-                    String str_obj = String.valueOf(obj);
+            GeckoVolumeMonth month = new GeckoVolumeMonth();
+            month.setId(new GeckoVolumeMonthKey(String.valueOf(id).toLowerCase(), "GECKO",
+                    Utils.convertDateToString("dd", calendar.getTime())));
+            month.setTotalVolume(total_volume);
+            geckoVolumeMonthRepository.save(month);
 
-                    if (String.valueOf(str_obj).toLowerCase().indexOf("fungible") > 0) {
-                        if (!Objects.equals("", str_categories)) {
-                            str_categories += "; ";
+            {
+                Object total_supply = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "total_supply"));
+                Object max_supply = Utils.getLinkedHashMapValue(result, Arrays.asList("market_data", "max_supply"));
+                Object circulating_supply = Utils.getLinkedHashMapValue(result,
+                        Arrays.asList("market_data", "circulating_supply"));
+
+                Object categories = Utils.getLinkedHashMapValue(result, Arrays.asList("categories"));
+                String str_categories = "";
+                if (categories instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<Object> ct = (List<Object>) categories;
+                    for (Object obj : ct) {
+
+                        String str_obj = String.valueOf(obj);
+                        if (str_obj.toLowerCase().contains("ecosystem")) {
+                            continue;
                         }
-                        str_categories += "NFT";
-                    } else if (String.valueOf(str_obj).toLowerCase().indexOf("ecosystem") < 0
-                            && !Objects.equals("null", str_obj)) {
 
                         if (!Objects.equals("", str_categories)) {
                             str_categories += "; ";
@@ -149,113 +170,90 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                         str_categories += str_obj;
                     }
                 }
-            }
 
-            Object tickers = Utils.getLinkedHashMapValue(result, Arrays.asList("tickers"));
-            String str_trade_url = "";
-            if (tickers instanceof List) {
-                @SuppressWarnings("unchecked")
-                List<Object> tk = (List<Object>) tickers;
-                for (Object obj : tk) {
-                    String trade_url = Utils
-                            .getStringValue(Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url"))).toLowerCase();
-
-                    if (trade_url.contains("binance.com/en") && trade_url.contains("usdt")) {
-                        str_trade_url = trade_url;
-                        break;
-                    }
-                }
-
-                if (!Utils.isNotBlank(str_trade_url)) {
+                Object tickers = Utils.getLinkedHashMapValue(result, Arrays.asList("tickers"));
+                String str_trade_url = "";
+                if (tickers instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<Object> tk = (List<Object>) tickers;
                     for (Object obj : tk) {
-                        String trade_url = Utils
-                                .getStringValue(Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url")))
-                                .toLowerCase();
-
-                        if (trade_url.contains("binance.com/en") && trade_url.contains("busd")) {
-                            str_trade_url = trade_url;
+                        Object trade_url = Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url"));
+                        if (String.valueOf(trade_url).toLowerCase().contains("binance.com/en")) {
+                            str_trade_url = String.valueOf(trade_url);
                             break;
                         }
                     }
                 }
 
-                if (!Utils.isNotBlank(str_trade_url)) {
-                    for (Object obj : tk) {
-                        String trade_url = Utils
-                                .getStringValue(Utils.getLinkedHashMapValue(obj, Arrays.asList("trade_url")))
-                                .toLowerCase();
-
-                        if (trade_url.contains("binance.com/en")) {
-                            str_trade_url = trade_url;
-                            break;
-                        }
-                    }
+                coin.setCategory(str_categories);
+                if (symbol.equals("juv")) {
+                    boolean a = true;
                 }
+                // DeFi
+                // Fan Token
+                // L/B
+                // Platform
+                // Game
+                // Web3
+                String trend = "";
+                String str_categories_low = String.valueOf(str_categories).toLowerCase();
+                if (str_categories_low.contains("gaming")) {
+                    trend = "Game";
+                } else if (str_categories_low.contains("earn")) {
+                    trend = "Earn";
+                } else if (str_categories_low.contains("nft")) {
+                    trend = "NFT";
+                } else if (str_categories_low.contains("fan")) {
+                    trend = "Fan";
+                } else if (str_categories_low.contains("sports")) {
+                    trend = "Fan";
+                } else if (str_categories_low.contains("lending")) {
+                    trend = "L/B";
+                } else if (str_categories_low.contains("borrowing")) {
+                    trend = "L/B";
+                } else if (str_categories_low.contains("defi")) {
+                    trend = "DeFi";
+                } else if (str_categories_low.contains("dex")) {
+                    trend = "DeFi";
+                } else if (str_categories_low.contains("finance")) {
+                    trend = "DeFi";
+                } else if (str_categories_low.contains("network")) {
+                    // trend = "Platform";
+                } else if (str_categories_low.contains("platform")) {
+                    // trend = "Platform";
+                } else if (str_categories_low.contains("infrastructure")) {
+                    // trend = "Platform";
+                } else if (str_categories_low.contains("oracle")) {
+                    trend = "DB";
+                } else if (str_categories_low.contains("storage")) {
+                    trend = "DB";
+                } else if (str_categories_low.contains("protocol")) {
+                    // trend = "Platform";
+                } else if (str_categories_low.contains("web3")) {
+                    trend = "Web3";
+                } else if (str_categories_low.contains("metaverse")) {
+                    // trend = "Metaverse";
+                }
+
+                String backer = "";
+                if (String.valueOf(str_categories).toLowerCase().indexOf("launchpool") > 0) {
+                    backer = "Binance";
+                }
+                coin.setTrend(trend + " (" + min_year + ")");
+                coin.setBusd(String.valueOf(symbol).toUpperCase() + "_BUSD");
+                coin.setTotalSupply(Utils.getBigDecimal(total_supply));
+                coin.setMaxSupply(Utils.getBigDecimal(max_supply));
+                coin.setBacker(backer);
             }
 
-            coin.setCategory(str_categories);
 
-            // DeFi
-            // Fan Token
-            // L/B
-            // Platform
-            // Game
-            // Web3
-            String trend = "";
-            if (String.valueOf(str_categories).toLowerCase().indexOf("gaming") > 0) {
-                trend = "Game";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("earn") > 0) {
-                trend = "Earn";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("nft") > 0) {
-                trend = "NFT";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("fan") > 0) {
-                trend = "Fan Token";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("lending") > 0) {
-                trend = "L/B";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("borrowing") > 0) {
-                trend = "L/B";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("defi") > 0) {
-                trend = "DeFi";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("dex") > 0) {
-                trend = "DeFi";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("finance") > 0) {
-                trend = "DeFi";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("network") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("platform") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("infrastructure") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("oracle") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("storage") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("protocol") > 0) {
-                trend = "Platform";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("web3") > 0) {
-                trend = "Web3";
-            } else if (String.valueOf(str_categories).toLowerCase().indexOf("metaverse") > 0) {
-                trend = "Metaverse";
-            }
+            candidateCoinRepository.save(coin);
 
-            String backer = "";
-            if (String.valueOf(str_categories).toLowerCase().indexOf("launchpool") > 0) {
-                backer = "Binance";
-            }
-            coin.setTrend(trend);
-            coin.setUsdt(String.valueOf(symbol).toUpperCase() + "_USDT");
-            coin.setBusd(String.valueOf(symbol).toUpperCase() + "_BUSD");
-            coin.setTotalSupply(Utils.getBigDecimal(total_supply));
-            coin.setMaxSupply(Utils.getBigDecimal(max_supply));
-            coin.setCirculatingSupply(Utils.getBigDecimal(circulating_supply));
-            coin.setBinanceTrade(str_trade_url);
-            coin.setCoinGeckoLink("https://www.coingecko.com/en/coins/" + String.valueOf(id));
-            coin.setBacker(backer);
+            return coin;
+        } catch (Exception e) {
         }
 
-        //candidateCoinRepository.save(coin);
-
-        return coin;
+        return null;
     }
 
     @Override
@@ -501,7 +499,7 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
             list.add(new CandidateCoin("threshold-network-token", "T", "Threshold Network"));
             list.add(new CandidateCoin("tycoon-global", "TCT", "Tycoon Global"));
 
-            //candidateCoinRepository.saveAll(list);
+            candidateCoinRepository.saveAll(list);
             System.out.println("end CoinGeckoServiceImpl.initCandidateCoin success -->");
 
             return list;
@@ -515,12 +513,35 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
 
     @Override
     @Transactional
+    public void delete(String gecko_id) {
+
+        try {
+            System.out.println("Start delete  --->");
+            if (!Objects.equals(null, gecko_id)) {
+                String sql = " DELETE FROM candidate_coin WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM gecko_volumn_day WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM binance_volumn_week WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM binance_volumn_day WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM priority_coin WHERE gecko_id=:gecko_id ;"
+                        + " DELETE FROM priority_coin_history WHERE gecko_id=:gecko_id ;";
+
+                Query query = entityManager.createNativeQuery(sql);
+                query.setParameter("gecko_id", gecko_id);
+                query.executeUpdate();
+            }
+
+            System.out.println("End delete success <---");
+        } catch (Exception e) {
+            System.out.println("Add token  error --->");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
     public Response add(CoinGeckoTokenRequest request) {
         try {
             System.out.println("Start add  --->");
-
-            CandidateCoin entity = new CandidateCoin(request.getId(), request.getSymbol(), request.getName());
-            //candidateCoinRepository.save(entity);
 
             List<BinanceVolumnDay> days = new ArrayList<BinanceVolumnDay>();
             for (int index = 1; index < 24; index++) {
@@ -532,15 +553,15 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 days.add(new BinanceVolumnDay(id));
             }
 
-            binanceVolumnDayRepository.saveAll(days);
+        } catch (
 
-            System.out.println("End add success <---");
-            return new Response("200", "Ok", null, entity);
-        } catch (Exception e) {
+        Exception e) {
             System.out.println("Add token  error --->");
             System.out.println(e.getMessage());
             return new Response("500", "Error", e.toString());
         }
+
+        return new Response("200", "add", null, request.getId());
     }
 
     @Override
@@ -552,8 +573,6 @@ public class CoinGeckoServiceImpl implements CoinGeckoService {
                 String sql = " DELETE FROM candidate_coin WHERE gecko_id=:gecko_id ;"
                         + " DELETE FROM gecko_volumn_day WHERE gecko_id=:gecko_id ;"
                         + " DELETE FROM binance_volumn_week WHERE gecko_id=:gecko_id ;"
-                        + " DELETE FROM binance_volumn_day WHERE gecko_id=:gecko_id ;"
-                        + " DELETE FROM priority_coin WHERE gecko_id=:gecko_id ;"
                         + " DELETE FROM priority_coin_history WHERE gecko_id=:gecko_id ;";
 
                 Query query = entityManager.createNativeQuery(sql);

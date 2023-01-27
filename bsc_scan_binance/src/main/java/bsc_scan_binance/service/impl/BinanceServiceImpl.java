@@ -1646,10 +1646,6 @@ public class BinanceServiceImpl implements BinanceService {
 
             // https://www.omnicalculator.com/finance/rsi#:~:text=Calculate%20relative%20strength%20(RS)%20by,1%20%2D%20RS)%20from%20100.
 
-            {
-
-            }
-
             BigDecimal total_volume = BigDecimal.ZERO;
             String yyyymm = Utils.getYYYYMM();
             for (int index = 0; index < list_days.size(); index++) {
@@ -1702,21 +1698,6 @@ public class BinanceServiceImpl implements BinanceService {
         entity.setNote(note);
 
         return entity;
-    }
-
-    private Boolean isHasData(List<Object> result_usdt, int index) {
-        Object obj_usdt = result_usdt.get(index);
-
-        @SuppressWarnings("unchecked")
-        List<Object> arr_usdt = (List<Object>) obj_usdt;
-
-        String open_time = arr_usdt.get(0).toString();
-
-        if (Objects.equals("0", open_time)) {
-            return false;
-        }
-
-        return true;
     }
 
     @SuppressWarnings("unchecked")

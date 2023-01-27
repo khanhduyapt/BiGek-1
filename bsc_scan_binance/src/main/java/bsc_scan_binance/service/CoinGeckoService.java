@@ -21,4 +21,6 @@ public interface CoinGeckoService {
 	public List<CandidateCoin> getList(String formBinance);
 
 	public CandidateCoin loadData(String gecko_id);
+
+	public void delete(String gecko_id);
 }
