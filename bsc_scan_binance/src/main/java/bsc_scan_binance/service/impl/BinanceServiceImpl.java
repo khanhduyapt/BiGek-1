@@ -2702,8 +2702,8 @@ public class BinanceServiceImpl implements BinanceService {
         String msg = "";
         String chartname = Utils.getChartName(list);
 
-        String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
-        // String sl = "";
+        String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list) + "_"
+                + list.get(1).getPrice_close_candle();
 
         String current_trend = Utils.check3CuttingXforH1(list, maIndex);
 
@@ -2786,6 +2786,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         } else {
             type = " (Spot) ";
+            sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG);
         }
         type = type + Utils.analysisVolume(list_days);
 
