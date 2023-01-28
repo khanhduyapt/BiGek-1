@@ -2190,12 +2190,13 @@ public class Utils {
         }
 
         BigDecimal ma50_1 = calcMA(list, 50, 1);
+        BigDecimal ma50_1_1;
         if (list.get(0).getId().contains("BTC")) {
-            ma50_1 = ma50_1.multiply(BigDecimal.valueOf(1.01));
+            ma50_1_1 = ma50_1.multiply(BigDecimal.valueOf(1.01));
         } else {
-            ma50_1 = ma50_1.multiply(BigDecimal.valueOf(1.05));
+            ma50_1_1 = ma50_1.multiply(BigDecimal.valueOf(1.05));
         }
-        if (ma3_1.compareTo(ma50_1) > 0) {
+        if (ma3_1.compareTo(ma50_1_1) > 0) {
             return "";
         }
 
@@ -2218,6 +2219,7 @@ public class Utils {
             return ""; // Ma20 down
         }
         // --------------------------------
+
         List<BigDecimal> open_close = getLowHeightCandle(list.subList(1, 3));
         BigDecimal low = open_close.get(0);
         BigDecimal hig = open_close.get(1);
@@ -2225,6 +2227,11 @@ public class Utils {
             if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
                 return TREND_LONG;
             }
+        }
+
+        // ma3 cut up ma50
+        if ((ma3_1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(ma3_2) > 0)) {
+            return TREND_LONG;
         }
 
         return "";
@@ -2237,13 +2244,13 @@ public class Utils {
 
         BigDecimal ma3_1 = calcMA(list, 3, 1);
         BigDecimal ma50_1 = calcMA(list, 50, 1);
-
+        BigDecimal ma50_1_1;
         if (list.get(0).getId().contains("BTC")) {
-            ma50_1 = ma50_1.multiply(BigDecimal.valueOf(0.99));
+            ma50_1_1 = ma50_1.multiply(BigDecimal.valueOf(0.99));
         } else {
-            ma50_1 = ma50_1.multiply(BigDecimal.valueOf(0.95));
+            ma50_1_1 = ma50_1.multiply(BigDecimal.valueOf(0.95));
         }
-        if (ma3_1.compareTo(ma50_1) < 0) {
+        if (ma3_1.compareTo(ma50_1_1) < 0) {
             return "";
         }
 
@@ -2279,6 +2286,11 @@ public class Utils {
             if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
                 return TREND_SHORT;
             }
+        }
+
+        // ma3 cut down ma50
+        if ((ma3_1.compareTo(ma50_1) < 0) && (ma50_1.compareTo(ma3_2) < 0)) {
+            return TREND_SHORT;
         }
 
         return "";
