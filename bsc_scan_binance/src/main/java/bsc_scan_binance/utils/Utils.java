@@ -469,13 +469,20 @@ public class Utils {
         return false;
     }
 
+    public static boolean isAllowSendMsgSetting() {
+        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
+                || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static void sendToMyTelegram(String text) {
         String msg = text.replaceAll("↑", "^").replaceAll("↓", "v").replaceAll(" ", "");
         System.out.println(msg + " 💰 ");
 
-        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
-                || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
-
+        if (isAllowSendMsgSetting()) {
             sendToChatId(Utils.chatId_duydk, msg + " 💰 ");
         }
     }
@@ -484,9 +491,7 @@ public class Utils {
         String msg = text.replaceAll("↑", "^").replaceAll("↓", "v").replaceAll(" ", "");
         System.out.println(msg);
 
-        if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
-                || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
-
+        if (isAllowSendMsgSetting()) {
             if (!isBusinessTime()) {
                 return;
             }

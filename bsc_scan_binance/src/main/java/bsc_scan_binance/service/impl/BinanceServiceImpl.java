@@ -2764,11 +2764,13 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     public void sendMsgChart15m(String gecko_id, String symbol) {
-        List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-        sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
-        // -----------------------------------------------//
-        if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-            sendMsgKillLongShort(gecko_id, symbol, list_15m);
+        if (Utils.isAllowSendMsgSetting()) {
+            List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
+            sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
+            // -----------------------------------------------//
+            if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+                sendMsgKillLongShort(gecko_id, symbol, list_15m);
+            }
         }
     }
 
