@@ -2125,18 +2125,14 @@ public class Utils {
 
         if ((ma3_taker_volume_1.compareTo(ma50_taker_volume) > 0)
                 && (ma50_taker_volume.compareTo(ma3_taker_volume_2) > 0)) {
-            result += ",3Up" + maSlowIndex;
+            result += " 3Up" + maSlowIndex;
         }
 
         if (ma3_taker_volume_1.compareTo(ma50_taker_volume.multiply(BigDecimal.valueOf(1.1))) > 0) {
-            result += "," + getPercentStr(ma3_taker_volume_1, ma50_taker_volume);
+            result += " " + getPercentStr(ma3_taker_volume_1, ma50_taker_volume);
         }
 
-        if (isNotBlank(result)) {
-            result = result.substring(1);
-        }
-
-        return result;
+        return result.trim();
     }
 
     public static String check3CuttingXforH1(List<BtcFutures> list, int maSlowIndex) {

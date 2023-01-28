@@ -2687,9 +2687,9 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_H1_EUR = Utils.loadData("EUR", TIME_1h, 60);
             List<BtcFutures> list_H1_GBP = Utils.loadData("GBP", TIME_1h, 60);
 
-            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 50, "", "");
-            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 50, "", "");
-            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 50, "", "");
+            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 20, "", "AUDEURGBPUSDTAUDEURGBPUSDT");
+            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 20, "", "AUDEURGBPUSDTAUDEURGBPUSDT");
+            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 20, "", "AUDEURGBPUSDTAUDEURGBPUSDT");
 
             boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H1_AUD, 50);
             boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H1_EUR, 50);
