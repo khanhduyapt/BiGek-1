@@ -5,10 +5,12 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.persistence.EntityManager;
@@ -2743,6 +2745,12 @@ public class BinanceServiceImpl implements BinanceService {
     public void checkCurrency() {
         try {
             if (!Utils.isBusinessTime()) {
+                return;
+            }
+
+            int dow = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+            boolean isWeekend = ((dow < Calendar.MONDAY) || (dow > Calendar.FRIDAY));
+            if (isWeekend) {
                 return;
             }
 

@@ -2220,8 +2220,8 @@ public class Utils {
         List<BigDecimal> open_close = getLowHeightCandle(list.subList(1, 2));
         BigDecimal low = open_close.get(0); // list.get(1).getPrice_open_candle();
         BigDecimal hig = open_close.get(1); // list.get(1).getPrice_close_candle();
-        if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0) && (hig.compareTo(ma20_1) > 0)
-                && (ma20_1.compareTo(low) > 0)) {
+        if ((ma10_1.compareTo(ma20_1) > 0) && (hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)
+                && (hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
             return TREND_LONG;
         }
 
