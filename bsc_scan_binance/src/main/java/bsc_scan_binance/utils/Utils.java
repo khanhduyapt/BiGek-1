@@ -2189,17 +2189,6 @@ public class Utils {
             return ""; // Ma3 move down
         }
 
-        BigDecimal ma50_1 = calcMA(list, 50, 1);
-        BigDecimal ma50_1_1;
-        if (list.get(0).getId().contains("BTC")) {
-            ma50_1_1 = ma50_1.multiply(BigDecimal.valueOf(1.01));
-        } else {
-            ma50_1_1 = ma50_1.multiply(BigDecimal.valueOf(1.05));
-        }
-        if (ma3_1.compareTo(ma50_1_1) > 0) {
-            return "";
-        }
-
         // --------------------------------
         BigDecimal ma10_1 = calcMA(list, 10, 1);
         BigDecimal ma10_2 = calcMA(list, 10, 2);
@@ -2219,17 +2208,8 @@ public class Utils {
             return ""; // Ma20 down
         }
 
-        // --------------------------------
-        // List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 2));
-        // BigDecimal low = open_close.get(0);
-        // BigDecimal hig = open_close.get(1);
-        // if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
-        // if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
-        // return TREND_LONG;
-        // }
-        // }
-
         // ma3 cut up ma50
+        BigDecimal ma50_1 = calcMA(list, 50, 1);
         if ((ma3_1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(ma3_2) > 0)) {
             return TREND_LONG;
         }
@@ -2243,17 +2223,6 @@ public class Utils {
         }
 
         BigDecimal ma3_1 = calcMA(list, 3, 1);
-        BigDecimal ma50_1 = calcMA(list, 50, 1);
-        BigDecimal ma50_1_1;
-        if (list.get(0).getId().contains("BTC")) {
-            ma50_1_1 = ma50_1.multiply(BigDecimal.valueOf(0.99));
-        } else {
-            ma50_1_1 = ma50_1.multiply(BigDecimal.valueOf(0.95));
-        }
-        if (ma3_1.compareTo(ma50_1_1) < 0) {
-            return "";
-        }
-
         BigDecimal ma3_2 = calcMA(list, 3, 2);
         if (ma3_1.compareTo(ma3_2) > 0) {
             return ""; // Ma3 move Up
@@ -2279,16 +2248,8 @@ public class Utils {
             return ""; // Ma20 Up
         }
 
-        // List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 2));
-        // BigDecimal low = open_close.get(0);
-        // BigDecimal hig = open_close.get(1);
-        // if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
-        // if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
-        // return TREND_SHORT;
-        // }
-        // }
-
         // ma3 cut down ma50
+        BigDecimal ma50_1 = calcMA(list, 50, 1);
         if ((ma3_1.compareTo(ma50_1) < 0) && (ma50_1.compareTo(ma3_2) < 0)) {
             return TREND_SHORT;
         }
