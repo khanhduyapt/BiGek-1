@@ -259,6 +259,9 @@ p {
                 <span th:classappend="${token.rate1d4h_css}">1d4h: <span th:text="${token.rate1d4h}"></span>% </span>
             </div>
             <p style="font-size: 0.6rem !important;" th:text="${token.oco_depth}">
+            <div style="font-size: 0.8rem !important;">
+                <span th:classappend="${token.range_taker_css}" th:text="${token.range_taker}"></span>
+            </div>
           </td>
 
           <td style="text-align: right;"

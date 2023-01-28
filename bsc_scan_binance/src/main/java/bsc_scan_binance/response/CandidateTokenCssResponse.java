@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class CandidateTokenCssResponse {
     private String gecko_id = "";
@@ -147,6 +146,8 @@ public class CandidateTokenCssResponse {
     private String range_backer_css = "";
     private String range_entry_h1 = "";
     private String range_entry_h1_css = "";
+    private String range_taker = "";
+    private String range_taker_css = "";
 
     private String today = "";
     private String day_0 = "";

@@ -704,7 +704,7 @@ public class Utils {
 
     public static String getCurrentYyyyMmDdHHByChart(List<BtcFutures> list) {
         String id = list.get(0).getId();
-        String result = getCurrentYyyyMmDdHH() + "_";
+        String result = getCurrentYyyyMmDd_HH() + "_";
 
         if (id.contains("_3m_")) {
             result += getCurrentMinute_Blog15minutes();
@@ -717,7 +717,7 @@ public class Utils {
         return result;
     }
 
-    public static String getCurrentYyyyMmDdHH() {
+    public static String getCurrentYyyyMmDd_HH() {
         return Utils.convertDateToString("yyyy.MM.dd_HH", Calendar.getInstance().getTime()) + "h";
     }
 
@@ -2105,58 +2105,65 @@ public class Utils {
         return result;
     }
 
-    public static String analysisTradingVolume(List<BtcFutures> list, int maSlowIndex) {
+    public static String analysisTakerVolume(List<BtcFutures> list, int maSlowIndex) {
 
         String result = "";
         int length = list.size() > maSlowIndex ? list.size() : maSlowIndex;
-        BigDecimal trading_volume = BigDecimal.ZERO;
+        // BigDecimal trading_volume = BigDecimal.ZERO;
         BigDecimal taker_volume = BigDecimal.ZERO;
         for (int index = 0; index < length; index++) {
             BtcFutures dto = list.get(index);
-            trading_volume = trading_volume.add(dto.getTrading_volume());
+            // trading_volume = trading_volume.add(dto.getTrading_volume());
             taker_volume = taker_volume.add(dto.getTaker_volume());
         }
-        BigDecimal ma50_trading_volume = trading_volume.divide(BigDecimal.valueOf(length), 5, RoundingMode.CEILING);
+        // BigDecimal ma50_trading_volume =
+        // trading_volume.divide(BigDecimal.valueOf(length), 5, RoundingMode.CEILING);
         BigDecimal ma50_taker_volume = taker_volume.divide(BigDecimal.valueOf(length), 5, RoundingMode.CEILING);
 
-        BigDecimal ma3_trading_volume_1 = (list.get(1).getTrading_volume().add(list.get(2).getTrading_volume())
-                .add(list.get(3).getTrading_volume()));
-        ma3_trading_volume_1 = ma3_trading_volume_1.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        // BigDecimal ma3_trading_volume_1 =
+        // (list.get(1).getTrading_volume().add(list.get(2).getTrading_volume())
+        // .add(list.get(3).getTrading_volume()));
+        // ma3_trading_volume_1 = ma3_trading_volume_1.divide(BigDecimal.valueOf(3), 5,
+        // RoundingMode.CEILING);
         BigDecimal ma3_taker_volume_1 = (list.get(1).getTaker_volume().add(list.get(2).getTaker_volume())
                 .add(list.get(3).getTaker_volume()));
         ma3_taker_volume_1 = ma3_taker_volume_1.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
 
-        BigDecimal ma3_trading_volume_2 = (list.get(4).getTrading_volume().add(list.get(2).getTrading_volume())
-                .add(list.get(3).getTrading_volume()));
-        ma3_trading_volume_2 = ma3_trading_volume_2.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        // BigDecimal ma3_trading_volume_2 =
+        // (list.get(4).getTrading_volume().add(list.get(2).getTrading_volume())
+        // .add(list.get(3).getTrading_volume()));
+        // ma3_trading_volume_2 = ma3_trading_volume_2.divide(BigDecimal.valueOf(3), 5,
+        // RoundingMode.CEILING);
         BigDecimal ma3_taker_volume_2 = (list.get(4).getTaker_volume().add(list.get(2).getTaker_volume())
                 .add(list.get(3).getTaker_volume()));
         ma3_taker_volume_2 = ma3_taker_volume_2.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
 
-        if ((ma3_trading_volume_1.compareTo(ma50_trading_volume) > 0)
-                && (ma50_trading_volume.compareTo(ma3_trading_volume_2) > 0)) {
-            result += ",TradingVol3Up" + maSlowIndex;
-        }
-        if ((ma3_trading_volume_1.compareTo(ma50_trading_volume) < 0)
-                && (ma50_trading_volume.compareTo(ma3_trading_volume_2) < 0)) {
-            result += ",TradingVol3Down" + maSlowIndex;
-        }
+        // if ((ma3_trading_volume_1.compareTo(ma50_trading_volume) > 0)
+        // && (ma50_trading_volume.compareTo(ma3_trading_volume_2) > 0)) {
+        // result += ",TradingVol3Up" + maSlowIndex;
+        // }
+        // if ((ma3_trading_volume_1.compareTo(ma50_trading_volume) < 0)
+        // && (ma50_trading_volume.compareTo(ma3_trading_volume_2) < 0)) {
+        // result += ",TradingVol3Down" + maSlowIndex;
+        // }
         if ((ma3_taker_volume_1.compareTo(ma50_taker_volume) > 0)
                 && (ma50_taker_volume.compareTo(ma3_taker_volume_2) > 0)) {
-            result += ",TakerVol3Up" + maSlowIndex;
+            result += ",3Up" + maSlowIndex;
         }
         if ((ma3_taker_volume_1.compareTo(ma50_taker_volume) < 0)
                 && (ma50_taker_volume.compareTo(ma3_taker_volume_2) < 0)) {
-            result += ",TakerVol3Down" + maSlowIndex;
+            // result += ",TakerVol3Down" + maSlowIndex;
         }
 
-        if (ma3_trading_volume_1.compareTo(ma50_trading_volume.multiply(BigDecimal.valueOf(1.5))) > 0) {
-            result += ",TradingVol3=Vol" + maSlowIndex + "x"
-                    + ma3_trading_volume_1.divide(ma50_trading_volume, 2, RoundingMode.CEILING);
-        }
+        // if
+        // (ma3_trading_volume_1.compareTo(ma50_trading_volume.multiply(BigDecimal.valueOf(1.5)))
+        // > 0) {
+        // result += ",TradingVol3=Vol" + maSlowIndex + "x"
+        // + ma3_trading_volume_1.divide(ma50_trading_volume, 2, RoundingMode.CEILING);
+        // }
         if (ma3_taker_volume_1.compareTo(ma50_taker_volume.multiply(BigDecimal.valueOf(1.5))) > 0) {
-            result += ",TakerVol3=Vol" + maSlowIndex + "x"
-                    + ma3_taker_volume_1.divide(ma50_taker_volume, 2, RoundingMode.CEILING);
+            result += ",Taker:" + getPercentStr(ma3_taker_volume_1, ma50_taker_volume);
+            // + ma3_taker_volume_1.divide(ma50_taker_volume, 2, RoundingMode.CEILING);
         }
 
         if (isNotBlank(result)) {

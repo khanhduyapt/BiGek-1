@@ -991,6 +991,21 @@ public class BinanceServiceImpl implements BinanceService {
                         }
                     }
 
+                    String taker = "";
+                    if (futu.contains("taker{") && futu.contains("}taker")) {
+                        try {
+                            taker = futu.substring(futu.indexOf("taker{"), futu.indexOf("}taker"));
+                            futu = futu.replace(taker + "}taker", "").replaceAll("  ", "");
+
+                            taker = taker.replace("taker{", "");
+
+                            css.setRange_taker_css(CSS_PRICE_FOCUS);
+                            css.setRange_taker("Taker:" + taker);
+                        } catch (Exception e) {
+                            css.setRange_taker("taker exception");
+                        }
+                    }
+
                     if (futu.contains("_GoodPrice")) {
                         futu = futu.replace("_GoodPrice", "");
 
@@ -1608,7 +1623,7 @@ public class BinanceServiceImpl implements BinanceService {
                     {
                         BinanceVolumnDayKey id = new BinanceVolumnDayKey(gecko_id, symbol, hh);
                         day.setId(id);
-                        day.setTotalVolume(dto.getTrading_volume());
+                        day.setTotalVolume(dto.getTaker_volume());
                         day.setTotalTrasaction(BigDecimal.ZERO);
                         day.setPriceAtBinance(Utils.getBinancePrice(symbol));
                         day.setLow_price(dto.getLow_price());
@@ -1644,7 +1659,7 @@ public class BinanceServiceImpl implements BinanceService {
                     key.setDd(dd2);
                     key.setHh(hh2);
                     ddhh.setId(key);
-                    ddhh.setVolume(dto.getTrading_volume());
+                    ddhh.setVolume(dto.getTaker_volume());
                     binanceVolumeDateTimeRepository.save(ddhh);
                 }
 
@@ -1652,7 +1667,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             // https://www.omnicalculator.com/finance/rsi#:~:text=Calculate%20relative%20strength%20(RS)%20by,1%20%2D%20RS)%20from%20100.
 
-            BigDecimal total_volume = BigDecimal.ZERO;
+            BigDecimal total_volume_month = BigDecimal.ZERO;
             String yyyymm = Utils.getYYYYMM();
             for (int index = 0; index < list_days.size(); index++) {
                 BtcFutures dto = list_days.get(index);
@@ -1660,7 +1675,7 @@ public class BinanceServiceImpl implements BinanceService {
                 String yyyymmdd = Utils.getYYYYMMDD(-index);
                 entity.setId(new BinanceVolumnWeekKey(gecko_id, symbol, yyyymmdd));
                 entity.setAvgPrice(dto.getPrice_close_candle());
-                entity.setTotalVolume(dto.getTrading_volume());
+                entity.setTotalVolume(dto.getTaker_volume());
                 entity.setTotalTrasaction(BigDecimal.ZERO);
                 entity.setMin_price(dto.getLow_price());
                 entity.setMax_price(dto.getHight_price());
@@ -1668,14 +1683,14 @@ public class BinanceServiceImpl implements BinanceService {
                 list_week.add(entity);
 
                 if (yyyymmdd.contains(yyyymm)) {
-                    total_volume = total_volume.add(dto.getTrading_volume());
+                    total_volume_month = total_volume_month.add(dto.getTrading_volume());
                 }
             }
 
             {
                 GeckoVolumeMonth month = new GeckoVolumeMonth();
                 month.setId(new GeckoVolumeMonthKey(gecko_id, "BINANCE", Utils.getMM()));
-                month.setTotalVolume(total_volume);
+                month.setTotalVolume(total_volume_month);
                 list_binance_vol.add(month);
             }
 
@@ -2672,9 +2687,9 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_H1_EUR = Utils.loadData("EUR", TIME_1h, 60);
             List<BtcFutures> list_H1_GBP = Utils.loadData("GBP", TIME_1h, 60);
 
-            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 50, "");
-            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 50, "");
-            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 50, "");
+            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 50, "", "");
+            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 50, "", "");
+            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 50, "", "");
 
             boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H1_AUD, 50);
             boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H1_EUR, 50);
@@ -2698,7 +2713,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private String sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex, String find_trend) {
+    private String sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex, String find_trend,
+            String append) {
         String msg = "";
         String vol = "";
         String chartname = Utils.getChartName(list);
@@ -2726,9 +2742,11 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Utils.isNotBlank(msg)) {
-            String trading_vol = Utils.analysisTradingVolume(list, maIndex);
+            String trading_vol = Utils.analysisTakerVolume(list, maIndex);
             msg += "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")" + Utils.new_line_from_service + vol;
             msg += Utils.isNotBlank(trading_vol) ? Utils.new_line_from_service + trading_vol : "";
+            msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
+
             sendMsgPerHour(EVENT_ID, msg, true);
         }
 
@@ -2741,7 +2759,7 @@ public class BinanceServiceImpl implements BinanceService {
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
-            sendMsgByTrendMaX(symbol, list_15m, 50, "");
+            sendMsgByTrendMaX(symbol, list_15m, 50, "", "");
         }
     }
 
@@ -2763,7 +2781,24 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+        String taker = "";
+        BigDecimal current_price = list_days.get(0).getCurrPrice();
+        String vol_h1 = Utils.analysisTakerVolume(list_h1, 50);
+        String vol_h4 = Utils.analysisTakerVolume(list_h4, 50);
+        String vol_d1 = Utils.analysisTakerVolume(list_days, 30);
+        if (Utils.isNotBlank(vol_h1 + vol_h4 + vol_d1)) {
+            taker += Utils.isNotBlank(vol_h1) ? " (H1):" + vol_h1 : "";
+            taker += Utils.isNotBlank(vol_h4) ? " (H4):" + vol_h4 : "";
+            taker += Utils.isNotBlank(vol_d1) ? " (D):" + vol_d1 : "";
 
+            // String volume = symbol + "(" + Utils.removeLastZero(current_price) + ")" +
+            // Utils.new_line_from_service;
+            // volume += "Taker," + taker;
+            // volume = vol.replace(",", Utils.new_line_from_service);
+            // String EVENT_TAKER_VOL_ID = "VOL_" + symbol + "_" +
+            // Utils.getYyyyMmDdHH_ChangeDailyChart();
+            // sendMsgPerHour(EVENT_TAKER_VOL_ID, volume, true);
+        }
         Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
 
         String type = "";
@@ -2771,21 +2806,19 @@ public class BinanceServiceImpl implements BinanceService {
             type = " (Futures) ";
 
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-                sendMsgByTrendMaX(symbol, list_h4, 50, "");
-                sendMsgByTrendMaX(symbol, list_days, 10, "");
+                sendMsgByTrendMaX(symbol, list_h4, 50, "", taker);
+                sendMsgByTrendMaX(symbol, list_days, 10, "", taker);
             } else {
-                sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG); // H4
-                sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG); // D
-                sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG);// W
+                sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+                sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
+                sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG, taker);// W
             }
         } else {
             type = " (Spot) ";
-            sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG); // D
-            sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG); // W
+            sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
+            sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG, taker); // W
         }
         type = type + Utils.analysisVolume(list_days);
-
-        BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         String scapLongH4 = Utils.getScapLong(list_h4, list_days, 10, allow_long_d1);
         String scapLongD1 = Utils.getScapLong(list_days, list_days, 10, allow_long_d1);
@@ -2875,9 +2908,13 @@ public class BinanceServiceImpl implements BinanceService {
         if (Utils.isNotBlank(scapLongD1)) {
             ma7 = "_ma7(" + scapLongD1.replace(",", " ") + ")~";
         }
+
+        if (Utils.isNotBlank(taker)) {
+            taker = " taker{" + taker + "}taker";
+        }
         // ---------------------------------------------------------
 
-        String result = note + type + m2ma + ma7 + sl2ma;
+        String result = note + type + m2ma + ma7 + sl2ma + taker;
         if (result.length() > 255) {
             // result = result.substring(0, 250) + "...";
         }

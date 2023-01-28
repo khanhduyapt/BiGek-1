@@ -102,7 +102,7 @@ public class BscScanBinanceApplication {
 
                         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
                         key += Utils.getStringValue(coin.getSymbol()) + "_";
-                        key += Utils.getCurrentYyyyMmDd_Blog4h();
+                        key += Utils.getCurrentYyyyMmDd_HH();
 
                         boolean reload = false;
                         if (keys_dict.containsKey(key)) {
@@ -138,7 +138,7 @@ public class BscScanBinanceApplication {
                     }
 
                     if (Objects.equals(idx, size - 1)) {
-                        System.out.println("reload: " + Utils.getCurrentYyyyMmDdHH());
+                        System.out.println("reload: " + Utils.getCurrentYyyyMmDd_HH());
                         idx = 0;
                     } else {
                         idx += 1;
