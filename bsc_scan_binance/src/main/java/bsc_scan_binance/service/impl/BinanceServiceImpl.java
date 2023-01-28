@@ -2155,27 +2155,12 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     @Transactional
     public String getTextDepthData() {
-        BigDecimal price_now = Utils.getBinancePrice(SYMBOL_BTC);
         saveDepthData("bitcoin", "BTC");
-
         String result = "";
-
         List<DepthResponse> list = getDepthDataBtc(1);
 
         if (!CollectionUtils.isEmpty(list)) {
-            Boolean isAddPriceNow = false;
-
-            for (DepthResponse dto : list) {
-
-                if (!isAddPriceNow) {
-                    if (dto.getPrice().compareTo(price_now) > 0) {
-                        result += "< NOW >";
-                        isAddPriceNow = true;
-                    }
-                }
-
-                result += dto.toStringMillion(price_now);
-            }
+            result = list.get(0).getPrice() + "<NOW>" + list.get(list.size() - 1).getPrice();
         }
 
         return result.trim();
