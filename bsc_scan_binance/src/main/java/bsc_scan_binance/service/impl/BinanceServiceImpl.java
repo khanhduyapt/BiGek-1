@@ -2678,13 +2678,11 @@ public class BinanceServiceImpl implements BinanceService {
             String append) {
         String msg = "";
         String vol = "";
+        String current_trend = "";
         String chartname = Utils.getChartName(list);
-
         String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
 
         boolean isScapChart = Utils.isScapChart(list);
-
-        String current_trend = "";
         if (isScapChart) {
             current_trend = Utils.check3CuttingUpForM15(list);
         } else {
@@ -2712,7 +2710,7 @@ public class BinanceServiceImpl implements BinanceService {
         if (Utils.isNotBlank(msg)) {
             String curr_price = "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
             if (isScapChart) {
-                msg = "(LONG)" + chartname + symbol + curr_price + " 🚀🚀🚀🚀🚀 ";
+                msg = "(LONG)" + chartname + symbol + curr_price + " 🚀";
             } else {
                 msg += curr_price + Utils.new_line_from_service + vol;
                 msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";

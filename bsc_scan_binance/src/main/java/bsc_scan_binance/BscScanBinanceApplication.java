@@ -57,6 +57,7 @@ public class BscScanBinanceApplication {
                 try {
                     TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
                     telegramBotsApi.registerBot(wandaBot);
+
                     binance_service.clearTrash();
                 } catch (TelegramApiException e) {
                     e.printStackTrace();

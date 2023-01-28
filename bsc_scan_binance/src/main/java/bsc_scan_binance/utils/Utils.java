@@ -519,17 +519,26 @@ public class Utils {
 
     public static void sendToChatId(String chat_id, String text) {
         try {
-            String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
-
             // Telegram token
             String apiToken = "5349894943:AAE_0-ZnbikN9m1aRoyCI2nkT2vgLnFBA-8";
 
+            String urlSetWebhook = "https://api.telegram.org/bot%s/setWebhook";
+            urlSetWebhook = String.format(urlSetWebhook, apiToken);
+
+            String urlString = "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=";
             urlString = String.format(urlString, apiToken, chat_id) + text;
             try {
-                URL url = new URL(urlString);
+                URL url = new URL(urlSetWebhook);
                 URLConnection conn = url.openConnection();
-                @SuppressWarnings("unused")
-                InputStream is = new BufferedInputStream(conn.getInputStream());
+                conn.getInputStream();
+
+                url = new URL(urlString);
+                conn = url.openConnection();
+                conn.getInputStream();
+
+                // @SuppressWarnings("unused")
+                // InputStream is = new BufferedInputStream(conn.getInputStream());
+                // System.out.println(is);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -2175,8 +2184,12 @@ public class Utils {
         }
 
         BigDecimal ma3_1 = calcMA(list, 3, 1);
-        BigDecimal ma50_1 = calcMA(list, 50, 1);
+        BigDecimal ma3_2 = calcMA(list, 3, 2);
+        if (ma3_1.compareTo(ma3_2) < 0) {
+            return ""; // Ma3 move down
+        }
 
+        BigDecimal ma50_1 = calcMA(list, 50, 1);
         if (list.get(0).getId().contains("BTC")) {
             ma50_1 = ma50_1.multiply(BigDecimal.valueOf(1.01));
         } else {
@@ -2186,54 +2199,32 @@ public class Utils {
             return "";
         }
 
-        BigDecimal ma3_2 = calcMA(list, 3, 2);
-
-        if (ma3_1.compareTo(ma3_2) < 0) {
-            return ""; // Ma3 move down
-        }
-
+        // --------------------------------
         BigDecimal ma10_1 = calcMA(list, 10, 1);
-
+        BigDecimal ma10_2 = calcMA(list, 10, 2);
         if (ma3_1.compareTo(ma10_1) < 0) {
             return ""; // Ma3 down ma10
         }
-
+        if (ma10_1.compareTo(ma10_2) < 0) {
+            return ""; // Ma10 down
+        }
+        // --------------------------------
         BigDecimal ma20_1 = calcMA(list, 20, 1);
+        BigDecimal ma20_2 = calcMA(list, 20, 2);
         if (ma3_1.compareTo(ma20_1) < 0) {
             return ""; // Ma3 down ma20
         }
-
-        BigDecimal ma10_2 = calcMA(list, 10, 2);
-        BigDecimal ma20_2 = calcMA(list, 20, 2);
-
-        BigDecimal close2 = list.get(2).getPrice_close_candle();
-        BigDecimal open2 = list.get(2).getPrice_open_candle();
-        // candle2:Up, ma10_1 > ma20_1 : up
-        if ((close2.compareTo(open2) > 0)) {
-            if ((close2.compareTo(ma10_2) > 0) && (ma10_2.compareTo(open2) > 0)) {
-                if ((close2.compareTo(ma20_2) > 0) && (ma20_2.compareTo(open2) > 0)) {
-                    return TREND_LONG;
-                }
-            }
+        if (ma20_1.compareTo(ma20_2) < 0) {
+            return ""; // Ma20 down
         }
-
-        BigDecimal close1 = list.get(1).getPrice_close_candle();
-        BigDecimal open1 = list.get(1).getPrice_open_candle();
-        // candle1:Up, ma10_1 > ma20_1 : up
-        if ((close1.compareTo(open1) > 0)) {
-            if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(open1) > 0)) {
-                if ((close1.compareTo(ma20_1) > 0) && (ma20_1.compareTo(open1) > 0)) {
-                    return TREND_LONG;
-                }
-            }
-        }
-
+        // --------------------------------
         List<BigDecimal> open_close = getLowHeightCandle(list.subList(1, 3));
         BigDecimal low = open_close.get(0);
         BigDecimal hig = open_close.get(1);
-        if ((ma10_1.compareTo(ma20_1) > 0) && (hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)
-                && (hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
-            return TREND_LONG;
+        if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
+            if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
+                return TREND_LONG;
+            }
         }
 
         return "";
@@ -2272,36 +2263,20 @@ public class Utils {
         }
 
         BigDecimal ma10_2 = calcMA(list, 10, 2);
-        BigDecimal ma20_2 = calcMA(list, 20, 2);
-
-        BigDecimal close2 = list.get(2).getPrice_close_candle();
-        BigDecimal open2 = list.get(2).getPrice_open_candle();
-
-        // candle2:Down, ma10_1 < ma20_1 : down
-        if ((close2.compareTo(open2) < 0) && (ma10_1.compareTo(ma20_1) < 0)) {
-            if ((close2.compareTo(ma10_2) < 0) && (ma10_2.compareTo(open2) < 0)) {
-                if ((close2.compareTo(ma20_2) < 0) && (ma20_2.compareTo(open2) < 0)) {
-                    return TREND_SHORT;
-                }
-            }
+        if (ma10_1.compareTo(ma10_2) > 0) {
+            return ""; // Ma10 Up
         }
 
-        BigDecimal close1 = list.get(1).getPrice_close_candle();
-        BigDecimal open1 = list.get(1).getPrice_open_candle();
-        // candle1:Up, ma10_1 < ma20_1 : down
-        if ((close1.compareTo(open1) < 0)) {
-            if ((close1.compareTo(ma10_1) < 0) && (ma10_1.compareTo(open1) < 0)) {
-                if ((close1.compareTo(ma20_1) < 0) && (ma20_1.compareTo(open1) < 0)) {
-                    return TREND_SHORT;
-                }
-            }
+        BigDecimal ma20_2 = calcMA(list, 20, 2);
+        if (ma20_1.compareTo(ma20_2) > 0) {
+            return ""; // Ma20 Up
         }
 
         List<BigDecimal> open_close = getLowHeightCandle(list.subList(1, 3));
         BigDecimal low = open_close.get(0);
         BigDecimal hig = open_close.get(1);
-        if ((ma20_1.compareTo(ma10_1) > 0) && (hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)
-                && (hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
+        if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0) && (hig.compareTo(ma20_1) > 0)
+                && (ma20_1.compareTo(low) > 0)) {
             return TREND_SHORT;
         }
 
