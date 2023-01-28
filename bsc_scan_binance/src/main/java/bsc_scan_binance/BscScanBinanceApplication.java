@@ -89,17 +89,18 @@ public class BscScanBinanceApplication {
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;
 
+                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
                             binance_service.getChartWD("bitcoin", "BTC");
                             wait(SLEEP_MINISECONDS);
-                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
 
+                            System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
                             binance_service.getChartWD("ethereum", "ETH");
                             wait(SLEEP_MINISECONDS);
-                            System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
 
+                            System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
-                            System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
+
                         }
 
                         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
@@ -119,10 +120,11 @@ public class BscScanBinanceApplication {
                         }
 
                         if (reload) {
-                            binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
+                            String msg = "(" + (idx + 1) + "/" + size + ")" + Utils.getTimeHHmm() + ";";
+                            msg += coin.getGeckoid() + ";" + coin.getSymbol();
+                            System.out.println(msg);
 
-                            String msg = Utils.getTimeHHmm() + "Binance " + (idx + 1) + "/" + size + "; id:"
-                                    + coin.getGeckoid() + "; Symbol: " + coin.getSymbol();
+                            binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
 
                             try {
                                 gecko_service.loadData(coin.getGeckoid());
@@ -131,7 +133,6 @@ public class BscScanBinanceApplication {
                                         + e.getMessage());
                             }
 
-                            System.out.println(msg);
                         }
 
                         wait(SLEEP_MINISECONDS);

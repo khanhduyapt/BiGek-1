@@ -471,7 +471,7 @@ public class Utils {
 
     public static void sendToMyTelegram(String text) {
         String msg = text.replaceAll("↑", "^").replaceAll("↓", "v").replaceAll(" ", "");
-        System.out.println("sendToMyTelegram: " + msg);
+        System.out.println(msg + " 💰 ");
 
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
                 || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
@@ -482,7 +482,7 @@ public class Utils {
 
     public static void sendToTelegram(String text) {
         String msg = text.replaceAll("↑", "^").replaceAll("↓", "v").replaceAll(" ", "");
-        System.out.println("sendToTelegram: " + msg);
+        System.out.println(msg);
 
         if ((BscScanBinanceApplication.app_flag == const_app_flag_msg_on)
                 || (BscScanBinanceApplication.app_flag == const_app_flag_all_and_msg)) {
