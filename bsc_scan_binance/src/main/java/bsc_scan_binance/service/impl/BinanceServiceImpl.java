@@ -2713,13 +2713,14 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     public void sendMsgChart15m(String gecko_id, String symbol) {
+        String btc_trend = IS_BTC_ALLOW_LONG ? "" : "______BTC(h1)_DOWN_TREND______";
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
-        } else if (IS_BTC_ALLOW_LONG) {
-            sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_LONG, "");
+            sendMsgByTrendMaX(symbol, list_15m, 10, "", btc_trend);
+        } else {
+            sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_LONG, btc_trend);
         }
     }
 
