@@ -2771,6 +2771,11 @@ public class BinanceServiceImpl implements BinanceService {
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
                 sendMsgKillLongShort(gecko_id, symbol, list_15m);
             }
+
+            if (Objects.equals("BTC", symbol)) {
+                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+                sendMsgByTrendMaX(symbol, list_5m, 50, "", "");
+            }
         }
     }
 

@@ -2175,6 +2175,17 @@ public class Utils {
         }
 
         BigDecimal ma3_1 = calcMA(list, 3, 1);
+        BigDecimal ma50_1 = calcMA(list, 50, 1);
+
+        if (list.get(0).getId().contains("BTC")) {
+            ma50_1 = ma50_1.multiply(BigDecimal.valueOf(1.01));
+        } else {
+            ma50_1 = ma50_1.multiply(BigDecimal.valueOf(1.05));
+        }
+        if (ma3_1.compareTo(ma50_1) > 0) {
+            return "";
+        }
+
         BigDecimal ma3_2 = calcMA(list, 3, 2);
 
         if (ma3_1.compareTo(ma3_2) < 0) {

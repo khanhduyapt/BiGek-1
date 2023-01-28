@@ -84,15 +84,15 @@ public class BscScanBinanceApplication {
                         cur_blog5minute = Utils.getCurrentMinute_Blog5minutes();
                         if (pre_blog5minute != cur_blog5minute) {
                             pre_blog5minute = cur_blog5minute;
+
+                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
+                            binance_service.getChartWD("bitcoin", "BTC");
+                            wait(SLEEP_MINISECONDS);
                         }
 
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;
-
-                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
-                            binance_service.getChartWD("bitcoin", "BTC");
-                            wait(SLEEP_MINISECONDS);
 
                             System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
                             binance_service.getChartWD("ethereum", "ETH");
