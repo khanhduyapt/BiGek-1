@@ -2728,19 +2728,15 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     public void sendMsgChart15m(String gecko_id, String symbol) {
-        if (IS_BTC_ALLOW_LONG) {
-            List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-            String msg = sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
-            // -----------------------------------------------//
-            if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-                sendMsgKillLongShort(gecko_id, symbol, list_15m);
-            }
+        List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
+        if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+            sendMsgKillLongShort(gecko_id, symbol, list_15m);
+        }
 
-            // if (Objects.equals("BTC", symbol)) {
-            if (Utils.isBlank(msg)) {
-                List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-                sendMsgByTrendMaX(symbol, list_5m, 50, "", "");
-            }
+        String msg = sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
+        if (IS_BTC_ALLOW_LONG && Utils.isBlank(msg)) {
+            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+            sendMsgByTrendMaX(symbol, list_5m, 50, "", "");
         }
     }
 
