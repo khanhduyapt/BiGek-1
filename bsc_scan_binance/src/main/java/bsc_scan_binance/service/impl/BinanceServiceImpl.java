@@ -999,8 +999,8 @@ public class BinanceServiceImpl implements BinanceService {
 
                             taker = taker.replace("taker{", "");
 
-                            css.setRange_taker_css(CSS_PRICE_FOCUS);
-                            css.setRange_taker("Taker:" + taker);
+                            css.setRange_taker_css(CSS_PRICE_WHITE);
+                            css.setRange_taker(taker);
                         } catch (Exception e) {
                             css.setRange_taker("taker exception");
                         }
@@ -2781,15 +2781,17 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
-        String taker = "";
         BigDecimal current_price = list_days.get(0).getCurrPrice();
+        // -------------------------------------------------------------------------
+        String taker = "";
         String vol_h1 = Utils.analysisTakerVolume(list_h1, 50);
         String vol_h4 = Utils.analysisTakerVolume(list_h4, 50);
         String vol_d1 = Utils.analysisTakerVolume(list_days, 30);
         if (Utils.isNotBlank(vol_h1 + vol_h4 + vol_d1)) {
-            taker += Utils.isNotBlank(vol_h1) ? " (H1):" + vol_h1 : "";
-            taker += Utils.isNotBlank(vol_h4) ? " (H4):" + vol_h4 : "";
-            taker += Utils.isNotBlank(vol_d1) ? " (D):" + vol_d1 : "";
+            taker += "Taker:";
+            taker += Utils.isNotBlank(vol_h1) ? " (H1)" + vol_h1 : "";
+            taker += Utils.isNotBlank(vol_h4) ? " (H4)" + vol_h4 : "";
+            taker += Utils.isNotBlank(vol_d1) ? " (D)" + vol_d1 : "";
 
             // String volume = symbol + "(" + Utils.removeLastZero(current_price) + ")" +
             // Utils.new_line_from_service;
@@ -2799,6 +2801,7 @@ public class BinanceServiceImpl implements BinanceService {
             // Utils.getYyyyMmDdHH_ChangeDailyChart();
             // sendMsgPerHour(EVENT_TAKER_VOL_ID, volume, true);
         }
+        // -------------------------------------------------------------------------
         Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
 
         String type = "";
