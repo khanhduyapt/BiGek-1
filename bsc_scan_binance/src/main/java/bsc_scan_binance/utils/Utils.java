@@ -2145,20 +2145,23 @@ public class Utils {
         BigDecimal ma3_2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
         // Ma3 move Up
-        if (ma3_1.compareTo(ma3_2) > 0) {
-            List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 3));
-            BigDecimal open1 = open_close.get(0); // list.get(1).getPrice_open_candle();
-            BigDecimal close1 = open_close.get(1);// list.get(1).getPrice_close_candle();
-            // Up trend candle
-            if (close1.compareTo(open1) > 0) {
-                BigDecimal ma10_1 = calcMA(list, 10, 1);
-                BigDecimal ma10_2 = calcMA(list, 10, 2);
-                if (ma10_1.compareTo(ma10_2) > 0) {
-                    BigDecimal ma20_1 = calcMA(list, 20, 1);
+        String symbol = list.get(0).getId().toLowerCase();
+        if (symbol.contains("_1h_")) {
+            if (ma3_1.compareTo(ma3_2) > 0) {
+                List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 3));
+                BigDecimal open1 = open_close.get(0); // list.get(1).getPrice_open_candle();
+                BigDecimal close1 = open_close.get(1);// list.get(1).getPrice_close_candle();
+                // Up trend candle
+                if (close1.compareTo(open1) > 0) {
+                    BigDecimal ma10_1 = calcMA(list, 10, 1);
+                    BigDecimal ma10_2 = calcMA(list, 10, 2);
+                    if (ma10_1.compareTo(ma10_2) > 0) {
+                        BigDecimal ma20_1 = calcMA(list, 20, 1);
 
-                    if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(open1) > 0)
-                            && (close1.compareTo(ma20_1) > 0) && (ma20_1.compareTo(open1) > 0)) {
-                        return TREND_LONG;
+                        if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(open1) > 0)
+                                && (close1.compareTo(ma20_1) > 0) && (ma20_1.compareTo(open1) > 0)) {
+                            return TREND_LONG;
+                        }
                     }
                 }
             }

@@ -2742,9 +2742,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Utils.isNotBlank(msg)) {
-            String trading_vol = Utils.analysisTakerVolume(list, maIndex);
             msg += "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")" + Utils.new_line_from_service + vol;
-            msg += Utils.isNotBlank(trading_vol) ? Utils.new_line_from_service + trading_vol : "";
             msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
 
             sendMsgPerHour(EVENT_ID, msg, true);
@@ -2817,8 +2815,10 @@ public class BinanceServiceImpl implements BinanceService {
             } else {
                 sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
                 sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
+
                 sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
                         taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");// D
+
                 sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
                         taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW");// W
             }
