@@ -103,9 +103,11 @@ public class BscScanBinanceApplication {
                             wait(SLEEP_MINISECONDS);
                         }
 
-                        if (BscScanBinanceApplication.TAKER_TOKENS.contains("_" + coin.getSymbol() + "_")) {
-                            System.out.println("Check taker (m15)" + coin.getSymbol());
-                            binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
+                        if (!"_BTC_ETH_BNB_".contains("_" + coin.getSymbol() + "_")) {
+                            if (BscScanBinanceApplication.TAKER_TOKENS.contains("_" + coin.getSymbol() + "_")) {
+                                System.out.println("Check taker (m15)" + coin.getSymbol());
+                                binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
+                            }
                         }
 
                         // ----------------------------------------------------------
