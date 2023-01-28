@@ -2855,16 +2855,13 @@ public class BinanceServiceImpl implements BinanceService {
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
                 sendMsgChart15m(gecko_id, symbol);
 
-                // sendMsgByTrendMaX(symbol, list_h4, 50, "", taker);
-
                 sendMsgByTrendMaX(symbol, list_days, 10, "",
                         taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D
+
                 sendMsgByTrendMaX(symbol, list_days, 50, "",
                         taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
             } else {
                 sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
-
-                // sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
 
                 sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
                         taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");// D
@@ -2874,7 +2871,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } else {
             type = " (Spot) ";
-            // sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
 
             sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
                     taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D
