@@ -2725,7 +2725,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String current_trend = "";
         if (isScapChart) {
-            current_trend = Utils.check3CuttingXforM15(list);
+            current_trend = Utils.check3CuttingUpForM15(list);
         } else {
             current_trend = Utils.check3CuttingXforH1(list, maIndex);
         }
@@ -2749,10 +2749,11 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Utils.isNotBlank(msg)) {
+            String curr_price = "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
             if (isScapChart) {
-                msg = symbol + chartname + " 🚀 (" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")Up.";
+                msg = "(LONG)" + chartname + symbol + curr_price + " 🚀🚀🚀🚀🚀 ";
             } else {
-                msg += "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")" + Utils.new_line_from_service + vol;
+                msg += curr_price + Utils.new_line_from_service + vol;
                 msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
             }
             sendMsgPerHour(EVENT_ID, msg, true);
@@ -2800,7 +2801,6 @@ public class BinanceServiceImpl implements BinanceService {
             taker += Utils.isNotBlank(vol_h4) ? " (H4)" + vol_h4 : "";
             taker += Utils.isNotBlank(vol_d1) ? " (D)" + vol_d1 : "";
         }
-        //
         // -------------------------------------------------------------------------
         if (Utils.isNotBlank(taker)) {
             if (!BscScanBinanceApplication.TAKER_TOKENS.contains("_" + symbol + "_")) {
@@ -2821,14 +2821,16 @@ public class BinanceServiceImpl implements BinanceService {
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
                 sendMsgChart15m(gecko_id, symbol);
 
-                sendMsgByTrendMaX(symbol, list_h4, 50, "", taker);
+                // sendMsgByTrendMaX(symbol, list_h4, 50, "", taker);
+
                 sendMsgByTrendMaX(symbol, list_days, 10, "",
-                        taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");
+                        taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D
                 sendMsgByTrendMaX(symbol, list_days, 50, "",
-                        taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW");
+                        taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
             } else {
                 sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
-                sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
+
+                // sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
 
                 sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
                         taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");// D
@@ -2838,9 +2840,11 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } else {
             type = " (Spot) ";
-            sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
+            // sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG, taker); // D
+
             sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
-                    taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // W
+                    taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D
+
             sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
                     taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
         }

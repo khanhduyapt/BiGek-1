@@ -121,6 +121,7 @@ public class BscScanBinanceApplication {
                         }
 
                         if (BscScanBinanceApplication.TAKER_TOKENS.contains("_" + coin.getSymbol() + "_")) {
+                            System.out.println("Check taker (m15)" + coin.getSymbol());
                             binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
                         }
 
