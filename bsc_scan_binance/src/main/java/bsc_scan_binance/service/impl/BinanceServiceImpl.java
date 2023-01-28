@@ -2734,6 +2734,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String msg = sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
+
         if (IS_BTC_ALLOW_LONG && Utils.isBlank(msg)) {
             List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
             sendMsgByTrendMaX(symbol, list_5m, 50, "", "");
