@@ -703,14 +703,22 @@ public class Utils {
     }
 
     public static String getCurrentYyyyMmDdHHByChart(List<BtcFutures> list) {
-        String id = list.get(0).getId();
+        String symbol = list.get(0).getId();
         String result = getCurrentYyyyMmDd_HH() + "_";
 
-        if (id.contains("_3m_")) {
+        if (symbol.contains("_4h_")) {
+            return getCurrentYyyyMmDd_Blog4h() + "_";
+        }
+
+        if (symbol.contains("_1d_")) {
+            return getYyyyMmDdHH_ChangeDailyChart() + "_";
+        }
+
+        if (symbol.contains("_3m_")) {
             result += getCurrentMinute_Blog15minutes();
         }
 
-        if (id.contains("_1m_")) {
+        if (symbol.contains("_1m_")) {
             result += getCurrentMinute_Blog5minutes();
         }
 
