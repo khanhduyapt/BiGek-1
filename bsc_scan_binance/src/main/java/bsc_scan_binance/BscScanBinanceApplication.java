@@ -101,12 +101,18 @@ public class BscScanBinanceApplication {
                             System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
-
                         }
+
+                        if (BscScanBinanceApplication.TAKER_TOKENS.contains("_" + coin.getSymbol() + "_")) {
+                            System.out.println("Check taker (m15)" + coin.getSymbol());
+                            binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
+                        }
+
+                        // ----------------------------------------------------------
 
                         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
                         key += Utils.getStringValue(coin.getSymbol()) + "_";
-                        key += Utils.getCurrentYyyyMmDd_HH();
+                        key += Utils.getCurrentYyyyMmDd_Blog4h();
 
                         boolean reload = false;
                         if (keys_dict.containsKey(key)) {
@@ -119,12 +125,6 @@ public class BscScanBinanceApplication {
                             keys_dict.put(key, key);
                             reload = true;
                         }
-
-                        if (BscScanBinanceApplication.TAKER_TOKENS.contains("_" + coin.getSymbol() + "_")) {
-                            System.out.println("Check taker (m15)" + coin.getSymbol());
-                            binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
-                        }
-
                         if (reload) {
                             String msg = "(" + (idx + 1) + "/" + size + ")" + Utils.getTimeHHmm();
                             msg += coin.getSymbol() + " " + coin.getGeckoid();
