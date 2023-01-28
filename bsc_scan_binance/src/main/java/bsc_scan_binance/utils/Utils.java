@@ -2092,7 +2092,7 @@ public class Utils {
             SL = (SL_LowHeigh.compareTo(SL_10percent) < 0) ? SL_10percent : SL_LowHeigh;
         }
 
-        int usd = 5;
+        int usd = 10;
         BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
         vol = formatPrice(vol.multiply(entry).abs(), 0);
 
@@ -2145,27 +2145,47 @@ public class Utils {
         }
 
         BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
-        BigDecimal close1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
-        BigDecimal close2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
+        BigDecimal ma3_1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
+        BigDecimal ma3_2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
+
+        // Ma3 move Up
+        if (ma3_1.compareTo(ma3_2) > 0) {
+            List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 3));
+            BigDecimal open1 = open_close.get(0); // list.get(1).getPrice_open_candle();
+            BigDecimal close1 = open_close.get(1);// list.get(1).getPrice_close_candle();
+            // Up trend candle
+            if (close1.compareTo(open1) > 0) {
+                BigDecimal ma10_1 = calcMA(list, 10, 1);
+                BigDecimal ma10_2 = calcMA(list, 10, 2);
+                if (ma10_1.compareTo(ma10_2) > 0) {
+                    BigDecimal ma20_1 = calcMA(list, 20, 1);
+
+                    if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(open1) > 0)
+                            && (close1.compareTo(ma20_1) > 0) && (ma20_1.compareTo(open1) > 0)) {
+                        return TREND_LONG;
+                    }
+                }
+            }
+        }
 
         if (maSlowIndex < 50) {
             boolean m15IsAboveMa50 = Utils.isAboveMALine(list, 50, 1);
 
-            if (!m15IsAboveMa50 && (close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0)
-                    && (ma_X_c.compareTo(close2) > 0)) {
+            if (!m15IsAboveMa50 && (ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma_X_c) > 0)
+                    && (ma_X_c.compareTo(ma3_2) > 0)) {
                 return TREND_LONG;
             }
 
-            if (m15IsAboveMa50 && (close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0)
-                    && (ma_X_c.compareTo(close2) < 0)) {
+            if (m15IsAboveMa50 && (ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma_X_c) < 0)
+                    && (ma_X_c.compareTo(ma3_2) < 0)) {
                 return TREND_SHORT;
             }
         } else {
-            if ((close1.compareTo(close2) > 0) && (close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
+            if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(ma3_2) > 0)) {
                 return TREND_LONG;
             }
 
-            if ((close1.compareTo(close2) < 0) && (close1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(close2) < 0)) {
+            if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(ma3_2) < 0)) {
                 return TREND_SHORT;
             }
         }

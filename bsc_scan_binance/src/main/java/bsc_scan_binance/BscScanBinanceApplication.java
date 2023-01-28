@@ -1,9 +1,11 @@
 package bsc_scan_binance;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -73,7 +75,7 @@ public class BscScanBinanceApplication {
 
                 int pre_blog5minute = -1;
                 int cur_blog5minute = -1;
-
+                Date start_time = Calendar.getInstance().getTime();
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
@@ -138,7 +140,12 @@ public class BscScanBinanceApplication {
                     }
 
                     if (Objects.equals(idx, size - 1)) {
-                        System.out.println("reload: " + Utils.getCurrentYyyyMmDd_HH());
+                        Date curr_time = Calendar.getInstance().getTime();
+                        long diff = curr_time.getTime() - start_time.getTime();
+                        start_time = Calendar.getInstance().getTime();
+
+                        System.out.println("reload: " + Utils.getCurrentYyyyMmDd_HH() + ", spend:"
+                                + TimeUnit.MILLISECONDS.toMinutes(diff) + " Minutes.");
                         idx = 0;
                     } else {
                         idx += 1;
