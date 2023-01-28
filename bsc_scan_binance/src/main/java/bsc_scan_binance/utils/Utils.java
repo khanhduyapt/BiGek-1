@@ -2129,7 +2129,7 @@ public class Utils {
         }
 
         if (ma3_taker_volume_1.compareTo(ma50_taker_volume.multiply(BigDecimal.valueOf(1.1))) > 0) {
-            result += " " + getPercentStr(ma3_taker_volume_1, ma50_taker_volume);
+            result += " :" + getPercentStr(ma3_taker_volume_1, ma50_taker_volume);
         }
 
         return result.trim();

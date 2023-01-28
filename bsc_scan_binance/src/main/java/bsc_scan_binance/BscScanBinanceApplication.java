@@ -144,7 +144,7 @@ public class BscScanBinanceApplication {
                         long diff = curr_time.getTime() - start_time.getTime();
                         start_time = Calendar.getInstance().getTime();
 
-                        System.out.println("reload: " + Utils.getCurrentYyyyMmDd_HH() + ", spend:"
+                        System.out.println("reload: " + Utils.getMmDD_TimeHHmm() + ", spend:"
                                 + TimeUnit.MILLISECONDS.toMinutes(diff) + " Minutes.");
                         idx = 0;
                     } else {
