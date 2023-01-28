@@ -2853,6 +2853,8 @@ public class BinanceServiceImpl implements BinanceService {
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
                 sendMsgChart15m(gecko_id, symbol);
 
+                sendMsgByTrendMaX(symbol, list_h1, 50, "", taker); // H4
+
                 sendMsgByTrendMaX(symbol, list_days, 10, "",
                         taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D
 
@@ -2869,6 +2871,8 @@ public class BinanceServiceImpl implements BinanceService {
             }
         } else {
             type = " (Spot) ";
+
+            sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
 
             sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
                     taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D

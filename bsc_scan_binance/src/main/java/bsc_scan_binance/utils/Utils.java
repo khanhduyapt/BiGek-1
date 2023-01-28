@@ -1444,7 +1444,7 @@ public class Utils {
     public static boolean isScapChart(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
         if (symbol.contains("_1h_")) {
-            return false;
+            return true;
         }
         if (symbol.contains("_2h_")) {
             return false;
@@ -2220,7 +2220,7 @@ public class Utils {
         }
         // --------------------------------
 
-        List<BigDecimal> open_close = getLowHeightCandle(list.subList(1, 3));
+        List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 3));
         BigDecimal low = open_close.get(0);
         BigDecimal hig = open_close.get(1);
         if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
@@ -2279,7 +2279,7 @@ public class Utils {
             return ""; // Ma20 Up
         }
 
-        List<BigDecimal> open_close = getLowHeightCandle(list.subList(1, 3));
+        List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 3));
         BigDecimal low = open_close.get(0);
         BigDecimal hig = open_close.get(1);
         if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
