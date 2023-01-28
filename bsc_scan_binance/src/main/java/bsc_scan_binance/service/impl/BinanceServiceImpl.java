@@ -2811,8 +2811,9 @@ public class BinanceServiceImpl implements BinanceService {
         // -------------------------------------------------------------------------
         if (Utils.isNotBlank(taker)) {
             if (!BscScanBinanceApplication.TAKER_TOKENS.contains("_" + symbol + "_")) {
-                BscScanBinanceApplication.TAKER_TOKENS += symbol + "_";
                 if (!"_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+
+                    BscScanBinanceApplication.TAKER_TOKENS += symbol + "_";
                     sendMsgChart15m(gecko_id, symbol);
                 }
             }
