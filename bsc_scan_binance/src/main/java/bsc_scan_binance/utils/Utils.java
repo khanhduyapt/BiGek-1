@@ -223,7 +223,7 @@ public class Utils {
                 day.setTaker_volume(taker_volume);
 
                 BigDecimal candle_heigh = hight_price.subtract(low_price).abs();
-                BigDecimal range = candle_heigh.divide(BigDecimal.valueOf(10), 5, RoundingMode.CEILING);
+                BigDecimal range = candle_heigh.divide(BigDecimal.valueOf(10), 6, RoundingMode.CEILING);
 
                 day.setUptrend(false);
                 if (price_open_candle.compareTo(price_close_candle) < 0) {
@@ -436,7 +436,7 @@ public class Utils {
 
     public static BigDecimal getMidPrice(BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal mid_price = (getBigDecimal(hight_price).add(getBigDecimal(low_price)));
-        mid_price = mid_price.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
+        mid_price = mid_price.divide(BigDecimal.valueOf(2), 6, RoundingMode.CEILING);
 
         return mid_price;
     }
@@ -445,7 +445,7 @@ public class Utils {
         BigDecimal mid_price = getMidPrice(low_price, hight_price);
 
         BigDecimal danger_range = (hight_price.subtract(mid_price));
-        danger_range = danger_range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        danger_range = danger_range.divide(BigDecimal.valueOf(3), 6, RoundingMode.CEILING);
 
         BigDecimal danger_price = mid_price.subtract(danger_range);
 
@@ -1146,7 +1146,7 @@ public class Utils {
     public static BigDecimal getGoodPriceLong(BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal range = (hight_price.subtract(low_price));
 
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(5), 6, RoundingMode.CEILING);
 
         BigDecimal good_price = low_price.add(range);
 
@@ -1156,7 +1156,7 @@ public class Utils {
     public static BigDecimal getGoodPriceShort(BigDecimal low_price, BigDecimal hight_price) {
         BigDecimal range = (hight_price.subtract(low_price));
 
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(5), 6, RoundingMode.CEILING);
 
         BigDecimal good_price = hight_price.subtract(range);
 
@@ -1172,7 +1172,7 @@ public class Utils {
         }
 
         BigDecimal candle_beard_length = open_candle.subtract(low_price);
-        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 6, RoundingMode.CEILING);
 
         BigDecimal stop_loss = low_price.subtract(candle_beard_length);
         return stop_loss;
@@ -1180,7 +1180,7 @@ public class Utils {
 
     public static BigDecimal getPriceAtMidCandle(BigDecimal open_candle, BigDecimal close_candle) {
         BigDecimal candle_beard_length = close_candle.subtract(open_candle);
-        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 6, RoundingMode.CEILING);
 
         BigDecimal mid = open_candle.add(candle_beard_length);
         return mid;
@@ -1195,7 +1195,7 @@ public class Utils {
         }
 
         BigDecimal candle_beard_length = hight_price.subtract(close_candle);
-        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
+        candle_beard_length = candle_beard_length.divide(BigDecimal.valueOf(2), 6, RoundingMode.CEILING);
 
         BigDecimal stop_loss = hight_price.add(candle_beard_length);
         return stop_loss;
@@ -1427,6 +1427,27 @@ public class Utils {
         return 50;
     }
 
+    public static boolean isScapChart(List<BtcFutures> list) {
+        String symbol = list.get(0).getId().toLowerCase();
+        if (symbol.contains("_1h_")) {
+            return false;
+        }
+        if (symbol.contains("_2h_")) {
+            return false;
+        }
+        if (symbol.contains("_4h_")) {
+            return false;
+        }
+        if (symbol.contains("_1d_")) {
+            return false;
+        }
+        if (symbol.contains("_1w_")) {
+            return false;
+        }
+
+        return true;
+    }
+
     public static String getChartName(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
         if (symbol.contains("_1h_")) {
@@ -1575,7 +1596,7 @@ public class Utils {
         }
 
         if (count > 0) {
-            sum = sum.divide(BigDecimal.valueOf(count), 5, RoundingMode.CEILING);
+            sum = sum.divide(BigDecimal.valueOf(count), 6, RoundingMode.CEILING);
         }
 
         return sum;
@@ -1593,7 +1614,7 @@ public class Utils {
             }
         }
         if (count > 0) {
-            sum = sum.divide(BigDecimal.valueOf(count), 5, RoundingMode.CEILING);
+            sum = sum.divide(BigDecimal.valueOf(count), 6, RoundingMode.CEILING);
         }
 
         return sum;
@@ -1725,7 +1746,7 @@ public class Utils {
         }
 
         BigDecimal range = (hight_price.subtract(low_price));
-        range = range.divide(BigDecimal.valueOf(5), 5, RoundingMode.CEILING);
+        range = range.divide(BigDecimal.valueOf(5), 6, RoundingMode.CEILING);
 
         BigDecimal mid_price = hight_price.subtract(range);
 
@@ -1773,7 +1794,7 @@ public class Utils {
 
         BigDecimal stop_loss = Utils.getStopLossForLong(low, open);
         BigDecimal candle_height = hig.subtract(entry);
-        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 5, RoundingMode.CEILING);
+        BigDecimal mid_candle = candle_height.divide(BigDecimal.valueOf(2), 6, RoundingMode.CEILING);
         BigDecimal take_porfit_1 = entry.add(mid_candle);
         BigDecimal take_porfit_2 = hig;
 
@@ -1935,8 +1956,8 @@ public class Utils {
             }
         }
 
-        BigDecimal avg_high = total_high.divide(BigDecimal.valueOf(limit - 1), 5, RoundingMode.CEILING);
-        BigDecimal avg_low = total_low.divide(BigDecimal.valueOf(limit - 1), 5, RoundingMode.CEILING);
+        BigDecimal avg_high = total_high.divide(BigDecimal.valueOf(limit - 1), 6, RoundingMode.CEILING);
+        BigDecimal avg_low = total_low.divide(BigDecimal.valueOf(limit - 1), 6, RoundingMode.CEILING);
 
         dto.setHigh(high);
         dto.setLow(low);
@@ -2121,15 +2142,15 @@ public class Utils {
             BtcFutures dto = list.get(index);
             taker_volume = taker_volume.add(dto.getTaker_volume());
         }
-        BigDecimal ma50_taker_volume = taker_volume.divide(BigDecimal.valueOf(length), 5, RoundingMode.CEILING);
+        BigDecimal ma50_taker_volume = taker_volume.divide(BigDecimal.valueOf(length), 6, RoundingMode.CEILING);
 
         BigDecimal ma3_taker_volume_1 = (list.get(1).getTaker_volume().add(list.get(2).getTaker_volume())
                 .add(list.get(3).getTaker_volume()));
-        ma3_taker_volume_1 = ma3_taker_volume_1.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        ma3_taker_volume_1 = ma3_taker_volume_1.divide(BigDecimal.valueOf(3), 6, RoundingMode.CEILING);
 
         BigDecimal ma3_taker_volume_2 = (list.get(4).getTaker_volume().add(list.get(2).getTaker_volume())
                 .add(list.get(3).getTaker_volume()));
-        ma3_taker_volume_2 = ma3_taker_volume_2.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+        ma3_taker_volume_2 = ma3_taker_volume_2.divide(BigDecimal.valueOf(3), 6, RoundingMode.CEILING);
 
         if ((ma3_taker_volume_1.compareTo(ma50_taker_volume) > 0)
                 && (ma50_taker_volume.compareTo(ma3_taker_volume_2) > 0)) {
@@ -2141,6 +2162,61 @@ public class Utils {
         }
 
         return result.trim();
+    }
+
+    public static String check3CuttingXforM15(List<BtcFutures> list) {
+        if (list.size() < 50) {
+            return "";
+        }
+
+        BigDecimal ma3_1 = calcMA(list, 3, 1);
+        BigDecimal ma3_2 = calcMA(list, 3, 2);
+
+        if (ma3_1.compareTo(ma3_2) < 0) {
+            return ""; // Ma3 move down
+        }
+
+        BigDecimal ma10_1 = calcMA(list, 10, 1);
+
+        if (ma3_1.compareTo(ma10_1) < 0) {
+            return ""; // Ma3 down ma10
+        }
+
+        BigDecimal ma20_1 = calcMA(list, 20, 1);
+        if (ma3_1.compareTo(ma20_1) < 0) {
+            return ""; // Ma3 down ma20
+        }
+
+        BigDecimal ma10_2 = calcMA(list, 10, 2);
+        BigDecimal ma20_2 = calcMA(list, 20, 2);
+
+        BigDecimal close2 = list.get(2).getPrice_close_candle();
+        BigDecimal open2 = list.get(2).getPrice_open_candle();
+        // candle2:Up, ma10_1 > ma20_1 : up
+        if ((close2.compareTo(open2) > 0) && (ma10_1.compareTo(ma20_1) > 0)) {
+            if ((close2.compareTo(ma10_2) > 0) && (ma10_2.compareTo(open2) > 0)) {
+                if ((close2.compareTo(ma20_2) > 0) && (ma20_2.compareTo(open2) > 0)) {
+                    return TREND_LONG;
+                }
+            }
+        }
+
+        List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 2));
+        BigDecimal low = open_close.get(0); // list.get(1).getPrice_open_candle();
+        BigDecimal hig = open_close.get(1); // list.get(1).getPrice_close_candle();
+        if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0) && (hig.compareTo(ma20_1) > 0)
+                && (ma20_1.compareTo(low) > 0)) {
+            return TREND_LONG;
+        }
+
+        // , int maIndex
+        // BigDecimal ma_slow_1 = calcMA(list, maIndex, 1);
+        // BigDecimal ma_slow_2 = calcMA(list, maIndex, 2);
+        // if ((ma3_1.compareTo(ma_slow_1) > 0) && (ma_slow_2.compareTo(ma3_2) > 0)) {
+        // return TREND_LONG;
+        // }
+
+        return "";
     }
 
     public static String check3CuttingXforH1(List<BtcFutures> list, int maSlowIndex) {
@@ -2252,33 +2328,17 @@ public class Utils {
     public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail, String trend) {
         String symbol = list.get(0).getId();
 
-        int cur = 1;
-        int pre = 2;
-        int fastIndex = 3;
-        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
-        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
-        boolean isMa_fast_Up = true;
-        if (ma_fast_p.compareTo(ma_fast_c) > 0) {
-            isMa_fast_Up = false;
-        }
-
         // -----------------------------------------------
         String trend_slow = check3CuttingXforH1(list, slowIndex);
         boolean isCuttingUp = false;// Long
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
             isCuttingUp = Objects.equals(trend_slow, TREND_LONG);
-            if (isCuttingUp && !isMa_fast_Up) {
-                isCuttingUp = false;
-            }
         }
 
         // -----------------------------------------------
         boolean isCuttingDown = false; // Short
         if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
             isCuttingDown = Objects.equals(trend_slow, TREND_SHORT);
-            if (isCuttingDown && isMa_fast_Up) {
-                isCuttingDown = false;
-            }
         }
 
         // --------------------------------------------------
@@ -2292,10 +2352,10 @@ public class Utils {
 
             List<BigDecimal> low_heigh = getLowHeightCandle(list);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
-            range = range.divide(BigDecimal.valueOf(3), 5, RoundingMode.CEILING);
+            range = range.divide(BigDecimal.valueOf(3), 6, RoundingMode.CEILING);
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
 
-            if (ma_fast_c.compareTo(max_allow_long) > 0) {
+            if (currPrice.compareTo(max_allow_long) > 0) {
                 // result += TREND_DANGER;
                 // return "";
             }

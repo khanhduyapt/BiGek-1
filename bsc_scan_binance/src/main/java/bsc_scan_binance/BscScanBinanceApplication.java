@@ -25,6 +25,7 @@ public class BscScanBinanceApplication {
     public static int app_flag = Utils.const_app_flag_all_coin; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin; 5:
                                                                 // all_and_msg
     public static String callFormBinance = "";
+    public static String TAKER_TOKENS = "_";
     public static int SLEEP_MINISECONDS = 6000;
 
     public static void main(String[] args) {
@@ -117,6 +118,10 @@ public class BscScanBinanceApplication {
                         } else {
                             keys_dict.put(key, key);
                             reload = true;
+                        }
+
+                        if (BscScanBinanceApplication.TAKER_TOKENS.contains("_" + coin.getSymbol() + "_")) {
+                            binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
                         }
 
                         if (reload) {
