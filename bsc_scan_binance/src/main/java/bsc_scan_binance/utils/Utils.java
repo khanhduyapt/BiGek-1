@@ -2218,16 +2218,16 @@ public class Utils {
         if (ma20_1.compareTo(ma20_2) < 0) {
             return ""; // Ma20 down
         }
-        // --------------------------------
 
-        List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 3));
-        BigDecimal low = open_close.get(0);
-        BigDecimal hig = open_close.get(1);
-        if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
-            if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
-                return TREND_LONG;
-            }
-        }
+        // --------------------------------
+        // List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 2));
+        // BigDecimal low = open_close.get(0);
+        // BigDecimal hig = open_close.get(1);
+        // if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
+        // if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
+        // return TREND_LONG;
+        // }
+        // }
 
         // ma3 cut up ma50
         if ((ma3_1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(ma3_2) > 0)) {
@@ -2279,14 +2279,14 @@ public class Utils {
             return ""; // Ma20 Up
         }
 
-        List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 3));
-        BigDecimal low = open_close.get(0);
-        BigDecimal hig = open_close.get(1);
-        if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
-            if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
-                return TREND_SHORT;
-            }
-        }
+        // List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 2));
+        // BigDecimal low = open_close.get(0);
+        // BigDecimal hig = open_close.get(1);
+        // if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
+        // if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
+        // return TREND_SHORT;
+        // }
+        // }
 
         // ma3 cut down ma50
         if ((ma3_1.compareTo(ma50_1) < 0) && (ma50_1.compareTo(ma3_2) < 0)) {
