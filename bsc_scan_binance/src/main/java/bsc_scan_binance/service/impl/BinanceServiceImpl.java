@@ -165,7 +165,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String CSS_PRICE_WHITE = "text-white bg-info rounded-lg px-1";
     private static final String CSS_MIN28_DAYS = "text-white rounded-lg bg-info px-1";
 
-    private Boolean btc_is_uptrend_today = true;
+    private Boolean IS_BTC_ALLOW_LONG = true;
     private String btc_week_day_trending = "";
 
     private int pre_HH_CheckUSD = 0;
@@ -1109,7 +1109,7 @@ public class BinanceServiceImpl implements BinanceService {
                         }
 
                         css.setRange_wdh_css("");
-                        if (btc_is_uptrend_today) {
+                        if (IS_BTC_ALLOW_LONG) {
                             css.setFutures_css("text-white bg-success rounded-lg px-2");
                         } else {
                             css.setFutures_css("text-white bg-danger rounded-lg px-2");
@@ -2676,6 +2676,11 @@ public class BinanceServiceImpl implements BinanceService {
 
     private String sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex, String find_trend,
             String append) {
+
+        if (!Utils.isAllowSendMsgSetting()) {
+            return "SettingSendMsg";
+        }
+
         String msg = "";
         String vol = "";
         String current_trend = "";
@@ -2723,7 +2728,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     public void sendMsgChart15m(String gecko_id, String symbol) {
-        if (Utils.isAllowSendMsgSetting()) {
+        if (IS_BTC_ALLOW_LONG) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             String msg = sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
             // -----------------------------------------------//
@@ -2743,6 +2748,10 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     public void checkCurrency() {
         try {
+            if (!Utils.isAllowSendMsgSetting()) {
+                return;
+            }
+
             if (!Utils.isBusinessTime()) {
                 return;
             }
@@ -2820,6 +2829,11 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+
+        if (Objects.equals("BTC", symbol)) {
+            IS_BTC_ALLOW_LONG = Utils.isUptrendByMaIndex(list_h4, 10);
+        }
+
         BigDecimal current_price = list_days.get(0).getCurrPrice();
         // -------------------------------------------------------------------------
         String taker = "";
@@ -2861,24 +2875,30 @@ public class BinanceServiceImpl implements BinanceService {
                 sendMsgByTrendMaX(symbol, list_days, 50, "",
                         taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
             } else {
-                sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+                if (IS_BTC_ALLOW_LONG) {
+                    sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+                }
 
                 sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
                         taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");// D
 
                 sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
                         taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW");// W
+
             }
         } else {
             type = " (Spot) ";
 
-            sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+            if (IS_BTC_ALLOW_LONG) {
+                sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+            }
 
             sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
                     taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D
 
             sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
                     taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
+
         }
         type = type + Utils.analysisVolume(list_days);
 
@@ -2935,7 +2955,6 @@ public class BinanceServiceImpl implements BinanceService {
         String curr_week_day_trending = W1 + D1;
         if (Objects.equals("BTC", symbol)) {
             btc_week_day_trending = curr_week_day_trending;
-            btc_is_uptrend_today = list_days.get(0).isUptrend();
         }
 
         // ---------------------------------------------------------
