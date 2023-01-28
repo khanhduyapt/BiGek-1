@@ -2675,6 +2675,9 @@ public class BinanceServiceImpl implements BinanceService {
         boolean isScapChart = Utils.isScapChart(list);
         if (isScapChart) {
             current_trend = Utils.check3CuttingUpForM15(list);
+            if (Utils.isBlank(current_trend)) {
+                current_trend = Utils.check3CuttingDownForM15(list);
+            }
         } else {
             current_trend = Utils.check3CuttingXforH1(list, maIndex);
         }
