@@ -2793,14 +2793,6 @@ public class BinanceServiceImpl implements BinanceService {
             taker += Utils.isNotBlank(vol_h1) ? " (H1)" + vol_h1 : "";
             taker += Utils.isNotBlank(vol_h4) ? " (H4)" + vol_h4 : "";
             taker += Utils.isNotBlank(vol_d1) ? " (D)" + vol_d1 : "";
-
-            // String volume = symbol + "(" + Utils.removeLastZero(current_price) + ")" +
-            // Utils.new_line_from_service;
-            // volume += "Taker," + taker;
-            // volume = vol.replace(",", Utils.new_line_from_service);
-            // String EVENT_TAKER_VOL_ID = "VOL_" + symbol + "_" +
-            // Utils.getYyyyMmDdHH_ChangeDailyChart();
-            // sendMsgPerHour(EVENT_TAKER_VOL_ID, volume, true);
         }
         // -------------------------------------------------------------------------
         Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
