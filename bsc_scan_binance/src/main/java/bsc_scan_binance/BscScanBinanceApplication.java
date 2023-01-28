@@ -120,7 +120,7 @@ public class BscScanBinanceApplication {
                         }
 
                         if (reload) {
-                            String msg = "(" + (idx + 1) + "/" + size + ")" + Utils.getTimeHHmm() + ";";
+                            String msg = "(" + (idx + 1) + "/" + size + ")" + Utils.getTimeHHmm();
                             msg += coin.getGeckoid() + ";" + coin.getSymbol();
                             System.out.println(msg);
 
