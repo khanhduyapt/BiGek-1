@@ -2209,9 +2209,20 @@ public class Utils {
         BigDecimal close2 = list.get(2).getPrice_close_candle();
         BigDecimal open2 = list.get(2).getPrice_open_candle();
         // candle2:Up, ma10_1 > ma20_1 : up
-        if ((close2.compareTo(open2) > 0) && (ma10_1.compareTo(ma20_1) > 0)) {
+        if ((close2.compareTo(open2) > 0)) {
             if ((close2.compareTo(ma10_2) > 0) && (ma10_2.compareTo(open2) > 0)) {
                 if ((close2.compareTo(ma20_2) > 0) && (ma20_2.compareTo(open2) > 0)) {
+                    return TREND_LONG;
+                }
+            }
+        }
+
+        BigDecimal close1 = list.get(1).getPrice_close_candle();
+        BigDecimal open1 = list.get(1).getPrice_open_candle();
+        // candle1:Up, ma10_1 > ma20_1 : up
+        if ((close1.compareTo(open1) > 0)) {
+            if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(open1) > 0)) {
+                if ((close1.compareTo(ma20_1) > 0) && (ma20_1.compareTo(open1) > 0)) {
                     return TREND_LONG;
                 }
             }
@@ -2270,6 +2281,17 @@ public class Utils {
         if ((close2.compareTo(open2) < 0) && (ma10_1.compareTo(ma20_1) < 0)) {
             if ((close2.compareTo(ma10_2) < 0) && (ma10_2.compareTo(open2) < 0)) {
                 if ((close2.compareTo(ma20_2) < 0) && (ma20_2.compareTo(open2) < 0)) {
+                    return TREND_SHORT;
+                }
+            }
+        }
+
+        BigDecimal close1 = list.get(1).getPrice_close_candle();
+        BigDecimal open1 = list.get(1).getPrice_open_candle();
+        // candle1:Up, ma10_1 < ma20_1 : down
+        if ((close1.compareTo(open1) < 0)) {
+            if ((close1.compareTo(ma10_1) < 0) && (ma10_1.compareTo(open1) < 0)) {
+                if ((close1.compareTo(ma20_1) < 0) && (ma20_1.compareTo(open1) < 0)) {
                     return TREND_SHORT;
                 }
             }
