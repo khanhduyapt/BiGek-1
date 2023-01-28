@@ -2317,17 +2317,6 @@ public class Utils {
         BigDecimal ma3_1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
         BigDecimal ma3_2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
-        // Ma3 move Up
-        String symbol = list.get(0).getId().toLowerCase();
-        if (symbol.contains("_1h_")) {
-            if (isNotBlank(check3CuttingUpForM15(list))) {
-                return TREND_LONG;
-            }
-            if (isNotBlank(check3CuttingDownForM15(list))) {
-                return TREND_SHORT;
-            }
-        }
-
         if (maSlowIndex < 50) {
             boolean m15IsAboveMa50 = Utils.isAboveMALine(list, 50, 1);
 
