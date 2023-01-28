@@ -2703,11 +2703,12 @@ public class BinanceServiceImpl implements BinanceService {
         if (Utils.isNotBlank(msg)) {
             String curr_price = "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
             if (isScapChart) {
-                msg = "(LONG)" + chartname + symbol + curr_price + " 🚀";
+                msg = "(" + current_trend + ")" + chartname + symbol + curr_price + " 🚀";
             } else {
                 msg += curr_price + Utils.new_line_from_service + vol;
-                msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
             }
+            msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
+
             sendMsgPerHour(EVENT_ID, msg, true);
         }
 
