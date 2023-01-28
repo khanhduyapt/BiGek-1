@@ -101,6 +101,10 @@ public class BscScanBinanceApplication {
                             System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
+
+                            System.out.println(Utils.getTimeHHmm() + "checkCurrency");
+                            binance_service.checkCurrency();
+                            wait(SLEEP_MINISECONDS);
                         }
 
                         if (!"_BTC_ETH_BNB_".contains("_" + coin.getSymbol() + "_")) {

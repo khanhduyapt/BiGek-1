@@ -2672,47 +2672,6 @@ public class BinanceServiceImpl implements BinanceService {
         return msg;
     }
 
-    // AUD_EUR_GBP_USDT
-    private void checkCurrency() {
-        try {
-            if (!Utils.isBusinessTime()) {
-                return;
-            }
-
-            if (pre_HH_CheckUSD == Utils.getCurrentHH()) {
-                return;
-            }
-
-            List<BtcFutures> list_H1_AUD = Utils.loadData("AUD", TIME_1h, 60);
-            List<BtcFutures> list_H1_EUR = Utils.loadData("EUR", TIME_1h, 60);
-            List<BtcFutures> list_H1_GBP = Utils.loadData("GBP", TIME_1h, 60);
-
-            sendMsgByTrendMaX("AUD_USDT", list_H1_AUD, 20, "", "AUDEURGBPUSDTAUDEURGBPUSDT");
-            sendMsgByTrendMaX("EUR_USDT", list_H1_EUR, 20, "", "AUDEURGBPUSDTAUDEURGBPUSDT");
-            sendMsgByTrendMaX("GBP_USDT", list_H1_GBP, 20, "", "AUDEURGBPUSDTAUDEURGBPUSDT");
-
-            boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_H1_AUD, 50);
-            boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_H1_EUR, 50);
-            boolean IsUpGBP_S = Utils.isUptrendByMaIndex(list_H1_GBP, 50);
-
-            int count_usd_uptrend = 3;
-            count_usd_uptrend -= IsUpAUD_S ? 1 : 0;
-            count_usd_uptrend -= IsUpEUR_S ? 1 : 0;
-            count_usd_uptrend -= IsUpGBP_S ? 1 : 0;
-            usd_is_uptrend_today = (count_usd_uptrend > 1) ? true : false;
-            if (usd_is_uptrend_today) {
-                TREND_CURRENCY_TODAY = Utils.TREND_SHORT;
-            } else {
-                TREND_CURRENCY_TODAY = Utils.TREND_LONG;
-            }
-
-            pre_HH_CheckUSD = Utils.getCurrentHH();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private String sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex, String find_trend,
             String append) {
         String msg = "";
@@ -2779,13 +2738,71 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
+    // AUD_EUR_GBP_USDT
+    @Override
+    public void checkCurrency() {
+        try {
+            if (!Utils.isBusinessTime()) {
+                return;
+            }
+
+            List<BtcFutures> list_AUD = Utils.loadData("AUD", TIME_15m, 50);
+            List<BtcFutures> list_EUR = Utils.loadData("EUR", TIME_15m, 50);
+            List<BtcFutures> list_GBP = Utils.loadData("GBP", TIME_15m, 50);
+
+            String chartname = Utils.getChartName(list_AUD);
+
+            String AUD_TREND = Utils.check3CuttingUpForM15(list_AUD);
+            if (Utils.isBlank(AUD_TREND)) {
+                AUD_TREND = Utils.check3CuttingDownForM15(list_AUD);
+            }
+            if (Utils.isNotBlank(AUD_TREND)) {
+                String msg = "(" + AUD_TREND + ")" + chartname + " AUD_USDT";
+                String EVENT_ID = EVENT_PUMP + "AUD_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_AUD);
+                sendMsgPerHour(EVENT_ID, msg, true);
+            }
+
+            String EUR_TREND = Utils.check3CuttingUpForM15(list_EUR);
+            if (Utils.isBlank(EUR_TREND)) {
+                EUR_TREND = Utils.check3CuttingDownForM15(list_EUR);
+            }
+            if (Utils.isNotBlank(EUR_TREND)) {
+                String msg = "(" + EUR_TREND + ")" + chartname + " EUR_USDT";
+                String EVENT_ID = EVENT_PUMP + "EUR_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_EUR);
+                sendMsgPerHour(EVENT_ID, msg, true);
+            }
+
+            String GBP_TREND = Utils.check3CuttingUpForM15(list_GBP);
+            if (Utils.isBlank(GBP_TREND)) {
+                GBP_TREND = Utils.check3CuttingDownForM15(list_GBP);
+            }
+            if (Utils.isNotBlank(GBP_TREND)) {
+                String msg = "(" + GBP_TREND + ")" + chartname + " GBP_USDT";
+                String EVENT_ID = EVENT_PUMP + "GBP_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_GBP);
+                sendMsgPerHour(EVENT_ID, msg, true);
+            }
+
+            boolean IsUpAUD_S = Utils.isUptrendByMaIndex(list_AUD, 50);
+            boolean IsUpEUR_S = Utils.isUptrendByMaIndex(list_EUR, 50);
+            boolean IsUpGBP_S = Utils.isUptrendByMaIndex(list_GBP, 50);
+
+            int count_usd_uptrend = 3;
+            count_usd_uptrend -= IsUpAUD_S ? 1 : 0;
+            count_usd_uptrend -= IsUpEUR_S ? 1 : 0;
+            count_usd_uptrend -= IsUpGBP_S ? 1 : 0;
+            usd_is_uptrend_today = (count_usd_uptrend > 1) ? true : false;
+            if (usd_is_uptrend_today) {
+                TREND_CURRENCY_TODAY = Utils.TREND_SHORT;
+            } else {
+                TREND_CURRENCY_TODAY = Utils.TREND_LONG;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
-        // AUD_EUR_GBP_USDT
-        if (Objects.equals("ETH", symbol)) {
-            checkCurrency();
-        }
-
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
