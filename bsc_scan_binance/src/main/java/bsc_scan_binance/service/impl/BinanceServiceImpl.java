@@ -2731,13 +2731,10 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
-        }
 
-        String msg = sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
-
-        if (IS_BTC_ALLOW_LONG && Utils.isBlank(msg)) {
-            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-            sendMsgByTrendMaX(symbol, list_5m, 50, "", "");
+            sendMsgByTrendMaX(symbol, list_15m, 10, "", "");
+        } else if (IS_BTC_ALLOW_LONG) {
+            sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_LONG, "");
         }
     }
 
@@ -2828,7 +2825,7 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
 
         if (Objects.equals("BTC", symbol)) {
-            IS_BTC_ALLOW_LONG = Utils.isUptrendByMaIndex(list_h4, 10);
+            IS_BTC_ALLOW_LONG = Utils.isUptrendByMaIndex(list_h1, 10);
         }
 
         BigDecimal current_price = list_days.get(0).getCurrPrice();
