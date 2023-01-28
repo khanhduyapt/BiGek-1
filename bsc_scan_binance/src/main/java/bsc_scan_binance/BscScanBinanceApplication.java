@@ -80,6 +80,8 @@ public class BscScanBinanceApplication {
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
+                    // binance_service.getChartWD("project-galaxy", "GAL");
+
                     try {
                         cur_blog5minute = Utils.getCurrentMinute_Blog5minutes();
                         if (pre_blog5minute != cur_blog5minute) {

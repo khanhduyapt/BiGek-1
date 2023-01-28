@@ -2218,19 +2218,12 @@ public class Utils {
         }
 
         List<BigDecimal> open_close = getLowHeightCandle(list.subList(1, 2));
-        BigDecimal low = open_close.get(0); // list.get(1).getPrice_open_candle();
-        BigDecimal hig = open_close.get(1); // list.get(1).getPrice_close_candle();
+        BigDecimal low = open_close.get(0);
+        BigDecimal hig = open_close.get(1);
         if ((ma10_1.compareTo(ma20_1) > 0) && (hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)
                 && (hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
             return TREND_LONG;
         }
-
-        // , int maIndex
-        // BigDecimal ma_slow_1 = calcMA(list, maIndex, 1);
-        // BigDecimal ma_slow_2 = calcMA(list, maIndex, 2);
-        // if ((ma3_1.compareTo(ma_slow_1) > 0) && (ma_slow_2.compareTo(ma3_2) > 0)) {
-        // return TREND_LONG;
-        // }
 
         return "";
     }
@@ -2307,6 +2300,9 @@ public class Utils {
         if (symbol.contains("_1h_")) {
             if (isNotBlank(check3CuttingUpForM15(list))) {
                 return TREND_LONG;
+            }
+            if (isNotBlank(check3CuttingDownForM15(list))) {
+                return TREND_SHORT;
             }
         }
 
