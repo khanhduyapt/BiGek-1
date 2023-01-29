@@ -170,7 +170,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     private int pre_HH_CheckUSD = 0;
     private String TREND_CURRENCY_TODAY = Utils.TREND_LONG;
-    private Boolean RANGE_H4_BTC_IS_DANGER = true;
+    private Boolean RANGE_BTC_IS_DANGER = true;
     private Boolean usd_is_uptrend_today = true;
 
     private String monitorBitcoinBalancesOnExchanges_temp = "";
@@ -2814,12 +2814,20 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+        BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         if (Objects.equals("BTC", symbol)) {
             IS_BTC_ALLOW_LONG = Utils.isUptrendByMaIndex(list_h1, 10);
+
+            List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_days);
+            BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
+            range = range.divide(BigDecimal.valueOf(4), 6, RoundingMode.CEILING);
+            BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
+            if (current_price.compareTo(max_allow_long) > 0) {
+                RANGE_BTC_IS_DANGER = true;
+            }
         }
 
-        BigDecimal current_price = list_days.get(0).getCurrPrice();
         // -------------------------------------------------------------------------
         String taker = "";
         String vol_h1 = Utils.analysisTakerVolume(list_h1, 50);
@@ -2860,40 +2868,42 @@ public class BinanceServiceImpl implements BinanceService {
                 sendMsgByTrendMaX(symbol, list_days, 50, "",
                         taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
             } else {
-                if (Utils.isNotBlank(taker)) {
-                    if (IS_BTC_ALLOW_LONG) {
-                        sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+                if (!RANGE_BTC_IS_DANGER) {
+                    if (Utils.isNotBlank(taker)) {
+                        if (IS_BTC_ALLOW_LONG) {
+                            sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+                        }
+
+                        sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
+                                taker + Utils.new_line_from_service + "H4H4H4H4H4H4H4H4H4H4H4"); // D
                     }
+                    sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
+                            taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");// D
 
-                    sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
-                            taker + Utils.new_line_from_service + "H4H4H4H4H4H4H4H4H4H4H4"); // D
+                    sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
+                            taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW");// W
                 }
-                sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
-                        taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");// D
-
-                sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
-                        taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW");// W
-
             }
         } else {
             type = " (Spot) ";
 
-            if (Utils.isNotBlank(taker)) {
-                if (IS_BTC_ALLOW_LONG) {
-                    sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG,
-                            taker + Utils.new_line_from_service + "H4H4H4H4(Spot)H4H4H4H4"); // H4
+            if (!RANGE_BTC_IS_DANGER) {
+                if (Utils.isNotBlank(taker)) {
+                    if (IS_BTC_ALLOW_LONG) {
+                        sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG,
+                                taker + Utils.new_line_from_service + "H1H1H1H1(Spot)H1H1H1H1"); // H4
+                    }
+
+                    sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
+                            taker + Utils.new_line_from_service + "H4H4H4H4(Spot)H4H4H4H4"); // D
                 }
 
-                sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
-                        taker + Utils.new_line_from_service + "H4H4H4H4(Spot)H4H4H4H4"); // D
+                sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
+                        taker + Utils.new_line_from_service + "DDDDDDD(Spot)DDDDDDD"); // D
+
+                sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
+                        taker + Utils.new_line_from_service + "WWWWWWW(Spot)WWWWWWW"); // W
             }
-
-            sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
-                    taker + Utils.new_line_from_service + "DDDDDDD(Spot)DDDDDDD"); // D
-
-            sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
-                    taker + Utils.new_line_from_service + "WWWWWWW(Spot)WWWWWWW"); // W
-
         }
         type = type + Utils.analysisVolume(list_days);
 
