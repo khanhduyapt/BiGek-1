@@ -2758,9 +2758,9 @@ public class BinanceServiceImpl implements BinanceService {
                 return;
             }
 
-            List<BtcFutures> list_AUD = Utils.loadData("AUD", TIME_4h, 50);
-            List<BtcFutures> list_EUR = Utils.loadData("EUR", TIME_4h, 50);
-            List<BtcFutures> list_GBP = Utils.loadData("GBP", TIME_4h, 50);
+            List<BtcFutures> list_AUD = Utils.loadData("AUD", TIME_1h, 50);
+            List<BtcFutures> list_EUR = Utils.loadData("EUR", TIME_1h, 50);
+            List<BtcFutures> list_GBP = Utils.loadData("GBP", TIME_1h, 50);
 
             String chartname = Utils.getChartName(list_AUD);
             int maSlow = 10;
