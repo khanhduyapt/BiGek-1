@@ -2397,6 +2397,12 @@ public class Utils {
                 return TREND_LONG;
             }
 
+            BigDecimal close1 = list.get(1).getPrice_close_candle();
+            BigDecimal close2 = list.get(2).getPrice_close_candle();
+            if ((close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
+                return TREND_LONG;
+            }
+
             if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(ma3_2) < 0)) {
                 return TREND_SHORT;
             }
