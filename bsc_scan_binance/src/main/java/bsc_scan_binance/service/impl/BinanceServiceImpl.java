@@ -2678,7 +2678,9 @@ public class BinanceServiceImpl implements BinanceService {
                 return "";
             }
         }
+
         BigDecimal price_now = list.get(0).getCurrPrice();
+
         List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list);
         String atl = Utils.new_line_from_service + chartname;
         atl += "atl:" + Utils.getPercentToEntry(price_now, low_heigh.get(0), true);
@@ -2706,7 +2708,7 @@ public class BinanceServiceImpl implements BinanceService {
             String curr_price = "(" + Utils.removeLastZero(price_now) + ")";
 
             if (Objects.equals(msg, Utils.TREND_STOP_LONG)) {
-                msg = "(" + Utils.TREND_STOP_LONG + ")" + chartname + symbol;
+                msg = "(" + Utils.TREND_STOP_LONG + ")" + chartname + symbol + curr_price + atl;
             } else {
                 msg += curr_price + Utils.new_line_from_service + vol;
                 msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
