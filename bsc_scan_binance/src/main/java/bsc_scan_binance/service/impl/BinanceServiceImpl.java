@@ -2678,27 +2678,32 @@ public class BinanceServiceImpl implements BinanceService {
                 return "";
             }
         }
+        BigDecimal price_now = list.get(0).getCurrPrice();
+        List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list);
+        String atl = Utils.new_line_from_service + chartname;
+        atl += "atl:" + Utils.getPercentToEntry(price_now, low_heigh.get(0), true);
+        atl += ", ath:" + Utils.getPercentToEntry(price_now, low_heigh.get(1), true);
 
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
 
             msg = " 💹. " + symbol + chartname + ":3Up" + maIndex
                     + (list.get(0).getId().contains("_3m_") ? " 🚀" : " 🚀");
             EVENT_ID += "_UP";
-            vol = Utils.calcVol(list, true);
+            vol = Utils.calcVol(list, true) + atl;
 
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
 
             msg = " 📉. " + symbol + chartname + ":3Down" + maIndex
                     + (list.get(0).getId().contains("_3m_") ? " 🥶" : " 🥶");
             EVENT_ID += "_DOWN";
-            vol = Utils.calcVol(list, false);
+            vol = Utils.calcVol(list, false) + atl;
 
         } else if (Objects.equals("BTC", symbol) && Utils.isStopLong(list)) {
             msg = Utils.TREND_STOP_LONG;
         }
 
         if (Utils.isNotBlank(msg)) {
-            String curr_price = "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
+            String curr_price = "(" + Utils.removeLastZero(price_now) + ")";
 
             if (Objects.equals(msg, Utils.TREND_STOP_LONG)) {
                 msg = "(" + Utils.TREND_STOP_LONG + ")" + chartname + symbol;
