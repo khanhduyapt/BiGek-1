@@ -2758,29 +2758,29 @@ public class BinanceServiceImpl implements BinanceService {
                 return;
             }
 
-            List<BtcFutures> list_AUD = Utils.loadData("AUD", TIME_15m, 50);
-            List<BtcFutures> list_EUR = Utils.loadData("EUR", TIME_15m, 50);
-            List<BtcFutures> list_GBP = Utils.loadData("GBP", TIME_15m, 50);
+            List<BtcFutures> list_AUD = Utils.loadData("AUD", TIME_4h, 50);
+            List<BtcFutures> list_EUR = Utils.loadData("EUR", TIME_4h, 50);
+            List<BtcFutures> list_GBP = Utils.loadData("GBP", TIME_4h, 50);
 
             String chartname = Utils.getChartName(list_AUD);
-
-            String AUD_TREND = Utils.switchStrategy(list_AUD, 50);
+            int maSlow = 10;
+            String AUD_TREND = Utils.check3CuttingXforH1(list_AUD, maSlow);
             if (Utils.isNotBlank(AUD_TREND)) {
-                String msg = "(" + AUD_TREND + ")" + chartname + " AUD_USDT";
+                String msg = "( 💰💰💰💰💰💰 Check 💰💰💰💰💰💰 )" + chartname + " AUD_USDT";
                 String EVENT_ID = EVENT_PUMP + "AUD_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_AUD);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
 
-            String EUR_TREND = Utils.switchStrategy(list_EUR, 50);
+            String EUR_TREND = Utils.check3CuttingXforH1(list_EUR, maSlow);
             if (Utils.isNotBlank(EUR_TREND)) {
-                String msg = "(" + EUR_TREND + ")" + chartname + " EUR_USDT";
+                String msg = "( 💰💰💰💰💰💰 Check 💰💰💰💰💰💰 )" + chartname + " EUR_USDT";
                 String EVENT_ID = EVENT_PUMP + "EUR_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_EUR);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
 
-            String GBP_TREND = Utils.switchStrategy(list_GBP, 50);
+            String GBP_TREND = Utils.check3CuttingXforH1(list_GBP, maSlow);
             if (Utils.isNotBlank(GBP_TREND)) {
-                String msg = "(" + GBP_TREND + ")" + chartname + " GBP_USDT";
+                String msg = "( 💰💰💰💰💰💰 Check 💰💰💰💰💰💰 )" + chartname + " GBP_USDT";
                 String EVENT_ID = EVENT_PUMP + "GBP_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_GBP);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
