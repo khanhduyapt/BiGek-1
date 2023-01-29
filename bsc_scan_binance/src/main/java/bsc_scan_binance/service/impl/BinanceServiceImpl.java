@@ -2733,8 +2733,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals("BTC", symbol)) {
-            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-            sendMsgByTrendMaX(symbol, list_5m, 50, "", btc_trend);
+            // List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+            // sendMsgByTrendMaX(symbol, list_5m, 50, "", btc_trend);
         }
     }
 
@@ -2860,10 +2860,14 @@ public class BinanceServiceImpl implements BinanceService {
                 sendMsgByTrendMaX(symbol, list_days, 50, "",
                         taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
             } else {
-                if (IS_BTC_ALLOW_LONG) {
-                    sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
-                }
+                if (Utils.isNotBlank(taker)) {
+                    if (IS_BTC_ALLOW_LONG) {
+                        sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+                    }
 
+                    sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
+                            taker + Utils.new_line_from_service + "H4H4H4H4H4H4H4H4H4H4H4"); // D
+                }
                 sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
                         taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");// D
 
@@ -2874,15 +2878,21 @@ public class BinanceServiceImpl implements BinanceService {
         } else {
             type = " (Spot) ";
 
-            if (IS_BTC_ALLOW_LONG) {
-                sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG, taker); // H4
+            if (Utils.isNotBlank(taker)) {
+                if (IS_BTC_ALLOW_LONG) {
+                    sendMsgByTrendMaX(symbol, list_h1, 50, Utils.TREND_LONG,
+                            taker + Utils.new_line_from_service + "H4H4H4H4(Spot)H4H4H4H4"); // H4
+                }
+
+                sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
+                        taker + Utils.new_line_from_service + "H4H4H4H4(Spot)H4H4H4H4"); // D
             }
 
             sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
-                    taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D
+                    taker + Utils.new_line_from_service + "DDDDDDD(Spot)DDDDDDD"); // D
 
             sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
-                    taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
+                    taker + Utils.new_line_from_service + "WWWWWWW(Spot)WWWWWWW"); // W
 
         }
         type = type + Utils.analysisVolume(list_days);

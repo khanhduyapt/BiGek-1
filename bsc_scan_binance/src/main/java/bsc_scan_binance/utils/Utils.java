@@ -1554,7 +1554,7 @@ public class Utils {
         for (BtcFutures dto : list) {
             if (count < length) {
                 count += 1;
-                avg_qty = avg_qty.add(dto.getTrading_qty());
+                avg_qty = avg_qty.add(dto.getTaker_volume());
             }
         }
 
@@ -1562,9 +1562,9 @@ public class Utils {
             avg_qty = avg_qty.divide(BigDecimal.valueOf(count), 0, RoundingMode.CEILING);
         }
         BigDecimal tem_qty = avg_qty.multiply(BigDecimal.valueOf(1));
-        BigDecimal cur_qty_0 = list.get(0).getTrading_qty();
-        BigDecimal pre_qty_1 = list.get(1).getTrading_qty();
-        BigDecimal pre_qty_2 = list.get(2).getTrading_qty();
+        BigDecimal cur_qty_0 = list.get(0).getTaker_volume();
+        BigDecimal pre_qty_1 = list.get(1).getTaker_volume();
+        BigDecimal pre_qty_2 = list.get(2).getTaker_volume();
 
         String result = "";
         if (cur_qty_0.compareTo(tem_qty) > 0) {
