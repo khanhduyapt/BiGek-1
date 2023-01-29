@@ -88,14 +88,16 @@ public class BscScanBinanceApplication {
                         if (pre_blog5minute != cur_blog5minute) {
                             pre_blog5minute = cur_blog5minute;
 
-                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
-                            binance_service.getChartWD("bitcoin", "BTC");
-                            wait(SLEEP_MINISECONDS);
+                            binance_service.sendMsgChart15m("bitcoin", "BTC");
                         }
 
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;
+
+                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
+                            binance_service.getChartWD("bitcoin", "BTC");
+                            wait(SLEEP_MINISECONDS);
 
                             System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
                             binance_service.getChartWD("ethereum", "ETH");
@@ -112,8 +114,8 @@ public class BscScanBinanceApplication {
 
                         if (!"_BTC_ETH_BNB_".contains("_" + coin.getSymbol() + "_")) {
                             if (BscScanBinanceApplication.TAKER_TOKENS.contains("_" + coin.getSymbol() + "_")) {
-                                System.out.println("Check taker (m15)" + coin.getSymbol());
-                                binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
+                                // System.out.println("Check taker (m15)" + coin.getSymbol());
+                                // binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
                             }
                         }
 

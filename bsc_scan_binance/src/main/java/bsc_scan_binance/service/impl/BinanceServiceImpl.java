@@ -2672,16 +2672,7 @@ public class BinanceServiceImpl implements BinanceService {
         String chartname = Utils.getChartName(list);
         String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
 
-        boolean isScapChart = Utils.isScapChart(list);
-        if (isScapChart) {
-            current_trend = Utils.check3CuttingUpForM15(list);
-            if (Utils.isBlank(current_trend)) {
-                current_trend = Utils.check3CuttingDownForM15(list);
-            }
-        } else {
-            current_trend = Utils.check3CuttingXforH1(list, maIndex);
-        }
-
+        current_trend = Utils.switchStrategy(list, maIndex);
         if (Utils.isNotBlank(find_trend)) {
             if (!Objects.equals(current_trend, find_trend)) {
                 return "";
@@ -2689,25 +2680,32 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
+
             msg = " 💹. " + symbol + chartname + ":3Up" + maIndex
-                    + (list.get(0).getId().contains("_3m_") ? " 🚀🚀🚀" : " 🚀");
+                    + (list.get(0).getId().contains("_3m_") ? " 🚀" : " 🚀");
             EVENT_ID += "_UP";
             vol = Utils.calcVol(list, true);
+
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
+
             msg = " 📉. " + symbol + chartname + ":3Down" + maIndex
-                    + (list.get(0).getId().contains("_3m_") ? " 🥶🥶🥶" : " 🥶");
+                    + (list.get(0).getId().contains("_3m_") ? " 🥶" : " 🥶");
             EVENT_ID += "_DOWN";
             vol = Utils.calcVol(list, false);
+
+        } else if (Objects.equals("BTC", symbol) && Utils.isStopLong(list)) {
+            msg = Utils.TREND_STOP_LONG;
         }
 
         if (Utils.isNotBlank(msg)) {
             String curr_price = "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
-            if (isScapChart) {
-                msg = "(" + current_trend + ")" + chartname + symbol + curr_price + " 🚀";
+
+            if (Objects.equals(msg, Utils.TREND_STOP_LONG)) {
+                msg = "(" + Utils.TREND_STOP_LONG + ")" + chartname + symbol;
             } else {
                 msg += curr_price + Utils.new_line_from_service + vol;
+                msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
             }
-            msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
 
             sendMsgPerHour(EVENT_ID, msg, true);
         }
@@ -2719,12 +2717,19 @@ public class BinanceServiceImpl implements BinanceService {
     public void sendMsgChart15m(String gecko_id, String symbol) {
         String btc_trend = IS_BTC_ALLOW_LONG ? "" : "______BTC(h1)_DOWN_TREND______";
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-        if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-            sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
-            sendMsgByTrendMaX(symbol, list_15m, 10, "", btc_trend);
+        if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+
+            sendMsgKillLongShort(gecko_id, symbol, list_15m);
+            sendMsgByTrendMaX(symbol, list_15m, 50, "", btc_trend);
+
         } else {
-            sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_LONG, btc_trend);
+            // sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_LONG, btc_trend);
+        }
+
+        if (Objects.equals("BTC", symbol)) {
+            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
+            sendMsgByTrendMaX(symbol, list_5m, 50, "", btc_trend);
         }
     }
 
@@ -2752,30 +2757,21 @@ public class BinanceServiceImpl implements BinanceService {
 
             String chartname = Utils.getChartName(list_AUD);
 
-            String AUD_TREND = Utils.check3CuttingUpForM15(list_AUD);
-            if (Utils.isBlank(AUD_TREND)) {
-                AUD_TREND = Utils.check3CuttingDownForM15(list_AUD);
-            }
+            String AUD_TREND = Utils.switchStrategy(list_AUD, 50);
             if (Utils.isNotBlank(AUD_TREND)) {
                 String msg = "(" + AUD_TREND + ")" + chartname + " AUD_USDT";
                 String EVENT_ID = EVENT_PUMP + "AUD_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_AUD);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
 
-            String EUR_TREND = Utils.check3CuttingUpForM15(list_EUR);
-            if (Utils.isBlank(EUR_TREND)) {
-                EUR_TREND = Utils.check3CuttingDownForM15(list_EUR);
-            }
+            String EUR_TREND = Utils.switchStrategy(list_EUR, 50);
             if (Utils.isNotBlank(EUR_TREND)) {
                 String msg = "(" + EUR_TREND + ")" + chartname + " EUR_USDT";
                 String EVENT_ID = EVENT_PUMP + "EUR_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_EUR);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
 
-            String GBP_TREND = Utils.check3CuttingUpForM15(list_GBP);
-            if (Utils.isBlank(GBP_TREND)) {
-                GBP_TREND = Utils.check3CuttingDownForM15(list_GBP);
-            }
+            String GBP_TREND = Utils.switchStrategy(list_GBP, 50);
             if (Utils.isNotBlank(GBP_TREND)) {
                 String msg = "(" + GBP_TREND + ")" + chartname + " GBP_USDT";
                 String EVENT_ID = EVENT_PUMP + "GBP_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_GBP);

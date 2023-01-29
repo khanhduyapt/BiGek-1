@@ -1441,7 +1441,8 @@ public class Utils {
         return 50;
     }
 
-    public static boolean isScapChart(List<BtcFutures> list) {
+    @SuppressWarnings("unused")
+    private static boolean isScapChart(List<BtcFutures> list) {
         String symbol = list.get(0).getId().toLowerCase();
         if (symbol.contains("_1h_")) {
             return true;
@@ -2178,7 +2179,81 @@ public class Utils {
         return result.trim();
     }
 
-    public static String check3CuttingUpForM15(List<BtcFutures> list) {
+    public static boolean isStopLong(List<BtcFutures> list) {
+        BigDecimal ma3_1 = calcMA(list, 3, 1);
+        BigDecimal ma50_1 = calcMA(list, 50, 1);
+        if (ma3_1.compareTo(ma50_1) < 0) {
+            return false;
+        }
+        BigDecimal ma3_2 = calcMA(list, 3, 2);
+        BigDecimal maClose_1 = calcMA(list, 20, 1);
+        if ((ma3_1.compareTo(maClose_1) < 0) && (maClose_1.compareTo(ma3_2) < 0)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String switchStrategy(List<BtcFutures> list, int maSlowIndex) {
+        String symbol = list.get(0).getId().toLowerCase();
+
+        if (symbol.contains("_2h_") || symbol.contains("_4h_") || symbol.contains("_1d_") || symbol.contains("_1w_")) {
+            return check3CuttingXforH1(list, maSlowIndex);
+        } else {
+
+            if (symbol.contains("_1h_") || symbol.contains("_15m_")) {
+                String current_trend = check3CuttingUp50ForM15(list);
+                if (isBlank(current_trend)) {
+                    current_trend = check3CuttingDown50ForM15(list);
+                }
+                return current_trend;
+            } else {
+                return check3CuttingUpForM5(list);
+            }
+        }
+    }
+
+    private static String check3CuttingUpForM5(List<BtcFutures> list) {
+        if (list.size() < 50) {
+            return "";
+        }
+
+        BigDecimal ma3_1 = calcMA(list, 3, 1);
+        BigDecimal ma3_2 = calcMA(list, 3, 2);
+        if (ma3_1.compareTo(ma3_2) < 0) {
+            return ""; // Ma3 move down
+        }
+
+        // --------------------------------
+        BigDecimal ma10_1 = calcMA(list, 10, 1);
+        BigDecimal ma10_2 = calcMA(list, 10, 2);
+        if (ma3_1.compareTo(ma10_1) < 0) {
+            return ""; // Ma3 down ma10
+        }
+        if (ma10_1.compareTo(ma10_2) < 0) {
+            return ""; // Ma10 down
+        }
+        // --------------------------------
+        BigDecimal ma20_1 = calcMA(list, 20, 1);
+        BigDecimal ma20_2 = calcMA(list, 20, 2);
+        if (ma3_1.compareTo(ma20_1) < 0) {
+            return ""; // Ma3 down ma20
+        }
+        if (ma20_1.compareTo(ma20_2) < 0) {
+            return ""; // Ma20 down
+        }
+
+        // --------------------------------
+        BigDecimal ma50_1 = calcMA(list, 50, 1);
+        BigDecimal close1 = list.get(1).getPrice_close_candle();
+        BigDecimal close2 = list.get(2).getPrice_close_candle();
+        if ((close1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(close2) > 0)) {
+            return TREND_LONG;
+        }
+
+        return "";
+    }
+
+    private static String check3CuttingUp50ForM15(List<BtcFutures> list) {
         if (list.size() < 50) {
             return "";
         }
@@ -2214,10 +2289,20 @@ public class Utils {
             return TREND_LONG;
         }
 
+        //// --------------------------------
+        // List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 2));
+        // BigDecimal low = open_close.get(0);
+        // BigDecimal hig = open_close.get(1);
+        // if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
+        // if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
+        // return TREND_LONG;
+        // }
+        // }
+
         return "";
     }
 
-    public static String check3CuttingDownForM15(List<BtcFutures> list) {
+    private static String check3CuttingDown50ForM15(List<BtcFutures> list) {
         if (list.size() < 50) {
             return "";
         }
@@ -2253,6 +2338,15 @@ public class Utils {
         if ((ma3_1.compareTo(ma50_1) < 0) && (ma50_1.compareTo(ma3_2) < 0)) {
             return TREND_SHORT;
         }
+
+        // List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 2));
+        // BigDecimal low = open_close.get(0);
+        // BigDecimal hig = open_close.get(1);
+        // if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
+        // if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
+        // return TREND_SHORT;
+        // }
+        // }
 
         return "";
     }
@@ -2313,7 +2407,7 @@ public class Utils {
     }
 
     public static boolean isUptrendByMaIndex(List<BtcFutures> list, int maIndex) {
-        BigDecimal ma_c = calcMA(list, maIndex, 0);
+        BigDecimal ma_c = calcMA(list, maIndex, 1);
         BigDecimal ma_p = calcMA(list, maIndex, 2);
         if (ma_c.compareTo(ma_p) > 0) {
             return true;
