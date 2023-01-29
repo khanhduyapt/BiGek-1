@@ -746,7 +746,7 @@ public class BinanceServiceImpl implements BinanceService {
                     }
                 }
 
-                avg_price = total_price.divide(BigDecimal.valueOf(avgPriceList.size()), 6, RoundingMode.CEILING);
+                avg_price = total_price.divide(BigDecimal.valueOf(avgPriceList.size()), 10, RoundingMode.CEILING);
 
                 price_now = Utils.getBigDecimalValue(css.getCurrent_price());
 
@@ -2823,7 +2823,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_days);
             BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
-            range = range.divide(BigDecimal.valueOf(4), 6, RoundingMode.CEILING);
+            range = range.divide(BigDecimal.valueOf(4), 10, RoundingMode.CEILING);
             BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
             if (current_price.compareTo(max_allow_long) > 0) {
                 RANGE_BTC_IS_DANGER = true;
@@ -2908,6 +2908,16 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
         type = type + Utils.analysisVolume(list_days);
+
+        if (!Objects.equals("BTC", symbol)) {
+            List<BtcFutures> list_h1_btc = Utils.loadData(symbol, TIME_1h, 50, "BTC");
+            String trend_compare_btc = Utils.check3CuttingXforH1(list_h1_btc, 50);
+            if (Objects.equals(Utils.TREND_LONG, trend_compare_btc)) {
+                String msg = "( 💰💰💰 Check 💰💰💰 ) (H1) " + symbol + "(" + Utils.removeLastZero(current_price) + ")";
+                String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol + Utils.getCurrentYyyyMmDdHHByChart(list_h1_btc);
+                sendMsgPerHour(EVENT_ID_COMPARE_BTC, msg, true);
+            }
+        }
 
         String scapLongH4 = Utils.getScapLong(list_h4, list_days, 10, allow_long_d1);
         String scapLongD1 = Utils.getScapLong(list_days, list_days, 10, allow_long_d1);
