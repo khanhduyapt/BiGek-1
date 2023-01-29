@@ -2205,6 +2205,11 @@ public class Utils {
                 if (isBlank(current_trend)) {
                     current_trend = check3CuttingDown50ForM15(list);
                 }
+
+                if (isBlank(current_trend) && list.get(0).getId().contains("BTC")) {
+                    return check3CuttingXforH1(list, maSlowIndex);
+                }
+
                 return current_trend;
             } else {
                 return check3CuttingUpForM5(list);
