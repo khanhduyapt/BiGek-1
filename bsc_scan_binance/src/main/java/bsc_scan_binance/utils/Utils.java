@@ -2361,7 +2361,21 @@ public class Utils {
         BigDecimal ma3_1 = calcMA(list, 3, 1); // list.get(1).getPrice_open_candle();
         BigDecimal ma3_2 = calcMA(list, 3, 2); // list.get(2).getPrice_open_candle();
 
-        if (maSlowIndex < 50) {
+        if (maSlowIndex < 20) {
+            boolean isAboveMa50 = Utils.isAboveMALine(list, 50, 1);
+            boolean isAboveMa10 = Utils.isAboveMALine(list, 10, 1);
+
+            if (!isAboveMa50 && !isAboveMa10 && (ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma_X_c) > 0)
+                    && (ma_X_c.compareTo(ma3_2) > 0)) {
+                return TREND_LONG;
+            }
+
+            if (isAboveMa50 && isAboveMa10 && (ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma_X_c) < 0)
+                    && (ma_X_c.compareTo(ma3_2) < 0)) {
+                return TREND_SHORT;
+            }
+
+        } else if (maSlowIndex < 50) {
             boolean m15IsAboveMa50 = Utils.isAboveMALine(list, 50, 1);
 
             if (!m15IsAboveMa50 && (ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma_X_c) > 0)
