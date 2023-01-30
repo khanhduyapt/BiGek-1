@@ -2952,10 +2952,10 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_compare_btc = Utils.loadData(symbol, TIME_4h, 50, "BTC");
             if (!CollectionUtils.isEmpty(list_compare_btc)) {
                 if (Utils.isMa3CuttingUpX(list_compare_btc, 50)) {
-                    String msg = "(H4)" + symbol + ":BTC.(" + Utils.removeLastZero(current_price) + ")";
-                    String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol
-                            + Utils.getCurrentYyyyMmDdHHByChart(list_compare_btc);
-                    sendMsgPerHour(EVENT_ID_COMPARE_BTC, msg, true);
+                    //String msg = "(H4)" + symbol + ":BTC.(" + Utils.removeLastZero(current_price) + ")";
+                    //String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol
+                    //        + Utils.getCurrentYyyyMmDdHHByChart(list_compare_btc);
+                    //sendMsgPerHour(EVENT_ID_COMPARE_BTC, msg, true);
 
                     note += "_PositionBTC";
                 }
