@@ -93,7 +93,7 @@ public class BscScanBinanceApplication {
                         if (pre_blog1minute != cur_blog1minute) {
                             pre_blog1minute = cur_blog1minute;
 
-                            binance_service.sendMsgChart1m("bitcoin", "BTC");
+                            // binance_service.sendMsgChart1m("bitcoin", "BTC");
                         }
 
                         cur_blog5minute = Utils.getCurrentMinute_Blog5minutes();
