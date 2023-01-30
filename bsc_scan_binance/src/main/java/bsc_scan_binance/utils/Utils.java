@@ -2162,11 +2162,11 @@ public class Utils {
         List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, 20));
         if (Objects.equals(trend, TREND_LONG)) {
             SL = low_heigh.get(0);
-            range = ma10.subtract(SL).multiply(BigDecimal.valueOf(2));
+            range = ma10.subtract(SL).multiply(BigDecimal.valueOf(3));
             TP = ma10.add(range);
         } else {
             SL = low_heigh.get(1);
-            range = SL.subtract(ma10).multiply(BigDecimal.valueOf(2));
+            range = SL.subtract(ma10).multiply(BigDecimal.valueOf(3));
             TP = ma10.subtract(range);
         }
 
