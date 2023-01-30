@@ -2619,7 +2619,7 @@ public class BinanceServiceImpl implements BinanceService {
         String atl = Utils.new_line_from_service + Utils.getAtlAth(list_15m);
 
         if (Utils.isNotBlank(append)) {
-            atl = Utils.new_line_from_service + append;
+            atl += Utils.new_line_from_service + append.replace("(H1)", "(H_1)");
         }
 
         if (ido.isBtcKillLongCandle()) {
@@ -2656,7 +2656,6 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String msg = "";
-        String vol = "";
         String current_trend = "";
         String chartname = Utils.getChartName(list);
         String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
@@ -2670,24 +2669,17 @@ public class BinanceServiceImpl implements BinanceService {
 
         BigDecimal price_now = list.get(0).getCurrPrice();
 
-        List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list);
-        String atl = Utils.new_line_from_service + chartname;
-        atl += "atl:" + Utils.getPercentToEntry(price_now, low_heigh.get(0), true);
-        atl += ", ath:" + Utils.getPercentToEntry(price_now, low_heigh.get(1), true);
-
         if (Objects.equals(Utils.TREND_LONG, current_trend)) {
 
             msg = " 💹. " + symbol + chartname + ":3Up" + maIndex
                     + (list.get(0).getId().contains("_3m_") ? " 🚀" : " 🚀");
             EVENT_ID += "_UP";
-            vol = Utils.calcVol(list, true) + atl;
 
         } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
 
             msg = " 📉. " + symbol + chartname + ":3Down" + maIndex
                     + (list.get(0).getId().contains("_3m_") ? " 🥶" : " 🥶");
             EVENT_ID += "_DOWN";
-            vol = Utils.calcVol(list, false) + atl;
 
         } else if (Objects.equals("BTC", symbol) && Utils.isStopLong(list)) {
             msg = Utils.TREND_STOP_LONG;
@@ -2697,11 +2689,12 @@ public class BinanceServiceImpl implements BinanceService {
             String curr_price = "(" + Utils.removeLastZero(price_now) + ")";
 
             if (Objects.equals(msg, Utils.TREND_STOP_LONG)) {
-                msg = "(" + Utils.TREND_STOP_LONG + ")" + chartname + symbol + curr_price + atl;
+                msg = "(" + Utils.TREND_STOP_LONG + ")" + chartname + symbol + curr_price;
             } else {
-                msg += curr_price + Utils.new_line_from_service + vol;
+                msg += curr_price;
                 msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
             }
+            msg += Utils.new_line_from_service + Utils.getAtlAth(list);
 
             sendMsgPerHour(EVENT_ID, msg, true);
         }
