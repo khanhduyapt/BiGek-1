@@ -2449,6 +2449,10 @@ public class Utils {
         int pre = 2;
         int fastIndex = 3;
         BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
+        String val = ma_fast_c.toString();
+        if(val.contains("E")) {
+            return false;
+        }
         BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
 
         BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
