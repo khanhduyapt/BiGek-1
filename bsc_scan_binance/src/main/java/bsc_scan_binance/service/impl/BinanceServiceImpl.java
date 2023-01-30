@@ -2910,13 +2910,12 @@ public class BinanceServiceImpl implements BinanceService {
         type = type + Utils.analysisVolume(list_days);
 
         if (!Objects.equals("BTC", symbol)) {
-            List<BtcFutures> list_h1_btc = Utils.loadData(symbol, TIME_1h, 50, "BTC");
-            if (!CollectionUtils.isEmpty(list_h1_btc)) {
-                String trend_compare_btc = Utils.check3CuttingXforH1(list_h1_btc, 50);
-                if (Objects.equals(Utils.TREND_LONG, trend_compare_btc)) {
-                    String msg = "( 💰 Check 💰 ) (H1) " + symbol + ":BTC.(" + Utils.removeLastZero(current_price)
-                            + ")";
-                    String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol + Utils.getCurrentYyyyMmDdHHByChart(list_h1_btc);
+            List<BtcFutures> list_compare_btc = Utils.loadData(symbol, TIME_4h, 50, "BTC");
+            if (!CollectionUtils.isEmpty(list_compare_btc)) {
+                if (Utils.isMa3CuttingUpX(list_compare_btc, 50)) {
+                    String msg = symbol + ":BTC.(" + Utils.removeLastZero(current_price) + ")";
+                    String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol
+                            + Utils.getCurrentYyyyMmDdHHByChart(list_compare_btc);
                     sendMsgPerHour(EVENT_ID_COMPARE_BTC, msg, true);
                 }
             }

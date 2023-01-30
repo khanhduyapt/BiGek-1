@@ -2457,6 +2457,12 @@ public class Utils {
             return true;
         }
 
+        BigDecimal close1 = list.get(1).getPrice_close_candle();
+        BigDecimal close2 = list.get(2).getPrice_close_candle();
+        if ((close1.compareTo(ma_slow_c) > 0) && (ma_slow_c.compareTo(close2) > 0)) {
+            return true;
+        }
+
         return false;
     }
 
