@@ -2725,8 +2725,12 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals("BTC", symbol)) {
-            // List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 50);
-            // sendMsgByTrendMaX(symbol, list_5m, 50, "", btc_trend);
+            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 20);
+            if (Utils.isMa3CuttingUpX(list_5m, 20)) {
+                String msg = "(5m)" + symbol + "(" + Utils.removeLastZero(list_5m.get(0).getCurrPrice()) + ")";
+                String EVENT_ID_BTC = EVENT_PUMP + symbol + Utils.getCurrentYyyyMmDdHHByChart(list_5m);
+                sendMsgPerHour(EVENT_ID_BTC, msg, true);
+            }
         }
     }
 
