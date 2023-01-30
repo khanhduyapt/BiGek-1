@@ -2714,7 +2714,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String trend = Utils.checkTrendLongShort1m(list, 50);
-        if (Objects.equals(BTC_H1_TRENDING, trend)) {
+        if (Utils.isNotBlank(trend) && Objects.equals(BTC_H1_TRENDING, trend)) {
 
             String msg = trend + Utils.getChartName(list) + symbol + "("
                     + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
@@ -2755,8 +2755,12 @@ public class BinanceServiceImpl implements BinanceService {
 
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
 
+        }
+
+        if (Objects.equals("BTC", symbol)) {
             sendScapMsgLongShort(list_15m, symbol);
         }
+
     }
 
     // AUD_EUR_GBP_USDT
