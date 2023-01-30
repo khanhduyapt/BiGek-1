@@ -86,11 +86,11 @@ public class BscScanBinanceApplication {
                     // binance_service.getChartWD("project-galaxy", "GAL");
 
                     try {
-                        cur_blog5minute = Utils.getCurrentMinute_Blog5minutes();
+                        cur_blog5minute = Utils.getCurrentMinute();
                         if (pre_blog5minute != cur_blog5minute) {
                             pre_blog5minute = cur_blog5minute;
 
-                            binance_service.sendMsgChart15m("bitcoin", "BTC");
+                            binance_service.sendMsgChart1m("bitcoin", "BTC");
                         }
 
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();

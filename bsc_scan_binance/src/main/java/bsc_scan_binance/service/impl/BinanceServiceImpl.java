@@ -2711,6 +2711,28 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @Override
+    public void sendMsgChart1m(String gecko_id, String symbol) {
+        if (Objects.equals("BTC", symbol)) {
+
+            List<BtcFutures> list = Utils.loadData(symbol, TIME_1m, 50);
+
+            String trend = Utils.checkTrendLongShort1m(list, 50);
+
+            if (Utils.isNotBlank(trend)) {
+                String msg = trend + "(" + Utils.getChartName(list) + ")" + symbol + "("
+                        + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
+
+                msg += Utils.new_line_from_service + Utils.calcSL_TP_5m(list, trend);
+                msg += Utils.new_line_from_service + " 💰💰💰💰💰💰💰💰💰💰💰💰💰💰 ";
+
+                String EVENT_ID_BTC = EVENT_PUMP + trend + symbol + Utils.getCurrentYyyyMmDdHHByChart(list);
+                sendMsgPerHour(EVENT_ID_BTC, msg, true);
+            }
+
+        }
+    }
+
+    @Override
     public void sendMsgChart15m(String gecko_id, String symbol) {
         String btc_trend = IS_BTC_ALLOW_LONG ? "" : "______BTC(h1)_DOWN_TREND______";
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
@@ -2724,14 +2746,6 @@ public class BinanceServiceImpl implements BinanceService {
             // sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_LONG, btc_trend);
         }
 
-        if (Objects.equals("BTC", symbol)) {
-            List<BtcFutures> list_5m = Utils.loadData(symbol, TIME_5m, 20);
-            if (Utils.isMa3CuttingUpX(list_5m, 20)) {
-                String msg = "(5m)" + symbol + "(" + Utils.removeLastZero(list_5m.get(0).getCurrPrice()) + ")";
-                String EVENT_ID_BTC = EVENT_PUMP + symbol + Utils.getCurrentYyyyMmDdHHByChart(list_5m);
-                sendMsgPerHour(EVENT_ID_BTC, msg, true);
-            }
-        }
     }
 
     // AUD_EUR_GBP_USDT
@@ -2854,6 +2868,7 @@ public class BinanceServiceImpl implements BinanceService {
             type = " (Futures) ";
 
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+
                 sendMsgChart15m(gecko_id, symbol);
 
                 sendMsgByTrendMaX(symbol, list_h1, 50, "", taker); // H4
