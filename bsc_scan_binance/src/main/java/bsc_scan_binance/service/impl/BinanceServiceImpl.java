@@ -2889,13 +2889,14 @@ public class BinanceServiceImpl implements BinanceService {
                     sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
                             taker + Utils.new_line_from_service + "H4H4H4H4(Spot)H4H4H4H4"); // D
                 }
-
-                sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
-                        taker + Utils.new_line_from_service + "DDDDDDD(Spot)DDDDDDD"); // D
-
-                sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
-                        taker + Utils.new_line_from_service + "WWWWWWW(Spot)WWWWWWW"); // W
             }
+
+            sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
+                    taker + Utils.new_line_from_service + "DDDDDDD(Spot)DDDDDDD"); // D
+
+            sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
+                    taker + Utils.new_line_from_service + "WWWWWWW(Spot)WWWWWWW"); // W
+
         }
         type = type + Utils.analysisVolume(list_days);
 
