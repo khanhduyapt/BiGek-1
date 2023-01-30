@@ -2157,8 +2157,10 @@ public class Utils {
         int length = list.size() > maSlowIndex ? list.size() : maSlowIndex;
         BigDecimal taker_volume = BigDecimal.ZERO;
         for (int index = 0; index < length; index++) {
-            BtcFutures dto = list.get(index);
-            taker_volume = taker_volume.add(dto.getTaker_volume());
+            if (index < list.size()) {
+                BtcFutures dto = list.get(index);
+                taker_volume = taker_volume.add(dto.getTaker_volume());
+            }
         }
         BigDecimal ma50_taker_volume = taker_volume.divide(BigDecimal.valueOf(length), 10, RoundingMode.CEILING);
 
@@ -2450,7 +2452,7 @@ public class Utils {
         int fastIndex = 3;
         BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
         String val = ma_fast_c.toString();
-        if(val.contains("E")) {
+        if (val.contains("E")) {
             return false;
         }
         BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
