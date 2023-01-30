@@ -2155,10 +2155,10 @@ public class Utils {
     public static String getAtlAth(List<BtcFutures> list) {
         BigDecimal entry = list.get(0).getCurrPrice();
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
-        String result = getChartName(list);
+        String result = "";
         result += " atl:" + getPercentToEntry(entry, low_heigh.get(0), true);
         result += ", ath:" + getPercentToEntry(entry, low_heigh.get(1), true);
-
+        result += getChartName(list);
         return result;
     }
 

@@ -2619,7 +2619,7 @@ public class BinanceServiceImpl implements BinanceService {
         String atl = Utils.new_line_from_service + Utils.getAtlAth(list_15m);
 
         if (Utils.isNotBlank(append)) {
-            atl += Utils.new_line_from_service + append.replace("(H1)", "(H_1)");
+            atl += Utils.new_line_from_service + append;
         }
 
         if (ido.isBtcKillLongCandle()) {
