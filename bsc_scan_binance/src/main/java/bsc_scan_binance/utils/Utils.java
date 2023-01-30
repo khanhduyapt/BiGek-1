@@ -2529,16 +2529,16 @@ public class Utils {
                 && (ma10_2.compareTo(ma3_2) > 0)) {
             return TREND_LONG;
         }
-
-        if (ma3_1.compareTo(ma10_1) < 0) {
-            BigDecimal close1 = list.get(1).getPrice_close_candle();
-            BigDecimal close2 = list.get(2).getPrice_close_candle();
-            if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(close2) > 0)) {
-                return TREND_LONG;
-            }
-        }
-
         if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma10_1) < 0) && (ma10_2.compareTo(ma3_2) < 0)) {
+            return TREND_SHORT;
+        }
+        //--------------------------------------------
+        BigDecimal close1 = list.get(1).getPrice_close_candle();
+        BigDecimal close2 = list.get(2).getPrice_close_candle();
+        if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(close2) > 0)) {
+            return TREND_LONG;
+        }
+        if ((close1.compareTo(ma10_1) < 0) && (ma10_1.compareTo(close2) < 0)) {
             return TREND_SHORT;
         }
 

@@ -2762,7 +2762,7 @@ public class BinanceServiceImpl implements BinanceService {
     public void checkCurrency() {
         try {
             if (!Utils.isAllowSendMsgSetting()) {
-                return;
+                //return;
             }
 
             if (!Utils.isBusinessTime()) {
@@ -2781,23 +2781,23 @@ public class BinanceServiceImpl implements BinanceService {
 
             String chartname = Utils.getChartName(list_AUD);
             int maSlow = 10;
-            String AUD_TREND = Utils.check3CuttingXforH1(list_AUD, maSlow);
+            String AUD_TREND = Utils.checkTrendLongShort1m(list_AUD, maSlow);
             if (Utils.isNotBlank(AUD_TREND)) {
-                String msg = "( 💰💰💰💰💰💰 Check 💰💰💰💰💰💰 )" + chartname + " AUD_USDT";
+                String msg = "(Check)" + chartname + " AUD_USDT";
                 String EVENT_ID = EVENT_PUMP + "AUD_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_AUD);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
 
-            String EUR_TREND = Utils.check3CuttingXforH1(list_EUR, maSlow);
+            String EUR_TREND = Utils.checkTrendLongShort1m(list_EUR, maSlow);
             if (Utils.isNotBlank(EUR_TREND)) {
-                String msg = "( 💰💰💰💰💰💰 Check 💰💰💰💰💰💰 )" + chartname + " EUR_USDT";
+                String msg = "(Check)" + chartname + " EUR_USDT";
                 String EVENT_ID = EVENT_PUMP + "EUR_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_EUR);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
 
-            String GBP_TREND = Utils.check3CuttingXforH1(list_GBP, maSlow);
+            String GBP_TREND = Utils.checkTrendLongShort1m(list_GBP, maSlow);
             if (Utils.isNotBlank(GBP_TREND)) {
-                String msg = "( 💰💰💰💰💰💰 Check 💰💰💰💰💰💰 )" + chartname + " GBP_USDT";
+                String msg = "(Check)" + chartname + " GBP_USDT";
                 String EVENT_ID = EVENT_PUMP + "GBP_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_GBP);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
