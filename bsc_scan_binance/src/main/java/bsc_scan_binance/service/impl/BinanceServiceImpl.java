@@ -2719,11 +2719,11 @@ public class BinanceServiceImpl implements BinanceService {
             String trend = Utils.checkTrendLongShort1m(list, 50);
 
             if (Utils.isNotBlank(trend)) {
-                String msg = trend + "(" + Utils.getChartName(list) + ")" + symbol + "("
+                String msg = trend + Utils.getChartName(list) + symbol + "("
                         + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
 
                 msg += Utils.new_line_from_service + Utils.calcSL_TP_5m(list, trend);
-                msg += Utils.new_line_from_service + " 💰💰💰💰💰💰💰💰💰💰💰💰💰💰 ";
+                msg += Utils.new_line_from_service + " 💰💰💰💰💰💰💰💰💰💰 ";
 
                 String EVENT_ID_BTC = EVENT_PUMP + trend + symbol + Utils.getCurrentYyyyMmDdHHByChart(list);
                 sendMsgPerHour(EVENT_ID_BTC, msg, true);
