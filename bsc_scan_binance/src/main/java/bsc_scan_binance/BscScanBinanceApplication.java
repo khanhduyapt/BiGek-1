@@ -77,6 +77,9 @@ public class BscScanBinanceApplication {
                 int pre_blog15minute = -1;
                 int cur_blog15minute = -1;
 
+                int pre_blog1minute = -1;
+                int cur_blog1minute = -1;
+
                 int pre_blog5minute = -1;
                 int cur_blog5minute = -1;
                 Date start_time = Calendar.getInstance().getTime();
@@ -86,11 +89,18 @@ public class BscScanBinanceApplication {
                     // binance_service.getChartWD("project-galaxy", "GAL");
 
                     try {
-                        cur_blog5minute = Utils.getCurrentMinute();
+                        cur_blog1minute = Utils.getCurrentMinute();
+                        if (pre_blog1minute != cur_blog1minute) {
+                            pre_blog1minute = cur_blog1minute;
+
+                            binance_service.sendMsgChart1m("bitcoin", "BTC");
+                        }
+
+                        cur_blog5minute = Utils.getCurrentMinute_Blog5minutes();
                         if (pre_blog5minute != cur_blog5minute) {
                             pre_blog5minute = cur_blog5minute;
 
-                            binance_service.sendMsgChart1m("bitcoin", "BTC");
+                            binance_service.sendMsgChart5m("bitcoin", "BTC");
                         }
 
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();

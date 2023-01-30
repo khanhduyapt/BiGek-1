@@ -44,4 +44,6 @@ public interface BinanceService {
     void checkCurrency();
 
     void sendMsgChart1m(String gecko_id, String symbol);
+
+    void sendMsgChart5m(String gecko_id, String symbol);
 }
