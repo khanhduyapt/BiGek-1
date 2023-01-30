@@ -2829,14 +2829,22 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_weeks)) {
             return "";
         }
-
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
+        if (CollectionUtils.isEmpty(list_days)) {
+            return "";
+        }
         List<BtcFutures> list_h4 = Utils.loadData(symbol, TIME_4h, 60);
+        if (CollectionUtils.isEmpty(list_h4)) {
+            return "";
+        }
         List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+        if (CollectionUtils.isEmpty(list_h1)) {
+            return "";
+        }
+
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         if (Objects.equals("BTC", symbol)) {
-
             boolean trend_ma10 = Utils.isUptrendByMaIndex(list_h1, 10);
             boolean trend_ma3 = Utils.isUptrendByMaIndex(list_h1, 3);
             if (trend_ma10 == trend_ma3) {
