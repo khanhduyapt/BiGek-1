@@ -2710,37 +2710,46 @@ public class BinanceServiceImpl implements BinanceService {
         return msg;
     }
 
+    private void sendMsgLongShort(List<BtcFutures> list, String symbol) {
+        if (!Objects.equals("BTC", symbol)) {
+            return;
+        }
+
+        String trend = Utils.checkTrendLongShort1m(list, 50);
+        if (Utils.isNotBlank(trend)) {
+            String btc_trend = IS_BTC_ALLOW_LONG ? "" : "______BTC(h1)_DOWN_TREND______";
+
+            String msg = trend + Utils.getChartName(list) + symbol + "("
+                    + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
+
+            msg += Utils.new_line_from_service + Utils.calcSL_TP_5m(list, trend);
+            msg += Utils.new_line_from_service + btc_trend;
+
+            String EVENT_ID_BTC = EVENT_PUMP + trend + symbol + Utils.getCurrentYyyyMmDdHHByChart(list);
+            sendMsgPerHour(EVENT_ID_BTC, msg, true);
+        }
+    }
+
     @Override
     public void sendMsgChart1m(String gecko_id, String symbol) {
         if (Objects.equals("BTC", symbol)) {
 
             List<BtcFutures> list = Utils.loadData(symbol, TIME_1m, 50);
 
-            String trend = Utils.checkTrendLongShort1m(list, 50);
-
-            if (Utils.isNotBlank(trend)) {
-                String msg = trend + Utils.getChartName(list) + symbol + "("
-                        + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
-
-                msg += Utils.new_line_from_service + Utils.calcSL_TP_5m(list, trend);
-                msg += Utils.new_line_from_service + " 💰💰💰💰💰💰💰💰💰💰 ";
-
-                String EVENT_ID_BTC = EVENT_PUMP + trend + symbol + Utils.getCurrentYyyyMmDdHHByChart(list);
-                sendMsgPerHour(EVENT_ID_BTC, msg, true);
-            }
-
+            sendMsgLongShort(list, symbol);
         }
     }
 
     @Override
     public void sendMsgChart15m(String gecko_id, String symbol) {
-        String btc_trend = IS_BTC_ALLOW_LONG ? "" : "______BTC(h1)_DOWN_TREND______";
+
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
 
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
 
             sendMsgKillLongShort(gecko_id, symbol, list_15m);
-            sendMsgByTrendMaX(symbol, list_15m, 50, "", btc_trend);
+
+            sendMsgLongShort(list_15m, symbol);
 
         } else {
             // sendMsgByTrendMaX(symbol, list_15m, 10, Utils.TREND_LONG, btc_trend);
