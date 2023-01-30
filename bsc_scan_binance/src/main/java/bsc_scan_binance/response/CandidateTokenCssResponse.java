@@ -2,7 +2,6 @@ package bsc_scan_binance.response;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -49,7 +48,7 @@ public class CandidateTokenCssResponse {
     private String max_price = "";
     private String avg_price_css = "";
 
-    private String pre_price_history = "";
+    private String token_btc_link = "";
     private String gecko_total_volume = "";
     private String gecko_volumn_history = "";
 

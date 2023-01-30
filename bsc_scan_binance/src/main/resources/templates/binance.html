@@ -219,18 +219,15 @@ p {
             </div>
           </td>
           <!-- Price -->
-          <td th:classappend="${token.btc_warning_css}"
-            style="text-align: right; min-width: 190px !important; max-width: 190px !important;">
-            <div>
+          <td style="text-align: right; min-width: 190px !important; max-width: 190px !important;">
+            <div th:classappend="${token.btc_warning_css}">
               <span th:text="${token.current_price} + '$'"></span>
+              <a th:target="_blank" th:href="${token.token_btc_link}">BTC</a>
             </div>
             <div style="font-size: 0.8rem !important;">
               Avg14d: <span th:text="${token.avg_price + '$'}"></span>
                 (<span style="text-align: left; min-width: 50px !important; max-width: 50px !important;"
                 th:text="${token.avg_percent}"></span>)
-            </div>
-            <div style="font-size: 0.7rem !important;">
-               <span th:text="${token.pre_price_history}"></span>
             </div>
           </td>
           <!-- OCO -->

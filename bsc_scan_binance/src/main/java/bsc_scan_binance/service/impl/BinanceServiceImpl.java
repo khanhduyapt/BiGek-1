@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import javax.persistence.EntityManager;
@@ -505,32 +504,19 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 // Price
-                String pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"
-                        + Utils.removeLastZero(dto.getPrice_pre_1h()) + "←"
-                        + Utils.removeLastZero(dto.getPrice_pre_2h()) + "←"
-                        + Utils.removeLastZero(dto.getPrice_pre_3h()) + "←"
-                        + Utils.removeLastZero(dto.getPrice_pre_4h());
-                if (pre_price_history.length() > 28) {
-                    pre_price_history = Utils.removeLastZero(dto.getPrice_now()) + "←"
-                            + Utils.removeLastZero(dto.getPrice_pre_1h()) + "←"
-                            + Utils.removeLastZero(dto.getPrice_pre_2h());
+                if (!Objects.equals("BTC", dto.getSymbol())) {
+                    css.setToken_btc_link(
+                            "https://vn.tradingview.com/chart/?symbol=BINANCE%3A" + dto.getSymbol() + "BTC");
+                    if (dto.getFutures().contains("_PositionBTC")) {
+                        css.setBtc_warning_css(CSS_PRICE_WARNING);
+                    }
                 }
-                css.setPre_price_history(pre_price_history);
 
                 css.setCurrent_price(Utils.removeLastZero(dto.getCurrent_price()));
                 css.setPrice_change_24h_css(Utils.getTextCss(css.getPrice_change_percentage_24h()));
                 css.setPrice_change_07d_css(Utils.getTextCss(css.getPrice_change_percentage_7d()));
                 css.setPrice_change_14d_css(Utils.getTextCss(css.getPrice_change_percentage_14d()));
                 css.setPrice_change_30d_css(Utils.getTextCss(css.getPrice_change_percentage_30d()));
-
-                String gecko_volumn_history = dto.getGec_vol_pre_1h() + "←" + dto.getGec_vol_pre_2h() + " ←"
-                        + dto.getGec_vol_pre_3h() + "←" + dto.getGec_vol_pre_4h() + "M";
-
-                if (gecko_volumn_history.length() > 20) {
-                    gecko_volumn_history = dto.getGec_vol_pre_1h() + "←" + dto.getGec_vol_pre_2h() + "M";
-                }
-
-                css.setGecko_volumn_history(gecko_volumn_history);
 
                 List<String> volList = new ArrayList<String>();
                 List<String> avgPriceList = new ArrayList<String>();
@@ -753,9 +739,8 @@ public class BinanceServiceImpl implements BinanceService {
                 if ((price_now.compareTo(BigDecimal.ZERO) > 0) && (avg_price.compareTo(BigDecimal.ZERO) > 0)) {
 
                     BigDecimal percent = Utils.getBigDecimalValue(Utils.toPercent(avg_price, price_now, 1));
-                    css.setAvg_price(Utils.removeLastZero(avg_price.toString()));
+                    css.setAvg_price(Utils.removeLastZero(Utils.roundDefault(avg_price)));
                     css.setAvg_percent(percent.toString() + "%");
-
                 } else {
                     css.setAvg_price("0.0");
                 }
@@ -1021,13 +1006,16 @@ public class BinanceServiceImpl implements BinanceService {
 
                             css.setRange_position("Long(H4)");
                             css.setRange_position_css(CSS_PRICE_SUCCESS + " bg-success");
-                        } else if (futu.contains("_PositionD1")) {
+                        }
+                        if (futu.contains("_PositionD1")) {
 
                             futu = futu.replace("_PositionD1", "");
 
                             css.setRange_position("Long(D1)");
                             css.setRange_position_css(CSS_PRICE_SUCCESS + " bg-success");
                         }
+
+                        futu = futu.replace("_PositionBTC", "");
 
                         css.setRange_wdh_css("text-primary");
                         css.setStop_loss_css("text-white bg-success rounded-lg px-1");
@@ -1173,7 +1161,9 @@ public class BinanceServiceImpl implements BinanceService {
 
             return list;
 
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
             return new ArrayList<CandidateTokenCssResponse>();
         }
@@ -2909,18 +2899,6 @@ public class BinanceServiceImpl implements BinanceService {
         }
         type = type + Utils.analysisVolume(list_days);
 
-        if (!Objects.equals("BTC", symbol)) {
-            List<BtcFutures> list_compare_btc = Utils.loadData(symbol, TIME_4h, 50, "BTC");
-            if (!CollectionUtils.isEmpty(list_compare_btc)) {
-                if (Utils.isMa3CuttingUpX(list_compare_btc, 50)) {
-                    String msg = "(H4)" + symbol + ":BTC.(" + Utils.removeLastZero(current_price) + ")";
-                    String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol
-                            + Utils.getCurrentYyyyMmDdHHByChart(list_compare_btc);
-                    sendMsgPerHour(EVENT_ID_COMPARE_BTC, msg, true);
-                }
-            }
-        }
-
         String scapLongH4 = Utils.getScapLong(list_h4, list_days, 10, allow_long_d1);
         String scapLongD1 = Utils.getScapLong(list_days, list_days, 10, allow_long_d1);
 
@@ -2969,6 +2947,21 @@ public class BinanceServiceImpl implements BinanceService {
         if (scapLongD1.contains(Utils.TREND_DANGER) || scapLongH4.contains(Utils.TREND_DANGER)) {
             // position = "";
         }
+
+        if (!Objects.equals("BTC", symbol)) {
+            List<BtcFutures> list_compare_btc = Utils.loadData(symbol, TIME_4h, 50, "BTC");
+            if (!CollectionUtils.isEmpty(list_compare_btc)) {
+                if (Utils.isMa3CuttingUpX(list_compare_btc, 50)) {
+                    String msg = "(H4)" + symbol + ":BTC.(" + Utils.removeLastZero(current_price) + ")";
+                    String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol
+                            + Utils.getCurrentYyyyMmDdHHByChart(list_compare_btc);
+                    sendMsgPerHour(EVENT_ID_COMPARE_BTC, msg, true);
+
+                    note += "_PositionBTC";
+                }
+            }
+        }
+
         note += position;
         // ---------------------------------------------------------
         String curr_week_day_trending = W1 + D1;

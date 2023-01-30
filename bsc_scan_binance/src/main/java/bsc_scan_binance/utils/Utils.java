@@ -1,8 +1,6 @@
 package bsc_scan_binance.utils;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -2254,12 +2252,13 @@ public class Utils {
 
         // --------------------------------
         BigDecimal ma50_1 = calcMA(list, 50, 1);
-        BigDecimal close1 = list.get(1).getPrice_close_candle();
-        BigDecimal close2 = list.get(2).getPrice_close_candle();
-        if ((close1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(close2) > 0)) {
-            return TREND_LONG;
+        if (ma3_1.compareTo(ma50_1) < 0) {
+            BigDecimal close1 = list.get(1).getPrice_close_candle();
+            BigDecimal close2 = list.get(2).getPrice_close_candle();
+            if ((close1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(close2) > 0)) {
+                return TREND_LONG;
+            }
         }
-
         return "";
     }
 
@@ -2299,12 +2298,13 @@ public class Utils {
             return TREND_LONG;
         }
 
-        BigDecimal close1 = list.get(1).getPrice_close_candle();
-        BigDecimal close2 = list.get(2).getPrice_close_candle();
-        if ((close1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(close2) > 0)) {
-            return TREND_LONG;
+        if (ma3_1.compareTo(ma50_1) < 0) {
+            BigDecimal close1 = list.get(1).getPrice_close_candle();
+            BigDecimal close2 = list.get(2).getPrice_close_candle();
+            if ((close1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(close2) > 0)) {
+                return TREND_LONG;
+            }
         }
-
         return "";
     }
 
@@ -2397,10 +2397,12 @@ public class Utils {
                 return TREND_LONG;
             }
 
-            BigDecimal close1 = list.get(1).getPrice_close_candle();
-            BigDecimal close2 = list.get(2).getPrice_close_candle();
-            if ((close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
-                return TREND_LONG;
+            if (ma3_1.compareTo(ma_X_c) < 0) {
+                BigDecimal close1 = list.get(1).getPrice_close_candle();
+                BigDecimal close2 = list.get(2).getPrice_close_candle();
+                if ((close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
+                    return TREND_LONG;
+                }
             }
 
             if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(ma3_2) < 0)) {
@@ -2457,10 +2459,12 @@ public class Utils {
             return true;
         }
 
-        BigDecimal close1 = list.get(1).getPrice_close_candle();
-        BigDecimal close2 = list.get(2).getPrice_close_candle();
-        if ((close1.compareTo(ma_slow_c) > 0) && (ma_slow_c.compareTo(close2) > 0)) {
-            return true;
+        if (ma_fast_c.compareTo(ma_slow_c) < 0) {
+            BigDecimal close1 = list.get(1).getPrice_close_candle();
+            BigDecimal close2 = list.get(2).getPrice_close_candle();
+            if ((close1.compareTo(ma_slow_c) > 0) && (ma_slow_c.compareTo(close2) > 0)) {
+                return true;
+            }
         }
 
         return false;
