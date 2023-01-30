@@ -39,11 +39,11 @@ public interface BinanceService {
 
     public void clearTrash();
 
-    void sendMsgChart15m(String gecko_id, String symbol);
-
     void checkCurrency();
 
     void sendMsgChart1m(String gecko_id, String symbol);
 
     void sendMsgChart5m(String gecko_id, String symbol);
+
+    void sendMsgChart15m(String gecko_id, String symbol, String append);
 }

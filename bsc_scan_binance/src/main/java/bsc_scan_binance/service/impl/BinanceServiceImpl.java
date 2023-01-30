@@ -2610,16 +2610,17 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private String sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m) {
+    private String sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m, String append) {
         String msg = "";
         String chartname = Utils.getChartName(list_15m);
         BtcFutures ido = list_15m.get(0);
         boolean isShort = Utils.isAboveMALine(list_15m, 50, 0);
 
-        List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_15m);
-        String atl = Utils.new_line_from_service + chartname;
-        atl += "atl:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(0), true);
-        atl += ", ath:" + Utils.getPercentToEntry(ido.getCurrPrice(), low_heigh.get(1), true);
+        String atl = Utils.new_line_from_service + Utils.getAtlAth(list_15m);
+
+        if (Utils.isNotBlank(append)) {
+            atl = Utils.new_line_from_service + append;
+        }
 
         if (ido.isBtcKillLongCandle()) {
             msg = Utils.getTimeHHmm() + " 🔻  " + symbol + " " + chartname + " kill "
@@ -2747,13 +2748,13 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @Override
-    public void sendMsgChart15m(String gecko_id, String symbol) {
+    public void sendMsgChart15m(String gecko_id, String symbol, String append) {
 
         List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
 
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
 
-            sendMsgKillLongShort(gecko_id, symbol, list_15m);
+            sendMsgKillLongShort(gecko_id, symbol, list_15m, append);
 
         }
 
@@ -2872,15 +2873,15 @@ public class BinanceServiceImpl implements BinanceService {
             taker += Utils.isNotBlank(vol_d1) ? " (D)" + vol_d1 : "";
         }
         // -------------------------------------------------------------------------
-        if (Utils.isNotBlank(taker)) {
-            if (!BscScanBinanceApplication.TAKER_TOKENS.contains("_" + symbol + "_")) {
-                if (!"_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-
-                    BscScanBinanceApplication.TAKER_TOKENS += symbol + "_";
-                    sendMsgChart15m(gecko_id, symbol);
-                }
-            }
-        }
+        //if (Utils.isNotBlank(taker)) {
+        //    if (!BscScanBinanceApplication.TAKER_TOKENS.contains("_" + symbol + "_")) {
+        //        if (!"_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+        //
+        //            BscScanBinanceApplication.TAKER_TOKENS += symbol + "_";
+        //            sendMsgChart15m(gecko_id, symbol);
+        //        }
+        //    }
+        //}
 
         // -------------------------------------------------------------------------
         Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
@@ -2891,7 +2892,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
 
-                sendMsgChart15m(gecko_id, symbol);
+                sendMsgChart15m(gecko_id, symbol, Utils.getAtlAth(list_h1));
 
                 sendMsgByTrendMaX(symbol, list_h1, 50, "", taker); // H4
 

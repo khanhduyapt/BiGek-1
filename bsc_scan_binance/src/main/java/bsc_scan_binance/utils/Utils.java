@@ -2152,6 +2152,16 @@ public class Utils {
         return result;
     }
 
+    public static String getAtlAth(List<BtcFutures> list) {
+        BigDecimal entry = list.get(0).getCurrPrice();
+        List<BigDecimal> low_heigh = getLowHeightCandle(list);
+        String result = getChartName(list);
+        result += " atl:" + getPercentToEntry(entry, low_heigh.get(0), true);
+        result += ", ath:" + getPercentToEntry(entry, low_heigh.get(1), true);
+
+        return result;
+    }
+
     public static String calcSL_TP_5m(List<BtcFutures> list, String trend) {
         BigDecimal entry = list.get(0).getCurrPrice();
         BigDecimal SL = BigDecimal.ZERO;
