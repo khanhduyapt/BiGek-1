@@ -2547,26 +2547,32 @@ public class Utils {
     }
 
     public static String checkTrendByIndex(List<BtcFutures> list, int fastIndex, int slowIndex, String trend) {
-        BigDecimal ma3_1 = calcMA(list, fastIndex, 1);
-        String val = ma3_1.toString();
+        if (CollectionUtils.isEmpty(list)) {
+            return "";
+        }
+        String val = list.get(0).getPrice_close_candle().toString();
         if (val.contains("E")) {
             return "";
         }
-        BigDecimal ma3_2 = calcMA(list, fastIndex, 2);
 
-        BigDecimal ma10_1 = calcMA(list, slowIndex, 1);
-        BigDecimal ma10_2 = calcMA(list, slowIndex, 2);
+        int str = 0;
+        int end = 1;
+        BigDecimal ma3_1 = calcMA(list, fastIndex, str);
+        BigDecimal ma3_2 = calcMA(list, fastIndex, end);
+
+        BigDecimal ma10_1 = calcMA(list, slowIndex, str);
+        BigDecimal ma10_2 = calcMA(list, slowIndex, end);
 
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
             if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma10_1) > 0)
                     && (ma10_2.compareTo(ma3_2) > 0)) {
-                return Utils.getChartName(list) + getTrendPrifix(TREND_LONG, fastIndex, slowIndex);
+                return getTrendPrifix(TREND_LONG, fastIndex, slowIndex);
             }
         }
 
         if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
             if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma10_1) < 0) && (ma10_2.compareTo(ma3_2) < 0)) {
-                return Utils.getChartName(list) + getTrendPrifix(TREND_SHORT, fastIndex, slowIndex);
+                return getTrendPrifix(TREND_SHORT, fastIndex, slowIndex);
             }
         }
 
