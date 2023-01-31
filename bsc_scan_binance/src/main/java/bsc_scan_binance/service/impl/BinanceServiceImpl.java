@@ -2780,6 +2780,22 @@ public class BinanceServiceImpl implements BinanceService {
             checkTrendByBtc(gecko_id, symbol, TIME_15m, BigDecimal.ZERO, true, supper_trend, false, Utils.TREND_LONG);
         }
 
+        if (Objects.equals("BTC", symbol)) {
+            String EVENT_DHH_SHORT = EVENT_D_H4_H1 + symbol + "_" + Utils.CHAR_SHORT + Utils.CHAR_SHORT
+                    + Utils.CHAR_SHORT;
+
+            id = new FundingHistoryKey();
+            id.setGeckoid(gecko_id);
+            id.setEventTime(EVENT_DHH_SHORT);
+            entity = fundingHistoryRepository.findById(id).orElse(null);
+            if (!Objects.equals(null, entity)) {
+                String supper_trend = Utils.CHAR_MONEY + Utils.CHAR_MONEY + Utils.CHAR_MONEY;
+                supper_trend += "SUPPER_SHORT" + Utils.CHAR_MONEY + Utils.CHAR_MONEY + Utils.CHAR_MONEY;
+
+                checkTrendByBtc(gecko_id, symbol, TIME_15m, BigDecimal.ZERO, true, supper_trend, false,
+                        Utils.TREND_SHORT);
+            }
+        }
     }
 
     public String checkTrendByBtc(String gecko_id, String symbol, String TIME, BigDecimal ref_price,

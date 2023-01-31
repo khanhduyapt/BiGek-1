@@ -2508,14 +2508,14 @@ public class Utils {
 
     // "l:Long, s:Short, n:normal"
     public static String initLongShort(List<BtcFutures> list) {
-        BigDecimal ma6_1 = calcMA(list, 6, 1);
-        BigDecimal ma6_2 = calcMA(list, 6, 2);
-        BigDecimal ma6_3 = calcMA(list, 6, 3);
-        if ((ma6_1.compareTo(ma6_2) > 0) && (ma6_3.compareTo(ma6_2) > 0)) {
+        BigDecimal ma_1 = calcMA(list, 10, 1);
+        BigDecimal ma_2 = calcMA(list, 10, 2);
+        BigDecimal ma_3 = calcMA(list, 10, 3);
+        if ((ma_1.compareTo(ma_2) > 0) && (ma_3.compareTo(ma_2) > 0)) {
             return CHAR_LONG;
         }
 
-        if ((ma6_2.compareTo(ma6_1) > 0) && (ma6_2.compareTo(ma6_3) > 0)) {
+        if ((ma_2.compareTo(ma_1) > 0) && (ma_2.compareTo(ma_3) > 0)) {
             return CHAR_SHORT;
         }
 
