@@ -2775,14 +2775,14 @@ public class BinanceServiceImpl implements BinanceService {
             String append) {
 
         List<BtcFutures> list_compare_btc = Utils.loadData(symbol, TIME, 50, "BTC");
-        String trend_compare_btc = "";
+        String trend = "";
 
         if (!CollectionUtils.isEmpty(list_compare_btc)) {
-            trend_compare_btc = Utils.checkTrendByIndex(list_compare_btc, 3, 10, Utils.TREND_LONG);
-            trend_compare_btc += Utils.checkTrendByIndex(list_compare_btc, 3, 20, Utils.TREND_LONG);
-            trend_compare_btc += Utils.checkTrendByIndex(list_compare_btc, 3, 50, Utils.TREND_LONG);
+            trend += Utils.checkTrendByIndex(list_compare_btc, 3, 10, Utils.TREND_LONG);
+            trend += Utils.checkTrendByIndex(list_compare_btc, 3, 20, Utils.TREND_LONG);
+            trend += Utils.checkTrendByIndex(list_compare_btc, 3, 50, Utils.TREND_LONG);
 
-            if (allowSendMsg && Utils.isNotBlank(trend_compare_btc)) {
+            if (allowSendMsg && Utils.isNotBlank(trend)) {
                 String chartname = Utils.getChartName(list_compare_btc);
 
                 saveDepthData(gecko_id, symbol);
@@ -2799,7 +2799,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 String str_current_price = "(" + Utils.removeLastZero(current_price) + ")";
-                String msg = chartname + trend_compare_btc + symbol + ".vs.BTC." + str_current_price;
+                String msg = chartname + trend + symbol + ".vs.BTC." + str_current_price;
                 if (Utils.isNotBlank(append)) {
                     msg += Utils.new_line_from_service + append;
                 }
@@ -2815,7 +2815,7 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        return trend_compare_btc;
+        return trend;
     }
 
     // AUD_EUR_GBP_USDT
