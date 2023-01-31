@@ -2919,8 +2919,8 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         if (Objects.equals("BTC", symbol)) {
-            boolean trend_h4 = Utils.isUptrendByMaIndex(list_h4, 10);
-            boolean trend_h1 = Utils.isUptrendByMaIndex(list_h1, 10);
+            boolean trend_h4 = Utils.isUptrendByMaIndex(list_h4, 6);
+            boolean trend_h1 = Utils.isUptrendByMaIndex(list_h1, 6);
             if (trend_h4 == trend_h1) {
                 BTC_H1_TRENDING = trend_h4 ? Utils.TREND_LONG : Utils.TREND_SHORT;
             } else {
@@ -3049,13 +3049,13 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (!Objects.equals("BTC", symbol)) {
-            if (Utils.isUptrendByMaIndex(list_h4, 10)) {
+            if (Utils.isUptrendByMaIndex(list_h4, 6)) {
                 String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, "");
                 if (Utils.isNotBlank(trend_by_btc)) {
                     note += "_PositionBTC4h";
                 }
 
-                if (Utils.isUptrendByMaIndex(list_h1, 10)) {
+                if (Utils.isUptrendByMaIndex(list_h1, 6)) {
                     trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_15m, current_price, true, "");
                     if (Utils.isNotBlank(trend_by_btc)) {
                         note += "_PositionBTC15m";
