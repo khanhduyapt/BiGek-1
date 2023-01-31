@@ -3084,28 +3084,54 @@ public class BinanceServiceImpl implements BinanceService {
             String chart_h4 = Utils.initLongShort(list_h4);
             String chart_h1 = Utils.initLongShort(list_h1);
             String DH4H1 = chart_d + chart_h4 + chart_h1;
-            String EVENT_DHH = EVENT_D_H4_H1 + symbol + "_" + DH4H1;
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DHH, gecko_id, symbol, DH4H1, true));
-        }
-
-        // ---------------------------------------------------------
-        if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
-            if (Utils.isUptrendByMaIndex(list_h4, 6)) {
-                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, type, true,
-                        Utils.TREND_LONG);
-                if (Utils.isNotBlank(trend_by_btc)) {
-                    note += "_PositionBTC4h";
+            String EVENT_DHH = EVENT_D_H4_H1 + symbol;
+            FundingHistoryKey id = new FundingHistoryKey(EVENT_DHH, gecko_id);
+            if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_d)) {
+                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DHH, gecko_id, symbol, DH4H1, true));
+            }
+            if (!Objects.equals(Utils.CHAR_NORMAL, chart_h4)) {
+                FundingHistory entity_dhh = fundingHistoryRepository.findById(id).orElse(null);
+                if (!Objects.equals(null, entity_dhh)) {
+                    String DHH = entity_dhh.getNote();
+                    String d = DHH.substring(0, 1);
+                    if (!Objects.equals(Utils.CHAR_NORMAL, d) && Objects.equals(d, chart_h4)) {
+                        DHH = DHH.substring(0, 1) + chart_h4 + DHH.substring(2, 3);
+                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DHH, gecko_id, symbol, DHH, true));
+                    }
                 }
-
-                if (Utils.isUptrendByMaIndex(list_h1, 6)) {
-                    trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_15m, current_price, true, type, true,
-                            Utils.TREND_LONG);
-                    if (Utils.isNotBlank(trend_by_btc)) {
-                        note += "_PositionBTC15m";
+            }
+            if (!Objects.equals(Utils.CHAR_NORMAL, chart_h1)) {
+                FundingHistory entity_dhh = fundingHistoryRepository.findById(id).orElse(null);
+                if (!Objects.equals(null, entity_dhh)) {
+                    String DHH = entity_dhh.getNote();
+                    String d = DHH.substring(0, 1);
+                    String h4 = DHH.substring(0, 1);
+                    if (!Objects.equals(Utils.CHAR_NORMAL, d) && Objects.equals(d, h4) && Objects.equals(d, chart_h1)) {
+                        DHH = DHH.substring(0, 2) + chart_h1;
+                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DHH, gecko_id, symbol, DHH, true));
                     }
                 }
             }
         }
+
+        // ---------------------------------------------------------
+//        if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
+//            if (Utils.isUptrendByMaIndex(list_h4, 6)) {
+//                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, type, true,
+//                        Utils.TREND_LONG);
+//                if (Utils.isNotBlank(trend_by_btc)) {
+//                    note += "_PositionBTC4h";
+//                }
+//
+//                if (Utils.isUptrendByMaIndex(list_h1, 6)) {
+//                    trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_15m, current_price, true, type, true,
+//                            Utils.TREND_LONG);
+//                    if (Utils.isNotBlank(trend_by_btc)) {
+//                        note += "_PositionBTC15m";
+//                    }
+//                }
+//            }
+//        }
         note += position;
         // ---------------------------------------------------------
         String mUpMa = "";
