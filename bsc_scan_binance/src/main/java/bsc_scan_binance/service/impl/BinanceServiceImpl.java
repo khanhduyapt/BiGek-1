@@ -2779,11 +2779,16 @@ public class BinanceServiceImpl implements BinanceService {
                 String chartname = Utils.getChartName(list_compare_btc);
 
                 saveDepthData(gecko_id, symbol);
+                list_bids_ok = getBids(gecko_id, current_price);
                 list_asks_ok = getAsks(gecko_id, current_price);
-                String max_ask = "";
+                String bid_ask = "";
+                if (!CollectionUtils.isEmpty(list_bids_ok)) {
+                    DepthResponse dto_min = list_bids_ok.get(list_bids_ok.size() - 1);
+                    bid_ask += "(bid)" + Utils.removeLastZero(dto_min.getPrice()) + "(" + dto_min.getPercent() + ")";
+                }
                 if (!CollectionUtils.isEmpty(list_asks_ok)) {
-                    DepthResponse dto = list_asks_ok.get(list_asks_ok.size() - 1);
-                    max_ask = "(ask_max)" + Utils.removeLastZero(dto.getPrice()) + "(" + dto.getPercent() + ")";
+                    DepthResponse dto_max = list_asks_ok.get(list_asks_ok.size() - 1);
+                    bid_ask += "(ask)" + Utils.removeLastZero(dto_max.getPrice()) + "(" + dto_max.getPercent() + ")";
                 }
 
                 String str_current_price = "(" + Utils.removeLastZero(current_price) + ")";
@@ -2791,8 +2796,8 @@ public class BinanceServiceImpl implements BinanceService {
                 if (Utils.isNotBlank(append)) {
                     msg += Utils.new_line_from_service + append;
                 }
-                if (Utils.isNotBlank(max_ask)) {
-                    msg += Utils.new_line_from_service + max_ask;
+                if (Utils.isNotBlank(bid_ask)) {
+                    msg += Utils.new_line_from_service + bid_ask;
                 }
                 String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol
                         + Utils.getCurrentYyyyMmDdHHByChart(list_compare_btc);
