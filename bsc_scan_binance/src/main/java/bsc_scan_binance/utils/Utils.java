@@ -2171,7 +2171,7 @@ public class Utils {
         BigDecimal ma10 = calcMA(list, 10, 1);
 
         List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, 20));
-        if (Objects.equals(trend, TREND_LONG)) {
+        if (trend.contains(TREND_LONG)) {
             SL = low_heigh.get(0);
             range = ma10.subtract(SL).multiply(BigDecimal.valueOf(3));
             TP = ma10.add(range);
@@ -2476,8 +2476,8 @@ public class Utils {
     }
 
     public static boolean isUptrendByMaIndex(List<BtcFutures> list, int maIndex) {
-        BigDecimal ma_c = calcMA(list, maIndex, 1);
-        BigDecimal ma_p = calcMA(list, maIndex, 2);
+        BigDecimal ma_c = calcMA(list, maIndex, 0);
+        BigDecimal ma_p = calcMA(list, maIndex, 1);
         if (ma_c.compareTo(ma_p) > 0) {
             return true;
         }

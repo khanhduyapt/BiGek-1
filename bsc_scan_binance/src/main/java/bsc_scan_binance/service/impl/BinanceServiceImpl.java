@@ -2719,7 +2719,8 @@ public class BinanceServiceImpl implements BinanceService {
             String msg = trend + Utils.getChartName(list) + symbol + "("
                     + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
 
-            msg += Utils.new_line_from_service + Utils.calcSL_TP_5m(list, trend);
+            msg += Utils.new_line_from_service
+                    + Utils.calcSL_TP_5m(list, trend.contains("Up") ? Utils.TREND_LONG : Utils.TREND_SHORT);
 
             String EVENT_ID_BTC = EVENT_PUMP + trend + symbol + Utils.getCurrentYyyyMmDdHHByChart(list);
             sendMsgPerHour(EVENT_ID_BTC, msg, true);
@@ -2836,7 +2837,8 @@ public class BinanceServiceImpl implements BinanceService {
             int maFast = 3;
             String chartname = Utils.getChartName(list_AUD);
 
-            String AUD_TREND = Utils.checkTrendByIndex(list_AUD, maFast, 10, "");
+            String AUD_TREND = "";
+            AUD_TREND += Utils.checkTrendByIndex(list_AUD, maFast, 10, "");
             AUD_TREND += Utils.checkTrendByIndex(list_AUD, maFast, 20, "");
             AUD_TREND += Utils.checkTrendByIndex(list_AUD, maFast, 50, "");
             if (Utils.isNotBlank(AUD_TREND)) {
@@ -2846,7 +2848,8 @@ public class BinanceServiceImpl implements BinanceService {
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
 
-            String EUR_TREND = Utils.checkTrendByIndex(list_EUR, maFast, 10, "");
+            String EUR_TREND = "";
+            EUR_TREND += Utils.checkTrendByIndex(list_EUR, maFast, 10, "");
             EUR_TREND += Utils.checkTrendByIndex(list_EUR, maFast, 20, "");
             EUR_TREND += Utils.checkTrendByIndex(list_EUR, maFast, 50, "");
             if (Utils.isNotBlank(EUR_TREND)) {
@@ -2856,7 +2859,8 @@ public class BinanceServiceImpl implements BinanceService {
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
 
-            String GBP_TREND = Utils.checkTrendByIndex(list_GBP, maFast, 10, "");
+            String GBP_TREND = "";
+            GBP_TREND += Utils.checkTrendByIndex(list_GBP, maFast, 10, "");
             GBP_TREND += Utils.checkTrendByIndex(list_GBP, maFast, 20, "");
             GBP_TREND += Utils.checkTrendByIndex(list_GBP, maFast, 50, "");
             if (Utils.isNotBlank(GBP_TREND)) {
@@ -2937,17 +2941,6 @@ public class BinanceServiceImpl implements BinanceService {
             taker += Utils.isNotBlank(vol_h4) ? " (H4)" + vol_h4 : "";
             taker += Utils.isNotBlank(vol_d1) ? " (D)" + vol_d1 : "";
         }
-        // -------------------------------------------------------------------------
-        //if (Utils.isNotBlank(taker)) {
-        //    if (!BscScanBinanceApplication.TAKER_TOKENS.contains("_" + symbol + "_")) {
-        //        if (!"_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-        //
-        //            BscScanBinanceApplication.TAKER_TOKENS += symbol + "_";
-        //            sendMsgChart15m(gecko_id, symbol);
-        //        }
-        //    }
-        //}
-
         // -------------------------------------------------------------------------
         Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
 
@@ -3050,14 +3043,18 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (!Objects.equals("BTC", symbol)) {
-            String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_15m, current_price, true, "");
-            if (Utils.isNotBlank(trend_by_btc)) {
-                note += "_PositionBTC15m";
-            }
+            if (Utils.isUptrendByMaIndex(list_h4, 10)) {
+                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, "");
+                if (Utils.isNotBlank(trend_by_btc)) {
+                    note += "_PositionBTC4h";
+                }
 
-            trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, "");
-            if (Utils.isNotBlank(trend_by_btc)) {
-                note += "_PositionBTC4h";
+                if (Utils.isUptrendByMaIndex(list_h1, 10)) {
+                    trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_15m, current_price, true, "");
+                    if (Utils.isNotBlank(trend_by_btc)) {
+                        note += "_PositionBTC15m";
+                    }
+                }
             }
         }
 
