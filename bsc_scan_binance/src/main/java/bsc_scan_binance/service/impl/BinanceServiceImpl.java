@@ -2710,8 +2710,12 @@ public class BinanceServiceImpl implements BinanceService {
         if (!Objects.equals("BTC", symbol)) {
             return;
         }
+        if (Objects.equals(Utils.TREND_OPPOSITE, BTC_H1_TRENDING)) {
+            return;
+        }
 
-        String trend = Utils.checkTrendByIndex(list, 3, 10, "");
+        String trend = "";
+        trend += Utils.checkTrendByIndex(list, 3, 10, "");
         trend += Utils.checkTrendByIndex(list, 3, 20, "");
         trend += Utils.checkTrendByIndex(list, 3, 50, "");
 
@@ -2721,6 +2725,8 @@ public class BinanceServiceImpl implements BinanceService {
 
             msg += Utils.new_line_from_service
                     + Utils.calcSL_TP_5m(list, trend.contains("Up") ? Utils.TREND_LONG : Utils.TREND_SHORT);
+
+            msg += "(H4.H1):" + BTC_H1_TRENDING;
 
             String EVENT_ID_BTC = EVENT_PUMP + trend + symbol + Utils.getCurrentYyyyMmDdHHByChart(list);
             sendMsgPerHour(EVENT_ID_BTC, msg, true);
@@ -2913,10 +2919,10 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         if (Objects.equals("BTC", symbol)) {
-            boolean trend_ma10 = Utils.isUptrendByMaIndex(list_h1, 10);
-            boolean trend_ma3 = Utils.isUptrendByMaIndex(list_h1, 3);
-            if (trend_ma10 == trend_ma3) {
-                BTC_H1_TRENDING = trend_ma10 ? Utils.TREND_LONG : Utils.TREND_SHORT;
+            boolean trend_h4 = Utils.isUptrendByMaIndex(list_h4, 10);
+            boolean trend_h1 = Utils.isUptrendByMaIndex(list_h1, 10);
+            if (trend_h4 == trend_h1) {
+                BTC_H1_TRENDING = trend_h4 ? Utils.TREND_LONG : Utils.TREND_SHORT;
             } else {
                 BTC_H1_TRENDING = Utils.TREND_OPPOSITE;
             }
