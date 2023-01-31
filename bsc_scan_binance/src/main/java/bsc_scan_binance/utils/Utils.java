@@ -60,12 +60,19 @@ public class Utils {
     public static final String PREPARE_ORDERS_DATA_TYPE_MIN14D = "4";
     public static final String PREPARE_ORDERS_DATA_TYPE_MAX14D = "5";
 
+    public static final String TREND_LONG_UP = "Up";
+    public static final String TREND_SHORT_DN = "Down";
     public static final String TREND_LONG = "Long";
     public static final String TREND_SHORT = "Short";
     public static final String TREND_DANGER = "(Danger)";
     public static final String TREND_OPPOSITE = "Opposite";
     public static final String TREND_START_LONG = "Start:Long";
     public static final String TREND_STOP_LONG = "Stop:Long";
+
+    public static final String CHAR_MONEY = "💰";
+    public static final String CHAR_LONG = "L";
+    public static final String CHAR_SHORT = "S";
+    public static final String CHAR_NORMAL = "n";
 
     public static final int MA_FAST = 6;
     public static final int MA_INDEX_H1_START_LONG = 50;
@@ -2499,6 +2506,22 @@ public class Utils {
         return false;
     }
 
+    // "l:Long, s:Short, n:normal"
+    public static String initLongShort(List<BtcFutures> list) {
+        BigDecimal ma6_1 = calcMA(list, 6, 1);
+        BigDecimal ma6_2 = calcMA(list, 6, 2);
+        BigDecimal ma6_3 = calcMA(list, 6, 3);
+        if ((ma6_1.compareTo(ma6_2) > 0) && (ma6_3.compareTo(ma6_2) > 0)) {
+            return CHAR_LONG;
+        }
+
+        if ((ma6_2.compareTo(ma6_1) > 0) && (ma6_2.compareTo(ma6_3) > 0)) {
+            return CHAR_SHORT;
+        }
+
+        return CHAR_NORMAL;
+    }
+
     public static boolean isMa3CuttingUpX(List<BtcFutures> list, int slowIndex) {
         int cur = 1;
         int pre = 2;
@@ -2540,14 +2563,13 @@ public class Utils {
         BigDecimal ma10_1 = calcMA(list, slowIndex, 1);
         BigDecimal ma10_2 = calcMA(list, slowIndex, 2);
 
-        if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma10_1) > 0)
-                && (ma10_2.compareTo(ma3_2) > 0)) {
+        if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma10_1) > 0) && (ma10_2.compareTo(ma3_2) > 0)) {
             return TREND_LONG;
         }
         if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma10_1) < 0) && (ma10_2.compareTo(ma3_2) < 0)) {
             return TREND_SHORT;
         }
-        //--------------------------------------------
+        // --------------------------------------------
         BigDecimal close1 = list.get(1).getPrice_close_candle();
         BigDecimal close2 = list.get(2).getPrice_close_candle();
         if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(close2) > 0)) {
@@ -2578,8 +2600,7 @@ public class Utils {
         BigDecimal ma10_2 = calcMA(list, slowIndex, end);
 
         if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
-            if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma10_1) > 0)
-                    && (ma10_2.compareTo(ma3_2) > 0)) {
+            if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma10_1) > 0) && (ma10_2.compareTo(ma3_2) > 0)) {
                 return getTrendPrifix(TREND_LONG, fastIndex, slowIndex);
             }
         }
@@ -2594,8 +2615,8 @@ public class Utils {
     }
 
     public static String getTrendPrifix(String trend, int maFast, int maSlow) {
-        String check = Objects.equals(trend, Utils.TREND_LONG) ? maFast + "Up" + maSlow + " 💹"
-                : maFast + "Dn" + maSlow + " 📉";
+        String check = Objects.equals(trend, Utils.TREND_LONG) ? maFast + TREND_LONG_UP + maSlow + " 💹"
+                : maFast + TREND_SHORT_DN + maSlow + " 📉";
 
         return "(" + check + " )";
     }
