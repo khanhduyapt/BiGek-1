@@ -1647,6 +1647,20 @@ public class Utils {
         return getPercent(LowHeight.get(1), LowHeight.get(0));
     }
 
+    public static boolean isDangerRange(List<BtcFutures> list) {
+        BigDecimal ma3 = calcMA(list, 3, 0);
+
+        List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list);
+        BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
+        range = range.divide(BigDecimal.valueOf(4), 10, RoundingMode.CEILING);
+        BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
+        if (ma3.compareTo(max_allow_long) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static List<BigDecimal> getLowHeightCandle(List<BtcFutures> list) {
         List<BigDecimal> result = new ArrayList<BigDecimal>();
 
@@ -2610,16 +2624,6 @@ public class Utils {
         String result = "";
         if (isCuttingUp) {
             result = type + "Long" + getChartName(list) + "";
-
-            List<BigDecimal> low_heigh = getLowHeightCandle(list);
-            BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
-            range = range.divide(BigDecimal.valueOf(3), 10, RoundingMode.CEILING);
-            BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
-
-            if (currPrice.compareTo(max_allow_long) > 0) {
-                // result += TREND_DANGER;
-                // return "";
-            }
         } else if (isCuttingDown) {
             result = type + "Short" + getChartName(list);
         }

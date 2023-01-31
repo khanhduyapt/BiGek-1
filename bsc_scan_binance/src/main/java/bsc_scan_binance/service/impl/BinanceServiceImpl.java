@@ -2799,13 +2799,12 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 String str_current_price = "(" + Utils.removeLastZero(current_price) + ")";
-                String msg = chartname + trend + symbol + ".vs.BTC." + str_current_price;
-                if (Utils.isNotBlank(append)) {
-                    msg += Utils.new_line_from_service + append;
-                }
+                String msg = chartname + trend + symbol + ".vs.BTC." + str_current_price + append;
+
                 if (Utils.isNotBlank(bid_ask)) {
                     msg += Utils.new_line_from_service + bid_ask;
                 }
+
                 String EVENT_ID_COMPARE_BTC = EVENT_PUMP + symbol
                         + Utils.getCurrentYyyyMmDdHHByChart(list_compare_btc);
 
@@ -2848,7 +2847,7 @@ public class BinanceServiceImpl implements BinanceService {
             AUD_TREND += Utils.checkTrendByIndex(list_AUD, maFast, 20, "");
             AUD_TREND += Utils.checkTrendByIndex(list_AUD, maFast, 50, "");
             if (Utils.isNotBlank(AUD_TREND)) {
-                String msg = AUD_TREND + " AUD_USDT";
+                String msg = chartname + AUD_TREND + " AUD_USDT";
 
                 String EVENT_ID = EVENT_PUMP + "AUD_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_AUD);
                 sendMsgPerHour(EVENT_ID, msg, true);
@@ -2859,7 +2858,7 @@ public class BinanceServiceImpl implements BinanceService {
             EUR_TREND += Utils.checkTrendByIndex(list_EUR, maFast, 20, "");
             EUR_TREND += Utils.checkTrendByIndex(list_EUR, maFast, 50, "");
             if (Utils.isNotBlank(EUR_TREND)) {
-                String msg = EUR_TREND + " EUR_USDT";
+                String msg = chartname + EUR_TREND + " EUR_USDT";
 
                 String EVENT_ID = EVENT_PUMP + "EUR_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_EUR);
                 sendMsgPerHour(EVENT_ID, msg, true);
@@ -2870,7 +2869,7 @@ public class BinanceServiceImpl implements BinanceService {
             GBP_TREND += Utils.checkTrendByIndex(list_GBP, maFast, 20, "");
             GBP_TREND += Utils.checkTrendByIndex(list_GBP, maFast, 50, "");
             if (Utils.isNotBlank(GBP_TREND)) {
-                String msg = GBP_TREND + " GBP_USDT";
+                String msg = chartname + GBP_TREND + " GBP_USDT";
 
                 String EVENT_ID = EVENT_PUMP + "GBP_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_GBP);
                 sendMsgPerHour(EVENT_ID, msg, true);
@@ -2927,13 +2926,7 @@ public class BinanceServiceImpl implements BinanceService {
                 BTC_H1_TRENDING = Utils.TREND_OPPOSITE;
             }
 
-            List<BigDecimal> low_heigh = Utils.getLowHeightCandle(list_days);
-            BigDecimal range = low_heigh.get(1).subtract(low_heigh.get(0));
-            range = range.divide(BigDecimal.valueOf(4), 10, RoundingMode.CEILING);
-            BigDecimal max_allow_long = low_heigh.get(1).subtract(range);
-            if (current_price.compareTo(max_allow_long) > 0) {
-                RANGE_BTC_IS_DANGER = true;
-            }
+            RANGE_BTC_IS_DANGER = Utils.isDangerRange(list_days);
         }
 
         // -------------------------------------------------------------------------
@@ -3048,7 +3041,7 @@ public class BinanceServiceImpl implements BinanceService {
             // position = "";
         }
 
-        if (!Objects.equals("BTC", symbol)) {
+        if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
             if (Utils.isUptrendByMaIndex(list_h4, 6)) {
                 String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, "");
                 if (Utils.isNotBlank(trend_by_btc)) {
