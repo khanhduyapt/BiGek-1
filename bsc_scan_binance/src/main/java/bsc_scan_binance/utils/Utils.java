@@ -326,7 +326,8 @@ public class Utils {
                     if (strid.length() < 2) {
                         strid = "0" + strid;
                     }
-                    dto.setId(epic + "_15m_" + strid);
+                    strid = epic + (Objects.equals(CAPITAL_TIME_HOUR, TIME) ? "_1h_" : "_15m_") + strid;
+                    dto.setId(strid);
                     dto.setCurrPrice(close_price);
                     dto.setLow_price(low_price);
                     dto.setHight_price(hight_price);

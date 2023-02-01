@@ -87,18 +87,6 @@ public class BscScanBinanceApplication {
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;
 
-                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
-                            binance_service.getChartWD("bitcoin", "BTC");
-                            wait(SLEEP_MINISECONDS);
-
-                            System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
-                            binance_service.getChartWD("ethereum", "ETH");
-                            wait(SLEEP_MINISECONDS);
-
-                            System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
-                            binance_service.getChartWD("binancecoin", "BNB");
-                            wait(SLEEP_MINISECONDS);
-
                             if (Utils.isAllowSendMsgSetting()) {
                                 //US30    US Wall Street 30 (USA 30, Dow Jones)
                                 //US500   US 500 (S&P)
@@ -112,6 +100,22 @@ public class BscScanBinanceApplication {
                                     binance_service.checkCapital(EPIC);
                                     wait(SLEEP_MINISECONDS * 2);
                                 }
+
+                                //------------------------------------------
+
+                                System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
+                                binance_service.getChartWD("bitcoin", "BTC");
+                                wait(SLEEP_MINISECONDS);
+
+                                System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
+                                binance_service.getChartWD("ethereum", "ETH");
+                                wait(SLEEP_MINISECONDS);
+
+                                System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
+                                binance_service.getChartWD("binancecoin", "BNB");
+                                wait(SLEEP_MINISECONDS);
+
+                                //------------------------------------------
 
                                 //EURUSD  Euro / US Dollar
                                 //USDJPY  US Dollar / Japanese Yen
