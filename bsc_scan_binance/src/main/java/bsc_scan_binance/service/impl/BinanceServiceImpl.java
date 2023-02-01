@@ -2663,7 +2663,7 @@ public class BinanceServiceImpl implements BinanceService {
         String cur_trend = Utils.checkTrendByMa10_20_50(list, 3, trend);
         if (Utils.isNotBlank(cur_trend)) {
             String chartname = Utils.getChartName(list);
-            String msg = chartname + cur_trend + symbol + "(" + list.get(0).getCurrPrice() + ")";
+            String msg = chartname + cur_trend + symbol + "(" + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
 
             if (Utils.isNotBlank(append)) {
                 msg += Utils.new_line_from_service + append;
@@ -2775,7 +2775,7 @@ public class BinanceServiceImpl implements BinanceService {
         // ------------------------------------------------------------------------------------
         List<BtcFutures> list_1h = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_HOUR, 50);
         if (CollectionUtils.isEmpty(list_1h)) {
-            System.out.println(Utils.getTimeHHmm() + "Capital: " + EPIC + " (Empty)");
+            System.out.println(Utils.getTimeHHmm() + EPIC + " (Empty)");
             return;
         }
 
@@ -2789,7 +2789,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         sendScapMsgLongShort(list_15m, EPIC, trend, Utils.calc_BUF_LO_HI_BUF(list_1h, trend));
 
-        System.out.println(Utils.getTimeHHmm() + "Capital: " + EPIC + " " + Utils.getChartName(list_1h));
+        System.out.println(Utils.getTimeHHmm() + EPIC + " " + Utils.getChartName(list_1h));
     }
 
     @Transactional
@@ -2817,7 +2817,6 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         if (Objects.equals("BTC", symbol)) {
-
             boolean trend_h4 = Utils.isUptrendByMaIndex(list_h4, 6);
             boolean trend_h1 = Utils.isUptrendByMaIndex(list_h1, 6);
             if (trend_h4 == trend_h1) {
@@ -2839,8 +2838,9 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String taker = Utils.analysisTakerVolume(list_days, list_h4, list_h1);
-        sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG,
-                taker + type + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDD");
+        String day_append = taker;
+        day_append += type + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDD";
+        sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG, day_append);
 
         type = type + Utils.analysisVolume(list_days);
 
@@ -2920,7 +2920,9 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
         if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
             if (Utils.isUptrendByMaIndex(list_h1, 10)) {
-                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_1h, current_price, true, type, true);
+                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_1h, current_price, true,
+                        type.replace("}volma", "").replace("volma{", Utils.new_line_from_service), true);
+
                 if (Utils.isNotBlank(trend_by_btc)) {
                     note += "_PositionBTC15m";
                 }

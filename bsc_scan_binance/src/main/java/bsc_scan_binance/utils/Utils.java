@@ -68,7 +68,7 @@ public class Utils {
     public static final String PREPARE_ORDERS_DATA_TYPE_MAX14D = "5";
 
     public static final String TREND_LONG_UP = "Up";
-    public static final String TREND_SHORT_DN = "Down";
+    public static final String TREND_SHORT_DN = "Dn";
     public static final String TREND_LONG = "Long";
     public static final String TREND_SHORT = "Short";
     public static final String TREND_DANGER = "(Danger)";
@@ -99,6 +99,70 @@ public class Utils {
     public static final String CAPITAL_TIME_HOUR = "HOUR";
     public static final String CAPITAL_TIME_DAY = "DAY";
     public static final String CAPITAL_TIME_WEEK = "WEEK";
+
+    // US30 US Wall Street 30 (USA 30, Dow Jones)
+    // US500 US 500 (S&P)
+    // HK50 Hong Kong 50
+    // UK100 UK 100
+    // FR40 France 40 (France)
+    // DXY US Dollar Index
+    public static final List<String> EPICS_INDEXS = Arrays.asList("GOLD", "OIL_CRUDE", "US30", "US500", "UK100", "HK50",
+            "FR40");
+
+    // EURAUD Euro / Australian Dollar
+    // EURCAD Euro / Canadian dollar
+    // EURCHF Euro / Swiss Franc
+    // EURGBP Euro / British Pound
+    // EURJPY Euro / Japanese Yen
+    // EURMXN Euro / Mexican Peso
+    // EURNZD Euro / New Zealand Dollar
+    // EURUSD Euro / US Dollar
+    public static final List<String> EPICS_FOREX_EUR = Arrays.asList("EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY",
+            "EURMXN", "EURNZD", "EURUSD");
+
+    // AUDCAD Australian Dollar / Canadian Dollar
+    // AUDCHF Australian Dollar / Swiss Franc
+    // AUDCNH Australian Dollar / Chinese Yuan
+    // AUDJPY Australian Dollar / Japanese Yen
+    // AUDMXN Australian Dollar / Mexican Peso
+    // AUDNZD Australian Dollar / New Zealand Dollar
+    // AUDSGD Australian Dollar / Singapore Dollar
+    // AUDUSD Australian Dollar / US Dollar
+    public static final List<String> EPICS_FOREX_AUD = Arrays.asList("AUDCAD", "AUDCHF", "AUDCNH", "AUDJPY", "AUDMXN",
+            "AUDNZD", "AUDSGD", "AUDUSD");
+
+    // GBPAUD British Pound / Australian Dollar
+    // GBPCAD British Pound / Canadian dollar
+    // GBPCHF British Pound / Swiss Franc
+    // GBPJPY British Pound / Japanese Yen
+    // GBPMXN British Pound / Mexican Peso
+    // GBPNZD British Pound / New Zealand Dollar
+    // GBPUSD British Pound / US Dollar
+    public static final List<String> EPICS_FOREX_GBP = Arrays.asList("GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPMXN",
+            "GBPNZD", "GBPUSD");
+
+    // CADCHF Canadian dollar / Swiss Franc
+    // CADJPY Canadian dollar / Japanese Yen
+    // CADSGD Canadian Dollar / Singapore Dollar
+    // CHFHKD Swiss Franc / Hong Kong Dollar
+    // CHFJPY Swiss Franc / Japanese Yen
+    // CHFSGD Swiss Franc / Singapore Dollar
+    // CNHHKD Chinese yuan / Hong Kong Dollar
+    // CNHJPY Chinese Yuan / Japanese Yen
+    public static final List<String> EPICS_FOREX_CAD = Arrays.asList("CADCHF", "CADJPY", "CADSGD", "CHFHKD", "CHFJPY",
+            "CHFSGD", "CNHHKD", "CNHJPY");
+
+    // NZDCAD New Zealand Dollar / Canadian dollar
+    // NZDCHF New Zealand Dollar / Swiss Franc
+    // NZDJPY New Zealand Dollar / Japanese Yen
+    // NZDSGD New Zealand Dollar / Singapore Dollar
+    // NZDUSD New Zealand Dollar / US Dollar
+    // USDCAD US Dollar / Canadian dollar
+    // USDCHF US Dollar / Swiss Franc
+    // USDCNH US Dollar / Chinese Yuan
+    // USDJPY US Dollar / Japanese Yen
+    public static final List<String> EPICS_FOREX_DOLLAR = Arrays.asList("NZDCAD", "NZDCHF", "NZDJPY", "NZDSGD",
+            "NZDUSD", "USDCAD", "USDCHF", "USDCNH", "USDJPY");
 
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"

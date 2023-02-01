@@ -78,6 +78,21 @@ public class BscScanBinanceApplication {
                 int pre_blog15minute = -1;
                 int cur_blog15minute = -1;
 
+                int pre_blog15minute1 = -1;
+                int cur_blog15minute1 = -1;
+
+                int pre_blog15minute2 = -1;
+                int cur_blog15minute2 = -1;
+
+                int pre_blog15minute3 = -1;
+                int cur_blog15minute3 = -1;
+
+                int pre_blog15minute4 = -1;
+                int cur_blog15minute4 = -1;
+
+                int pre_blog15minute5 = -1;
+                int cur_blog15minute5 = -1;
+
                 Date start_time = Calendar.getInstance().getTime();
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
@@ -86,22 +101,6 @@ public class BscScanBinanceApplication {
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;
-
-                            if (Utils.isAllowSendMsgSetting()) {
-                                //US30    US Wall Street 30 (USA 30, Dow Jones)
-                                //US500   US 500 (S&P)
-                                //HK50    Hong Kong 50
-                                //UK100   UK 100
-                                //FR40    France 40 (France)
-                                //DXY     US Dollar Index
-                                List<String> epics_index = Arrays.asList("GOLD", "OIL_CRUDE", "US30", "US500",
-                                        "UK100", "HK50", "FR40");
-                                for (String EPIC : epics_index) {
-                                    binance_service.checkCapital(EPIC);
-                                    wait(SLEEP_MINISECONDS);
-                                }
-                            }
-                            //------------------------------------------
 
                             System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
                             binance_service.getChartWD("bitcoin", "BTC");
@@ -115,50 +114,83 @@ public class BscScanBinanceApplication {
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
 
-                            //------------------------------------------
-                            if (Utils.isAllowSendMsgSetting()) {
-                                //EURUSD  Euro / US Dollar
-                                //USDJPY  US Dollar / Japanese Yen
-                                //GBPUSD  British Pound / US Dollar
-                                //AUDUSD  Australian Dollar / US Dollar
-                                //GBPJPY  British Pound / Japanese Yen
-                                //USDCAD  US Dollar / Canadian dollar
-                                //EURJPY  Euro / Japanese Yen
-                                //USDCHF  US Dollar / Swiss Franc
-                                //AUDJPY  Australian Dollar / Japanese Yen
-                                //EURGBP  Euro / British Pound
-                                //EURAUD  Euro / Australian Dollar
-                                //CADJPY  Canadian dollar / Japanese Yen
-                                //GBPAUD  British Pound / Australian Dollar
-                                //NZDUSD  New Zealand Dollar / US Dollar
-                                //EURCAD  Euro / Canadian dollar
-                                //AUDCAD  Australian Dollar / Canadian Dollar
-                                //GBPCAD  British Pound / Canadian dollar
-                                //EURCHF  Euro / Swiss Franc
-                                //AUDNZD  Australian Dollar / New Zealand Dollar
-                                //CHFJPY  Swiss Franc / Japanese Yen
-                                List<String> epics_forex = Arrays.asList(
-                                        "EURCAD", "AUDCAD", "GBPCAD", "CADJPY",
-                                        "USDCAD", "USDJPY", "USDCHF",
-                                        "AUDUSD", "AUDJPY", "AUDNZD",
-                                        "GBPUSD", "GBPJPY", "GBPAUD",
-                                        "EURUSD", "EURJPY", "EURGBP", "EURAUD", "EURCHF",
-                                        "NZDUSD", "CHFJPY");
-
-                                for (String EPIC : epics_forex) {
+                            if (Utils.isAllowSendMsgSetting() && Utils.isBusinessTime()) {
+                                for (String EPIC : Utils.EPICS_INDEXS) {
                                     binance_service.checkCapital(EPIC);
                                     wait(SLEEP_MINISECONDS);
                                 }
                             }
                         }
 
-                        if (!"_BTC_ETH_BNB_".contains("_" + coin.getSymbol() + "_")) {
-                            if (BscScanBinanceApplication.TAKER_TOKENS.contains("_" + coin.getSymbol() + "_")) {
-                                // System.out.println("Check taker (m15)" + coin.getSymbol());
-                                // binance_service.sendMsgChart15m(coin.getGeckoid(), coin.getSymbol());
+                        if ((idx % 5 == 1) && Utils.isBusinessTime()) {
+                            cur_blog15minute1 = Utils.getCurrentMinute_Blog15minutes();
+                            if (pre_blog15minute1 != cur_blog15minute1) {
+                                pre_blog15minute1 = cur_blog15minute1;
+
+                                if (Utils.isAllowSendMsgSetting()) {
+                                    for (String EPIC : Utils.EPICS_FOREX_EUR) {
+                                        binance_service.checkCapital(EPIC);
+                                        wait(SLEEP_MINISECONDS);
+                                    }
+                                }
                             }
                         }
 
+                        if ((idx % 5 == 2) && Utils.isBusinessTime()) {
+                            cur_blog15minute2 = Utils.getCurrentMinute_Blog15minutes();
+                            if (pre_blog15minute2 != cur_blog15minute2) {
+                                pre_blog15minute2 = cur_blog15minute2;
+
+                                if (Utils.isAllowSendMsgSetting()) {
+                                    for (String EPIC : Utils.EPICS_FOREX_AUD) {
+                                        binance_service.checkCapital(EPIC);
+                                        wait(SLEEP_MINISECONDS);
+                                    }
+                                }
+                            }
+                        }
+
+                        if ((idx % 5 == 3) && Utils.isBusinessTime()) {
+                            cur_blog15minute3 = Utils.getCurrentMinute_Blog15minutes();
+                            if (pre_blog15minute3 != cur_blog15minute3) {
+                                pre_blog15minute3 = cur_blog15minute3;
+
+                                if (Utils.isAllowSendMsgSetting()) {
+                                    for (String EPIC : Utils.EPICS_FOREX_GBP) {
+                                        binance_service.checkCapital(EPIC);
+                                        wait(SLEEP_MINISECONDS);
+                                    }
+                                }
+                            }
+                        }
+
+                        if ((idx % 5 == 4) && Utils.isBusinessTime()) {
+                            cur_blog15minute4 = Utils.getCurrentMinute_Blog15minutes();
+                            if (pre_blog15minute4 != cur_blog15minute4) {
+                                pre_blog15minute4 = cur_blog15minute4;
+
+                                if (Utils.isAllowSendMsgSetting()) {
+                                    for (String EPIC : Utils.EPICS_FOREX_CAD) {
+                                        binance_service.checkCapital(EPIC);
+                                        wait(SLEEP_MINISECONDS);
+                                    }
+                                }
+                            }
+                        }
+
+                        if ((idx % 5 == 0) && Utils.isBusinessTime()) {
+                            cur_blog15minute5 = Utils.getCurrentMinute_Blog15minutes();
+                            if (pre_blog15minute5 != cur_blog15minute5) {
+                                pre_blog15minute5 = cur_blog15minute5;
+
+                                if (Utils.isAllowSendMsgSetting()) {
+                                    for (String EPIC : Utils.EPICS_FOREX_DOLLAR) {
+                                        binance_service.checkCapital(EPIC);
+                                        wait(SLEEP_MINISECONDS);
+                                    }
+                                }
+                            }
+                        }
                         // ----------------------------------------------------------
 
                         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
@@ -188,7 +220,6 @@ public class BscScanBinanceApplication {
                                 System.out.println("dkd error gecko_service.LoadData:[" + coin.getGeckoid() + "]"
                                         + e.getMessage());
                             }
-
                         }
 
                         wait(SLEEP_MINISECONDS);
