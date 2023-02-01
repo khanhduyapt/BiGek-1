@@ -2828,20 +2828,6 @@ public class BinanceServiceImpl implements BinanceService {
             RANGE_BTC_IS_DANGER = Utils.isDangerRange(list_days);
         }
 
-        // -------------------------------------------------------------------------
-        String taker = "";
-        String vol_h1 = Utils.analysisTakerVolume(list_h1, 50);
-        String vol_h4 = Utils.analysisTakerVolume(list_h4, 50);
-        String vol_d1 = Utils.analysisTakerVolume(list_days, 30);
-        if (Utils.isNotBlank(vol_h1 + vol_h4 + vol_d1)) {
-            taker += "Taker:";
-            taker += Utils.isNotBlank(vol_h1) ? " (H1)" + vol_h1 : "";
-            taker += Utils.isNotBlank(vol_h4) ? " (H4)" + vol_h4 : "";
-            taker += Utils.isNotBlank(vol_d1) ? " (D)" + vol_d1 : "";
-        }
-        // -------------------------------------------------------------------------
-        Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
-
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures) ";
@@ -2850,10 +2836,13 @@ public class BinanceServiceImpl implements BinanceService {
         } else {
             type = " (Spot) ";
         }
+
+        String taker = Utils.analysisTakerVolume(list_days, list_h4, list_h1);
         sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG, taker + type);
 
         type = type + Utils.analysisVolume(list_days);
 
+        Boolean allow_long_d1 = Utils.checkClosePriceAndMa_StartFindLong(list_days);
         String scapLongH4 = Utils.getScapLong(list_h4, list_days, 10, allow_long_d1);
         String scapLongD1 = Utils.getScapLong(list_days, list_days, 10, allow_long_d1);
 

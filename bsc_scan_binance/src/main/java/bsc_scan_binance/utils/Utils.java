@@ -2328,11 +2328,10 @@ public class Utils {
     }
 
     public static String calc_BUF_LO_HI_BUF(List<BtcFutures> list, String trend) {
-        BigDecimal entry = list.get(0).getCurrPrice();
         BigDecimal buf = BigDecimal.ZERO;
-
-        BigDecimal range = BigDecimal.ZERO;
-        BigDecimal ma10 = calcMA(list, 10, 1);
+        BigDecimal ma10 = calcMA(list, 10, 0);
+        BigDecimal entry = list.get(0).getCurrPrice();
+        BigDecimal range = entry.subtract(ma10).abs(); // .multiply(BigDecimal.valueOf(2))
 
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
         BigDecimal LO = low_heigh.get(0);
@@ -2340,15 +2339,12 @@ public class Utils {
 
         String result = "";
         if (trend.contains(TREND_LONG)) {
-            range = ma10.subtract(buf);
-            buf = LO.subtract(range);
+            buf = roundDefault(LO.subtract(range));
             result += "Buf:" + getPercentToEntry(LO, buf, true);
             result += ",Lo:" + getPercentToEntry(entry, LO, true);
             result += ",Hi:" + getPercentToEntry(entry, HI, true);
         } else {
-            range = buf.subtract(ma10);
-            buf = HI.add(range);
-
+            buf = roundDefault(HI.add(range));
             result += "Lo:" + getPercentToEntry(entry, LO, true);
             result += ",Hi:" + getPercentToEntry(entry, HI, true);
             result += ",Buf:" + getPercentToEntry(HI, buf, true);
@@ -2358,7 +2354,24 @@ public class Utils {
         return result;
     }
 
-    public static String analysisTakerVolume(List<BtcFutures> list, int maSlowIndex) {
+    public static String analysisTakerVolume(List<BtcFutures> list_days, List<BtcFutures> list_h4,
+            List<BtcFutures> list_h1) {
+
+        String taker = "";
+        String vol_h1 = Utils.analysisTakerVolume_sub(list_h1, 50);
+        String vol_h4 = Utils.analysisTakerVolume_sub(list_h4, 50);
+        String vol_d1 = Utils.analysisTakerVolume_sub(list_days, 30);
+        if (Utils.isNotBlank(vol_h1 + vol_h4 + vol_d1)) {
+            taker += "Taker:";
+            taker += Utils.isNotBlank(vol_h1) ? " (H1)" + vol_h1 : "";
+            taker += Utils.isNotBlank(vol_h4) ? " (H4)" + vol_h4 : "";
+            taker += Utils.isNotBlank(vol_d1) ? " (D)" + vol_d1 : "";
+        }
+
+        return taker;
+    }
+
+    private static String analysisTakerVolume_sub(List<BtcFutures> list, int maSlowIndex) {
         if (list.size() < 5) {
             return "";
         }
