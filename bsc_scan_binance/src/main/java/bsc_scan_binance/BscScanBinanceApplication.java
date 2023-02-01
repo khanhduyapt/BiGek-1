@@ -135,7 +135,7 @@ public class BscScanBinanceApplication {
 
                         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
                         key += Utils.getStringValue(coin.getSymbol()) + "_";
-                        key += Utils.getCurrentYyyyMmDd_Blog4h();
+                        key += Utils.getCurrentYyyyMmDd_Blog2h();
 
                         boolean reload = false;
                         if (keys_dict.containsKey(key)) {
