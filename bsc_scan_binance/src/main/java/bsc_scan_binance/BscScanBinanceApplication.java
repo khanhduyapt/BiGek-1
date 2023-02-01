@@ -106,11 +106,11 @@ public class BscScanBinanceApplication {
                                 //UK100   UK 100
                                 //FR40    France 40 (France)
                                 //DXY     US Dollar Index
-                                List<String> epics_index = Arrays.asList("GOLD", "US30", "UK100", "OIL_CRUDE", "US500",
-                                        "HK50", "UK100", "FR40");
+                                List<String> epics_index = Arrays.asList("GOLD", "OIL_CRUDE", "US30", "US500",
+                                        "UK100", "HK50", "FR40");
                                 for (String EPIC : epics_index) {
                                     binance_service.checkCapital(EPIC);
-                                    wait(SLEEP_MINISECONDS * 5);
+                                    wait(SLEEP_MINISECONDS * 2);
                                 }
 
                                 //EURUSD  Euro / US Dollar
@@ -133,14 +133,17 @@ public class BscScanBinanceApplication {
                                 //EURCHF  Euro / Swiss Franc
                                 //AUDNZD  Australian Dollar / New Zealand Dollar
                                 //CHFJPY  Swiss Franc / Japanese Yen
-                                List<String> epics_forex = Arrays.asList("EURUSD", "USDJPY", "GBPUSD", "AUDUSD",
-                                        "GBPJPY",
-                                        "USDCAD", "EURJPY", "USDCHF", "AUDJPY", "EURGBP", "EURAUD", "CADJPY", "GBPAUD",
-                                        "NZDUSD", "EURCAD", "AUDCAD", "GBPCAD", "EURCHF", "AUDNZD", "CHFJPY");
+                                List<String> epics_forex = Arrays.asList(
+                                        "EURCAD", "AUDCAD", "GBPCAD", "CADJPY",
+                                        "USDCAD", "USDJPY", "USDCHF",
+                                        "AUDUSD", "AUDJPY", "AUDNZD",
+                                        "GBPUSD", "GBPJPY", "GBPAUD",
+                                        "EURUSD", "EURJPY", "EURGBP", "EURAUD", "EURCHF",
+                                        "NZDUSD", "CHFJPY");
 
                                 for (String EPIC : epics_forex) {
                                     binance_service.checkCapital(EPIC);
-                                    wait(SLEEP_MINISECONDS * 5);
+                                    wait(SLEEP_MINISECONDS * 2);
                                 }
                             }
                         }

@@ -3006,8 +3006,8 @@ public class BinanceServiceImpl implements BinanceService {
             if (Utils.isNotBlank(trend_15m)) {
                 String chartname = Utils.getChartName(list_15m);
                 String msg = chartname + trend_15m + EPIC;
-                msg = Utils.new_line_from_service + Utils.calcSL_TP_5m(list_1h, trend);
-                msg = Utils.new_line_from_service + Utils.getAtlAth(list_1h);
+                msg += Utils.new_line_from_service + Utils.calcSL_TP_5m(list_1h, trend);
+                msg += Utils.new_line_from_service + Utils.getAtlAth(list_1h);
 
                 String EVENT_ID = EVENT_PUMP + EPIC + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_15m);
                 sendMsgPerHour(EVENT_ID, msg, true);
