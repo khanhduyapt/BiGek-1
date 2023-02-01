@@ -2749,8 +2749,31 @@ public class BinanceServiceImpl implements BinanceService {
         return trend;
     }
 
+    // "l:Long, s:Short, n:normal"
+    private String initLongOrShort(List<BtcFutures> list) {
+        BigDecimal ma_1 = Utils.calcMA(list, 10, 1);
+        BigDecimal ma_2 = Utils.calcMA(list, 10, 2);
+        BigDecimal ma_3 = Utils.calcMA(list, 10, 3);
+        BigDecimal ma50_1 = Utils.calcMA(list, 50, 1);
+
+        if ((ma_1.compareTo(ma_2) > 0) && (ma_3.compareTo(ma_2) > 0)) {
+            if (ma50_1.compareTo(ma_1) > 0) {
+                return Utils.CHAR_LONG;
+            }
+        }
+
+        if ((ma_2.compareTo(ma_1) > 0) && (ma_2.compareTo(ma_3) > 0)) {
+            if (ma50_1.compareTo(ma_1) < 0) {
+                return Utils.CHAR_SHORT;
+            }
+        }
+
+        return Utils.CHAR_NORMAL;
+    }
+
     public String createHistoryReverseOf_H1(List<BtcFutures> list_1h, String KEY) {
-        String chart_H = Utils.initLongShort(list_1h);
+
+        String chart_H = initLongOrShort(list_1h);
         String H = chart_H;
         FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, KEY);
         if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
@@ -2838,9 +2861,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String taker = Utils.analysisTakerVolume(list_days, list_h4, list_h1);
-        String day_append = taker;
-        day_append += type + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDD";
-        sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG, day_append);
+        sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG, "");
 
         type = type + Utils.analysisVolume(list_days);
 
@@ -2894,8 +2915,8 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
         // EVENT_D_H4_H1
         {
-            String chart_d = Utils.initLongShort(list_days);
-            String chart_h1 = Utils.initLongShort(list_h1);
+            String chart_d = Utils.initLongOrShort(list_days);
+            String chart_h1 = Utils.initLongOrShort(list_h1);
             String DH4H1 = chart_d + chart_h1;
             FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, gecko_id);
 

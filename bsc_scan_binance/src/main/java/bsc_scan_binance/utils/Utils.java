@@ -2573,22 +2573,6 @@ public class Utils {
         return false;
     }
 
-    // "l:Long, s:Short, n:normal"
-    public static String initLongShort(List<BtcFutures> list) {
-        BigDecimal ma_1 = calcMA(list, 10, 1);
-        BigDecimal ma_2 = calcMA(list, 10, 2);
-        BigDecimal ma_3 = calcMA(list, 10, 3);
-        if ((ma_1.compareTo(ma_2) > 0) && (ma_3.compareTo(ma_2) > 0)) {
-            return CHAR_LONG;
-        }
-
-        if ((ma_2.compareTo(ma_1) > 0) && (ma_2.compareTo(ma_3) > 0)) {
-            return CHAR_SHORT;
-        }
-
-        return CHAR_NORMAL;
-    }
-
 //    public static boolean isMa3CuttingUpX(List<BtcFutures> list, int slowIndex) {
 //        int cur = 1;
 //        int pre = 2;
