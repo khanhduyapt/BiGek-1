@@ -153,9 +153,9 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_FIBO_LONG_SHORT = "FIBO_";
     private static final String EVENT_TREND_1W1D = "1W1D";
     // "l:Long, s:Short, n:normal"
-    // DH4H1_BTC_LLL -> Search long m15.
-    // DH4H1_BTC_SSS -> Search short m15.
-    private static final String EVENT_DH = "DH4H1_"; // + SYMBOL + LLL
+    // DH4H1 BTC LL -> Search long m15.
+    // DH4H1 BTC SS -> Search short m15.
+    private static final String EVENT_DH = "DH4H1"; //
     private static final String EVENT_COMPRESSED_CHART = "Ma3_10_20_";
     private static final String EVENT_PUMP = "Pump_";
     private static final String EVENT_MSG_PER_HOUR = "MSG_PER_HOUR";
@@ -2855,11 +2855,18 @@ public class BinanceServiceImpl implements BinanceService {
     public void checkCurrencySub(String CUR) {
         int maFast = 3;
         List<BtcFutures> list = Utils.loadData(CUR, TIME_1h, 20);
-        String chartname = Utils.getChartName(list);
 
-        String chart = Utils.initLongShort(list);
-        if (!Objects.equals(Utils.CHAR_NORMAL, chart)) {
-            String trend = Objects.equals(Utils.CHAR_LONG, chart) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+        String chart_H = Utils.initLongShort(list);
+
+        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, CUR);
+        if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, CUR + "_USDT", CUR + "_USDT", chart_H, true));
+        }
+
+        FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
+        String H = entity.getNote();
+        if (!Objects.equals(Utils.CHAR_NORMAL, H)) {
+            String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
             List<BtcFutures> list_15m = Utils.loadData(CUR, TIME_15m, 50);
 
             String AUD_TREND = "";
@@ -2867,8 +2874,8 @@ public class BinanceServiceImpl implements BinanceService {
             AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 20, trend);
             AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 50, trend);
             if (Utils.isNotBlank(AUD_TREND)) {
+                String chartname = Utils.getChartName(list);
                 String msg = chartname + AUD_TREND + CUR + "_USDT";
-
                 String EVENT_ID = EVENT_PUMP + CUR + "_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
                 sendMsgPerHour(EVENT_ID, msg, true);
             }
@@ -3055,9 +3062,11 @@ public class BinanceServiceImpl implements BinanceService {
             String chart_h1 = Utils.initLongShort(list_h1);
             String DH4H1 = chart_d + chart_h1;
             FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, gecko_id);
+
             if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_d)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, gecko_id, symbol, DH4H1, true));
             }
+
             if (!Objects.equals(Utils.CHAR_NORMAL, chart_h1)) {
                 FundingHistory entity_dhh = fundingHistoryRepository.findById(id).orElse(null);
                 if (!Objects.equals(null, entity_dhh)) {
