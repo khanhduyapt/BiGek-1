@@ -2741,15 +2741,14 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     public String createHistoryReverseOf_H1(List<BtcFutures> list_1h, String KEY) {
-
         String chart_H = initLongOrShort(list_1h);
-        String H = chart_H;
         FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, KEY);
         if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
             fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, KEY, KEY, chart_H, true));
         }
 
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
+        String H = chart_H;
         if (!Objects.equals(null, entity)) {
             H = entity.getNote();
         }
