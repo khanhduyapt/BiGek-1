@@ -2915,8 +2915,8 @@ public class BinanceServiceImpl implements BinanceService {
         // ---------------------------------------------------------
         // EVENT_D_H4_H1
         {
-            String chart_d = Utils.initLongOrShort(list_days);
-            String chart_h1 = Utils.initLongOrShort(list_h1);
+            String chart_d = initLongOrShort(list_days);
+            String chart_h1 = initLongOrShort(list_h1);
             String DH4H1 = chart_d + chart_h1;
             FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, gecko_id);
 
