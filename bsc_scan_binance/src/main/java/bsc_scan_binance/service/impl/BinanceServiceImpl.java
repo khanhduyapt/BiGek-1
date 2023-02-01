@@ -1562,6 +1562,69 @@ public class BinanceServiceImpl implements BinanceService {
         return value;
     }
 
+    public void checkCurrencySub(String CUR) {
+        int maFast = 3;
+        List<BtcFutures> list = Utils.loadData(CUR, TIME_1h, 20);
+
+        String chart_H = Utils.initLongShort(list);
+        String H = chart_H;
+        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, CUR);
+        if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, CUR, CUR + "_USDT", chart_H, true));
+        }
+
+        FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
+        if (!Objects.equals(null, entity)) {
+            H = entity.getNote();
+        }
+
+        if (Objects.equals(Utils.CHAR_NORMAL, H)) {
+            return;
+        }
+
+        String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+        List<BtcFutures> list_15m = Utils.loadData(CUR, TIME_15m, 50);
+
+        String AUD_TREND = "";
+        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 10, trend);
+        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 20, trend);
+        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 50, trend);
+        if (Utils.isNotBlank(AUD_TREND)) {
+            String chartname = Utils.getChartName(list);
+            String msg = chartname + AUD_TREND + CUR + "_USDT";
+            String EVENT_ID = EVENT_PUMP + CUR + "_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
+            sendMsgPerHour(EVENT_ID, msg, true);
+        }
+
+    }
+
+    // AUD_EUR_GBP_USDT
+    @Override
+    public void checkCurrency() {
+        try {
+            if (!Utils.isAllowSendMsgSetting()) {
+                // return;
+            }
+
+            if (!Utils.isBusinessTime()) {
+                return;
+            }
+
+            int dow = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+            boolean isWeekend = ((dow < Calendar.MONDAY) || (dow > Calendar.FRIDAY));
+            if (isWeekend) {
+                return;
+            }
+
+            checkCurrencySub("AUD");
+            checkCurrencySub("EUR");
+            checkCurrencySub("GBP");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private String appendStringForBot(String value, String append) {
         String val = value;
         if (Utils.isNotBlank(append)) {
@@ -2738,39 +2801,39 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     @Override
-    public void sendMsgChart1m(String gecko_id, String symbol) {
-        if (Objects.equals("BTC", symbol)) {
-
-            List<BtcFutures> list = Utils.loadData(symbol, TIME_1m, 50);
-
-            sendScapMsgLongShort(list, symbol);
-        }
-    }
-
-    @Override
-    public void sendMsgChart5m(String gecko_id, String symbol) {
-        if (Objects.equals("BTC", symbol)) {
-
-            List<BtcFutures> list = Utils.loadData(symbol, TIME_5m, 50);
-
-            sendScapMsgLongShort(list, symbol);
-        }
-    }
-
-    @Override
     public void sendMsgChart15m(String gecko_id, String symbol, String append) {
 
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_15m, append);
-            if (Objects.equals("BTC", symbol)) {
-                sendScapMsgLongShort(list_15m, symbol);
+
+            FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, symbol);
+            FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
+            if (!Objects.equals(null, entity)) {
+                String H = entity.getNote();
+
+                if (!Objects.equals(Utils.CHAR_NORMAL, H)) {
+                    String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+
+                    String trend_15m = "";
+                    trend_15m += Utils.checkTrendByIndex(list_15m, 3, 10, trend);
+                    trend_15m += Utils.checkTrendByIndex(list_15m, 3, 20, trend);
+                    trend_15m += Utils.checkTrendByIndex(list_15m, 3, 50, trend);
+                    if (Utils.isNotBlank(trend_15m)) {
+                        String chartname = Utils.getChartName(list_15m);
+                        String msg = chartname + trend_15m + symbol;
+                        msg += Utils.new_line_from_service + Utils.getAtlAth(list_15m);
+
+                        String EVENT_ID = EVENT_PUMP + symbol + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_15m);
+                        sendMsgPerHour(EVENT_ID, msg, true);
+                    }
+                }
             }
         }
 
-        FundingHistoryKey id = new FundingHistoryKey();
-        id.setGeckoid(gecko_id);
-        id.setEventTime(EVENT_DH);
+        //--------------------------------------------------------------------
+
+        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, gecko_id);
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
         if (!Objects.equals(null, entity)) {
             String dh = entity.getNote();
@@ -2855,15 +2918,12 @@ public class BinanceServiceImpl implements BinanceService {
         return trend;
     }
 
-    public void checkCurrencySub(String CUR) {
-        int maFast = 3;
-        List<BtcFutures> list = Utils.loadData(CUR, TIME_1h, 20);
-
-        String chart_H = Utils.initLongShort(list);
+    public String createHistoryReverseOf_H1(List<BtcFutures> list_1h, String KEY) {
+        String chart_H = Utils.initLongShort(list_1h);
         String H = chart_H;
-        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, CUR);
+        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, KEY);
         if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, CUR, CUR + "_USDT", chart_H, true));
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, KEY, KEY, chart_H, true));
         }
 
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
@@ -2872,50 +2932,10 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Objects.equals(Utils.CHAR_NORMAL, H)) {
-            return;
+            return "";
         }
 
-        String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
-        List<BtcFutures> list_15m = Utils.loadData(CUR, TIME_15m, 50);
-
-        String AUD_TREND = "";
-        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 10, trend);
-        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 20, trend);
-        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 50, trend);
-        if (Utils.isNotBlank(AUD_TREND)) {
-            String chartname = Utils.getChartName(list);
-            String msg = chartname + AUD_TREND + CUR + "_USDT";
-            String EVENT_ID = EVENT_PUMP + CUR + "_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
-            sendMsgPerHour(EVENT_ID, msg, true);
-        }
-
-    }
-
-    // AUD_EUR_GBP_USDT
-    @Override
-    public void checkCurrency() {
-        try {
-            if (!Utils.isAllowSendMsgSetting()) {
-                // return;
-            }
-
-            if (!Utils.isBusinessTime()) {
-                return;
-            }
-
-            int dow = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-            boolean isWeekend = ((dow < Calendar.MONDAY) || (dow > Calendar.FRIDAY));
-            if (isWeekend) {
-                return;
-            }
-
-            checkCurrencySub("AUD");
-            checkCurrencySub("EUR");
-            checkCurrencySub("GBP");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return H;
     }
 
     // The maximum request rate is 10 per second -> 1 minute = 60 requests.
@@ -2979,19 +2999,8 @@ public class BinanceServiceImpl implements BinanceService {
 
             System.out.println(Utils.getTimeHHmm() + "Capital: " + EPIC + " " + Utils.getChartName(list_1h));
 
-            String chart_H = Utils.initLongShort(list_1h);
-            String H = chart_H;
-            FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, EPIC);
-            if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
-                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, EPIC, EPIC, chart_H, true));
-            }
-
-            FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
-            if (!Objects.equals(null, entity)) {
-                H = entity.getNote();
-            }
-
-            if (Objects.equals(Utils.CHAR_NORMAL, H)) {
+            String H = createHistoryReverseOf_H1(list_1h, EPIC);
+            if (Utils.isBlank(H)) {
                 return;
             }
 
@@ -3042,6 +3051,7 @@ public class BinanceServiceImpl implements BinanceService {
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         if (Objects.equals("BTC", symbol)) {
+
             boolean trend_h4 = Utils.isUptrendByMaIndex(list_h4, 6);
             boolean trend_h1 = Utils.isUptrendByMaIndex(list_h1, 6);
             if (trend_h4 == trend_h1) {
@@ -3071,9 +3081,10 @@ public class BinanceServiceImpl implements BinanceService {
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures) ";
 
-            sendMsgChart15m(gecko_id, symbol, Utils.getAtlAth(list_h1));
-
             if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+
+                createHistoryReverseOf_H1(list_h1, symbol);
+                sendMsgChart15m(gecko_id, symbol, Utils.getAtlAth(list_h1));
 
                 sendMsgByTrendMaX(symbol, list_h1, 50, "", taker); // H4
 
