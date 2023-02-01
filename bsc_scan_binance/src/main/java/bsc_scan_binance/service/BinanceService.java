@@ -39,7 +39,5 @@ public interface BinanceService {
 
     public void clearTrash();
 
-    void sendMsgChart15m(String gecko_id, String symbol, String append);
-
     void checkCapital(String EPIC);
 }

@@ -2674,37 +2674,6 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    @Override
-    public void sendMsgChart15m(String gecko_id, String symbol, String append) {
-        if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-            List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-            sendMsgKillLongShort(gecko_id, symbol, list_15m, append);
-
-            FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, symbol);
-            FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
-            if (!Objects.equals(null, entity)) {
-                String H = entity.getNote();
-
-                if (!Objects.equals(Utils.CHAR_NORMAL, H)) {
-                    String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
-
-                    sendScapMsgLongShort(list_15m, symbol, trend, append);
-                }
-            }
-            return;
-        }
-        // --------------------------------------------------------------------
-        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, gecko_id);
-        FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
-        if (!Objects.equals(null, entity)) {
-            String dh = entity.getNote();
-            if (Objects.equals(Utils.CHAR_LONG + Utils.CHAR_LONG, dh)) {
-
-                checkTrendByBtc(gecko_id, symbol, TIME_15m, BigDecimal.ZERO, true, "_____D1H1M15_LONG_____", false);
-            }
-        }
-    }
-
     public String checkTrendByBtc(String gecko_id, String symbol, String TIME, BigDecimal ref_price,
             boolean allowSendMsg, String append, boolean isCompareWithBtc) {
         String trend = "";
@@ -2854,8 +2823,22 @@ public class BinanceServiceImpl implements BinanceService {
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures) ";
+
             createHistoryReverseOf_H1(list_h1, symbol);
-            sendMsgChart15m(gecko_id, symbol, Utils.getAtlAth(list_h1));
+            String H = createHistoryReverseOf_H1(list_h1, symbol);
+
+            if (("_BTC_ETH_BNB_".contains("_" + symbol + "_") || Objects.equals(Utils.CHAR_LONG, H))) {
+                List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
+
+                if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+                    sendMsgKillLongShort(gecko_id, symbol, list_15m, "");
+                }
+
+                if (Objects.equals(Utils.CHAR_LONG, H)) {
+                    sendMsgKillLongShort(gecko_id, symbol, list_15m,
+                            Utils.calc_BUF_LO_HI_BUF(list_h1, Utils.TREND_LONG));
+                }
+            }
         } else {
             type = " (Spot) ";
         }
@@ -2933,6 +2916,15 @@ public class BinanceServiceImpl implements BinanceService {
                         DHH = DHH.substring(0, 1) + chart_h1;
                         fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, gecko_id, symbol, DHH, true));
                     }
+                }
+            }
+
+            FundingHistory entity_check = fundingHistoryRepository.findById(id).orElse(null);
+            if (!Objects.equals(null, entity_check)) {
+                String dh = entity_check.getNote();
+                if (Objects.equals(Utils.CHAR_LONG + Utils.CHAR_LONG, dh)) {
+
+                    checkTrendByBtc(gecko_id, symbol, TIME_15m, BigDecimal.ZERO, true, "_____D1H1M15_LONG_____", false);
                 }
             }
 
