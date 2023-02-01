@@ -2573,68 +2573,24 @@ public class Utils {
         return false;
     }
 
-//    public static boolean isMa3CuttingUpX(List<BtcFutures> list, int slowIndex) {
-//        int cur = 1;
-//        int pre = 2;
-//        int fastIndex = 3;
-//        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
-//        String val = ma_fast_c.toString();
-//        if (val.contains("E")) {
-//            return false;
-//        }
-//        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
-//
-//        BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
-//        BigDecimal ma_slow_p = calcMA(list, slowIndex, pre);
-//
-//        if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
-//                && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-//            return true;
-//        }
-//
-//        if (ma_fast_c.compareTo(ma_slow_c) < 0) {
-//            BigDecimal close1 = list.get(1).getPrice_close_candle();
-//            BigDecimal close2 = list.get(2).getPrice_close_candle();
-//            if ((close1.compareTo(ma_slow_c) > 0) && (ma_slow_c.compareTo(close2) > 0)) {
-//                return true;
-//            }
-//        }
-//
-//        return false;
-//    }
-
-//    public static String checkTrendLongShort1m(List<BtcFutures> list, int slowIndex) {
-//        BigDecimal ma3_1 = calcMA(list, MA_FAST, 1);
-//        String val = ma3_1.toString();
-//        if (val.contains("E")) {
-//            return "";
-//        }
-//        BigDecimal ma3_2 = calcMA(list, MA_FAST, 2);
-//
-//        BigDecimal ma10_1 = calcMA(list, slowIndex, 1);
-//        BigDecimal ma10_2 = calcMA(list, slowIndex, 2);
-//
-//        if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma10_1) > 0) && (ma10_2.compareTo(ma3_2) > 0)) {
-//            return TREND_LONG;
-//        }
-//        if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma10_1) < 0) && (ma10_2.compareTo(ma3_2) < 0)) {
-//            return TREND_SHORT;
-//        }
-//        // --------------------------------------------
-//        BigDecimal close1 = list.get(1).getPrice_close_candle();
-//        BigDecimal close2 = list.get(2).getPrice_close_candle();
-//        if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(close2) > 0)) {
-//            return TREND_LONG;
-//        }
-//        if ((close1.compareTo(ma10_1) < 0) && (ma10_1.compareTo(close2) < 0)) {
-//            return TREND_SHORT;
-//        }
-//
-//        return "";
-//    }
-
     public static String checkTrendByMa10_20_50(List<BtcFutures> list, int fastIndex, String trend) {
         String resutl = "";
+
+        if (Objects.equals(Utils.TREND_LONG, trend)) {
+            BigDecimal ma3_1 = Utils.calcMA(list, 3, 1);
+            BigDecimal ma50_1 = Utils.calcMA(list, 50, 1);
+            if (ma3_1.compareTo(ma50_1) > 0) {
+                return "";
+            }
+        }
+
+        if (Objects.equals(Utils.TREND_SHORT, trend)) {
+            BigDecimal ma3_1 = Utils.calcMA(list, 3, 1);
+            BigDecimal ma50_1 = Utils.calcMA(list, 50, 1);
+            if (ma3_1.compareTo(ma50_1) < 0) {
+                return "";
+            }
+        }
 
         resutl += Utils.checkTrendByIndex(list, fastIndex, 10, trend);
         resutl += Utils.checkTrendByIndex(list, fastIndex, 20, trend);
