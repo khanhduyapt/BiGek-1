@@ -24,7 +24,14 @@ import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
@@ -81,6 +88,17 @@ public class Utils {
     public static final int MA_INDEX_D1_STOP_LONG = 8;
     public static final int MA_INDEX_D1_START_LONG = 8;
     public static final int MA_INDEX_CURRENCY = 10;
+
+    public static String CST = "";
+    public static String X_SECURITY_TOKEN = "";
+    //MINUTE, MINUTE_5, MINUTE_15, MINUTE_30, HOUR, HOUR_4, DAY, WEEK
+    public static final String CAPITAL_TIME_MINUTE = "MINUTE";
+    public static final String CAPITAL_TIME_MINUTE_5 = "MINUTE_5";
+    public static final String CAPITAL_TIME_MINUTE_15 = "MINUTE_15";
+    public static final String CAPITAL_TIME_MINUTE_30 = "MINUTE_30";
+    public static final String CAPITAL_TIME_HOUR = "HOUR";
+    public static final String CAPITAL_TIME_DAY = "DAY";
+    public static final String CAPITAL_TIME_WEEK = "WEEK";
 
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
@@ -256,6 +274,74 @@ public class Utils {
         }
 
         return new ArrayList<BtcFutures>();
+    }
+
+    // https://open-api.capital.com/#tag/Markets-Info-greater-Prices
+    // https://api-capital.backend-capital.com/api/v1/markets/{epic}
+    public static List<BtcFutures> loadCapitalData(String epic, String TIME, int length) {
+
+        List<BtcFutures> list_15m = new ArrayList<BtcFutures>();
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> request;
+            RestTemplate restTemplate = new RestTemplate();
+
+            // Possible values are MINUTE, MINUTE_5, MINUTE_15, MINUTE_30, HOUR, HOUR_4, DAY, WEEK
+            // The maximum number of the values in answer. Default = 10, max = 1000
+            // Start date. Date format: YYYY-MM-DDTHH:MM:SS (e.g. 2022-04-01T01:01:00).  based on snapshotTimeUTC
+            // End date. Date format: YYYY-MM-DDTHH:MM:SS (e.g. 2022-04-01T01:01:00).
+
+            String url = "https://api-capital.backend-capital.com/api/v1/prices/" + epic
+                    + "?resolution=" + TIME + "&max=" + length;// + "&from=" + time_fr + "&to=" + time_to;
+
+            headers = new HttpHeaders();
+            MediaType mediaType = MediaType.parseMediaType("text/plain");
+            headers.setContentType(mediaType);
+            headers.set("X-SECURITY-TOKEN", X_SECURITY_TOKEN);
+            headers.set("CST", CST);
+            request = new HttpEntity<String>(headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+            JSONObject json = new JSONObject(response.getBody());
+            JSONArray prices = (JSONArray) json.get("prices");
+
+            if (!prices.isEmpty()) {
+                int id = 0;
+                for (int index = prices.length() - 1; index >= 0; index--) {
+                    JSONObject price = prices.getJSONObject(index);
+
+                    BigDecimal low_price = Utils.getBigDecimal(((JSONObject) price.get("lowPrice")).get("ask"));
+                    BigDecimal hight_price = Utils.getBigDecimal(((JSONObject) price.get("highPrice")).get("ask"));
+                    BigDecimal open_price = Utils.getBigDecimal(((JSONObject) price.get("openPrice")).get("ask"));
+                    BigDecimal close_price = Utils.getBigDecimal(((JSONObject) price.get("closePrice")).get("ask"));
+
+                    String snapshotTime = Utils.getStringValue(price.get("snapshotTime"));
+
+                    BtcFutures dto = new BtcFutures();
+                    String strid = Utils.getStringValue(id);
+                    if (strid.length() < 2) {
+                        strid = "0" + strid;
+                    }
+                    dto.setId(epic + "_15m_" + strid);
+                    dto.setCurrPrice(close_price);
+                    dto.setLow_price(low_price);
+                    dto.setHight_price(hight_price);
+                    dto.setPrice_open_candle(open_price);
+                    dto.setPrice_close_candle(close_price);
+
+                    list_15m.add(dto);
+
+                    // System.out.println(strid + ": " + snapshotTime);
+
+                    id += 1;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list_15m;
     }
 
     public static String createMsgBalance(OrdersProfitResponse dto, String newline) {

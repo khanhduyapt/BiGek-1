@@ -17,11 +17,15 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
@@ -2915,8 +2919,77 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
+    // The maximum request rate is 10 per second.
+    public void capital() {
+        //https://open-api.capital.com/#section/Authentication/How-to-start-new-session
+
+        try {
+            String API = "G1fTHbEak0kDE5mg";
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> request;
+            RestTemplate restTemplate = new RestTemplate();
+
+            // https://api-capital.backend-capital.com/api/v1/session/encryptionKey
+            //headers.set("X-CAP-API-KEY", API);
+            //HttpEntity<String> request = new HttpEntity<String>(headers);
+            //ResponseEntity<String> encryption = restTemplate1.exchange(
+            //        "https://api-capital.backend-capital.com/api/v1/session/encryptionKey", HttpMethod.GET, request,
+            //        String.class);
+            //JSONObject encryption_body = new JSONObject(encryption.getBody());
+            //String encryptionKey = Utils.getStringValue(encryption_body.get("encryptionKey"));
+            //String timeStamp = Utils.getStringValue(encryption_body.get("timeStamp"));
+
+            //--------------------------------------------------------------
+
+            // https://capital.com/api-request-examples
+            // https://open-api.capital.com/#tag/Session
+            headers = new HttpHeaders();
+            headers.set("X-CAP-API-KEY", API);
+            headers.set("Content-Type", "application/json");
+
+            JSONObject personJsonObject = new JSONObject();
+            personJsonObject.put("encryptedPassword", "false");
+            personJsonObject.put("identifier", "khanhduyapt@gmail.com");
+            personJsonObject.put("password", "Capital123$");
+
+            request = new HttpEntity<String>(personJsonObject.toString(), headers);
+
+            ResponseEntity<String> responseEntityStr = restTemplate.postForEntity(
+                    "https://api-capital.backend-capital.com/api/v1/session", request,
+                    String.class);
+
+            HttpHeaders res_header = responseEntityStr.getHeaders();
+            Utils.CST = Utils.getStringValue(res_header.get("CST").get(0));
+            Utils.X_SECURITY_TOKEN = Utils.getStringValue(res_header.get("X-SECURITY-TOKEN").get(0));
+
+            //------------------------------------------------------------------------------------
+            String epic = "GOLD";
+            List<BtcFutures> list_1h = Utils.loadCapitalData(epic, Utils.CAPITAL_TIME_HOUR, 50);
+            List<BtcFutures> list_15m = Utils.loadCapitalData(epic, Utils.CAPITAL_TIME_MINUTE_15, 50);
+
+            String trend_1h = "";
+            trend_1h += Utils.checkTrendByIndex(list_1h, 3, 10, "");
+            trend_1h += Utils.checkTrendByIndex(list_1h, 3, 20, "");
+            trend_1h += Utils.checkTrendByIndex(list_1h, 3, 50, "");
+            if (Utils.isNotBlank(trend_1h)) {
+                String chartname = Utils.getChartName(list_1h);
+                String msg = chartname + trend_1h + epic;
+                String EVENT_ID = EVENT_PUMP + epic + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_1h);
+                sendMsgPerHour(EVENT_ID, msg, true);
+            }
+
+            System.out.println(" ");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
+
+        capital();
+
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
@@ -3088,23 +3161,23 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
-//        if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
-//            if (Utils.isUptrendByMaIndex(list_h4, 6)) {
-//                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, type, true,
-//                        Utils.TREND_LONG);
-//                if (Utils.isNotBlank(trend_by_btc)) {
-//                    note += "_PositionBTC4h";
-//                }
-//
-//                if (Utils.isUptrendByMaIndex(list_h1, 6)) {
-//                    trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_15m, current_price, true, type, true,
-//                            Utils.TREND_LONG);
-//                    if (Utils.isNotBlank(trend_by_btc)) {
-//                        note += "_PositionBTC15m";
-//                    }
-//                }
-//            }
-//        }
+        //        if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
+        //            if (Utils.isUptrendByMaIndex(list_h4, 6)) {
+        //                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, type, true,
+        //                        Utils.TREND_LONG);
+        //                if (Utils.isNotBlank(trend_by_btc)) {
+        //                    note += "_PositionBTC4h";
+        //                }
+        //
+        //                if (Utils.isUptrendByMaIndex(list_h1, 6)) {
+        //                    trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_15m, current_price, true, type, true,
+        //                            Utils.TREND_LONG);
+        //                    if (Utils.isNotBlank(trend_by_btc)) {
+        //                        note += "_PositionBTC15m";
+        //                    }
+        //                }
+        //            }
+        //        }
         note += position;
         // ---------------------------------------------------------
         String mUpMa = "";
