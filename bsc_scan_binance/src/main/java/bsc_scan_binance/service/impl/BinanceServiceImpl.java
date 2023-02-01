@@ -2854,6 +2854,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             priorityCoinHistoryRepository.save(his);
         }
+        note += position;
         // ---------------------------------------------------------
         // EVENT_D_H4_H1
         {
@@ -2888,18 +2889,6 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        // ---------------------------------------------------------
-        if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
-            if (Utils.isUptrendByMaIndex(list_h1, 10)) {
-                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_1h, current_price, true,
-                        type.replace("}volma", "").replace("volma{", Utils.new_line_from_service), true);
-
-                if (Utils.isNotBlank(trend_by_btc)) {
-                    note += "_PositionBTC15m";
-                }
-            }
-        }
-        note += position;
         // ---------------------------------------------------------
         String mUpMa = "";
         String today = Utils.getToday_MMdd();
