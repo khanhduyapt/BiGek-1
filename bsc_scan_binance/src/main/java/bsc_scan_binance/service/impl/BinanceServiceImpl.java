@@ -2774,29 +2774,21 @@ public class BinanceServiceImpl implements BinanceService {
         return msg;
     }
 
-    private void sendScapMsgLongShort(List<BtcFutures> list, String symbol) {
-        if (!Objects.equals("BTC", symbol)) {
-            return;
-        }
-        if (Objects.equals(Utils.TREND_OPPOSITE, BTC_H1_TRENDING)) {
-            return;
-        }
+    private void sendScapMsgLongShort(List<BtcFutures> list, String symbol, String trend, String append) {
+        String trend_15m = "";
+        trend_15m += Utils.checkTrendByIndex(list, 3, 10, trend);
+        trend_15m += Utils.checkTrendByIndex(list, 3, 20, trend);
+        trend_15m += Utils.checkTrendByIndex(list, 3, 50, trend);
+        if (Utils.isNotBlank(trend_15m)) {
+            String chartname = Utils.getChartName(list);
+            String msg = chartname + trend_15m + symbol;
 
-        String trend = "";
-        trend += Utils.checkTrendByIndex(list, 3, 10, "");
-        trend += Utils.checkTrendByIndex(list, 3, 20, "");
-        trend += Utils.checkTrendByIndex(list, 3, 50, "");
+            if (Utils.isNotBlank(append)) {
+                msg += Utils.new_line_from_service + append;
+            }
 
-        if (Utils.isNotBlank(trend)) {
-            String msg = trend + Utils.getChartName(list) + symbol + "("
-                    + Utils.removeLastZero(list.get(0).getCurrPrice()) + ")";
-
-            msg += Utils.new_line_from_service + Utils.getAtlAth(list);
-
-            msg += "(H4.H1):" + BTC_H1_TRENDING;
-
-            String EVENT_ID_BTC = EVENT_PUMP + trend + symbol + Utils.getCurrentYyyyMmDdHHByChart(list);
-            sendMsgPerHour(EVENT_ID_BTC, msg, true);
+            String EVENT_ID = EVENT_PUMP + symbol + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
+            sendMsgPerHour(EVENT_ID, msg, true);
         }
     }
 
@@ -2815,18 +2807,7 @@ public class BinanceServiceImpl implements BinanceService {
                 if (!Objects.equals(Utils.CHAR_NORMAL, H)) {
                     String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
 
-                    String trend_15m = "";
-                    trend_15m += Utils.checkTrendByIndex(list_15m, 3, 10, trend);
-                    trend_15m += Utils.checkTrendByIndex(list_15m, 3, 20, trend);
-                    trend_15m += Utils.checkTrendByIndex(list_15m, 3, 50, trend);
-                    if (Utils.isNotBlank(trend_15m)) {
-                        String chartname = Utils.getChartName(list_15m);
-                        String msg = chartname + trend_15m + symbol;
-                        msg += Utils.new_line_from_service + Utils.getAtlAth(list_15m);
-
-                        String EVENT_ID = EVENT_PUMP + symbol + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_15m);
-                        sendMsgPerHour(EVENT_ID, msg, true);
-                    }
+                    sendScapMsgLongShort(list_15m, symbol, trend, append);
                 }
             }
         }
@@ -2996,7 +2977,6 @@ public class BinanceServiceImpl implements BinanceService {
 
             // ------------------------------------------------------------------------------------
             List<BtcFutures> list_1h = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_HOUR, 50);
-
             System.out.println(Utils.getTimeHHmm() + "Capital: " + EPIC + " " + Utils.getChartName(list_1h));
 
             String H = createHistoryReverseOf_H1(list_1h, EPIC);
@@ -3004,26 +2984,14 @@ public class BinanceServiceImpl implements BinanceService {
                 return;
             }
 
+            List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
             String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
 
-            List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
-            String trend_15m = "";
-            trend_15m += Utils.checkTrendByIndex(list_15m, 3, 10, trend);
-            trend_15m += Utils.checkTrendByIndex(list_15m, 3, 20, trend);
-            trend_15m += Utils.checkTrendByIndex(list_15m, 3, 50, trend);
-            if (Utils.isNotBlank(trend_15m)) {
-                String chartname = Utils.getChartName(list_15m);
-                String msg = chartname + trend_15m + EPIC;
-                msg += Utils.new_line_from_service + Utils.getAtlAth(list_1h);
-
-                String EVENT_ID = EVENT_PUMP + EPIC + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_15m);
-                sendMsgPerHour(EVENT_ID, msg, true);
-            }
+            sendScapMsgLongShort(list_15m, EPIC, trend, Utils.getAtlAth(list_1h));
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Transactional
