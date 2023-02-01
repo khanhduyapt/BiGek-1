@@ -276,12 +276,68 @@ public class Utils {
         return new ArrayList<BtcFutures>();
     }
 
+    private static void initCapital() {
+        String API = "G1fTHbEak0kDE5mg";
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request;
+        RestTemplate restTemplate = new RestTemplate();
+
+        // https://api-capital.backend-capital.com/api/v1/session/encryptionKey
+        //headers.set("X-CAP-API-KEY", API);
+        //HttpEntity<String> request = new HttpEntity<String>(headers);
+        //ResponseEntity<String> encryption = restTemplate1.exchange(
+        //        "https://api-capital.backend-capital.com/api/v1/session/encryptionKey", HttpMethod.GET, request,
+        //        String.class);
+        //JSONObject encryption_body = new JSONObject(encryption.getBody());
+        //String encryptionKey = Utils.getStringValue(encryption_body.get("encryptionKey"));
+        //String timeStamp = Utils.getStringValue(encryption_body.get("timeStamp"));
+
+        //--------------------------------------------------------------
+
+        // https://capital.com/api-request-examples
+        // https://open-api.capital.com/#tag/Session
+        headers = new HttpHeaders();
+        headers.set("X-CAP-API-KEY", API);
+        headers.set("Content-Type", "application/json");
+
+        JSONObject personJsonObject = new JSONObject();
+        personJsonObject.put("encryptedPassword", "false");
+        personJsonObject.put("identifier", "khanhduyapt@gmail.com");
+        personJsonObject.put("password", "Capital123$");
+
+        request = new HttpEntity<String>(personJsonObject.toString(), headers);
+
+        ResponseEntity<String> responseEntityStr = restTemplate.postForEntity(
+                "https://api-capital.backend-capital.com/api/v1/session", request,
+                String.class);
+
+        HttpHeaders res_header = responseEntityStr.getHeaders();
+        Utils.CST = Utils.getStringValue(res_header.get("CST").get(0));
+        Utils.X_SECURITY_TOKEN = Utils.getStringValue(res_header.get("X-SECURITY-TOKEN").get(0));
+
+        // ------------------------------------------------------------------------------------
+        //String nodeId = "hierarchy_v1.oil_markets_group";
+        //String marketnavigation = "marketnavigation/" + nodeId;
+        //String url_markets = "https://api-capital.backend-capital.com/api/v1/" + marketnavigation;
+        //headers = new HttpHeaders();
+        //MediaType mediaType = MediaType.parseMediaType("text/plain");
+        //headers.setContentType(mediaType);
+        //headers.set("X-SECURITY-TOKEN", Utils.X_SECURITY_TOKEN);
+        //headers.set("CST", Utils.CST);
+        //request = new HttpEntity<String>(headers);
+        //ResponseEntity<String> response = restTemplate.exchange(url_markets, HttpMethod.GET, request, String.class);
+
+    }
+
+    // https://open-api.capital.com/#section/Authentication/How-to-start-new-session
     // https://open-api.capital.com/#tag/Markets-Info-greater-Prices
     // https://api-capital.backend-capital.com/api/v1/markets/{epic}
     public static List<BtcFutures> loadCapitalData(String epic, String TIME, int length) {
 
         List<BtcFutures> list_15m = new ArrayList<BtcFutures>();
         try {
+            initCapital();
+
             HttpHeaders headers = new HttpHeaders();
             HttpEntity<String> request;
             RestTemplate restTemplate = new RestTemplate();
