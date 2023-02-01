@@ -2977,7 +2977,7 @@ public class BinanceServiceImpl implements BinanceService {
             // ------------------------------------------------------------------------------------
             List<BtcFutures> list_1h = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_HOUR, 50);
 
-            System.out.println(Utils.getTimeHHmm() + "checkCapital: " + EPIC + ":" + list_1h.size());
+            System.out.println(Utils.getTimeHHmm() + "Capital: " + EPIC + " " + Utils.getChartName(list_1h));
 
             String chart_H = Utils.initLongShort(list_1h);
             String H = chart_H;
