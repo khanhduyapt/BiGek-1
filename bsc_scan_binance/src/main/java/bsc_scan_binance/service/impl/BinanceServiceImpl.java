@@ -5,9 +5,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +48,6 @@ import bsc_scan_binance.repository.BinanceFuturesRepository;
 import bsc_scan_binance.repository.BinanceVolumeDateTimeRepository;
 import bsc_scan_binance.repository.BinanceVolumnDayRepository;
 import bsc_scan_binance.repository.BinanceVolumnWeekRepository;
-import bsc_scan_binance.repository.BitcoinBalancesOnExchangesRepository;
 import bsc_scan_binance.repository.BollAreaRepository;
 import bsc_scan_binance.repository.BtcFuturesRepository;
 import bsc_scan_binance.repository.BtcVolumeDayRepository;
@@ -126,44 +123,25 @@ public class BinanceServiceImpl implements BinanceService {
     @Autowired
     private FundingHistoryRepository fundingHistoryRepository;
 
-    @Autowired
-    private BitcoinBalancesOnExchangesRepository bitcoinBalancesOnExchangesRepository;
-
-    private static final String SYMBOL_BTC = "BTC";
-
     private static final String TIME_15m = "15m";
-    private static final String TIME_5m = "5m";
-    private static final String TIME_1m = "1m";
-
     private static final String TIME_1h = "1h";
-    private static final String TIME_2h = "2h";
     private static final String TIME_4h = "4h";
     private static final String TIME_1d = "1d";
     private static final String TIME_1w = "1w";
 
-    @SuppressWarnings("unused")
-    private static final int LIMIT_DATA_15m = 48;
-    private static final int LIMIT_DATA_1h = 50;
-    private static final int LIMIT_DATA_4h = 60;
-
-    private static final String EVENT_FUNDING_RATE = "FUNDING_RATE";
     private static final String EVENT_DANGER_CZ_KILL_LONG = "CZ_KILL_LONG";
     private static final String EVENT_BTC_RANGE = "BTC_RANGE";
-    private static final String EVENT_BTC_ON_EXCHANGES = "BTC_EXCHANGES";
-    private static final String EVENT_FIBO_LONG_SHORT = "FIBO_";
     private static final String EVENT_TREND_1W1D = "1W1D";
     // "l:Long, s:Short, n:normal"
     // DH4H1 BTC LL -> Search long m15.
     // DH4H1 BTC SS -> Search short m15.
     private static final String EVENT_DH = "DH4H1"; //
-    private static final String EVENT_COMPRESSED_CHART = "Ma3_10_20_";
     private static final String EVENT_PUMP = "Pump_";
     private static final String EVENT_MSG_PER_HOUR = "MSG_PER_HOUR";
     private static final String SEPARATE_D1_AND_H1 = "1DH1";
 
     private static final String CSS_PRICE_WARNING = "bg-warning border border-warning rounded px-1";
     private static final String CSS_PRICE_SUCCESS = "border border-success rounded px-1";
-    private static final String CSS_PRICE_FOCUS = "border-bottom border-dark";
     private static final String CSS_PRICE_DANGER = "border-bottom border-danger";
     private static final String CSS_PRICE_WHITE = "text-white bg-info rounded-lg px-1";
     private static final String CSS_MIN28_DAYS = "text-white rounded-lg bg-info px-1";
@@ -171,31 +149,19 @@ public class BinanceServiceImpl implements BinanceService {
     // private Boolean IS_Ma10_of_BTC_h1_ALLOW_LONG = true;
     private String BTC_H1_TRENDING = "";
 
-    private int pre_HH_CheckUSD = 0;
-    private Boolean RANGE_BTC_IS_DANGER = true;
-    private Boolean usd_is_uptrend_today = true;
-
-    private String monitorBitcoinBalancesOnExchanges_temp = "";
-
     @SuppressWarnings("unused")
     private String pre_monitorBtcPrice_mm = "";
     List<String> monitorBtcPrice_results = new ArrayList<String>();
 
-    private String pre_time_of_saved_data_4h = "";
-    private String pre_time_of_btc_kill_long_short = "";
     private String pre_Bitfinex_status = "";
     private String preSaveDepthData;
-    private String pre_btc6days = "";
-    private String CHART_BTC_4H = "";
     List<BtcFutures> btc6days = new ArrayList<BtcFutures>();
 
     List<DepthResponse> list_bids_ok = new ArrayList<DepthResponse>();
     List<DepthResponse> list_asks_ok = new ArrayList<DepthResponse>();
 
     private int pre_HH = 0;
-    private String pre_HH_h4 = "";
     private String sp500 = "";
-    private Hashtable<String, String> msg_vol_up_dict = new Hashtable<String, String>();
 
     @Override
     @Transactional
@@ -2272,7 +2238,7 @@ public class BinanceServiceImpl implements BinanceService {
             return "";
         }
 
-        List<BtcFutures> btc1hs = Utils.loadData(symbol, TIME_1h, LIMIT_DATA_1h);
+        List<BtcFutures> btc1hs = Utils.loadData(symbol, TIME_1h, 50);
         if (CollectionUtils.isEmpty(btc1hs)) {
             return "";
         }
@@ -2625,7 +2591,9 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    private String sendMsgKillLongShort(String gecko_id, String symbol, List<BtcFutures> list_15m, String append) {
+    private String sendMsgKillLongShort(String gecko_id, String symbol, String append) {
+        List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
+
         String msg = "";
         String chartname = Utils.getChartName(list_15m);
         BtcFutures ido = list_15m.get(0);
@@ -2659,7 +2627,7 @@ public class BinanceServiceImpl implements BinanceService {
         return msg;
     }
 
-    private void sendScapMsgLongShort(List<BtcFutures> list, String symbol, String trend, String append) {
+    private void sendScapMsg(List<BtcFutures> list, String symbol, String trend, String append) {
         String cur_trend = Utils.checkTrendByMa10_20_50(list, 3, trend);
         if (Utils.isNotBlank(cur_trend)) {
             String chartname = Utils.getChartName(list);
@@ -2778,7 +2746,7 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
         String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
 
-        sendScapMsgLongShort(list_15m, EPIC, trend, Utils.calc_BUF_LO_HI_BUF(list_1h, trend));
+        sendScapMsg(list_15m, EPIC, trend, Utils.calc_BUF_LO_HI_BUF(list_1h, trend));
 
         System.out.println(Utils.getTimeHHmm() + EPIC + " " + Utils.getChartName(list_1h));
     }
@@ -2815,35 +2783,28 @@ public class BinanceServiceImpl implements BinanceService {
             } else {
                 BTC_H1_TRENDING = Utils.TREND_OPPOSITE;
             }
-
-            RANGE_BTC_IS_DANGER = Utils.isDangerRange(list_days);
         }
 
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures) ";
-
-            createHistoryReverseOf_H1(list_h1, symbol);
-            String H = createHistoryReverseOf_H1(list_h1, symbol);
-
-            if (("_BTC_ETH_BNB_".contains("_" + symbol + "_") || Objects.equals(Utils.CHAR_LONG, H))) {
-                List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-
-                if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-                    sendMsgKillLongShort(gecko_id, symbol, list_15m, "");
-                }
-
-                if (Objects.equals(Utils.CHAR_LONG, H)) {
-                    sendMsgKillLongShort(gecko_id, symbol, list_15m,
-                            Utils.calc_BUF_LO_HI_BUF(list_h1, Utils.TREND_LONG));
-                }
-            }
         } else {
             type = " (Spot) ";
         }
 
+        if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+            sendMsgKillLongShort(gecko_id, symbol, Utils.getAtlAth(list_h1));
+        }
+
+        createHistoryReverseOf_H1(list_h1, symbol);
+        String H = createHistoryReverseOf_H1(list_h1, symbol);
+        if (Objects.equals(Utils.CHAR_LONG, H)) {
+            List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
+
+            sendScapMsg(list_15m, symbol, Utils.TREND_LONG, Utils.calc_BUF_LO_HI_BUF(list_h1, Utils.TREND_LONG));
+        }
+
         String taker = Utils.analysisTakerVolume(list_days, list_h4, list_h1);
-        sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG, "");
 
         type = type + Utils.analysisVolume(list_days);
 
@@ -2922,11 +2883,10 @@ public class BinanceServiceImpl implements BinanceService {
             if (!Objects.equals(null, entity_check)) {
                 String dh = entity_check.getNote();
                 if (Objects.equals(Utils.CHAR_LONG + Utils.CHAR_LONG, dh)) {
-
-                    checkTrendByBtc(gecko_id, symbol, TIME_15m, BigDecimal.ZERO, true, "_____D1H1M15_LONG_____", false);
+                    List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
+                    sendScapMsg(list_15m, symbol, Utils.TREND_LONG, "_____D1H1M15_LONG_____");
                 }
             }
-
         }
 
         // ---------------------------------------------------------
