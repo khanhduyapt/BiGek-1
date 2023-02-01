@@ -2918,7 +2918,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    // The maximum request rate is 10 per second.
+    // The maximum request rate is 10 per second -> 1 minute = 60 requests.
     @Override
     public void checkCapital(String EPIC) {
         //https://open-api.capital.com/#section/Authentication/How-to-start-new-session

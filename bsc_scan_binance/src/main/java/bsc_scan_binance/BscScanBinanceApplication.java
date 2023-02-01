@@ -98,7 +98,7 @@ public class BscScanBinanceApplication {
                                         "UK100", "HK50", "FR40");
                                 for (String EPIC : epics_index) {
                                     binance_service.checkCapital(EPIC);
-                                    wait(SLEEP_MINISECONDS * 2);
+                                    wait(SLEEP_MINISECONDS);
                                 }
 
                                 //------------------------------------------
@@ -147,7 +147,7 @@ public class BscScanBinanceApplication {
 
                                 for (String EPIC : epics_forex) {
                                     binance_service.checkCapital(EPIC);
-                                    wait(SLEEP_MINISECONDS * 2);
+                                    wait(SLEEP_MINISECONDS);
                                 }
                             }
                         }
