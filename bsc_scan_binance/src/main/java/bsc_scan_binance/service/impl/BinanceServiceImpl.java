@@ -2857,29 +2857,35 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list = Utils.loadData(CUR, TIME_1h, 20);
 
         String chart_H = Utils.initLongShort(list);
-
+        String H = chart_H;
         FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, CUR);
         if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, CUR + "_USDT", CUR + "_USDT", chart_H, true));
+            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, CUR, CUR + "_USDT", chart_H, true));
         }
 
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
-        String H = entity.getNote();
-        if (!Objects.equals(Utils.CHAR_NORMAL, H)) {
-            String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
-            List<BtcFutures> list_15m = Utils.loadData(CUR, TIME_15m, 50);
-
-            String AUD_TREND = "";
-            AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 10, trend);
-            AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 20, trend);
-            AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 50, trend);
-            if (Utils.isNotBlank(AUD_TREND)) {
-                String chartname = Utils.getChartName(list);
-                String msg = chartname + AUD_TREND + CUR + "_USDT";
-                String EVENT_ID = EVENT_PUMP + CUR + "_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
-                sendMsgPerHour(EVENT_ID, msg, true);
-            }
+        if (!Objects.equals(null, entity)) {
+            H = entity.getNote();
         }
+
+        if (Objects.equals(Utils.CHAR_NORMAL, H)) {
+            return;
+        }
+
+        String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+        List<BtcFutures> list_15m = Utils.loadData(CUR, TIME_15m, 50);
+
+        String AUD_TREND = "";
+        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 10, trend);
+        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 20, trend);
+        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 50, trend);
+        if (Utils.isNotBlank(AUD_TREND)) {
+            String chartname = Utils.getChartName(list);
+            String msg = chartname + AUD_TREND + CUR + "_USDT";
+            String EVENT_ID = EVENT_PUMP + CUR + "_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
+            sendMsgPerHour(EVENT_ID, msg, true);
+        }
+
     }
 
     // AUD_EUR_GBP_USDT
