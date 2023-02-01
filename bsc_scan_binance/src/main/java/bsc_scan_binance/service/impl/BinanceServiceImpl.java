@@ -2663,7 +2663,7 @@ public class BinanceServiceImpl implements BinanceService {
         String cur_trend = Utils.checkTrendByMa10_20_50(list, 3, trend);
         if (Utils.isNotBlank(cur_trend)) {
             String chartname = Utils.getChartName(list);
-            String msg = chartname + cur_trend + symbol;
+            String msg = chartname + cur_trend + symbol + "(" + list.get(0).getCurrPrice() + ")";
 
             if (Utils.isNotBlank(append)) {
                 msg += Utils.new_line_from_service + append;
@@ -2775,6 +2775,7 @@ public class BinanceServiceImpl implements BinanceService {
         // ------------------------------------------------------------------------------------
         List<BtcFutures> list_1h = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_HOUR, 50);
         if (CollectionUtils.isEmpty(list_1h)) {
+            System.out.println(Utils.getTimeHHmm() + "Capital: " + EPIC + " (Empty)");
             return;
         }
 
@@ -2838,7 +2839,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String taker = Utils.analysisTakerVolume(list_days, list_h4, list_h1);
-        sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG, taker + type);
+        sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG,
+                taker + type + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDD");
 
         type = type + Utils.analysisVolume(list_days);
 

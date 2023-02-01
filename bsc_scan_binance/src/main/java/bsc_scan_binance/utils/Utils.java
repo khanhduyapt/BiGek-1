@@ -366,7 +366,7 @@ public class Utils {
             JSONObject json = new JSONObject(response.getBody());
             JSONArray prices = (JSONArray) json.get("prices");
 
-            if (!prices.isEmpty()) {
+            if (!Objects.equals(null, prices)) {
                 int id = 0;
                 for (int index = prices.length() - 1; index >= 0; index--) {
                     JSONObject price = prices.getJSONObject(index);
@@ -2329,22 +2329,24 @@ public class Utils {
 
     public static String calc_BUF_LO_HI_BUF(List<BtcFutures> list, String trend) {
         BigDecimal buf = BigDecimal.ZERO;
-        BigDecimal ma10 = calcMA(list, 10, 0);
+        BigDecimal ma10 = calcMA(list, 10, 1);
+        BigDecimal ma20 = calcMA(list, 20, 1);
         BigDecimal entry = list.get(0).getCurrPrice();
-        BigDecimal range = entry.subtract(ma10).abs(); // .multiply(BigDecimal.valueOf(2))
+        BigDecimal range = ma10.subtract(ma20).abs();
 
+        List<BigDecimal> low_heigh_SL = getLowHeightCandle(list.subList(0, 10));
         List<BigDecimal> low_heigh = getLowHeightCandle(list);
         BigDecimal LO = low_heigh.get(0);
         BigDecimal HI = low_heigh.get(1);
 
         String result = "";
         if (trend.contains(TREND_LONG)) {
-            buf = roundDefault(LO.subtract(range));
+            buf = roundDefault(low_heigh_SL.get(0).subtract(range));
             result += "Buf:" + getPercentToEntry(LO, buf, true);
             result += ",Lo:" + getPercentToEntry(entry, LO, true);
             result += ",Hi:" + getPercentToEntry(entry, HI, true);
         } else {
-            buf = roundDefault(HI.add(range));
+            buf = roundDefault(low_heigh_SL.get(1).add(range));
             result += "Lo:" + getPercentToEntry(entry, LO, true);
             result += ",Hi:" + getPercentToEntry(entry, HI, true);
             result += ",Buf:" + getPercentToEntry(HI, buf, true);
