@@ -1558,68 +1558,68 @@ public class BinanceServiceImpl implements BinanceService {
         return value;
     }
 
-    public void checkCurrencySub(String CUR) {
-        int maFast = 3;
-        List<BtcFutures> list = Utils.loadData(CUR, TIME_1h, 20);
-
-        String chart_H = Utils.initLongShort(list);
-        String H = chart_H;
-        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, CUR);
-        if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, CUR, CUR + "_USDT", chart_H, true));
-        }
-
-        FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
-        if (!Objects.equals(null, entity)) {
-            H = entity.getNote();
-        }
-
-        if (Objects.equals(Utils.CHAR_NORMAL, H)) {
-            return;
-        }
-
-        String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
-        List<BtcFutures> list_15m = Utils.loadData(CUR, TIME_15m, 50);
-
-        String AUD_TREND = "";
-        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 10, trend);
-        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 20, trend);
-        AUD_TREND += Utils.checkTrendByIndex(list_15m, maFast, 50, trend);
-        if (Utils.isNotBlank(AUD_TREND)) {
-            String chartname = Utils.getChartName(list);
-            String msg = chartname + AUD_TREND + CUR + "_USDT";
-            String EVENT_ID = EVENT_PUMP + CUR + "_USDT_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
-            sendMsgPerHour(EVENT_ID, msg, true);
-        }
-
-    }
-
-    // AUD_EUR_GBP_USDT
-    @Override
-    public void checkCurrency() {
-        try {
-            if (!Utils.isAllowSendMsgSetting()) {
-                // return;
-            }
-
-            if (!Utils.isBusinessTime()) {
-                return;
-            }
-
-            int dow = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-            boolean isWeekend = ((dow < Calendar.MONDAY) || (dow > Calendar.FRIDAY));
-            if (isWeekend) {
-                return;
-            }
-
-            checkCurrencySub("AUD");
-            checkCurrencySub("EUR");
-            checkCurrencySub("GBP");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    // public void checkCurrencySub(String CUR) {
+    // int maFast = 3;
+    // List<BtcFutures> list = Utils.loadData(CUR, TIME_1h, 20);
+    //
+    // String chart_H = Utils.initLongShort(list);
+    // String H = chart_H;
+    // FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, CUR);
+    // if (!fundingHistoryRepository.existsById(id) ||
+    // !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
+    // fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, CUR, CUR +
+    // "_USDT", chart_H, true));
+    // }
+    //
+    // FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
+    // if (!Objects.equals(null, entity)) {
+    // H = entity.getNote();
+    // }
+    //
+    // if (Objects.equals(Utils.CHAR_NORMAL, H)) {
+    // return;
+    // }
+    //
+    // String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG :
+    // Utils.TREND_SHORT;
+    // List<BtcFutures> list_15m = Utils.loadData(CUR, TIME_15m, 50);
+    //
+    // String AUD_TREND = Utils.checkTrendByMa10_20_50(list_15m, maFast, trend);
+    // if (Utils.isNotBlank(AUD_TREND)) {
+    // String chartname = Utils.getChartName(list);
+    // String msg = chartname + AUD_TREND + CUR + "_USDT";
+    // String EVENT_ID = EVENT_PUMP + CUR + "_USDT_" + chartname +
+    // Utils.getCurrentYyyyMmDdHHByChart(list);
+    // sendMsgPerHour(EVENT_ID, msg, true);
+    // }
+    // }
+    //
+    // // AUD_EUR_GBP_USDT
+    // @Override
+    // public void checkCurrency() {
+    // try {
+    // if (!Utils.isAllowSendMsgSetting()) {
+    // // return;
+    // }
+    //
+    // if (!Utils.isBusinessTime()) {
+    // return;
+    // }
+    //
+    // int dow = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+    // boolean isWeekend = ((dow < Calendar.MONDAY) || (dow > Calendar.FRIDAY));
+    // if (isWeekend) {
+    // return;
+    // }
+    //
+    // checkCurrencySub("AUD");
+    // checkCurrencySub("EUR");
+    // checkCurrencySub("GBP");
+    //
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // }
+    // }
 
     private String appendStringForBot(String value, String append) {
         String val = value;
@@ -2175,37 +2175,13 @@ public class BinanceServiceImpl implements BinanceService {
         return list_asks_ok;
     }
 
-    @SuppressWarnings("unused")
-    private String getSL(List<DepthResponse> list, BigDecimal entry, boolean isLong) {
-        if (CollectionUtils.isEmpty(list)) {
-            return "";
+    @Override
+    @Transactional
+    public void clearTrash() {
+        List<FundingHistory> list = fundingHistoryRepository.clearTrash();
+        if (!CollectionUtils.isEmpty(list)) {
+            fundingHistoryRepository.deleteAll(list);
         }
-
-        BigDecimal max_vol = BigDecimal.ZERO;
-        BigDecimal sl = BigDecimal.ZERO;
-
-        for (int index = 0; index < list.size(); index++) {
-            DepthResponse dto = list.get(index);
-
-            if (dto.getVal_million_dolas().compareTo(max_vol) > 0) {
-                if (isLong) {
-                    if (dto.getPrice().compareTo(entry) < 0) {
-                        max_vol = dto.getVal_million_dolas();
-                        sl = dto.getPrice();
-                    }
-                } else {
-                    if (dto.getPrice().compareTo(entry) > 0) {
-                        max_vol = dto.getVal_million_dolas();
-                        sl = dto.getPrice();
-                    }
-                }
-
-            }
-        }
-
-        String mySL = "SL: " + Utils.removeLastZero(sl) + "("
-                + (isLong ? Utils.getPercentStr(entry, sl) : Utils.getPercentStr(sl, entry)) + ")";
-        return mySL;
     }
 
     @Override
@@ -2631,35 +2607,6 @@ public class BinanceServiceImpl implements BinanceService {
         return result;
     }
 
-    @SuppressWarnings("unused")
-    private String sendMsgMonitorFibo(String gecko_id, String symbol, List<BtcFutures> list, String only_trend,
-            int maIndex, boolean showDetail) {
-        String msg = Utils.getMmDD_TimeHHmm() + symbol + ",";
-
-        String result = Utils.checkMa3AndX(list, maIndex, showDetail, only_trend);
-
-        if (result.contains(Utils.TREND_DANGER)) {
-            return result;
-        }
-
-        if (Utils.isNotBlank(result)) {
-
-            msg = (msg + result).replace(",", Utils.new_line_from_service);
-            // msg += Utils.new_line_from_service + "Currency:" + TREND_CURRENCY_TODAY;
-
-            String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + symbol + "_" + Utils.getCurrentYyyyMmDd_HH_Blog2h();
-
-            if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
-                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
-
-                Utils.sendToMyTelegram(msg.replace(" ", ""));
-
-            }
-        }
-
-        return result;
-    }
-
     private void sendMsgPerHour(String EVENT_ID, String msg_content, boolean isOnlyMe) {
         String msg = Utils.getTimeHHmm();
         msg += msg_content;
@@ -2684,12 +2631,6 @@ public class BinanceServiceImpl implements BinanceService {
         BtcFutures ido = list_15m.get(0);
         boolean isShort = Utils.isAboveMALine(list_15m, 50, 0);
 
-        String atl = Utils.new_line_from_service + Utils.getAtlAth(list_15m);
-
-        if (Utils.isNotBlank(append)) {
-            atl += Utils.new_line_from_service + append;
-        }
-
         if (ido.isBtcKillLongCandle()) {
             msg = Utils.getTimeHHmm() + " 🔻  " + symbol + " " + chartname + " kill "
                     + (!isShort ? "LONG 💔 !!! " : "Long 💔 ");
@@ -2701,8 +2642,10 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Utils.isNotBlank(msg)) {
-            msg += Utils.removeLastZero(ido.getCurrPrice()) + atl;
-
+            msg += Utils.removeLastZero(ido.getCurrPrice());
+            if (Utils.isNotBlank(append)) {
+                msg += Utils.new_line_from_service + append;
+            }
             String EVENT_ID5 = EVENT_DANGER_CZ_KILL_LONG + "_" + ido.getId() + "_"
                     + list_15m.get(1).getPrice_close_candle();// Utils.getCurrentYyyyMmDd_Blog2h();
 
@@ -2716,68 +2659,11 @@ public class BinanceServiceImpl implements BinanceService {
         return msg;
     }
 
-    private String sendMsgByTrendMaX(String symbol, List<BtcFutures> list, int maIndex, String find_trend,
-            String append) {
-
-        if (!Utils.isAllowSendMsgSetting()) {
-            return "SettingSendMsg";
-        }
-
-        String msg = "";
-        String current_trend = "";
-        String chartname = Utils.getChartName(list);
-        String EVENT_ID = EVENT_PUMP + symbol + "_" + chartname + Utils.getCurrentYyyyMmDdHHByChart(list);
-
-        current_trend = Utils.switchStrategy(list, maIndex);
-        if (Utils.isNotBlank(find_trend)) {
-            if (!Objects.equals(current_trend, find_trend)) {
-                return "";
-            }
-        }
-
-        BigDecimal price_now = list.get(0).getCurrPrice();
-
-        if (Objects.equals(Utils.TREND_LONG, current_trend)) {
-
-            msg = " 💹. " + symbol + chartname + ":3Up" + maIndex
-                    + (list.get(0).getId().contains("_3m_") ? " 🚀" : " 🚀");
-            EVENT_ID += "_UP";
-
-        } else if (Objects.equals(Utils.TREND_SHORT, current_trend)) {
-
-            msg = " 📉. " + symbol + chartname + ":3Down" + maIndex
-                    + (list.get(0).getId().contains("_3m_") ? " 🥶" : " 🥶");
-            EVENT_ID += "_DOWN";
-
-        } else if (Objects.equals("BTC", symbol) && Utils.isStopLong(list)) {
-            msg = Utils.TREND_STOP_LONG;
-        }
-
-        if (Utils.isNotBlank(msg)) {
-            String curr_price = "(" + Utils.removeLastZero(price_now) + ")";
-
-            if (Objects.equals(msg, Utils.TREND_STOP_LONG)) {
-                msg = "(" + Utils.TREND_STOP_LONG + ")" + chartname + symbol + curr_price;
-            } else {
-                msg += curr_price;
-                msg += Utils.isNotBlank(append) ? Utils.new_line_from_service + append : "";
-            }
-            msg += Utils.new_line_from_service + Utils.getAtlAth(list);
-
-            sendMsgPerHour(EVENT_ID, msg, true);
-        }
-
-        return msg;
-    }
-
     private void sendScapMsgLongShort(List<BtcFutures> list, String symbol, String trend, String append) {
-        String trend_15m = "";
-        trend_15m += Utils.checkTrendByIndex(list, 3, 10, trend);
-        trend_15m += Utils.checkTrendByIndex(list, 3, 20, trend);
-        trend_15m += Utils.checkTrendByIndex(list, 3, 50, trend);
-        if (Utils.isNotBlank(trend_15m)) {
+        String cur_trend = Utils.checkTrendByMa10_20_50(list, 3, trend);
+        if (Utils.isNotBlank(cur_trend)) {
             String chartname = Utils.getChartName(list);
-            String msg = chartname + trend_15m + symbol;
+            String msg = chartname + cur_trend + symbol;
 
             if (Utils.isNotBlank(append)) {
                 msg += Utils.new_line_from_service + append;
@@ -2790,7 +2676,6 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     public void sendMsgChart15m(String gecko_id, String symbol, String append) {
-
         if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             sendMsgKillLongShort(gecko_id, symbol, list_15m, append);
@@ -2806,62 +2691,31 @@ public class BinanceServiceImpl implements BinanceService {
                     sendScapMsgLongShort(list_15m, symbol, trend, append);
                 }
             }
+            return;
         }
-
-        //--------------------------------------------------------------------
-
+        // --------------------------------------------------------------------
         FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, gecko_id);
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
         if (!Objects.equals(null, entity)) {
             String dh = entity.getNote();
-            if (Objects.equals(Utils.CHAR_NORMAL + Utils.CHAR_NORMAL, dh)) {
-                return;
-            }
-            String h = dh.substring(1, 2);
-            if (Objects.equals(Utils.CHAR_NORMAL, h)) {
-                return;
-            }
-
-            if (Objects.equals(Utils.CHAR_SHORT, h) && !Objects.equals("BTC", symbol)) {
-                return;
-            }
-
-            String supper_trend = "";
             if (Objects.equals(Utils.CHAR_LONG + Utils.CHAR_LONG, dh)) {
-                supper_trend = Utils.CHAR_MONEY + Utils.CHAR_MONEY + Utils.CHAR_MONEY;
-                supper_trend += "SUPPER_LONG";
-                supper_trend += Utils.CHAR_MONEY + Utils.CHAR_MONEY + Utils.CHAR_MONEY;
+
+                checkTrendByBtc(gecko_id, symbol, TIME_15m, BigDecimal.ZERO, true, "_____D1H1M15_LONG_____", false);
             }
-            String trend = (Objects.equals(Utils.CHAR_LONG, h)) ? Utils.TREND_LONG : Utils.TREND_SHORT;
-
-            checkTrendByBtc(gecko_id, symbol, TIME_15m, BigDecimal.ZERO, true, supper_trend, false, trend);
         }
-
     }
 
     public String checkTrendByBtc(String gecko_id, String symbol, String TIME, BigDecimal ref_price,
-            boolean allowSendMsg, String append, boolean isCompareWithBtc, String find_trend) {
+            boolean allowSendMsg, String append, boolean isCompareWithBtc) {
         String trend = "";
         String CURRENCY = isCompareWithBtc ? "BTC" : "USDT";
         List<BtcFutures> list_compare_btc = Utils.loadData(symbol, TIME, 50, CURRENCY);
         BigDecimal current_price = isCompareWithBtc ? ref_price : list_compare_btc.get(0).getCurrPrice();
 
         if (!CollectionUtils.isEmpty(list_compare_btc)) {
-            trend += Utils.checkTrendByIndex(list_compare_btc, 3, 10, Utils.TREND_LONG);
-            trend += Utils.checkTrendByIndex(list_compare_btc, 3, 20, Utils.TREND_LONG);
-            trend += Utils.checkTrendByIndex(list_compare_btc, 3, 50, Utils.TREND_LONG);
+            trend = Utils.checkTrendByMa10_20_50(list_compare_btc, 3, Utils.TREND_LONG);
 
             if (allowSendMsg && Utils.isNotBlank(trend)) {
-
-                if (Utils.isNotBlank(find_trend)) {
-                    String find = Objects.equals(Utils.TREND_LONG, find_trend) ? Utils.TREND_LONG_UP
-                            : Utils.TREND_SHORT_DN;
-
-                    if (!trend.contains(find)) {
-                        return "";
-                    }
-                }
-
                 String chartname = Utils.getChartName(list_compare_btc);
 
                 saveDepthData(gecko_id, symbol);
@@ -2878,7 +2732,7 @@ public class BinanceServiceImpl implements BinanceService {
                 }
 
                 String str_current_price = "(" + Utils.removeLastZero(current_price) + ")";
-                String msg = chartname + trend + symbol + ".vs.BTC." + str_current_price + append;
+                String msg = chartname + trend + symbol + str_current_price + append;
 
                 if (Utils.isNotBlank(bid_ask)) {
                     msg += Utils.new_line_from_service + bid_ask;
@@ -2932,7 +2786,7 @@ public class BinanceServiceImpl implements BinanceService {
         List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
         String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
 
-        sendScapMsgLongShort(list_15m, EPIC, trend, Utils.getAtlAth(list_1h));
+        sendScapMsgLongShort(list_15m, EPIC, trend, Utils.calc_BUF_LO_HI_BUF(list_1h, trend));
 
         System.out.println(Utils.getTimeHHmm() + "Capital: " + EPIC + " " + Utils.getChartName(list_1h));
     }
@@ -2991,50 +2845,13 @@ public class BinanceServiceImpl implements BinanceService {
         String type = "";
         if (binanceFuturesRepository.existsById(gecko_id)) {
             type = " (Futures) ";
-
-            if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
-
-                createHistoryReverseOf_H1(list_h1, symbol);
-                sendMsgChart15m(gecko_id, symbol, Utils.getAtlAth(list_h1));
-
-                sendMsgByTrendMaX(symbol, list_h1, 50, "", taker); // H4
-
-                sendMsgByTrendMaX(symbol, list_days, 10, "",
-                        taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD"); // D
-
-                sendMsgByTrendMaX(symbol, list_days, 50, "",
-                        taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW"); // W
-            } else {
-                if (!RANGE_BTC_IS_DANGER) {
-                    if (Utils.isNotBlank(taker)) {
-                        sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
-                                taker + Utils.new_line_from_service + "H4H4H4H4H4H4H4H4H4H4H4"); // D
-                    }
-
-                    sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
-                            taker + Utils.new_line_from_service + "DDDDDDDDDDDDDDDDDDDDDDD");// D
-
-                    sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
-                            taker + Utils.new_line_from_service + "WWWWWWWWWWWWWWWWWWWWWWW");// W
-                }
-            }
+            createHistoryReverseOf_H1(list_h1, symbol);
+            sendMsgChart15m(gecko_id, symbol, Utils.getAtlAth(list_h1));
         } else {
             type = " (Spot) ";
-
-            if (!RANGE_BTC_IS_DANGER) {
-                if (Utils.isNotBlank(taker)) {
-                    sendMsgByTrendMaX(symbol, list_h4, 50, Utils.TREND_LONG,
-                            taker + Utils.new_line_from_service + "H4H4H4H4(Spot)H4H4H4H4"); // D
-                }
-            }
-
-            sendMsgByTrendMaX(symbol, list_days, 10, Utils.TREND_LONG,
-                    taker + Utils.new_line_from_service + "DDDDDDD(Spot)DDDDDDD"); // D
-
-            sendMsgByTrendMaX(symbol, list_days, 50, Utils.TREND_LONG,
-                    taker + Utils.new_line_from_service + "WWWWWWW(Spot)WWWWWWW"); // W
-
         }
+        sendScapMsgLongShort(list_days, symbol, Utils.TREND_LONG, taker + type);
+
         type = type + Utils.analysisVolume(list_days);
 
         String scapLongH4 = Utils.getScapLong(list_h4, list_days, 10, allow_long_d1);
@@ -3083,9 +2900,6 @@ public class BinanceServiceImpl implements BinanceService {
 
             priorityCoinHistoryRepository.save(his);
         }
-        if (scapLongD1.contains(Utils.TREND_DANGER) || scapLongH4.contains(Utils.TREND_DANGER)) {
-            // position = "";
-        }
         // ---------------------------------------------------------
         // EVENT_D_H4_H1
         {
@@ -3113,23 +2927,14 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         // ---------------------------------------------------------
-        //        if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
-        //            if (Utils.isUptrendByMaIndex(list_h4, 6)) {
-        //                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_4h, current_price, false, type, true,
-        //                        Utils.TREND_LONG);
-        //                if (Utils.isNotBlank(trend_by_btc)) {
-        //                    note += "_PositionBTC4h";
-        //                }
-        //
-        //                if (Utils.isUptrendByMaIndex(list_h1, 6)) {
-        //                    trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_15m, current_price, true, type, true,
-        //                            Utils.TREND_LONG);
-        //                    if (Utils.isNotBlank(trend_by_btc)) {
-        //                        note += "_PositionBTC15m";
-        //                    }
-        //                }
-        //            }
-        //        }
+        if (!Objects.equals("BTC", symbol) && !Utils.isDangerRange(list_h4)) {
+            if (Utils.isUptrendByMaIndex(list_h1, 10)) {
+                String trend_by_btc = checkTrendByBtc(gecko_id, symbol, TIME_1h, current_price, true, type, true);
+                if (Utils.isNotBlank(trend_by_btc)) {
+                    note += "_PositionBTC15m";
+                }
+            }
+        }
         note += position;
         // ---------------------------------------------------------
         String mUpMa = "";
@@ -3196,15 +3001,6 @@ public class BinanceServiceImpl implements BinanceService {
         loadBinanceData(gecko_id, symbol, list_days, list_h1, result);
 
         return result;
-    }
-
-    @Override
-    @Transactional
-    public void clearTrash() {
-        List<FundingHistory> list = fundingHistoryRepository.clearTrash();
-        if (!CollectionUtils.isEmpty(list)) {
-            fundingHistoryRepository.deleteAll(list);
-        }
     }
 
 }

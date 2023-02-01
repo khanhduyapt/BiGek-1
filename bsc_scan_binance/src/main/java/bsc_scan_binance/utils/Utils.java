@@ -91,7 +91,7 @@ public class Utils {
 
     public static String CST = "";
     public static String X_SECURITY_TOKEN = "";
-    //MINUTE, MINUTE_5, MINUTE_15, MINUTE_30, HOUR, HOUR_4, DAY, WEEK
+    // MINUTE, MINUTE_5, MINUTE_15, MINUTE_30, HOUR, HOUR_4, DAY, WEEK
     public static final String CAPITAL_TIME_MINUTE = "MINUTE";
     public static final String CAPITAL_TIME_MINUTE_5 = "MINUTE_5";
     public static final String CAPITAL_TIME_MINUTE_15 = "MINUTE_15";
@@ -283,16 +283,18 @@ public class Utils {
         RestTemplate restTemplate = new RestTemplate();
 
         // https://api-capital.backend-capital.com/api/v1/session/encryptionKey
-        //headers.set("X-CAP-API-KEY", API);
-        //HttpEntity<String> request = new HttpEntity<String>(headers);
-        //ResponseEntity<String> encryption = restTemplate1.exchange(
-        //        "https://api-capital.backend-capital.com/api/v1/session/encryptionKey", HttpMethod.GET, request,
-        //        String.class);
-        //JSONObject encryption_body = new JSONObject(encryption.getBody());
-        //String encryptionKey = Utils.getStringValue(encryption_body.get("encryptionKey"));
-        //String timeStamp = Utils.getStringValue(encryption_body.get("timeStamp"));
+        // headers.set("X-CAP-API-KEY", API);
+        // HttpEntity<String> request = new HttpEntity<String>(headers);
+        // ResponseEntity<String> encryption = restTemplate1.exchange(
+        // "https://api-capital.backend-capital.com/api/v1/session/encryptionKey",
+        // HttpMethod.GET, request,
+        // String.class);
+        // JSONObject encryption_body = new JSONObject(encryption.getBody());
+        // String encryptionKey =
+        // Utils.getStringValue(encryption_body.get("encryptionKey"));
+        // String timeStamp = Utils.getStringValue(encryption_body.get("timeStamp"));
 
-        //--------------------------------------------------------------
+        // --------------------------------------------------------------
 
         // https://capital.com/api-request-examples
         // https://open-api.capital.com/#tag/Session
@@ -307,25 +309,26 @@ public class Utils {
 
         request = new HttpEntity<String>(personJsonObject.toString(), headers);
 
-        ResponseEntity<String> responseEntityStr = restTemplate.postForEntity(
-                "https://api-capital.backend-capital.com/api/v1/session", request,
-                String.class);
+        ResponseEntity<String> responseEntityStr = restTemplate
+                .postForEntity("https://api-capital.backend-capital.com/api/v1/session", request, String.class);
 
         HttpHeaders res_header = responseEntityStr.getHeaders();
         Utils.CST = Utils.getStringValue(res_header.get("CST").get(0));
         Utils.X_SECURITY_TOKEN = Utils.getStringValue(res_header.get("X-SECURITY-TOKEN").get(0));
 
         // ------------------------------------------------------------------------------------
-        //String nodeId = "hierarchy_v1.oil_markets_group";
-        //String marketnavigation = "marketnavigation/" + nodeId;
-        //String url_markets = "https://api-capital.backend-capital.com/api/v1/" + marketnavigation;
-        //headers = new HttpHeaders();
-        //MediaType mediaType = MediaType.parseMediaType("text/plain");
-        //headers.setContentType(mediaType);
-        //headers.set("X-SECURITY-TOKEN", Utils.X_SECURITY_TOKEN);
-        //headers.set("CST", Utils.CST);
-        //request = new HttpEntity<String>(headers);
-        //ResponseEntity<String> response = restTemplate.exchange(url_markets, HttpMethod.GET, request, String.class);
+        // String nodeId = "hierarchy_v1.oil_markets_group";
+        // String marketnavigation = "marketnavigation/" + nodeId;
+        // String url_markets = "https://api-capital.backend-capital.com/api/v1/" +
+        // marketnavigation;
+        // headers = new HttpHeaders();
+        // MediaType mediaType = MediaType.parseMediaType("text/plain");
+        // headers.setContentType(mediaType);
+        // headers.set("X-SECURITY-TOKEN", Utils.X_SECURITY_TOKEN);
+        // headers.set("CST", Utils.CST);
+        // request = new HttpEntity<String>(headers);
+        // ResponseEntity<String> response = restTemplate.exchange(url_markets,
+        // HttpMethod.GET, request, String.class);
 
     }
 
@@ -342,13 +345,15 @@ public class Utils {
             HttpEntity<String> request;
             RestTemplate restTemplate = new RestTemplate();
 
-            // Possible values are MINUTE, MINUTE_5, MINUTE_15, MINUTE_30, HOUR, HOUR_4, DAY, WEEK
+            // Possible values are MINUTE, MINUTE_5, MINUTE_15, MINUTE_30, HOUR, HOUR_4,
+            // DAY, WEEK
             // The maximum number of the values in answer. Default = 10, max = 1000
-            // Start date. Date format: YYYY-MM-DDTHH:MM:SS (e.g. 2022-04-01T01:01:00).  based on snapshotTimeUTC
+            // Start date. Date format: YYYY-MM-DDTHH:MM:SS (e.g. 2022-04-01T01:01:00).
+            // based on snapshotTimeUTC
             // End date. Date format: YYYY-MM-DDTHH:MM:SS (e.g. 2022-04-01T01:01:00).
 
-            String url = "https://api-capital.backend-capital.com/api/v1/prices/" + epic
-                    + "?resolution=" + TIME + "&max=" + length;// + "&from=" + time_fr + "&to=" + time_to;
+            String url = "https://api-capital.backend-capital.com/api/v1/prices/" + epic + "?resolution=" + TIME
+                    + "&max=" + length;// + "&from=" + time_fr + "&to=" + time_to;
 
             headers = new HttpHeaders();
             MediaType mediaType = MediaType.parseMediaType("text/plain");
@@ -2154,15 +2159,6 @@ public class Utils {
         return dto;
     }
 
-    // down:
-    // -20
-    // -24
-    // -60
-    //
-    // up:
-    // -15
-    // 20
-
     public static String getScapLong(List<BtcFutures> list_entry, List<BtcFutures> list_tp, int usd, boolean isLong) {
         try {
 
@@ -2331,29 +2327,33 @@ public class Utils {
         return result;
     }
 
-    public static String calcSL_TP_5m(List<BtcFutures> list, String trend) {
+    public static String calc_BUF_LO_HI_BUF(List<BtcFutures> list, String trend) {
         BigDecimal entry = list.get(0).getCurrPrice();
-        BigDecimal SL = BigDecimal.ZERO;
-        BigDecimal TP = BigDecimal.ZERO;
+        BigDecimal buf = BigDecimal.ZERO;
+
         BigDecimal range = BigDecimal.ZERO;
         BigDecimal ma10 = calcMA(list, 10, 1);
 
-        List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, 20));
-        if (trend.contains(TREND_LONG)) {
-            SL = low_heigh.get(0);
-            range = ma10.subtract(SL);
-            range = range.multiply(BigDecimal.valueOf(3));
-            TP = ma10.add(range);
-        } else {
-            SL = low_heigh.get(1);
-            range = SL.subtract(ma10);
-            range = range.multiply(BigDecimal.valueOf(3));
-            TP = ma10.subtract(range);
-        }
+        List<BigDecimal> low_heigh = getLowHeightCandle(list);
+        BigDecimal LO = low_heigh.get(0);
+        BigDecimal HI = low_heigh.get(1);
 
-        String result = getChartName(list);
-        result += " SL:" + getPercentToEntry(entry, SL, true);
-        result += ", TP:" + getPercentToEntry(entry, TP, true);
+        String result = "";
+        if (trend.contains(TREND_LONG)) {
+            range = ma10.subtract(buf);
+            buf = LO.subtract(range);
+            result += "Buf:" + getPercentToEntry(LO, buf, true);
+            result += ",Lo:" + getPercentToEntry(entry, LO, true);
+            result += ",Hi:" + getPercentToEntry(entry, HI, true);
+        } else {
+            range = buf.subtract(ma10);
+            buf = HI.add(range);
+
+            result += "Lo:" + getPercentToEntry(entry, LO, true);
+            result += ",Hi:" + getPercentToEntry(entry, HI, true);
+            result += ",Buf:" + getPercentToEntry(HI, buf, true);
+        }
+        result += getChartName(list);
 
         return result;
     }
@@ -2405,167 +2405,6 @@ public class Utils {
             return true;
         }
         return false;
-    }
-
-    public static String switchStrategy(List<BtcFutures> list, int maSlowIndex) {
-        String symbol = list.get(0).getId().toLowerCase();
-
-        if (symbol.contains("_2h_") || symbol.contains("_4h_") || symbol.contains("_1d_") || symbol.contains("_1w_")) {
-            return check3CuttingXforH1(list, maSlowIndex);
-        } else {
-
-            if (symbol.contains("_1h_") || symbol.contains("_15m_")) {
-                String current_trend = check3CuttingUp50ForM15(list);
-                if (isBlank(current_trend)) {
-                    current_trend = check3CuttingDown50ForM15(list);
-                }
-
-                if (isBlank(current_trend) && list.get(0).getId().contains("BTC")) {
-                    return check3CuttingXforH1(list, maSlowIndex);
-                }
-
-                return current_trend;
-            } else {
-                return check3CuttingUpForM5(list);
-            }
-        }
-    }
-
-    private static String check3CuttingUpForM5(List<BtcFutures> list) {
-        if (list.size() < 50) {
-            return "";
-        }
-
-        BigDecimal ma3_1 = calcMA(list, MA_FAST, 1);
-        BigDecimal ma3_2 = calcMA(list, MA_FAST, 2);
-        if (ma3_1.compareTo(ma3_2) < 0) {
-            return ""; // Ma3 move down
-        }
-
-        // --------------------------------
-        BigDecimal ma10_1 = calcMA(list, 10, 1);
-        BigDecimal ma10_2 = calcMA(list, 10, 2);
-        if (ma3_1.compareTo(ma10_1) < 0) {
-            return ""; // Ma3 down ma10
-        }
-        if (ma10_1.compareTo(ma10_2) < 0) {
-            return ""; // Ma10 down
-        }
-        // --------------------------------
-        BigDecimal ma20_1 = calcMA(list, 20, 1);
-        BigDecimal ma20_2 = calcMA(list, 20, 2);
-        if (ma3_1.compareTo(ma20_1) < 0) {
-            return ""; // Ma3 down ma20
-        }
-        if (ma20_1.compareTo(ma20_2) < 0) {
-            return ""; // Ma20 down
-        }
-
-        // --------------------------------
-        BigDecimal ma50_1 = calcMA(list, 50, 1);
-        if (ma3_1.compareTo(ma50_1) < 0) {
-            BigDecimal close1 = list.get(1).getPrice_close_candle();
-            BigDecimal close2 = list.get(2).getPrice_close_candle();
-            if ((close1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(close2) > 0)) {
-                return TREND_LONG;
-            }
-        }
-        return "";
-    }
-
-    private static String check3CuttingUp50ForM15(List<BtcFutures> list) {
-        if (list.size() < 50) {
-            return "";
-        }
-
-        BigDecimal ma3_1 = calcMA(list, MA_FAST, 1);
-        BigDecimal ma3_2 = calcMA(list, MA_FAST, 2);
-        if (ma3_1.compareTo(ma3_2) < 0) {
-            return ""; // Ma3 move down
-        }
-
-        // --------------------------------
-        BigDecimal ma10_1 = calcMA(list, 10, 1);
-        BigDecimal ma10_2 = calcMA(list, 10, 2);
-        if (ma3_1.compareTo(ma10_1) < 0) {
-            return ""; // Ma3 down ma10
-        }
-        if (ma10_1.compareTo(ma10_2) < 0) {
-            return ""; // Ma10 down
-        }
-        // --------------------------------
-        BigDecimal ma20_1 = calcMA(list, 20, 1);
-        BigDecimal ma20_2 = calcMA(list, 20, 2);
-        if (ma3_1.compareTo(ma20_1) < 0) {
-            return ""; // Ma3 down ma20
-        }
-        if (ma20_1.compareTo(ma20_2) < 0) {
-            return ""; // Ma20 down
-        }
-
-        // ma3 cut up ma50
-        BigDecimal ma50_1 = calcMA(list, 50, 1);
-        if ((ma3_1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(ma3_2) > 0)) {
-            return TREND_LONG;
-        }
-
-        if (ma3_1.compareTo(ma50_1) < 0) {
-            BigDecimal close1 = list.get(1).getPrice_close_candle();
-            BigDecimal close2 = list.get(2).getPrice_close_candle();
-            if ((close1.compareTo(ma50_1) > 0) && (ma50_1.compareTo(close2) > 0)) {
-                return TREND_LONG;
-            }
-        }
-        return "";
-    }
-
-    private static String check3CuttingDown50ForM15(List<BtcFutures> list) {
-        if (list.size() < 50) {
-            return "";
-        }
-
-        BigDecimal ma3_1 = calcMA(list, MA_FAST, 1);
-        BigDecimal ma3_2 = calcMA(list, MA_FAST, 2);
-        if (ma3_1.compareTo(ma3_2) > 0) {
-            return ""; // Ma3 move Up
-        }
-
-        BigDecimal ma10_1 = calcMA(list, 10, 1);
-        if (ma3_1.compareTo(ma10_1) > 0) {
-            return ""; // Ma3 Up ma10
-        }
-
-        BigDecimal ma20_1 = calcMA(list, 20, 1);
-        if (ma3_1.compareTo(ma20_1) > 0) {
-            return ""; // Ma3 Up ma20
-        }
-
-        BigDecimal ma10_2 = calcMA(list, 10, 2);
-        if (ma10_1.compareTo(ma10_2) > 0) {
-            return ""; // Ma10 Up
-        }
-
-        BigDecimal ma20_2 = calcMA(list, 20, 2);
-        if (ma20_1.compareTo(ma20_2) > 0) {
-            return ""; // Ma20 Up
-        }
-
-        // ma3 cut down ma50
-        BigDecimal ma50_1 = calcMA(list, 50, 1);
-        if ((ma3_1.compareTo(ma50_1) < 0) && (ma50_1.compareTo(ma3_2) < 0)) {
-            return TREND_SHORT;
-        }
-
-        // List<BigDecimal> open_close = getOpenCloseCandle(list.subList(1, 2));
-        // BigDecimal low = open_close.get(0);
-        // BigDecimal hig = open_close.get(1);
-        // if ((hig.compareTo(ma10_1) > 0) && (ma10_1.compareTo(low) > 0)) {
-        // if ((hig.compareTo(ma20_1) > 0) && (ma20_1.compareTo(low) > 0)) {
-        // return TREND_SHORT;
-        // }
-        // }
-
-        return "";
     }
 
     public static String check3CuttingXforH1(List<BtcFutures> list, int maSlowIndex) {
@@ -2671,67 +2510,77 @@ public class Utils {
         return CHAR_NORMAL;
     }
 
-    public static boolean isMa3CuttingUpX(List<BtcFutures> list, int slowIndex) {
-        int cur = 1;
-        int pre = 2;
-        int fastIndex = 3;
-        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
-        String val = ma_fast_c.toString();
-        if (val.contains("E")) {
-            return false;
-        }
-        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
+//    public static boolean isMa3CuttingUpX(List<BtcFutures> list, int slowIndex) {
+//        int cur = 1;
+//        int pre = 2;
+//        int fastIndex = 3;
+//        BigDecimal ma_fast_c = calcMA(list, fastIndex, cur);
+//        String val = ma_fast_c.toString();
+//        if (val.contains("E")) {
+//            return false;
+//        }
+//        BigDecimal ma_fast_p = calcMA(list, fastIndex, pre);
+//
+//        BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
+//        BigDecimal ma_slow_p = calcMA(list, slowIndex, pre);
+//
+//        if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
+//                && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
+//            return true;
+//        }
+//
+//        if (ma_fast_c.compareTo(ma_slow_c) < 0) {
+//            BigDecimal close1 = list.get(1).getPrice_close_candle();
+//            BigDecimal close2 = list.get(2).getPrice_close_candle();
+//            if ((close1.compareTo(ma_slow_c) > 0) && (ma_slow_c.compareTo(close2) > 0)) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
 
-        BigDecimal ma_slow_c = calcMA(list, slowIndex, cur);
-        BigDecimal ma_slow_p = calcMA(list, slowIndex, pre);
+//    public static String checkTrendLongShort1m(List<BtcFutures> list, int slowIndex) {
+//        BigDecimal ma3_1 = calcMA(list, MA_FAST, 1);
+//        String val = ma3_1.toString();
+//        if (val.contains("E")) {
+//            return "";
+//        }
+//        BigDecimal ma3_2 = calcMA(list, MA_FAST, 2);
+//
+//        BigDecimal ma10_1 = calcMA(list, slowIndex, 1);
+//        BigDecimal ma10_2 = calcMA(list, slowIndex, 2);
+//
+//        if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma10_1) > 0) && (ma10_2.compareTo(ma3_2) > 0)) {
+//            return TREND_LONG;
+//        }
+//        if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma10_1) < 0) && (ma10_2.compareTo(ma3_2) < 0)) {
+//            return TREND_SHORT;
+//        }
+//        // --------------------------------------------
+//        BigDecimal close1 = list.get(1).getPrice_close_candle();
+//        BigDecimal close2 = list.get(2).getPrice_close_candle();
+//        if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(close2) > 0)) {
+//            return TREND_LONG;
+//        }
+//        if ((close1.compareTo(ma10_1) < 0) && (ma10_1.compareTo(close2) < 0)) {
+//            return TREND_SHORT;
+//        }
+//
+//        return "";
+//    }
 
-        if ((ma_fast_c.compareTo(ma_fast_p) > 0) && (ma_fast_c.compareTo(ma_slow_c) > 0)
-                && (ma_slow_p.compareTo(ma_fast_p) > 0)) {
-            return true;
-        }
+    public static String checkTrendByMa10_20_50(List<BtcFutures> list, int fastIndex, String trend) {
+        String resutl = "";
 
-        if (ma_fast_c.compareTo(ma_slow_c) < 0) {
-            BigDecimal close1 = list.get(1).getPrice_close_candle();
-            BigDecimal close2 = list.get(2).getPrice_close_candle();
-            if ((close1.compareTo(ma_slow_c) > 0) && (ma_slow_c.compareTo(close2) > 0)) {
-                return true;
-            }
-        }
+        resutl += Utils.checkTrendByIndex(list, fastIndex, 10, trend);
+        resutl += Utils.checkTrendByIndex(list, fastIndex, 20, trend);
+        resutl += Utils.checkTrendByIndex(list, fastIndex, 50, trend);
 
-        return false;
+        return resutl;
     }
 
-    public static String checkTrendLongShort1m(List<BtcFutures> list, int slowIndex) {
-        BigDecimal ma3_1 = calcMA(list, MA_FAST, 1);
-        String val = ma3_1.toString();
-        if (val.contains("E")) {
-            return "";
-        }
-        BigDecimal ma3_2 = calcMA(list, MA_FAST, 2);
-
-        BigDecimal ma10_1 = calcMA(list, slowIndex, 1);
-        BigDecimal ma10_2 = calcMA(list, slowIndex, 2);
-
-        if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma10_1) > 0) && (ma10_2.compareTo(ma3_2) > 0)) {
-            return TREND_LONG;
-        }
-        if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma10_1) < 0) && (ma10_2.compareTo(ma3_2) < 0)) {
-            return TREND_SHORT;
-        }
-        // --------------------------------------------
-        BigDecimal close1 = list.get(1).getPrice_close_candle();
-        BigDecimal close2 = list.get(2).getPrice_close_candle();
-        if ((close1.compareTo(ma10_1) > 0) && (ma10_1.compareTo(close2) > 0)) {
-            return TREND_LONG;
-        }
-        if ((close1.compareTo(ma10_1) < 0) && (ma10_1.compareTo(close2) < 0)) {
-            return TREND_SHORT;
-        }
-
-        return "";
-    }
-
-    public static String checkTrendByIndex(List<BtcFutures> list, int fastIndex, int slowIndex, String trend) {
+    private static String checkTrendByIndex(List<BtcFutures> list, int fastIndex, int slowIndex, String trend) {
         if (CollectionUtils.isEmpty(list)) {
             return "";
         }
@@ -2740,8 +2589,8 @@ public class Utils {
             return "";
         }
 
-        int str = 0;
-        int end = 1;
+        int str = 1;
+        int end = 2;
         BigDecimal ma3_1 = calcMA(list, fastIndex, str);
         BigDecimal ma3_2 = calcMA(list, fastIndex, end);
 
@@ -2770,93 +2619,4 @@ public class Utils {
         return "(" + check + " )";
     }
 
-    public static String checkMa3AndX(List<BtcFutures> list, int slowIndex, boolean showDetail, String trend) {
-        String symbol = list.get(0).getId();
-
-        // -----------------------------------------------
-        String trend_slow = check3CuttingXforH1(list, slowIndex);
-        boolean isCuttingUp = false;// Long
-        if (isBlank(trend) || Objects.equals(trend, TREND_LONG)) {
-            isCuttingUp = Objects.equals(trend_slow, TREND_LONG);
-        }
-
-        // -----------------------------------------------
-        boolean isCuttingDown = false; // Short
-        if (isBlank(trend) || Objects.equals(trend, TREND_SHORT)) {
-            isCuttingDown = Objects.equals(trend_slow, TREND_SHORT);
-        }
-
-        // --------------------------------------------------
-
-        String type = "Check(Ma" + getStringValue(slowIndex) + ")";
-        BigDecimal currPrice = list.get(0).getCurrPrice();
-
-        String result = "";
-        if (isCuttingUp) {
-            result = type + "Long" + getChartName(list) + "";
-        } else if (isCuttingDown) {
-            result = type + "Short" + getChartName(list);
-        }
-
-        if (symbol.contains("AUD_") || symbol.contains("AUD_") || symbol.contains("AUD_")) {
-            return result;
-        }
-
-        // --------------------------------------------------
-        try {
-
-            if (isNotBlank(result)) {
-                symbol = symbol.replace("_00", "").replace("_1d", "_D").replace("_1h", "(H1)").replace("_4h", "(H4)");
-                int usd = 10;
-                boolean isLong = result.contains(TREND_LONG);
-                List<BigDecimal> low_heigh = getLowHeightCandle(list.subList(0, list.size() > 13 ? 13 : list.size()));
-                BigDecimal lh_stoploss = isLong ? low_heigh.get(0).multiply(BigDecimal.valueOf(0.9995))
-                        : low_heigh.get(1).multiply(BigDecimal.valueOf(1.0005));
-
-                List<BigDecimal> fiboList = calcFiboTakeProfit(lh_stoploss, currPrice);
-
-                BigDecimal SL = fiboList.get(0);
-                BigDecimal entry = fiboList.get(1);
-                BigDecimal TP3 = fiboList.get(4);
-
-                BigDecimal vol = BigDecimal.valueOf(usd).divide(entry.subtract(SL), 10, RoundingMode.CEILING);
-                vol = formatPrice(vol.multiply(entry).abs(), 0);
-
-                BigDecimal earn3 = TP3.subtract(entry).abs().divide(entry, 10, RoundingMode.CEILING);
-                earn3 = formatPrice(vol.multiply(earn3), 1);
-
-                result += " SL" + getChartName(list) + ": " + getPercentToEntry(entry, SL, true);
-                result += " Vol: " + removeLastZero(vol).replace(".0", "") + ":" + usd + "$";
-
-                if (showDetail) {
-                    int start_index = 0;
-                    BigDecimal temp = isLong ? low_heigh.get(0) : low_heigh.get(1);
-                    for (int index = 0; index <= 13; index++) {
-                        if (index < list.size()) {
-                            BtcFutures dto = list.get(index);
-                            if (isLong) {
-                                if (temp.compareTo(dto.getLow_price()) >= 0) {
-                                    start_index = index;
-                                }
-                            } else {
-                                if (temp.compareTo(dto.getHight_price()) <= 0) {
-                                    start_index = index;
-                                }
-                            }
-                        }
-                    }
-                    String timing2 = timingTarget(getChartName(list), start_index * 5);
-                    if (isNotBlank(timing2)) {
-                        result += ",END:" + timing2;
-                    }
-                }
-            }
-        } catch (Exception e) {
-        }
-
-        if (!(result.contains(TREND_LONG) || result.contains(TREND_SHORT))) {
-            result = "";
-        }
-        return result;
-    }
 }
