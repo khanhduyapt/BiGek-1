@@ -2796,7 +2796,6 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgKillLongShort(gecko_id, symbol, Utils.getAtlAth(list_h1));
         }
 
-        createHistoryReverseOf_H1(list_h1, symbol);
         String H = createHistoryReverseOf_H1(list_h1, symbol);
         if (Objects.equals(Utils.CHAR_LONG, H)) {
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
@@ -2867,14 +2866,14 @@ public class BinanceServiceImpl implements BinanceService {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, gecko_id, symbol, DH4H1, true));
             }
 
-            if (!Objects.equals(Utils.CHAR_NORMAL, chart_h1)) {
+            if (Objects.equals(Utils.CHAR_LONG, chart_h1)) {
                 FundingHistory entity_dhh = fundingHistoryRepository.findById(id).orElse(null);
                 if (!Objects.equals(null, entity_dhh)) {
                     String DHH = entity_dhh.getNote();
                     String d = DHH.substring(0, 1);
-                    if (!Objects.equals(Utils.CHAR_NORMAL, d) && Objects.equals(d, chart_h1)) {
-                        DHH = DHH.substring(0, 1) + chart_h1;
-                        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, gecko_id, symbol, DHH, true));
+                    if (!Objects.equals(Utils.CHAR_NORMAL, d)) {
+                        fundingHistoryRepository
+                                .save(createPumpDumpEntity(EVENT_DH, gecko_id, symbol, d + chart_h1, true));
                     }
                 }
             }
