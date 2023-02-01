@@ -2425,7 +2425,7 @@ public class BinanceServiceImpl implements BinanceService {
             // -----------------------------------------------------------------------------------------//
 
             if (Utils.isNotBlank(msg)) {
-                String EVENT_ID = EVENT_DANGER_CZ_KILL_LONG + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
+                String EVENT_ID = EVENT_DANGER_CZ_KILL_LONG + "_" + Utils.getCurrentYyyyMmDd_HH_Blog2h();
 
                 if (!fundingHistoryRepository.existsPumDump("bitcoin", EVENT_ID)) {
 
@@ -2588,7 +2588,7 @@ public class BinanceServiceImpl implements BinanceService {
             msg = (msg + result).replace(",", Utils.new_line_from_service);
             // msg += Utils.new_line_from_service + "Currency:" + TREND_CURRENCY_TODAY;
 
-            String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + symbol + "_" + Utils.getCurrentYyyyMmDd_Blog2h();
+            String EVENT_LONG_SHORT = EVENT_FIBO_LONG_SHORT + symbol + "_" + Utils.getCurrentYyyyMmDd_HH_Blog2h();
 
             if (!fundingHistoryRepository.existsPumDump(gecko_id, EVENT_LONG_SHORT)) {
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_LONG_SHORT, gecko_id, symbol, "", true));
@@ -2920,7 +2920,8 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     // The maximum request rate is 10 per second.
-    public void capital() {
+    @Override
+    public void checkCapital(String EPIC) {
         //https://open-api.capital.com/#section/Authentication/How-to-start-new-session
 
         try {
@@ -2962,33 +2963,64 @@ public class BinanceServiceImpl implements BinanceService {
             Utils.CST = Utils.getStringValue(res_header.get("CST").get(0));
             Utils.X_SECURITY_TOKEN = Utils.getStringValue(res_header.get("X-SECURITY-TOKEN").get(0));
 
-            //------------------------------------------------------------------------------------
-            String epic = "GOLD";
-            List<BtcFutures> list_1h = Utils.loadCapitalData(epic, Utils.CAPITAL_TIME_HOUR, 50);
-            List<BtcFutures> list_15m = Utils.loadCapitalData(epic, Utils.CAPITAL_TIME_MINUTE_15, 50);
+            // ------------------------------------------------------------------------------------
+            //String nodeId = "hierarchy_v1.oil_markets_group";
+            //String marketnavigation = "marketnavigation/" + nodeId;
+            //String url_markets = "https://api-capital.backend-capital.com/api/v1/" + marketnavigation;
+            //headers = new HttpHeaders();
+            //MediaType mediaType = MediaType.parseMediaType("text/plain");
+            //headers.setContentType(mediaType);
+            //headers.set("X-SECURITY-TOKEN", Utils.X_SECURITY_TOKEN);
+            //headers.set("CST", Utils.CST);
+            //request = new HttpEntity<String>(headers);
+            //ResponseEntity<String> response = restTemplate.exchange(url_markets, HttpMethod.GET, request, String.class);
 
-            String trend_1h = "";
-            trend_1h += Utils.checkTrendByIndex(list_1h, 3, 10, "");
-            trend_1h += Utils.checkTrendByIndex(list_1h, 3, 20, "");
-            trend_1h += Utils.checkTrendByIndex(list_1h, 3, 50, "");
-            if (Utils.isNotBlank(trend_1h)) {
-                String chartname = Utils.getChartName(list_1h);
-                String msg = chartname + trend_1h + epic;
-                String EVENT_ID = EVENT_PUMP + epic + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_1h);
-                sendMsgPerHour(EVENT_ID, msg, true);
+            // ------------------------------------------------------------------------------------
+            List<BtcFutures> list_1h = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_HOUR, 50);
+
+            System.out.println(Utils.getTimeHHmm() + "checkCapital: " + EPIC + ":" + list_1h.size());
+
+            String chart_H = Utils.initLongShort(list_1h);
+            String H = chart_H;
+            FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, EPIC);
+            if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
+                fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH, EPIC, EPIC, chart_H, true));
             }
 
-            System.out.println(" ");
+            FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
+            if (!Objects.equals(null, entity)) {
+                H = entity.getNote();
+            }
+
+            if (Objects.equals(Utils.CHAR_NORMAL, H)) {
+                return;
+            }
+
+            String trend = Objects.equals(Utils.CHAR_LONG, H) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+
+            List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
+            String trend_15m = "";
+            trend_15m += Utils.checkTrendByIndex(list_15m, 3, 10, trend);
+            trend_15m += Utils.checkTrendByIndex(list_15m, 3, 20, trend);
+            trend_15m += Utils.checkTrendByIndex(list_15m, 3, 50, trend);
+            if (Utils.isNotBlank(trend_15m)) {
+                String chartname = Utils.getChartName(list_15m);
+                String msg = chartname + trend_15m + EPIC;
+                msg = Utils.new_line_from_service + Utils.calcSL_TP_5m(list_1h, trend);
+                msg = Utils.new_line_from_service + Utils.getAtlAth(list_1h);
+
+                String EVENT_ID = EVENT_PUMP + EPIC + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_15m);
+                sendMsgPerHour(EVENT_ID, msg, true);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
-
-        capital();
 
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 

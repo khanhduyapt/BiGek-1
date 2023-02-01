@@ -310,12 +310,16 @@ public class Utils {
                 for (int index = prices.length() - 1; index >= 0; index--) {
                     JSONObject price = prices.getJSONObject(index);
 
-                    BigDecimal low_price = Utils.getBigDecimal(((JSONObject) price.get("lowPrice")).get("ask"));
-                    BigDecimal hight_price = Utils.getBigDecimal(((JSONObject) price.get("highPrice")).get("ask"));
-                    BigDecimal open_price = Utils.getBigDecimal(((JSONObject) price.get("openPrice")).get("ask"));
-                    BigDecimal close_price = Utils.getBigDecimal(((JSONObject) price.get("closePrice")).get("ask"));
+                    BigDecimal low_price = Utils
+                            .formatPrice(Utils.getBigDecimal(((JSONObject) price.get("lowPrice")).get("ask")), 5);
+                    BigDecimal hight_price = Utils
+                            .formatPrice(Utils.getBigDecimal(((JSONObject) price.get("highPrice")).get("ask")), 5);
+                    BigDecimal open_price = Utils
+                            .formatPrice(Utils.getBigDecimal(((JSONObject) price.get("openPrice")).get("ask")), 5);
+                    BigDecimal close_price = Utils
+                            .formatPrice(Utils.getBigDecimal(((JSONObject) price.get("closePrice")).get("ask")), 5);
 
-                    String snapshotTime = Utils.getStringValue(price.get("snapshotTime"));
+                    // String snapshotTime = Utils.getStringValue(price.get("snapshotTime"));
 
                     BtcFutures dto = new BtcFutures();
                     String strid = Utils.getStringValue(id);
@@ -818,7 +822,7 @@ public class Utils {
         String result = getCurrentYyyyMmDd_HH() + "_";
 
         if (symbol.contains("_4h_")) {
-            return getCurrentYyyyMmDd_Blog4h() + "_";
+            return getCurrentYyyyMmDd_HH_Blog4h() + "_";
         }
 
         if (symbol.contains("_1d_")) {
@@ -840,7 +844,7 @@ public class Utils {
         return Utils.convertDateToString("yyyy.MM.dd_HH", Calendar.getInstance().getTime()) + "h";
     }
 
-    public static String getCurrentYyyyMmDd_Blog2h() {
+    public static String getCurrentYyyyMmDd_HH_Blog2h() {
         String result = Utils.convertDateToString("yyyy.MM.dd_", Calendar.getInstance().getTime());
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         HH = HH / 2;
@@ -848,7 +852,7 @@ public class Utils {
         return result;
     }
 
-    public static String getCurrentYyyyMmDd_Blog4h() {
+    public static String getCurrentYyyyMmDd_HH_Blog4h() {
         String result = Utils.convertDateToString("yyyy.MM.dd_", Calendar.getInstance().getTime());
         int HH = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         HH = HH / 4;

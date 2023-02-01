@@ -1,5 +1,6 @@
 package bsc_scan_binance;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
@@ -44,8 +45,8 @@ public class BscScanBinanceApplication {
 
             // Debug
             // app_flag = Utils.const_app_flag_msg_on;
-            // app_flag = Utils.const_app_flag_all_and_msg;
-             app_flag = Utils.const_app_flag_all_coin;
+            app_flag = Utils.const_app_flag_all_and_msg;
+            // app_flag = Utils.const_app_flag_all_coin;
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -77,32 +78,11 @@ public class BscScanBinanceApplication {
                 int pre_blog15minute = -1;
                 int cur_blog15minute = -1;
 
-                int pre_blog1minute = -1;
-                int cur_blog1minute = -1;
-
-                int pre_blog5minute = -1;
-                int cur_blog5minute = -1;
                 Date start_time = Calendar.getInstance().getTime();
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
-                    // binance_service.getChartWD("project-galaxy", "GAL");
-
                     try {
-                        cur_blog1minute = Utils.getCurrentMinute();
-                        if (pre_blog1minute != cur_blog1minute) {
-                            pre_blog1minute = cur_blog1minute;
-
-                            // binance_service.sendMsgChart1m("bitcoin", "BTC");
-                        }
-
-                        cur_blog5minute = Utils.getCurrentMinute_Blog5minutes();
-                        if (pre_blog5minute != cur_blog5minute) {
-                            pre_blog5minute = cur_blog5minute;
-
-                            // binance_service.sendMsgChart5m("bitcoin", "BTC");
-                        }
-
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;
@@ -119,9 +99,50 @@ public class BscScanBinanceApplication {
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
 
-                            System.out.println(Utils.getTimeHHmm() + "checkCurrency");
-                            binance_service.checkCurrency();
-                            wait(SLEEP_MINISECONDS);
+                            if (Utils.isAllowSendMsgSetting()) {
+                                //US30    US Wall Street 30 (USA 30, Dow Jones)
+                                //US500   US 500 (S&P)
+                                //HK50    Hong Kong 50
+                                //UK100   UK 100
+                                //FR40    France 40 (France)
+                                //DXY     US Dollar Index
+                                List<String> epics_index = Arrays.asList("GOLD", "US30", "UK100", "OIL_CRUDE", "US500",
+                                        "HK50", "UK100", "FR40");
+                                for (String EPIC : epics_index) {
+                                    binance_service.checkCapital(EPIC);
+                                    wait(SLEEP_MINISECONDS * 5);
+                                }
+
+                                //EURUSD  Euro / US Dollar
+                                //USDJPY  US Dollar / Japanese Yen
+                                //GBPUSD  British Pound / US Dollar
+                                //AUDUSD  Australian Dollar / US Dollar
+                                //GBPJPY  British Pound / Japanese Yen
+                                //USDCAD  US Dollar / Canadian dollar
+                                //EURJPY  Euro / Japanese Yen
+                                //USDCHF  US Dollar / Swiss Franc
+                                //AUDJPY  Australian Dollar / Japanese Yen
+                                //EURGBP  Euro / British Pound
+                                //EURAUD  Euro / Australian Dollar
+                                //CADJPY  Canadian dollar / Japanese Yen
+                                //GBPAUD  British Pound / Australian Dollar
+                                //NZDUSD  New Zealand Dollar / US Dollar
+                                //EURCAD  Euro / Canadian dollar
+                                //AUDCAD  Australian Dollar / Canadian Dollar
+                                //GBPCAD  British Pound / Canadian dollar
+                                //EURCHF  Euro / Swiss Franc
+                                //AUDNZD  Australian Dollar / New Zealand Dollar
+                                //CHFJPY  Swiss Franc / Japanese Yen
+                                List<String> epics_forex = Arrays.asList("EURUSD", "USDJPY", "GBPUSD", "AUDUSD",
+                                        "GBPJPY",
+                                        "USDCAD", "EURJPY", "USDCHF", "AUDJPY", "EURGBP", "EURAUD", "CADJPY", "GBPAUD",
+                                        "NZDUSD", "EURCAD", "AUDCAD", "GBPCAD", "EURCHF", "AUDNZD", "CHFJPY");
+
+                                for (String EPIC : epics_forex) {
+                                    binance_service.checkCapital(EPIC);
+                                    wait(SLEEP_MINISECONDS * 5);
+                                }
+                            }
                         }
 
                         if (!"_BTC_ETH_BNB_".contains("_" + coin.getSymbol() + "_")) {
@@ -135,8 +156,7 @@ public class BscScanBinanceApplication {
 
                         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
                         key += Utils.getStringValue(coin.getSymbol()) + "_";
-                        key += Utils.getCurrentYyyyMmDd_Blog2h();
-
+                        key += Utils.getCurrentYyyyMmDd_HH();
                         boolean reload = false;
                         if (keys_dict.containsKey(key)) {
                             if (!Objects.equals(key, keys_dict.get(key))) {

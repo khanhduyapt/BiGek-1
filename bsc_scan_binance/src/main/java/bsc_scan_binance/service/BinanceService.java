@@ -46,4 +46,6 @@ public interface BinanceService {
     void sendMsgChart5m(String gecko_id, String symbol);
 
     void sendMsgChart15m(String gecko_id, String symbol, String append);
+
+    void checkCapital(String EPIC);
 }
