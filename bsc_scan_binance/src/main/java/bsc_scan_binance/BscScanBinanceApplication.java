@@ -100,23 +100,23 @@ public class BscScanBinanceApplication {
                                     binance_service.checkCapital(EPIC);
                                     wait(SLEEP_MINISECONDS);
                                 }
+                            }
+                            //------------------------------------------
 
-                                //------------------------------------------
+                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
+                            binance_service.getChartWD("bitcoin", "BTC");
+                            wait(SLEEP_MINISECONDS);
 
-                                System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
-                                binance_service.getChartWD("bitcoin", "BTC");
-                                wait(SLEEP_MINISECONDS);
+                            System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
+                            binance_service.getChartWD("ethereum", "ETH");
+                            wait(SLEEP_MINISECONDS);
 
-                                System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
-                                binance_service.getChartWD("ethereum", "ETH");
-                                wait(SLEEP_MINISECONDS);
+                            System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
+                            binance_service.getChartWD("binancecoin", "BNB");
+                            wait(SLEEP_MINISECONDS);
 
-                                System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
-                                binance_service.getChartWD("binancecoin", "BNB");
-                                wait(SLEEP_MINISECONDS);
-
-                                //------------------------------------------
-
+                            //------------------------------------------
+                            if (Utils.isAllowSendMsgSetting()) {
                                 //EURUSD  Euro / US Dollar
                                 //USDJPY  US Dollar / Japanese Yen
                                 //GBPUSD  British Pound / US Dollar
