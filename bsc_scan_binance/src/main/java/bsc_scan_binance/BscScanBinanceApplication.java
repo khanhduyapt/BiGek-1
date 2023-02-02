@@ -30,6 +30,9 @@ public class BscScanBinanceApplication {
     public static int SLEEP_MINISECONDS = 6000;
     private static Hashtable<String, String> keys_dict = new Hashtable<String, String>();
 
+    private static int pre_blog15minute = -1;
+    private static int cur_blog15minute = -1;
+
     public static void main(String[] args) {
         try {
             System.out.println("Start "
@@ -72,9 +75,6 @@ public class BscScanBinanceApplication {
             int index_forex = 0;
             int index_crypto = 0;
 
-            int pre_blog15minute = -1;
-            int cur_blog15minute = -1;
-
             List<String> capital_list = new ArrayList<String>();
             capital_list.addAll(Utils.EPICS_INDEXS);
             capital_list.addAll(Utils.EPICS_FOREX_EUR);
@@ -91,6 +91,8 @@ public class BscScanBinanceApplication {
 
                 for (index_crypto = 0; index_crypto < crypto_size; index_crypto++) {
                     try {
+                        check_Blog15(binance_service);
+
                         if (index_forex < capital_list.size()) {
                             String EPIC = capital_list.get(index_forex);
 
@@ -128,23 +130,7 @@ public class BscScanBinanceApplication {
                     CandidateCoin coin = crypto_list.get(index_crypto);
 
                     try {
-                        cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
-                        if (pre_blog15minute != cur_blog15minute) {
-                            pre_blog15minute = cur_blog15minute;
-
-                            System.out.println(Utils.getTimeHHmm() + "Check BTC(15m)");
-                            binance_service.getChartWD("bitcoin", "BTC");
-                            wait(SLEEP_MINISECONDS);
-
-                            System.out.println(Utils.getTimeHHmm() + "Check ETH(15m)");
-                            binance_service.getChartWD("ethereum", "ETH");
-                            wait(SLEEP_MINISECONDS);
-
-                            System.out.println(Utils.getTimeHHmm() + "Check BNB(15m)");
-                            binance_service.getChartWD("binancecoin", "BNB");
-                            wait(SLEEP_MINISECONDS);
-                        }
-
+                        check_Blog15(binance_service);
                         // ----------------------------------------------------------
 
                         if (index_forex < capital_list.size()) {
@@ -180,6 +166,25 @@ public class BscScanBinanceApplication {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void check_Blog15(BinanceService binance_service) {
+        cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
+        if (pre_blog15minute != cur_blog15minute) {
+            pre_blog15minute = cur_blog15minute;
+
+            System.out.println(Utils.getTimeHHmm() + "Check BTC(15m)");
+            binance_service.getChartWD("bitcoin", "BTC");
+            wait(SLEEP_MINISECONDS);
+
+            System.out.println(Utils.getTimeHHmm() + "Check ETH(15m)");
+            binance_service.getChartWD("ethereum", "ETH");
+            wait(SLEEP_MINISECONDS);
+
+            System.out.println(Utils.getTimeHHmm() + "Check BNB(15m)");
+            binance_service.getChartWD("binancecoin", "BNB");
+            wait(SLEEP_MINISECONDS);
         }
     }
 
