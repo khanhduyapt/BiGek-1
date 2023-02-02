@@ -2969,6 +2969,13 @@ public class BinanceServiceImpl implements BinanceService {
                 sendScapMsg(list_15m, symbol, Utils.TREND_LONG, Utils.calc_BUF_LO_HI_BUF(list_h1, Utils.TREND_LONG));
 
             }
+
+        } else if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+
+            List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
+            String trend = Objects.equals(Utils.CHAR_LONG, start_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+            sendScapMsg(list_15m, symbol, trend, Utils.calc_BUF_LO_HI_BUF(list_h1, Utils.TREND_LONG));
+
         }
 
         return "";

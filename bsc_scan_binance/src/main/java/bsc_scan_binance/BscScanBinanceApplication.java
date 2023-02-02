@@ -69,6 +69,9 @@ public class BscScanBinanceApplication {
             }
 
             // --------------------Debug--------------------
+            int index_forex = 0;
+            int index_crypto = 0;
+
             int pre_blog15minute = -1;
             int cur_blog15minute = -1;
 
@@ -79,27 +82,34 @@ public class BscScanBinanceApplication {
             capital_list.addAll(Utils.EPICS_FOREX_GBP);
             capital_list.addAll(Utils.EPICS_FOREX_CAD);
             capital_list.addAll(Utils.EPICS_FOREX_DOLLAR);
+            capital_list.addAll(Utils.EPICS_FOREX_OTHERS);
 
             if (app_flag != Utils.const_app_flag_webonly) {
-                List<CandidateCoin> list = gecko_service.getList(callFormBinance);
+                List<CandidateCoin> crypto_list = gecko_service.getList(callFormBinance);
 
-                for (int index = 0; index < list.size(); index++) {
+                int crypto_size = crypto_list.size();
+
+                for (index_crypto = 0; index_crypto < crypto_size; index_crypto++) {
                     try {
-                        if (index < capital_list.size()) {
-                            String EPIC = capital_list.get(index);
+                        if (index_forex < capital_list.size()) {
+                            String EPIC = capital_list.get(index_forex);
 
                             binance_service.init_DXY_index(EPIC);
                             binance_service.checkCapital(EPIC);
 
                             String msg = Utils.getTimeHHmm() + EPIC;
-                            msg += "(" + (index + 1) + "/" + capital_list.size() + ")";
+                            msg += "(" + (index_forex + 1) + "/" + capital_list.size() + ")";
                             System.out.println(msg);
+
+                            index_forex += 1;
+                        } else {
+                            index_forex = 0;
                         }
 
-                        CandidateCoin coin = list.get(index);
+                        CandidateCoin coin = crypto_list.get(index_crypto);
                         gecko_service.loadData(coin.getGeckoid());
                         binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
-                        check_Crypto_WD(binance_service, coin, index, list.size());
+                        check_Crypto_WD(binance_service, coin, index_crypto, crypto_size);
 
                         wait(SLEEP_MINISECONDS);
                     } catch (Exception e) {
@@ -111,11 +121,11 @@ public class BscScanBinanceApplication {
                 //----------------------------------------------
                 //----------------------------------------------
 
-                int idx = 0;
-                int size = list.size();
+                index_forex = 0;
+
                 Date start_time = Calendar.getInstance().getTime();
-                while (idx < size) {
-                    CandidateCoin coin = list.get(idx);
+                while (index_crypto < crypto_size) {
+                    CandidateCoin coin = crypto_list.get(index_crypto);
 
                     try {
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
@@ -137,11 +147,16 @@ public class BscScanBinanceApplication {
 
                         // ----------------------------------------------------------
 
-                        if (idx < capital_list.size()) {
-                            String EPIC = capital_list.get(idx);
+                        if (index_forex < capital_list.size()) {
+                            String EPIC = capital_list.get(index_forex);
                             binance_service.checkCapital(EPIC);
+
+                            index_forex += 1;
+                        } else {
+                            index_forex = 0;
                         }
-                        check_Crypto_WD(binance_service, coin, idx, size);
+
+                        check_Crypto_WD(binance_service, coin, index_crypto, crypto_size);
 
                         wait(SLEEP_MINISECONDS);
 
@@ -149,16 +164,16 @@ public class BscScanBinanceApplication {
                         e.printStackTrace();
                     }
 
-                    if (Objects.equals(idx, size - 1)) {
+                    if (Objects.equals(index_crypto, crypto_size - 1)) {
                         Date curr_time = Calendar.getInstance().getTime();
                         long diff = curr_time.getTime() - start_time.getTime();
                         start_time = Calendar.getInstance().getTime();
 
                         System.out.println("reload: " + Utils.getMmDD_TimeHHmm() + ", spend:"
                                 + TimeUnit.MILLISECONDS.toMinutes(diff) + " Minutes.");
-                        idx = 0;
+                        index_crypto = 0;
                     } else {
-                        idx += 1;
+                        index_crypto += 1;
                     }
 
                 }

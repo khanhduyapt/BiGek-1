@@ -165,6 +165,74 @@ public class Utils {
     public static final List<String> EPICS_FOREX_DOLLAR = Arrays.asList("NZDCAD", "NZDCHF", "NZDJPY", "NZDSGD",
             "NZDUSD", "USDCAD", "USDCHF", "USDCNH", "USDJPY");
 
+    //AUDHKD  Australian Dollar / Hong Kong Dollar
+    //AUDPLN  Australian Dollar / Polish Zloty
+    //AUDZAR  Australian Dollar / Rand
+    //CADCNH  Canadian Dollar / Chinese yuan
+    //CADHKD  Canadian Dollar / Hong Kong Dollar
+    //CADMXN  Canadian Dollar / Mexican Peso
+    //CADNOK  Canadian dollar / Norwegian Krone
+    //CADPLN  Canadian dollar / Polish Zloty
+    //CADTRY  Canadian Dollar / Turkish Lira
+    //CADZAR  Canadian Dollar / Rand
+    //CHFCNH  Swiss Franc / Chinese yuan
+    //CHFCZK  Swiss Franc / Czech Koruna
+    //CHFDKK  Swiss Franc / Danish Krone
+    //CHFMXN  Swiss Franc / Mexican Peso
+    //CHFNOK  Swiss Franc / Norwegian Krone
+    //CHFPLN  Swiss Franc / Polish Zloty
+    //CHFSEK  Swiss Franc / Swedish Krona
+    //CHFTRY  Swiss Franc / Turkish Lira
+    //CHFZAR  Swiss Franc / Rand
+    //DKKJPY  Danish Krone / Yen
+    //EURCZK  Euro / Czech Koruna
+    //EURDKK  Euro / Danish Krone
+    //EURILS  Euro / New Israeli Sheqel
+    //EURPLN  Euro / Polish Zloty
+    //EURRON  Euro / Romanian Leu
+    //EURSGD  Euro / Singapore Dollar
+    //GBPCNH  Pound Sterling / Chinese yuan
+    //GBPCZK  British Pound / Czech Koruna
+    //GBPDKK  British Pound / Danish Krone
+    //GBPHKD  British Pound / Hong Kong Dollar
+    //GBPHUF  British Pound / Hungarian Forint
+    //GBPNOK  British Pound / Norwegian Krone
+    //GBPPLN  British Pound / Polish Zloty
+    //GBPSEK  British Pound / Swedish Krona
+    //GBPSGD  British Pound / Singapore Dollar
+    //GBPTRY  British Pound / Turkish lira
+    //GBPZAR  British Pound / South African Rand
+    //HKDMXN  Hong Kong Dollar / Mexican Peso
+    //HKDTRY  Hong Kong Dollar / Turkish Lira
+    //NOKSEK  Norwegian Krone / Swedish Krona
+    //NOKTRY  Norwegian Krone / Turkish Lira
+    //NZDCNH  New Zealand Dollar / Chinese yuan
+    //NZDHKD  New Zealand Dollar / Hong Kong Dollar
+    //NZDMXN  New Zealand Dollar / Mexican Peso
+    //NZDPLN  New Zealand Dollar / Zloty
+    //NZDSEK  New Zealand Dollar / Swedish Krona
+    //NZDTRY  New Zealand Dollar / Turkish Lira
+    //PLNSEK  Zloty / Swedish Krona
+    //PLNTRY  Zloty / Turkish Lira
+    //SEKMXN  Swedish Krona / Mexican Peso
+    //SEKTRY  Swedish Krona / Turkish Lira
+    //SGDHKD  Singapore Dollar / Hong Kong Dollar
+    //SGDMXN  Singapore Dollar / Mexican Peso
+    //TRYJPY  Turkish Lira / Japanese Yen
+    //USDCZK  US Dollar / Czech Koruna
+    //USDDKK  US Dollar / Danish Krone
+    //USDHKD  US Dollar / Hong Kong Dollar
+    //USDILS  US Dollar / Israeli New Shekel
+    //USDRON  US Dollar / Romanian Leu
+    //USDTRY  US Dollar / Turkish Lira
+    public static final List<String> EPICS_FOREX_OTHERS = Arrays.asList("AUDHKD", "AUDPLN", "AUDZAR", "CADCNH",
+            "CADHKD", "CADMXN", "CADNOK", "CADPLN", "CADTRY", "CADZAR", "CHFCNH", "CHFCZK", "CHFDKK", "CHFMXN",
+            "CHFNOK", "CHFPLN", "CHFSEK", "CHFTRY", "CHFZAR", "DKKJPY", "EURCZK", "EURDKK", "EURILS", "EURPLN",
+            "EURRON", "EURSGD", "GBPCNH", "GBPCZK", "GBPDKK", "GBPHKD", "GBPHUF", "GBPNOK", "GBPPLN", "GBPSEK",
+            "GBPSGD", "GBPTRY", "GBPZAR", "HKDMXN", "HKDTRY", "NOKSEK", "NOKTRY", "NZDCNH", "NZDHKD", "NZDMXN",
+            "NZDPLN", "NZDSEK", "NZDTRY", "PLNSEK", "PLNTRY", "SEKMXN", "SEKTRY", "SGDHKD", "SGDMXN", "TRYJPY",
+            "USDCZK", "USDDKK", "USDHKD", "USDILS", "USDRON", "USDTRY");
+
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
             + "    SELECT                                                                                   \n"
