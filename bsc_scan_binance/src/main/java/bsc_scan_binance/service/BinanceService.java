@@ -40,4 +40,6 @@ public interface BinanceService {
     public void clearTrash();
 
     void checkCapital(String EPIC);
+
+    void init_DXY_index(String EPIC);
 }

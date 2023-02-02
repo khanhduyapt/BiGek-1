@@ -136,6 +136,7 @@ public class BinanceServiceImpl implements BinanceService {
     // DH4H1 BTC LL -> Search long m15.
     // DH4H1 BTC SS -> Search short m15.
     private static final String EVENT_DH = "DH4H1"; //
+    private static final String EVENT_DH_INDEX = "DH4H1_INDEX"; //
     private static final String EVENT_PUMP = "Pump_";
     private static final String EVENT_MSG_PER_HOUR = "MSG_PER_HOUR";
     private static final String SEPARATE_D1_AND_H1 = "1DH1";
@@ -2708,6 +2709,62 @@ public class BinanceServiceImpl implements BinanceService {
         return Utils.CHAR_NORMAL;
     }
 
+    @Override
+    @Transactional
+    public void init_DXY_index(String EPIC) {
+        List<BtcFutures> list_days = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_DAY, 20);
+        createHistoryReverseOf_D1(list_days, EPIC);
+    }
+
+    public void createHistoryReverseOf_D1(List<BtcFutures> list_days, String KEY) {
+        String chart_D = Utils.CHAR_OPPOSITE;
+
+        if (!CollectionUtils.isEmpty(list_days) && list_days.size() >= 20) {
+            BigDecimal ma3_1 = Utils.calcMA(list_days, 3, 0);
+            BigDecimal ma3_2 = Utils.calcMA(list_days, 3, 1);
+            Boolean ma3_up = ma3_1.compareTo(ma3_2) > 0;
+
+            BigDecimal ma10_1 = Utils.calcMA(list_days, 10, 0);
+            BigDecimal ma10_2 = Utils.calcMA(list_days, 10, 2);
+            Boolean ma10_up = ma10_1.compareTo(ma10_2) > 0;
+
+            BigDecimal ma20_1 = Utils.calcMA(list_days, 20, 0);
+            BigDecimal ma20_2 = Utils.calcMA(list_days, 20, 2);
+            Boolean ma20_up = ma20_1.compareTo(ma20_2) > 0;
+
+            if ((ma3_up == ma10_up) && (ma10_up == ma20_up)) {
+                if (Objects.equals("DXY", KEY)) {
+                    chart_D = ma10_up ? Utils.CHAR_LONG : Utils.CHAR_SHORT;
+                } else if (KEY.indexOf("USD") > 2) {
+                    // USDCAD US Dollar / Canadian dollar
+                    // USDCHF US Dollar / Swiss Franc
+                    // USDCNH US Dollar / Chinese Yuan
+                    // USDJPY US Dollar / Japanese Yen
+                    chart_D = ma10_up ? Utils.CHAR_LONG : Utils.CHAR_SHORT;
+                } else {
+                    // EURUSD Euro / US Dollar
+                    // AUDUSD Australian Dollar / US Dollar
+                    // GBPUSD British Pound / US Dollar
+                    // NZDUSD New Zealand Dollar / US Dollar
+                    chart_D = ma10_up ? Utils.CHAR_SHORT : Utils.CHAR_LONG;
+                }
+            }
+        }
+
+        fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH_INDEX, KEY, KEY.replace("USD", ""), chart_D, true));
+    }
+
+    public String getHistoryReverseOf_D1(String KEY) {
+        String chart_D = "";
+
+        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH_INDEX, KEY);
+        FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
+        if (!Objects.equals(null, entity)) {
+            chart_D = entity.getNote();
+        }
+        return chart_D;
+    }
+
     public String createHistoryReverseOf_H1(List<BtcFutures> list_1h, String KEY) {
         String chart_H = initLongOrShort(list_1h);
         FundingHistoryKey id = new FundingHistoryKey(EVENT_DH, KEY);
@@ -2731,6 +2788,10 @@ public class BinanceServiceImpl implements BinanceService {
     // The maximum request rate is 10 per second -> 1 minute = 60 requests.
     @Override
     public void checkCapital(String EPIC) {
+        String chart_D = getHistoryReverseOf_D1(EPIC);
+        if (Objects.equals(Utils.CHAR_OPPOSITE, chart_D)) {
+            return;
+        }
         // ------------------------------------------------------------------------------------
         List<BtcFutures> list_1h = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_HOUR, 50);
         if (CollectionUtils.isEmpty(list_1h)) {

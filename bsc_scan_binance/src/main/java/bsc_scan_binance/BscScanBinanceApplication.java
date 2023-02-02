@@ -1,5 +1,6 @@
 package bsc_scan_binance;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
@@ -92,11 +93,29 @@ public class BscScanBinanceApplication {
                 int pre_blog15minute5 = -1;
                 int cur_blog15minute5 = -1;
 
+                String curChangeDailyChart = "";
+                String preChangeDailyChart = "";
                 Date start_time = Calendar.getInstance().getTime();
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
                     try {
+
+                        curChangeDailyChart = Utils.getYyyyMmDdHH_ChangeDailyChart();
+                        if (!Objects.equals(curChangeDailyChart, preChangeDailyChart)) {
+                            preChangeDailyChart = curChangeDailyChart;
+
+                            // BXY (index CBOE), JXY CXY EXY ZXY AXY -> cfd TVC
+                            final List<String> EPICS_INDEXS = Arrays.asList("DXY", "EURUSD", "AUDUSD", "GBPUSD",
+                                    "NZDUSD", "USDCAD", "USDCHF", "USDCNH", "USDJPY");
+
+                            for (String EPIC : EPICS_INDEXS) {
+                                System.out.println(Utils.getTimeHHmm() + "init " + EPIC);
+                                binance_service.init_DXY_index(EPIC);
+                                wait(SLEEP_MINISECONDS);
+                            }
+                        }
+
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;

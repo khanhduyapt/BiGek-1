@@ -80,6 +80,7 @@ public class Utils {
     public static final String CHAR_LONG = "L";
     public static final String CHAR_SHORT = "S";
     public static final String CHAR_NORMAL = "n";
+    public static final String CHAR_OPPOSITE = "o";
 
     public static final int MA_FAST = 6;
     public static final int MA_INDEX_H1_START_LONG = 50;
@@ -400,8 +401,7 @@ public class Utils {
     // https://open-api.capital.com/#tag/Markets-Info-greater-Prices
     // https://api-capital.backend-capital.com/api/v1/markets/{epic}
     public static List<BtcFutures> loadCapitalData(String epic, String TIME, int length) {
-
-        List<BtcFutures> list_15m = new ArrayList<BtcFutures>();
+        List<BtcFutures> results = new ArrayList<BtcFutures>();
         try {
             initCapital();
 
@@ -459,7 +459,7 @@ public class Utils {
                     dto.setPrice_open_candle(open_price);
                     dto.setPrice_close_candle(close_price);
 
-                    list_15m.add(dto);
+                    results.add(dto);
 
                     // System.out.println(strid + ": " + snapshotTime);
 
@@ -471,7 +471,7 @@ public class Utils {
             e.printStackTrace();
         }
 
-        return list_15m;
+        return results;
     }
 
     public static String createMsgBalance(OrdersProfitResponse dto, String newline) {
@@ -720,7 +720,7 @@ public class Utils {
 
         if (isAllowSendMsgSetting()) {
             if (!isBusinessTime()) {
-                return;
+                // return;
             }
 
             sendToChatId(Utils.chatId_duydk, msg);
