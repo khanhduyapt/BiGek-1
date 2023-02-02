@@ -63,6 +63,7 @@ public class BscScanBinanceApplication {
             if (Objects.equals("PC", hostname)) {
                 app_flag = Utils.const_app_flag_all_and_msg;
             } else {
+                // DESKTOP-L4M1JU2
                 app_flag = Utils.const_app_flag_all_coin;
             }
 
@@ -117,7 +118,7 @@ public class BscScanBinanceApplication {
                         check_Blog15(binance_service, cry_list);
                         check_Forex_15m(binance_service, forex_list);
 
-                        //----------------------------------------------
+                        // ----------------------------------------------
 
                         if (index_forex < capital_list.size()) {
                             String EPIC = capital_list.get(index_forex);
@@ -148,9 +149,9 @@ public class BscScanBinanceApplication {
                     }
                 }
 
-                //----------------------------------------------
-                //----------------------------------------------
-                //----------------------------------------------
+                // ----------------------------------------------
+                // ----------------------------------------------
+                // ----------------------------------------------
 
                 index_forex = 0;
                 Date start_time = Calendar.getInstance().getTime();
