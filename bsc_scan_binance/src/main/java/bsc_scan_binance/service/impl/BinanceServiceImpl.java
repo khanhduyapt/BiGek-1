@@ -1125,6 +1125,10 @@ public class BinanceServiceImpl implements BinanceService {
                 css.setBinance_trade(trading_view);
                 css.setName(dto.getTrend_d() + dto.getTrend_h1());
 
+                if (BscScanBinanceApplication.forex_naming_dict.containsKey(dto.getEpic())) {
+                    css.setPumping_history(BscScanBinanceApplication.forex_naming_dict.get(dto.getEpic()));
+                }
+
                 css.setTrading_view(trading_view);
                 css.setToken_btc_link(trading_view);
 
@@ -1147,7 +1151,7 @@ public class BinanceServiceImpl implements BinanceService {
             String sql = " "
                     + "SELECT DISTINCT ON (epic)                                                                \n"
                     + "    tmp.epic,                                                                            \n"
-                    + "    (case when tmp.trend_d  = 'L' then '(D)Long'  when tmp.trend_d = 'S' then '(D)Short' else '' end) trend_d,       \n"
+                    + "    (case when tmp.trend_d  = 'L' then '(D)Long'  when tmp.trend_d = 'S' then '(D)Short' when tmp.trend_d = 'o' then '(D)Sideway' else '' end) trend_d,       \n"
                     + "    (case when tmp.trend_h1 = 'L' then '(H1)Long' when tmp.trend_h1 = 'S' then '(H1)Short' else '' end) trend_h1     \n"
                     + "FROM                                                                                     \n"
                     + "(                                                                                        \n"
@@ -1158,19 +1162,30 @@ public class BinanceServiceImpl implements BinanceService {
                     + "' and str_h.gecko_id = str_d.gecko_id) as trend_h1  \n"
                     + "    FROM funding_history str_d                                                           \n"
                     + "    WHERE str_d.event_time = '" + EVENT_DH_STR_D_FX + "'                               \n"
+
                     + "    UNION                                                                                \n"
+
                     + "    SELECT                                                                               \n"
                     + "        str_h.symbol as epic,                                                            \n"
                     + "        (select str_d.note from funding_history str_d where event_time = '" + EVENT_DH_STR_D_FX
                     + "' and str_d.gecko_id = str_h.gecko_id) as trend_d,  \n"
                     + "        str_h.note   as trend_h1                                                         \n"
                     + "    FROM funding_history str_h                                                           \n"
-                    + "    WHERE str_h.event_time = '" + EVENT_DH_STR_H_FX
-                    + "'                                            \n"
+                    + "    WHERE str_h.event_time = '" + EVENT_DH_STR_H_FX + "'                               \n"
+
+                    + "    UNION                                                                                \n"
+                    + "    SELECT                                                                               \n"
+                    + "        str_h.symbol as epic,                                                            \n"
+                    + "        (select str_d.note from funding_history str_d where event_time = 'DH4H1_D_TREND_FX' and str_d.gecko_id = str_h.gecko_id) as trend_d,   \n"
+                    + "        str_h.note   as trend_h1                                                         \n"
+                    + "    FROM funding_history str_h                                                           \n"
+                    + "    WHERE str_h.event_time = 'DH4H1_STR_H_FX'                                            \n"
                     + ") tmp                                                                                    \n"
+                    + "WHERE tmp.trend_h1 is not null                                                           \n" //-- (tmp.trend_d = tmp.trend_h1) or (tmp.trend_h1 is not null)
                     + "ORDER BY tmp.epic                                                                        \n";
 
             Query query = entityManager.createNativeQuery(sql, "ForexHistoryResponse");
+
             @SuppressWarnings("unchecked")
             List<ForexHistoryResponse> results = query.getResultList();
 

@@ -70,6 +70,9 @@ p {
   vertical-align: middle !important;
 }
 
+.hide {
+  color: transparent !important;
+}
 .css-1ifhear{
   width: 16px;
   height: 16px;
@@ -168,16 +171,16 @@ p {
             <span style="font-size: 0.7rem !important;" th:text="${token.pumping_history}" th:classappend="${token.pumping_history_css}"></span>
           </td>
           <!-- MC/Vol -->
-          <td style="font-size: 0.8rem !important; text-align: right; max-width: 220px !important;">
+          <td style="font-size: 0.8rem !important; text-align: right; max-width: 220px !important;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}">
             <span th:classappend="${token.market_cap_css}" th:text="${#numbers.formatDecimal(token.market_cap, 0, 'COMMA', 0, 'POINT') + '$'}"></span>
             <p style="font-size: 0.8rem !important;"
               th:text="${#numbers.formatDecimal(token.gecko_total_volume, 0, 'COMMA', 0, 'POINT') + '$'}">
             <p style="font-size: 0.7rem !important;"
               th:text="${token.gecko_volumn_history}">
            </td>
-          <!-- v/mc -->
-          <td style="font-size: 0.8rem !important; text-align: right; min-width: 100px !important; max-width: 100px !important;" th:classappend="${token.volumn_div_marketcap_css}">
-            <div>
+          <!-- Volume -->
+          <td style="font-size: 0.8rem !important; text-align: right; min-width: 100px !important; max-width: 100px !important;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}">
+            <div th:classappend="${token.volumn_div_marketcap_css}">
               <span th:text="${token.volumn_div_marketcap} + '%'"></span>
               <span th:classappend="${token.volumn_binance_div_marketcap_css}" th:text="${token.volumn_binance_div_marketcap + '%'}"></span>
             </div>
@@ -219,7 +222,7 @@ p {
             </div>
           </td>
           <!-- Price -->
-          <td style="text-align: right; min-width: 190px !important; max-width: 190px !important;">
+          <td style="text-align: right; min-width: 190px !important; max-width: 190px !important;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}">
             <div th:classappend="${token.btc_warning_css}">
               <span th:text="${token.current_price} + '$'"></span>
               <a th:target="_blank" th:href="${token.token_btc_link}">BTC</a>
@@ -231,24 +234,21 @@ p {
             </div>
           </td>
           <!-- OCO -->
-          <td class="oco_css" th:classappend="${token.oco_css}"
-            style="text-align: left; padding-left: 0.5rem !important; min-width: 450px !important; max-width: 500px !important;">
+          <td class="oco_css" style="text-align: left; padding-left: 0.5rem !important; min-width: 450px !important; max-width: 500px !important;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}">
             <div style="font-size: 0.9rem !important;" th:classappend="${token.min_14d_css}">
-              <span th:text="${token.oco_tp_price}"></span><span
-                th:classappend="${token.oco_tp_price_hight_css}"
-                th:text="${token.oco_tp_price_hight}"></span>
+              <span th:text="${token.oco_tp_price}"></span>
+              <span th:classappend="${token.oco_tp_price_hight_css}" th:text="${token.oco_tp_price_hight}"></span>
             </div>
-            <div style="font-size: 0.8rem !important;">
-              <span th:text="${token.oco_stop_limit}"></span><span
-                th:classappend="${token.oco_stop_limit_low_css}"
-                th:text="${token.oco_stop_limit_low}"></span>
+            <div style="font-size: 0.8rem !important;" th:classappend="${token.oco_css}">
+              <span th:text="${token.oco_stop_limit}"></span>
+              <span th:classappend="${token.oco_stop_limit_low_css}" th:text="${token.oco_stop_limit_low}"></span>
             </div>
             <div style="font-size: 0.8rem !important;">
               <span th:text="${token.avg_history}"></span>
               <span th:text="${token.min28day}" th:classappend="${token.min28day_css}" ></span>
             </div>
 
-            <div style="font-size: 0.8rem !important;">
+            <div style="font-size: 0.8rem !important;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}"> 
                 <span th:classappend="${token.rate1h_css}">1h: <span th:text="${token.rate1h}"></span>% </span>
                 <span th:classappend="${token.rate2h_css}">2h: <span th:text="${token.rate2h}"></span>% </span>
                 <span th:classappend="${token.rate4h_css}">4h: <span th:text="${token.rate4h}"></span>% </span>
@@ -261,31 +261,21 @@ p {
             </div>
           </td>
 
-          <td style="text-align: right;"
-            th:classappend="${token.price_change_24h_css}"
-            th:text="${#numbers.formatDecimal(token.price_change_percentage_24h, 1, 'COMMA', 1, 'POINT') + '%'}">
-          <td style="text-align: right"
-            th:classappend="${token.price_change_07d_css}"
-            th:text="${#numbers.formatDecimal(token.price_change_percentage_7d,  1, 'COMMA', 1, 'POINT') + '%'}">
-          <td style="text-align: right;"
-            th:classappend="${token.price_change_14d_css}"
-            th:text="${#numbers.formatDecimal(token.price_change_percentage_14d, 1, 'COMMA', 1, 'POINT') + '%'}">
-          <td style="text-align: right;"
-            th:classappend="${token.price_change_30d_css}"
-            th:text="${#numbers.formatDecimal(token.price_change_percentage_30d, 1, 'COMMA', 1, 'POINT') + '%'}">
-
+          <td style="text-align: right;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': token.price_change_24h_css}" th:text="${#numbers.formatDecimal(token.price_change_percentage_24h, 1, 'COMMA', 1, 'POINT') + '%'}">
+          <td style="text-align: right"  th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': token.price_change_07d_css}" th:text="${#numbers.formatDecimal(token.price_change_percentage_7d,  1, 'COMMA', 1, 'POINT') + '%'}">
+          <td style="text-align: right;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': token.price_change_14d_css}" th:text="${#numbers.formatDecimal(token.price_change_percentage_14d, 1, 'COMMA', 1, 'POINT') + '%'}">
+          <td style="text-align: right;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': token.price_change_30d_css}" th:text="${#numbers.formatDecimal(token.price_change_percentage_30d, 1, 'COMMA', 1, 'POINT') + '%'}">
 
           <!-- Star -->
-          <td style="text-align: center; min-width: 160px !important;"
-            th:classappend="${token.star_css}" th:text="${token.star}">
+          <td style="text-align: center; min-width: 160px !important;" th:classappend="${token.star_css}" th:text="${token.star}">
           <!-- Volume/AvgPrice/Low-Hight today -->
 
           <!-- Details -->
-          <td class="" style="max-width: 80px !important;" th:switch="${token.symbol}">
-            <a th:case="'BTC'" th:target="_blank" th:href="${'/' + token.symbol}">
+          <td style="max-width: 80px !important;" th:switch="${token.symbol}">
+            <a th:case="'BTC'" th:target="_blank" th:href="${'/' + token.symbol}" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}" >
               <span th:text="${token.symbol}"></span>
             </a>
-            <a th:case="*" th:target="_blank" th:href="${'/' + token.symbol}">
+            <a th:case="*" th:target="_blank" th:href="${'/' + token.symbol}" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}" >
               <span th:text="${token.symbol}"></span>
             </a>
           </td>

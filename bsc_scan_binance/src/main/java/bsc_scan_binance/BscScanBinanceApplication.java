@@ -30,12 +30,15 @@ public class BscScanBinanceApplication {
     public static int SLEEP_MINISECONDS_INIT = 3000;
     public static int SLEEP_MINISECONDS = 6000;
     private static Hashtable<String, String> keys_dict = new Hashtable<String, String>();
+    public static Hashtable<String, String> forex_naming_dict = new Hashtable<String, String>();
 
     private static int pre_blog15minute = -1;
     private static int cur_blog15minute = -1;
 
     public static void main(String[] args) {
         try {
+            initForex_naming_dict();
+
             System.out.println("Start "
                     + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()) + " ---->");
 
@@ -63,6 +66,7 @@ public class BscScanBinanceApplication {
                 WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
 
                 try {
+
                     TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
                     telegramBotsApi.registerBot(wandaBot);
 
@@ -215,6 +219,109 @@ public class BscScanBinanceApplication {
 
             binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
         }
+    }
+
+    private static void initForex_naming_dict() {
+        forex_naming_dict.put("AUDCAD", "Australian Dollar / Canadian Dollar");
+        forex_naming_dict.put("AUDCHF", "Australian Dollar / Swiss Franc");
+        forex_naming_dict.put("AUDCNH", "Australian Dollar / Chinese Yuan");
+        forex_naming_dict.put("AUDHKD", "Australian Dollar / Hong Kong Dollar");
+        forex_naming_dict.put("AUDJPY", "Australian Dollar / Japanese Yen");
+        forex_naming_dict.put("AUDMXN", "Australian Dollar / Mexican Peso");
+        forex_naming_dict.put("AUDNZD", "Australian Dollar / New Zealand Dollar");
+        forex_naming_dict.put("AUDPLN", "Australian Dollar / Polish Zloty");
+        forex_naming_dict.put("AUDSGD", "Australian Dollar / Singapore Dollar");
+        forex_naming_dict.put("AUDUSD", "Australian Dollar / US Dollar");
+        forex_naming_dict.put("AUDZAR", "Australian Dollar / Rand");
+        forex_naming_dict.put("CADCHF", "Canadian dollar / Swiss Franc");
+        forex_naming_dict.put("CADCNH", "Canadian Dollar / Chinese yuan");
+        forex_naming_dict.put("CADHKD", "Canadian Dollar / Hong Kong Dollar");
+        forex_naming_dict.put("CADJPY", "Canadian dollar / Japanese Yen");
+        forex_naming_dict.put("CADMXN", "Canadian Dollar / Mexican Peso");
+        forex_naming_dict.put("CADNOK", "Canadian dollar / Norwegian Krone");
+        forex_naming_dict.put("CADPLN", "Canadian dollar / Polish Zloty");
+        forex_naming_dict.put("CADSGD", "Canadian Dollar / Singapore Dollar");
+        forex_naming_dict.put("CADTRY", "Canadian Dollar / Turkish Lira");
+        forex_naming_dict.put("CADZAR", "Canadian Dollar / Rand");
+        forex_naming_dict.put("CHFCNH", "Swiss Franc / Chinese yuan");
+        forex_naming_dict.put("CHFCZK", "Swiss Franc / Czech Koruna");
+        forex_naming_dict.put("CHFDKK", "Swiss Franc / Danish Krone");
+        forex_naming_dict.put("CHFHKD", "Swiss Franc / Hong Kong Dollar");
+        forex_naming_dict.put("CHFJPY", "Swiss Franc / Japanese Yen");
+        forex_naming_dict.put("CHFMXN", "Swiss Franc / Mexican Peso");
+        forex_naming_dict.put("CHFNOK", "Swiss Franc / Norwegian Krone");
+        forex_naming_dict.put("CHFPLN", "Swiss Franc / Polish Zloty");
+        forex_naming_dict.put("CHFSEK", "Swiss Franc / Swedish Krona");
+        forex_naming_dict.put("CHFSGD", "Swiss Franc / Singapore Dollar");
+        forex_naming_dict.put("CHFTRY", "Swiss Franc / Turkish Lira");
+        forex_naming_dict.put("CHFZAR", "Swiss Franc / Rand");
+        forex_naming_dict.put("CNHHKD", "Chinese yuan / Hong Kong Dollar");
+        forex_naming_dict.put("CNHJPY", "Chinese Yuan / Japanese Yen");
+        forex_naming_dict.put("DKKJPY", "Danish Krone / Yen");
+        forex_naming_dict.put("EURAUD", "Euro / Australian Dollar");
+        forex_naming_dict.put("EURCAD", "Euro / Canadian dollar");
+        forex_naming_dict.put("EURCHF", "Euro / Swiss Franc");
+        forex_naming_dict.put("EURCZK", "Euro / Czech Koruna");
+        forex_naming_dict.put("EURDKK", "Euro / Danish Krone");
+        forex_naming_dict.put("EURGBP", "Euro / British Pound");
+        forex_naming_dict.put("EURILS", "Euro / New Israeli Sheqel");
+        forex_naming_dict.put("EURJPY", "Euro / Japanese Yen");
+        forex_naming_dict.put("EURMXN", "Euro / Mexican Peso");
+        forex_naming_dict.put("EURNZD", "Euro / New Zealand Dollar");
+        forex_naming_dict.put("EURPLN", "Euro / Polish Zloty");
+        forex_naming_dict.put("EURRON", "Euro / Romanian Leu");
+        forex_naming_dict.put("EURSGD", "Euro / Singapore Dollar");
+        forex_naming_dict.put("EURUSD", "Euro / US Dollar");
+        forex_naming_dict.put("GBPAUD", "British Pound / Australian Dollar");
+        forex_naming_dict.put("GBPCAD", "British Pound / Canadian dollar");
+        forex_naming_dict.put("GBPCHF", "British Pound / Swiss Franc");
+        forex_naming_dict.put("GBPCNH", "Pound Sterling / Chinese yuan");
+        forex_naming_dict.put("GBPCZK", "British Pound / Czech Koruna");
+        forex_naming_dict.put("GBPDKK", "British Pound / Danish Krone");
+        forex_naming_dict.put("GBPHKD", "British Pound / Hong Kong Dollar");
+        forex_naming_dict.put("GBPHUF", "British Pound / Hungarian Forint");
+        forex_naming_dict.put("GBPJPY", "British Pound / Japanese Yen");
+        forex_naming_dict.put("GBPMXN", "British Pound / Mexican Peso");
+        forex_naming_dict.put("GBPNOK", "British Pound / Norwegian Krone");
+        forex_naming_dict.put("GBPNZD", "British Pound / New Zealand Dollar");
+        forex_naming_dict.put("GBPPLN", "British Pound / Polish Zloty");
+        forex_naming_dict.put("GBPSEK", "British Pound / Swedish Krona");
+        forex_naming_dict.put("GBPSGD", "British Pound / Singapore Dollar");
+        forex_naming_dict.put("GBPTRY", "British Pound / Turkish lira");
+        forex_naming_dict.put("GBPUSD", "British Pound / US Dollar");
+        forex_naming_dict.put("GBPZAR", "British Pound / South African Rand");
+        forex_naming_dict.put("HKDMXN", "Hong Kong Dollar / Mexican Peso");
+        forex_naming_dict.put("HKDTRY", "Hong Kong Dollar / Turkish Lira");
+        forex_naming_dict.put("NOKSEK", "Norwegian Krone / Swedish Krona");
+        forex_naming_dict.put("NOKTRY", "Norwegian Krone / Turkish Lira");
+        forex_naming_dict.put("NZDCAD", "New Zealand Dollar / Canadian dollar");
+        forex_naming_dict.put("NZDCHF", "New Zealand Dollar / Swiss Franc");
+        forex_naming_dict.put("NZDCNH", "New Zealand Dollar / Chinese yuan");
+        forex_naming_dict.put("NZDHKD", "New Zealand Dollar / Hong Kong Dollar");
+        forex_naming_dict.put("NZDJPY", "New Zealand Dollar / Japanese Yen");
+        forex_naming_dict.put("NZDMXN", "New Zealand Dollar / Mexican Peso");
+        forex_naming_dict.put("NZDPLN", "New Zealand Dollar / Zloty");
+        forex_naming_dict.put("NZDSEK", "New Zealand Dollar / Swedish Krona");
+        forex_naming_dict.put("NZDSGD", "New Zealand Dollar / Singapore Dollar");
+        forex_naming_dict.put("NZDTRY", "New Zealand Dollar / Turkish Lira");
+        forex_naming_dict.put("NZDUSD", "New Zealand Dollar / US Dollar");
+        forex_naming_dict.put("PLNSEK", "Zloty / Swedish Krona");
+        forex_naming_dict.put("PLNTRY", "Zloty / Turkish Lira");
+        forex_naming_dict.put("SEKMXN", "Swedish Krona / Mexican Peso");
+        forex_naming_dict.put("SEKTRY", "Swedish Krona / Turkish Lira");
+        forex_naming_dict.put("SGDHKD", "Singapore Dollar / Hong Kong Dollar");
+        forex_naming_dict.put("SGDMXN", "Singapore Dollar / Mexican Peso");
+        forex_naming_dict.put("TRYJPY", "Turkish Lira / Japanese Yen");
+        forex_naming_dict.put("USDCAD", "US Dollar / Canadian dollar");
+        forex_naming_dict.put("USDCHF", "US Dollar / Swiss Franc");
+        forex_naming_dict.put("USDCNH", "US Dollar / Chinese Yuan");
+        forex_naming_dict.put("USDCZK", "US Dollar / Czech Koruna");
+        forex_naming_dict.put("USDDKK", "US Dollar / Danish Krone");
+        forex_naming_dict.put("USDHKD", "US Dollar / Hong Kong Dollar");
+        forex_naming_dict.put("USDILS", "US Dollar / Israeli New Shekel");
+        forex_naming_dict.put("USDJPY", "US Dollar / Japanese Yen");
+        forex_naming_dict.put("USDRON", "US Dollar / Romanian Leu");
+        forex_naming_dict.put("USDTRY", "US Dollar / Turkish Lira");
     }
 
     public static void wait(int sleep_ms) {
