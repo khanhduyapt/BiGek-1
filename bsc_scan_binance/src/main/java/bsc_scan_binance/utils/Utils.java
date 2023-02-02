@@ -107,8 +107,8 @@ public class Utils {
     // UK100 UK 100
     // FR40 France 40 (France)
     // DXY US Dollar Index
-    public static final List<String> EPICS_INDEXS = Arrays.asList("GOLD", "OIL_CRUDE", "US30", "US500", "UK100", "HK50",
-            "FR40");
+    public static final List<String> EPICS_INDEXS = Arrays.asList("DXY", "GOLD", "OIL_CRUDE", "US30", "US500", "UK100",
+            "HK50", "FR40");
 
     // EURAUD Euro / Australian Dollar
     // EURCAD Euro / Canadian dollar

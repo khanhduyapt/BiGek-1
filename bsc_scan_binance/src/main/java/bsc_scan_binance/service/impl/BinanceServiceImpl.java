@@ -2711,8 +2711,15 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Override
     @Transactional
+    public void init_DXY_Crypto(String symbol) {
+        List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
+        createHistoryReverseOf_D1(list_days, symbol);
+    }
+
+    @Override
+    @Transactional
     public void init_DXY_index(String EPIC) {
-        List<BtcFutures> list_days = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_DAY, 20);
+        List<BtcFutures> list_days = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_DAY, 30);
         createHistoryReverseOf_D1(list_days, EPIC);
     }
 
@@ -2720,8 +2727,8 @@ public class BinanceServiceImpl implements BinanceService {
         String chart_D = Utils.CHAR_OPPOSITE;
 
         if (!CollectionUtils.isEmpty(list_days) && list_days.size() >= 20) {
-            BigDecimal ma3_1 = Utils.calcMA(list_days, 3, 0);
-            BigDecimal ma3_2 = Utils.calcMA(list_days, 3, 1);
+            BigDecimal ma3_1 = Utils.calcMA(list_days, 3, 1);
+            BigDecimal ma3_2 = Utils.calcMA(list_days, 3, 2);
             Boolean ma3_up = ma3_1.compareTo(ma3_2) > 0;
 
             BigDecimal ma10_1 = Utils.calcMA(list_days, 10, 0);
@@ -2814,6 +2821,10 @@ public class BinanceServiceImpl implements BinanceService {
 
     @Transactional
     public String checkWDtrend(String gecko_id, String symbol) {
+        String chart_D = getHistoryReverseOf_D1(symbol);
+        if (Objects.equals(Utils.CHAR_OPPOSITE, chart_D)) {
+            return "";
+        }
 
         String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
 

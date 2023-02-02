@@ -1,6 +1,6 @@
 package bsc_scan_binance;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
@@ -28,6 +28,7 @@ public class BscScanBinanceApplication {
     public static String callFormBinance = "";
     public static String TAKER_TOKENS = "_";
     public static int SLEEP_MINISECONDS = 6000;
+    private static Hashtable<String, String> keys_dict = new Hashtable<String, String>();
 
     public static void main(String[] args) {
         try {
@@ -68,51 +69,64 @@ public class BscScanBinanceApplication {
             }
 
             // --------------------Debug--------------------
+            int pre_blog15minute = -1;
+            int cur_blog15minute = -1;
+
+            String curChangeDailyChart = "";
+            String preChangeDailyChart = "";
+
+            List<String> INDEXS = new ArrayList<String>();
+            INDEXS.addAll(Utils.EPICS_INDEXS);
+            INDEXS.addAll(Utils.EPICS_FOREX_EUR);
+            INDEXS.addAll(Utils.EPICS_FOREX_AUD);
+            INDEXS.addAll(Utils.EPICS_FOREX_GBP);
+            INDEXS.addAll(Utils.EPICS_FOREX_CAD);
+            INDEXS.addAll(Utils.EPICS_FOREX_DOLLAR);
 
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
-                Hashtable<String, String> keys_dict = new Hashtable<String, String>();
 
-                int size = list.size();
                 int idx = 0;
-                int pre_blog15minute = -1;
-                int cur_blog15minute = -1;
-
-                int pre_blog15minute1 = -1;
-                int cur_blog15minute1 = -1;
-
-                int pre_blog15minute2 = -1;
-                int cur_blog15minute2 = -1;
-
-                int pre_blog15minute3 = -1;
-                int cur_blog15minute3 = -1;
-
-                int pre_blog15minute4 = -1;
-                int cur_blog15minute4 = -1;
-
-                int pre_blog15minute5 = -1;
-                int cur_blog15minute5 = -1;
-
-                String curChangeDailyChart = "";
-                String preChangeDailyChart = "";
+                int size = list.size();
                 Date start_time = Calendar.getInstance().getTime();
                 while (idx < size) {
                     CandidateCoin coin = list.get(idx);
 
                     try {
-
                         curChangeDailyChart = Utils.getYyyyMmDdHH_ChangeDailyChart();
                         if (!Objects.equals(curChangeDailyChart, preChangeDailyChart)) {
                             preChangeDailyChart = curChangeDailyChart;
 
-                            // BXY (index CBOE), JXY CXY EXY ZXY AXY -> cfd TVC
-                            final List<String> EPICS_INDEXS = Arrays.asList("DXY", "EURUSD", "AUDUSD", "GBPUSD",
-                                    "NZDUSD", "USDCAD", "USDCHF", "USDCNH", "USDJPY");
+                            System.out.println(Utils.getTimeHHmm() + "init BTC");
+                            binance_service.init_DXY_Crypto("BTC");
+                            wait(SLEEP_MINISECONDS);
 
-                            for (String EPIC : EPICS_INDEXS) {
+                            System.out.println(Utils.getTimeHHmm() + "init ETH");
+                            binance_service.init_DXY_Crypto("ETH");
+                            wait(SLEEP_MINISECONDS);
+
+                            System.out.println(Utils.getTimeHHmm() + "init BNB");
+                            binance_service.init_DXY_Crypto("BNB");
+                            wait(SLEEP_MINISECONDS);
+
+                            System.out.println(Utils.getTimeHHmm() + "init " + coin.getSymbol());
+                            binance_service.init_DXY_Crypto(coin.getSymbol());
+
+                            //----------------------------------------------
+
+                            for (String EPIC : INDEXS) {
                                 System.out.println(Utils.getTimeHHmm() + "init " + EPIC);
                                 binance_service.init_DXY_index(EPIC);
                                 wait(SLEEP_MINISECONDS);
+                            }
+
+                            //----------------------------------------------
+
+                            try {
+                                gecko_service.loadData(coin.getGeckoid());
+                            } catch (Exception e) {
+                                System.out.println("gecko_service.LoadData:[" + coin.getGeckoid() + "]");
+                                e.printStackTrace();
                             }
                         }
 
@@ -121,6 +135,7 @@ public class BscScanBinanceApplication {
                             pre_blog15minute = cur_blog15minute;
 
                             System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
+
                             binance_service.getChartWD("bitcoin", "BTC");
                             wait(SLEEP_MINISECONDS);
 
@@ -132,115 +147,17 @@ public class BscScanBinanceApplication {
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
 
-                            if (Utils.isAllowSendMsgSetting() && Utils.isBusinessTime()) {
-                                for (String EPIC : Utils.EPICS_INDEXS) {
-                                    binance_service.checkCapital(EPIC);
-                                    wait(SLEEP_MINISECONDS);
-                                }
-                            }
                         }
 
-                        if ((idx % 5 == 1) && Utils.isBusinessTime()) {
-                            cur_blog15minute1 = Utils.getCurrentMinute_Blog15minutes();
-                            if (pre_blog15minute1 != cur_blog15minute1) {
-                                pre_blog15minute1 = cur_blog15minute1;
-
-                                if (Utils.isAllowSendMsgSetting()) {
-                                    for (String EPIC : Utils.EPICS_FOREX_EUR) {
-                                        binance_service.checkCapital(EPIC);
-                                        wait(SLEEP_MINISECONDS);
-                                    }
-                                }
-                            }
-                        }
-
-                        if ((idx % 5 == 2) && Utils.isBusinessTime()) {
-                            cur_blog15minute2 = Utils.getCurrentMinute_Blog15minutes();
-                            if (pre_blog15minute2 != cur_blog15minute2) {
-                                pre_blog15minute2 = cur_blog15minute2;
-
-                                if (Utils.isAllowSendMsgSetting()) {
-                                    for (String EPIC : Utils.EPICS_FOREX_AUD) {
-                                        binance_service.checkCapital(EPIC);
-                                        wait(SLEEP_MINISECONDS);
-                                    }
-                                }
-                            }
-                        }
-
-                        if ((idx % 5 == 3) && Utils.isBusinessTime()) {
-                            cur_blog15minute3 = Utils.getCurrentMinute_Blog15minutes();
-                            if (pre_blog15minute3 != cur_blog15minute3) {
-                                pre_blog15minute3 = cur_blog15minute3;
-
-                                if (Utils.isAllowSendMsgSetting()) {
-                                    for (String EPIC : Utils.EPICS_FOREX_GBP) {
-                                        binance_service.checkCapital(EPIC);
-                                        wait(SLEEP_MINISECONDS);
-                                    }
-                                }
-                            }
-                        }
-
-                        if ((idx % 5 == 4) && Utils.isBusinessTime()) {
-                            cur_blog15minute4 = Utils.getCurrentMinute_Blog15minutes();
-                            if (pre_blog15minute4 != cur_blog15minute4) {
-                                pre_blog15minute4 = cur_blog15minute4;
-
-                                if (Utils.isAllowSendMsgSetting()) {
-                                    for (String EPIC : Utils.EPICS_FOREX_CAD) {
-                                        binance_service.checkCapital(EPIC);
-                                        wait(SLEEP_MINISECONDS);
-                                    }
-                                }
-                            }
-                        }
-
-                        if ((idx % 5 == 0) && Utils.isBusinessTime()) {
-                            cur_blog15minute5 = Utils.getCurrentMinute_Blog15minutes();
-                            if (pre_blog15minute5 != cur_blog15minute5) {
-                                pre_blog15minute5 = cur_blog15minute5;
-
-                                if (Utils.isAllowSendMsgSetting()) {
-                                    for (String EPIC : Utils.EPICS_FOREX_DOLLAR) {
-                                        binance_service.checkCapital(EPIC);
-                                        wait(SLEEP_MINISECONDS);
-                                    }
-                                }
-                            }
-                        }
                         // ----------------------------------------------------------
 
-                        String key = Utils.getStringValue(coin.getGeckoid()) + "_";
-                        key += Utils.getStringValue(coin.getSymbol()) + "_";
-                        key += Utils.getCurrentYyyyMmDd_HH();
-                        boolean reload = false;
-                        if (keys_dict.containsKey(key)) {
-                            if (!Objects.equals(key, keys_dict.get(key))) {
-                                keys_dict.put(key, key);
-
-                                reload = true;
-                            }
-                        } else {
-                            keys_dict.put(key, key);
-                            reload = true;
-                        }
-                        if (reload) {
-                            String msg = "(" + (idx + 1) + "/" + size + ")" + Utils.getTimeHHmm();
-                            msg += coin.getSymbol() + " " + coin.getGeckoid();
-                            System.out.println(msg);
-
-                            binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
-
-                            try {
-                                gecko_service.loadData(coin.getGeckoid());
-                            } catch (Exception e) {
-                                System.out.println("dkd error gecko_service.LoadData:[" + coin.getGeckoid() + "]"
-                                        + e.getMessage());
-                            }
+                        if (idx < INDEXS.size()) {
+                            String EPIC = INDEXS.get(idx);
+                            binance_service.checkCapital(EPIC);
                         }
 
-                        wait(SLEEP_MINISECONDS);
+                        load(binance_service, coin, idx, size);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -256,18 +173,37 @@ public class BscScanBinanceApplication {
                     } else {
                         idx += 1;
                     }
+
+                    wait(SLEEP_MINISECONDS);
                 }
-
-                System.out.println("End BscScanBinanceApplication "
-                        + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime())
-                        + " <----");
             }
-        } catch (
-
-        Exception e) {
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
 
+    private static void load(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
+        String key = Utils.getStringValue(coin.getGeckoid()) + "_";
+        key += Utils.getStringValue(coin.getSymbol()) + "_";
+        key += Utils.getCurrentYyyyMmDd_HH();
+        boolean reload = false;
+        if (keys_dict.containsKey(key)) {
+            if (!Objects.equals(key, keys_dict.get(key))) {
+                keys_dict.put(key, key);
+
+                reload = true;
+            }
+        } else {
+            keys_dict.put(key, key);
+            reload = true;
+        }
+        if (reload) {
+            String msg = "(" + (idx + 1) + "/" + size + ")" + Utils.getTimeHHmm();
+            msg += coin.getSymbol() + " " + coin.getGeckoid();
+            System.out.println(msg);
+
+            binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
+        }
     }
 
     public static void wait(int sleep_ms) {

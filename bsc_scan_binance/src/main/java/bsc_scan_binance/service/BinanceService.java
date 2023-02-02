@@ -42,4 +42,6 @@ public interface BinanceService {
     void checkCapital(String EPIC);
 
     void init_DXY_index(String EPIC);
+
+    void init_DXY_Crypto(String symbol);
 }
