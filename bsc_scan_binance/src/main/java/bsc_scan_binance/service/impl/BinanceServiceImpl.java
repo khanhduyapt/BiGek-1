@@ -1161,9 +1161,7 @@ public class BinanceServiceImpl implements BinanceService {
 
             return list;
 
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<CandidateTokenCssResponse>();
         }
@@ -1188,7 +1186,7 @@ public class BinanceServiceImpl implements BinanceService {
                     + "    FROM funding_history str_h                                                           \n"
                     + "    WHERE str_h.event_time = 'DH4H1_STR_H_FX'                                            \n"
                     + ") tmp                                                                                    \n"
-                    + "WHERE tmp.trend_h1 is not null                                                           \n" //-- (tmp.trend_d = tmp.trend_h1) or (tmp.trend_h1 is not null)
+                    + "WHERE (tmp.trend_h1 is not null) and (tmp.trend_d = tmp.trend_h1)                        \n" //-- (tmp.trend_d = tmp.trend_h1) or (tmp.trend_h1 is not null)
                     + "ORDER BY tmp.epic                                                                        \n";
 
             Query query = entityManager.createNativeQuery(sql, "ForexHistoryResponse");
