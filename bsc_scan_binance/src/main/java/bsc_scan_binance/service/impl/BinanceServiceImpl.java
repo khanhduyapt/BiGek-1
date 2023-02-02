@@ -2973,10 +2973,10 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        FundingHistory drap = fundingHistoryRepository.findById(new FundingHistoryKey(EVENT_ID, EPIC)).orElse(null);
-        if (!Objects.equals(null, drap)) {
-            fundingHistoryRepository.deleteById(drap.getId());
-        }
+        //FundingHistory drap = fundingHistoryRepository.findById(new FundingHistoryKey(EVENT_ID, EPIC)).orElse(null);
+        //if (!Objects.equals(null, drap)) {
+        //    fundingHistoryRepository.deleteById(drap.getId());
+        //}
     }
 
     @Transactional
