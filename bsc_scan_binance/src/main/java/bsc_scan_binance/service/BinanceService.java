@@ -6,6 +6,7 @@ import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.EntryCssResponse;
+import bsc_scan_binance.response.ForexHistoryResponse;
 
 public interface BinanceService {
 
@@ -39,9 +40,17 @@ public interface BinanceService {
 
     public void clearTrash();
 
-    void checkCapital(String EPIC);
+    public void checkCapital(String EPIC);
 
-    void init_DXY_index(String EPIC);
+    public void checkSamePhaseForex15m(String EPIC);
 
-    void init_DXY_Crypto(String gecko_id, String symbol);
+    public void checkSamePhaseCrypto15m(String symbol);
+
+    public void init_DXY_index(String EPIC);
+
+    public void init_DXY_Crypto(String gecko_id, String symbol);
+
+    public List<ForexHistoryResponse> getForexSamePhaseList();
+
+    public List<ForexHistoryResponse> getCryptoSamePhaseList();
 }

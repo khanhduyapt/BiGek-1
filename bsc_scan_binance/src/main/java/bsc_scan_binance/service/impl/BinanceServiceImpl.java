@@ -140,7 +140,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_DH_STR_H_FX = "DH4H1_STR_H_FX";
     private static final String EVENT_DH_STR_D_CRYPTO = "DH4H1_STR_D_CRYPTO";
     private static final String EVENT_DH_STR_H_CRYPTO = "DH4H1_STR_H_CRYPTO";
-    private static final String EVENT_DH_TREND_FOREX = "DH4H1_D_TREND_FX";
+    private static final String EVENT_DH_TREND_FX = "DH4H1_D_TREND_FX";
     private static final String EVENT_DH_TREND_CRYPTO = "DH4H1_D_TREND_CRYPTO";
     //********************************************************************************
 
@@ -1115,7 +1115,7 @@ public class BinanceServiceImpl implements BinanceService {
                 index += 1;
             }
 
-            List<ForexHistoryResponse> list_fx = getForexList();
+            List<ForexHistoryResponse> list_fx = getForexSamePhaseList();
             for (ForexHistoryResponse dto : list_fx) {
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
 
@@ -1167,29 +1167,31 @@ public class BinanceServiceImpl implements BinanceService {
         }
     }
 
-    public List<ForexHistoryResponse> getForexList() {
+    @Override
+    public List<ForexHistoryResponse> getCryptoSamePhaseList() {
         try {
-            String sql = " "
-                    + "SELECT DISTINCT ON (epic)                                                                \n"
-                    + "    tmp.epic,                                                                            \n"
-                    + "    tmp.trend_d  as d,                                                                   \n"
-                    + "    tmp.trend_h1 as h,                                                                   \n"
-                    + "    (case when tmp.trend_d  = 'L' then '(D)Long'  when tmp.trend_d = 'S' then '(D)Short' when tmp.trend_d = 'o' then '(D)Sideway' else '' end)    as trend_d,  \n"
-                    + "    (case when tmp.trend_h1 = 'L' then '(H1)Long' when tmp.trend_h1 = 'S' then '(H1)Short' else '' end)                                           as trend_h1, \n"
-                    + "    (select append.note from funding_history append where append.event_time = concat('1W1D_FX_', append.gecko_id) and append.gecko_id = tmp.epic) as note      \n "
-                    + "FROM                                                                                     \n"
-                    + "(                                                                                        \n"
-                    + "    SELECT                                                                               \n"
-                    + "        str_h.symbol as epic,                                                            \n"
-                    + "        (select str_d.note from funding_history str_d where event_time = 'DH4H1_D_TREND_FX' and str_d.gecko_id = str_h.gecko_id) as trend_d,   \n"
-                    + "        str_h.note   as trend_h1                                                         \n"
-                    + "    FROM funding_history str_h                                                           \n"
-                    + "    WHERE str_h.event_time = 'DH4H1_STR_H_FX'                                            \n"
-                    + ") tmp                                                                                    \n"
-                    + "WHERE (tmp.trend_h1 is not null) and (tmp.trend_d = tmp.trend_h1)                        \n" //-- (tmp.trend_d = tmp.trend_h1) or (tmp.trend_h1 is not null)
-                    + "ORDER BY tmp.epic                                                                        \n";
+            String sql = Utils.sql_ForexHistoryResponse.replace("DH4H1_D_TREND_FX", EVENT_DH_TREND_CRYPTO)
+                    .replace("DH4H1_STR_H_FX", EVENT_DH_STR_H_CRYPTO);
+            sql = sql.replace("ORDER BY tmp.epic", " AND tmp.trend_d = 'L' ");
+            sql += " ORDER BY tmp.epic ";
 
             Query query = entityManager.createNativeQuery(sql, "ForexHistoryResponse");
+
+            @SuppressWarnings("unchecked")
+            List<ForexHistoryResponse> results = query.getResultList();
+
+            return results;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<ForexHistoryResponse>();
+    }
+
+    @Override
+    public List<ForexHistoryResponse> getForexSamePhaseList() {
+        try {
+            Query query = entityManager.createNativeQuery(Utils.sql_ForexHistoryResponse, "ForexHistoryResponse");
 
             @SuppressWarnings("unchecked")
             List<ForexHistoryResponse> results = query.getResultList();
@@ -2894,7 +2896,7 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_days)) {
             System.out.println("reload: " + EPIC + ": EMTPY");
         }
-        createTrend_D1(EVENT_DH_TREND_FOREX, list_days, EPIC);
+        createTrend_D1(EVENT_DH_TREND_FX, list_days, EPIC);
 
         createNewTrendCycle(EVENT_DH_STR_D_FX, list_days, EPIC);
     }
@@ -2979,13 +2981,13 @@ public class BinanceServiceImpl implements BinanceService {
         return chart_H;
     }
 
-    // The maximum request rate is 10 per second -> 1 minute = 60 requests.
     @Override
     @Transactional
+    // The maximum request rate is 10 per second -> 1 minute = 60 requests.
     public void checkCapital(String EPIC) {
         String EVENT_ID = EVENT_TREND_1W1D_FX + "_" + EPIC;
 
-        String trend_d1 = getTrend_D1(EVENT_DH_TREND_FOREX, EPIC);
+        String trend_d1 = getTrend_D1(EVENT_DH_TREND_FX, EPIC);
 
         if (Objects.equals(Utils.CHAR_LONG, trend_d1) || Objects.equals(Utils.CHAR_SHORT, trend_d1)) {
             // ------------------------------------------------------------------------------------
@@ -3007,20 +3009,49 @@ public class BinanceServiceImpl implements BinanceService {
                 }
                 append += Utils.new_line_from_service + "(Remark) D:" + trend_d1 + ",H1:" + start_h1;
 
-                if (Objects.equals(trend_d1, start_h1)) {
-                    String EVENT_ID_DH = Utils.getCurrentYyyyMmDdHHByChart(list_1h) + EPIC;
-                    String msg = Utils.getTimeHHmm() + EPIC + "(d:" + trend_d1 + ",h1: " + start_h1 + ")";
-                    sendMsgPerHour(EVENT_ID_DH, msg, true);
-                }
+                //if (Objects.equals(trend_d1, start_h1)) {
+                //    String EVENT_ID_DH = Utils.getCurrentYyyyMmDdHHByChart(list_1h) + EPIC;
+                //    String msg = Utils.getTimeHHmm() + EPIC + "(d:" + trend_d1 + ",h1: " + start_h1 + ")";
+                //    sendMsgPerHour(EVENT_ID_DH, msg, true);
+                //}
 
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, EPIC, EPIC, append, true));
             }
 
-            String trend_h1 = getTrend_D1(EVENT_DH_STR_H_FX, EPIC);
+            checkSamePhaseForex15m(EPIC);
+        }
+
+    }
+
+    @Override
+    public void checkSamePhaseForex15m(String EPIC) {
+        String trend_d1 = getTrend_D1(EVENT_DH_TREND_FX, EPIC);
+        String trend_h1 = getTrend_D1(EVENT_DH_STR_H_FX, EPIC);
+        String trend = Objects.equals(Utils.CHAR_LONG, trend_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+        String append = "______D.H." + trend + "______";
+
+        if (Objects.equals(Utils.CHAR_LONG, trend_d1) || Objects.equals(Utils.CHAR_SHORT, trend_d1)) {
             if (Objects.equals(trend_d1, trend_h1)) {
-                String trend = Objects.equals(Utils.CHAR_LONG, trend_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
                 List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
-                sendScapMsg(list_15m, EPIC, trend, "");
+
+                sendScapMsg(list_15m, EPIC, trend, append);
+            }
+        }
+    }
+
+    @Override
+    public void checkSamePhaseCrypto15m(String symbol) {
+        String trend_d1 = getTrend_D1(EVENT_DH_TREND_CRYPTO, symbol);
+        String trend_h1 = getTrend_D1(EVENT_DH_STR_H_CRYPTO, symbol);
+        String trend = Objects.equals(Utils.CHAR_LONG, trend_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+        String append = "______D.H." + trend + "______";
+
+        if (Objects.equals(Utils.CHAR_LONG, trend_d1) || Objects.equals(Utils.CHAR_SHORT, trend_d1)) {
+            if (Objects.equals(trend_d1, trend_h1)) {
+
+                List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
+
+                sendScapMsg(list_15m, symbol, trend, append);
             }
         }
     }
