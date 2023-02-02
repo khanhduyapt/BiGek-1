@@ -128,6 +128,26 @@ public class Utils {
             "NZDPLN", "NZDSEK", "NZDTRY", "PLNSEK", "PLNTRY", "SEKMXN", "SEKTRY", "SGDHKD", "SGDMXN", "TRYJPY",
             "USDCZK", "USDDKK", "USDHKD", "USDILS", "USDRON", "USDTRY");
 
+    public static String sql_CryptoHistoryResponse = " "
+            + "SELECT DISTINCT ON (epic)                                                                \n"
+            + "    tmp.epic,                                                                            \n"
+            + "    tmp.trend_d  as d,                                                                   \n"
+            + "    tmp.trend_h1 as h,                                                                   \n"
+            + "    (case when tmp.trend_d  = 'L' then '(D)Long'  when tmp.trend_d = 'S' then '(D)Short' when tmp.trend_d = 'o' then '(D)Sideway' else '' end)    as trend_d,  \n"
+            + "    (case when tmp.trend_h1 = 'L' then '(H1)Long' when tmp.trend_h1 = 'S' then '(H1)Short' else '' end)                                           as trend_h1, \n"
+            + "    (select append.note from funding_history append where append.event_time = concat('1W1D_FX_', append.gecko_id) and append.gecko_id = tmp.epic) as note      \n"
+            + "FROM                                                                                     \n"
+            + "(                                                                                        \n"
+            + "    SELECT                                                                               \n"
+            + "        str_h.symbol as epic,                                                            \n"
+            + "        (select str_d.note from funding_history str_d where event_time = 'DH4H1_D_TREND_CRYPTO' and str_d.gecko_id = str_h.gecko_id) as trend_d,   \n"
+            + "        str_h.note   as trend_h1                                                         \n"
+            + "    FROM funding_history str_h                                                           \n"
+            + "    WHERE str_h.event_time = 'DH4H1_STR_H_CRYPTO'                                            \n"
+            + ") tmp                                                                                    \n"
+            + "WHERE (tmp.trend_h1 is not null) and (tmp.trend_d = tmp.trend_h1) and (tmp.trend_d = 'L')  \n"
+            + "ORDER BY tmp.epic                                                                        \n";
+
     public static String sql_ForexHistoryResponse = " "
             + "SELECT DISTINCT ON (epic)                                                                \n"
             + "    tmp.epic,                                                                            \n"
@@ -144,6 +164,15 @@ public class Utils {
             + "        str_h.note   as trend_h1                                                         \n"
             + "    FROM funding_history str_h                                                           \n"
             + "    WHERE str_h.event_time = 'DH4H1_STR_H_FX'                                            \n"
+            + "    UNION                                                                                 \n"
+            + "    SELECT                                                                               \n"
+            + "        str_h.symbol as epic,                                                            \n"
+            + "        (select str_d.note from funding_history str_d where event_time = 'DH4H1_STR_H4_FX' and str_d.gecko_id = str_h.gecko_id) as trend_d,   \n"
+            + "        str_h.note   as trend_h1                                                         \n"
+            + "    FROM funding_history str_h                                                           \n"
+            + "    WHERE str_h.event_time = 'DH4H1_STR_M15_FX'                                          \n"
+
+
             + ") tmp                                                                                    \n"
             + "WHERE (tmp.trend_h1 is not null) and (tmp.trend_d = tmp.trend_h1)                        \n"
             + "ORDER BY tmp.epic                                                                        \n";

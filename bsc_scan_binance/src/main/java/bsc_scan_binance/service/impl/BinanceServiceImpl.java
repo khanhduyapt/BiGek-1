@@ -1146,6 +1146,9 @@ public class BinanceServiceImpl implements BinanceService {
                 String note = Utils.getStringValue(dto.getNote());
                 if (note.contains(Utils.new_line_from_service)) {
                     css.setRange_backer(note.substring(0, note.indexOf(Utils.new_line_from_service)));
+
+                    css.setRange_total_w(note.substring(note.indexOf(Utils.new_line_from_service))
+                            .replace(Utils.new_line_from_service, ""));
                 } else {
                     css.setRange_backer(note);
                 }
@@ -1172,12 +1175,7 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     public List<ForexHistoryResponse> getCryptoSamePhaseList() {
         try {
-            String sql = Utils.sql_ForexHistoryResponse.replace("DH4H1_D_TREND_FX", EVENT_DH_TREND_CRYPTO)
-                    .replace("DH4H1_STR_H_FX", EVENT_DH_STR_H_CRYPTO);
-            sql = sql.replace("ORDER BY tmp.epic", " AND tmp.trend_d = 'L' ");
-            sql += " ORDER BY tmp.epic ";
-
-            Query query = entityManager.createNativeQuery(sql, "ForexHistoryResponse");
+            Query query = entityManager.createNativeQuery(Utils.sql_CryptoHistoryResponse, "ForexHistoryResponse");
 
             @SuppressWarnings("unchecked")
             List<ForexHistoryResponse> results = query.getResultList();
@@ -2765,7 +2763,7 @@ public class BinanceServiceImpl implements BinanceService {
             return;
         }
 
-        createTrend_D1(EVENT_DH_TREND_CRYPTO, list_days, symbol);
+        createTrend_D1_byMa3_10_20(EVENT_DH_TREND_CRYPTO, list_days, symbol);
         createNewTrendCycleByVector(EVENT_DH_STR_D_CRYPTO, list_days, symbol);
 
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
@@ -2898,14 +2896,14 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_days)) {
             System.out.println("reload: " + EPIC + ": EMTPY");
         }
-        createTrend_D1(EVENT_DH_TREND_FX, list_days, EPIC);
+        createTrend_D1_byMa3_10_20(EVENT_DH_TREND_FX, list_days, EPIC);
 
         createNewTrendCycleByVector(EVENT_DH_STR_D_FX, list_days, EPIC);
     }
 
-    public String createTrend_D1(String event_dh_trend_crypto_or_forex, List<BtcFutures> list_days,
+    public String createTrend_D1_byMa3_10_20(String event_dh_trend_crypto_or_forex, List<BtcFutures> list_days,
             String key_or_symbol) {
-        String chart_D = Utils.CHAR_OPPOSITE;
+        String char_D1 = Utils.CHAR_OPPOSITE;
 
         if (!CollectionUtils.isEmpty(list_days) && list_days.size() >= 20) {
             BigDecimal ma3_1 = Utils.calcMA(list_days, 3, 1);
@@ -2921,26 +2919,26 @@ public class BinanceServiceImpl implements BinanceService {
             Boolean ma20_up = ma20_1.compareTo(ma20_2) > 0;
 
             if ((ma3_up == ma10_up) && (ma10_up == ma20_up)) {
-                chart_D = ma10_up ? Utils.CHAR_LONG : Utils.CHAR_SHORT;
+                char_D1 = ma10_up ? Utils.CHAR_LONG : Utils.CHAR_SHORT;
             }
         }
 
         fundingHistoryRepository.save(
-                createPumpDumpEntity(event_dh_trend_crypto_or_forex, key_or_symbol, key_or_symbol, chart_D, true));
+                createPumpDumpEntity(event_dh_trend_crypto_or_forex, key_or_symbol, key_or_symbol, char_D1, true));
 
-        return chart_D;
+        return char_D1;
     }
 
     public String getPrifixOfTrend(String event_dh_trend_crypto_or_forex, String key_or_symbol) {
-        String chart_D = "";
+        String char_D1 = "";
 
         FundingHistoryKey id = new FundingHistoryKey(event_dh_trend_crypto_or_forex, key_or_symbol);
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
         if (!Objects.equals(null, entity)) {
-            chart_D = entity.getNote();
+            char_D1 = entity.getNote();
         }
 
-        return chart_D;
+        return char_D1;
     }
 
     public String createNewTrendCycleByVector(String event_dh_str_h_or_d, List<BtcFutures> list,
