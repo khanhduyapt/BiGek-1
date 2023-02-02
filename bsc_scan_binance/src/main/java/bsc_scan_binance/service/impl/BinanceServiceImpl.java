@@ -136,7 +136,7 @@ public class BinanceServiceImpl implements BinanceService {
     // DH4H1 BTC LL -> Search long m15.
     // DH4H1 BTC SS -> Search short m15.
     private static final String EVENT_DH = "DH4H1"; //
-    private static final String EVENT_DH_INDEX = "DH4H1_INDEX"; //
+    private static final String EVENT_DH_INDEX = "DH4H1_D_TREND"; //
     private static final String EVENT_PUMP = "Pump_";
     private static final String EVENT_MSG_PER_HOUR = "MSG_PER_HOUR";
     private static final String SEPARATE_D1_AND_H1 = "1DH1";
