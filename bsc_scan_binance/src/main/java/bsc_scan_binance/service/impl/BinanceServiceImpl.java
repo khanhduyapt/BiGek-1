@@ -2988,7 +2988,6 @@ public class BinanceServiceImpl implements BinanceService {
         String trend_d1 = getTrend_D1(EVENT_DH_TREND_FOREX, EPIC);
 
         if (Objects.equals(Utils.CHAR_LONG, trend_d1) || Objects.equals(Utils.CHAR_SHORT, trend_d1)) {
-
             // ------------------------------------------------------------------------------------
             List<BtcFutures> list_1h = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_HOUR, 50);
             if (CollectionUtils.isEmpty(list_1h)) {
@@ -2999,31 +2998,31 @@ public class BinanceServiceImpl implements BinanceService {
             if (Objects.equals(Utils.CHAR_LONG, start_h1) || Objects.equals(Utils.CHAR_SHORT, start_h1)) {
 
                 String start_d1 = getNewCycleTrend(EVENT_DH_STR_D_FX, EPIC);
-                String trend_h1 = Objects.equals(Utils.CHAR_LONG, start_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
-
-                String append = "";
                 String supper_long = start_d1 + start_h1;
-                append = Utils.calc_BUF_LO_HI_BUF(list_1h, start_h1);
+
+                String append = Utils.getMmDD_TimeHHmm();
+                append += Utils.calc_BUF_LO_HI_BUF(list_1h, start_h1);
                 if (Objects.equals(Utils.CHAR_LONG + Utils.CHAR_LONG, supper_long)) {
                     append += Utils.new_line_from_service + "_____D1H1M15_LONG_____";
-
                 }
                 append += Utils.new_line_from_service + "(Remark) D:" + trend_d1 + ",H1:" + start_h1;
 
                 if (Objects.equals(trend_d1, start_h1)) {
-                    List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
-                    sendScapMsg(list_15m, EPIC, trend_h1, append);
+                    String EVENT_ID_DH = Utils.getCurrentYyyyMmDdHHByChart(list_1h) + EPIC;
+                    String msg = Utils.getTimeHHmm() + EPIC + "(d:" + trend_d1 + ",h1: " + start_h1 + ")";
+                    sendMsgPerHour(EVENT_ID_DH, msg, true);
                 }
 
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, EPIC, EPIC, append, true));
-                return;
+            }
+
+            String trend_h1 = getTrend_D1(EVENT_DH_STR_H_FX, EPIC);
+            if (Objects.equals(trend_d1, trend_h1)) {
+                String trend = Objects.equals(Utils.CHAR_LONG, trend_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+                List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
+                sendScapMsg(list_15m, EPIC, trend, "");
             }
         }
-
-        //FundingHistory drap = fundingHistoryRepository.findById(new FundingHistoryKey(EVENT_ID, EPIC)).orElse(null);
-        //if (!Objects.equals(null, drap)) {
-        //    fundingHistoryRepository.deleteById(drap.getId());
-        //}
     }
 
     @Transactional
