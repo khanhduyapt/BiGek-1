@@ -2688,12 +2688,9 @@ public class BinanceServiceImpl implements BinanceService {
         if (CollectionUtils.isEmpty(list_days)) {
             return;
         }
-        createTrend_D1(list_days, symbol);
 
-        String start_D = startNewCycleLongOrShort(list_days);
-        if (Utils.isNotBlank(start_D)) {
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH_STR_D, symbol, symbol, start_D, true));
-        }
+        createTrend_D1(list_days, symbol);
+        createNewTrendCycle(EVENT_DH_STR_D, list_days, symbol);
 
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
         if (CollectionUtils.isEmpty(list_weeks)) {
@@ -2864,8 +2861,8 @@ public class BinanceServiceImpl implements BinanceService {
         return chart_D;
     }
 
-    // L:Start Long, S: Start Short
-    private String startNewCycleLongOrShort(List<BtcFutures> list) {
+    public String createNewTrendCycle(String event_dh_str_h_or_d, List<BtcFutures> list, String epic_or_symbol) {
+        String start_strend = "";
         BigDecimal ma_1 = Utils.calcMA(list, 10, 1);
         BigDecimal ma_2 = Utils.calcMA(list, 10, 2);
         BigDecimal ma_3 = Utils.calcMA(list, 10, 3);
@@ -2873,27 +2870,23 @@ public class BinanceServiceImpl implements BinanceService {
 
         if ((ma_1.compareTo(ma_2) > 0) && (ma_3.compareTo(ma_2) > 0)) {
             if (ma50_1.compareTo(ma_1) > 0) {
-                return Utils.CHAR_LONG;
+                start_strend = Utils.CHAR_LONG;
             }
         }
 
         if ((ma_2.compareTo(ma_1) > 0) && (ma_2.compareTo(ma_3) > 0)) {
             if (ma50_1.compareTo(ma_1) < 0) {
-                return Utils.CHAR_SHORT;
+                start_strend = Utils.CHAR_SHORT;
             }
         }
 
-        return "";
-    }
-
-    public String createNewCycleTrend_H1(List<BtcFutures> list_1h, String epic_or_symbol) {
-        String start_H = startNewCycleLongOrShort(list_1h);
-        if (Utils.isNotBlank(start_H)) {
+        if (Utils.isNotBlank(start_strend)) {
             fundingHistoryRepository
-                    .save(createPumpDumpEntity(EVENT_DH_STR_H, epic_or_symbol, epic_or_symbol, start_H, true));
+                    .save(createPumpDumpEntity(event_dh_str_h_or_d, epic_or_symbol, epic_or_symbol, start_strend,
+                            true));
         }
 
-        return start_H;
+        return start_strend;
     }
 
     public String getNewCycleTrend(String EVENT_DH_STR_H0rD, String KEY) {
@@ -2921,7 +2914,7 @@ public class BinanceServiceImpl implements BinanceService {
             return;
         }
 
-        String start_h1 = createNewCycleTrend_H1(list_1h, EPIC);
+        String start_h1 = createNewTrendCycle(EVENT_DH_STR_H, list_1h, EPIC);
         if (Utils.isBlank(start_h1) || Objects.equals(Utils.CHAR_OPPOSITE, start_h1)) {
             return;
         }
@@ -2952,7 +2945,7 @@ public class BinanceServiceImpl implements BinanceService {
             return "";
         }
 
-        String start_h1 = createNewCycleTrend_H1(list_h1, symbol);
+        String start_h1 = createNewTrendCycle(EVENT_DH_STR_H, list_h1, symbol);
         if (Utils.isBlank(start_h1) || Objects.equals(Utils.CHAR_OPPOSITE, start_h1)) {
             return "";
         }
