@@ -3117,7 +3117,7 @@ public class BinanceServiceImpl implements BinanceService {
 
         String chartname = Utils.getChartName(list_h1);
         String EVENT_ID = EVENT_PUMP + symbol + chartname + Utils.getCurrentYyyyMmDdHHByChart(list_h1);
-        String msg = chartname + Utils.getTrendPrifix(char_h1, 3, 10) + symbol + "("
+        String msg = chartname + Utils.getTrendPrifix(char_h1, 10, 50) + symbol + "("
                 + Utils.removeLastZero(list_h1.get(0).getCurrPrice()) + ")";
 
         if (Objects.equals(Utils.CHAR_LONG, char_h1)) {
