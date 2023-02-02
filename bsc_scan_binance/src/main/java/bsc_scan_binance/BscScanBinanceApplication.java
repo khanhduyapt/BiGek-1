@@ -92,14 +92,14 @@ public class BscScanBinanceApplication {
                             for (String EPIC : INDEXS) {
                                 System.out.println(Utils.getTimeHHmm() + "init " + EPIC);
                                 binance_service.init_DXY_index(EPIC);
+                                binance_service.checkCapital(EPIC);
                                 wait(SLEEP_MINISECONDS);
                             }
                         }
-                        System.out.println(Utils.getTimeHHmm() + "init " + coin.getSymbol());
 
                         gecko_service.loadData(coin.getGeckoid());
                         binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
-                        checkCoinChartWD(binance_service, coin, index, list.size());
+                        check_Crypto_WD(binance_service, coin, index, list.size());
 
                         wait(SLEEP_MINISECONDS);
 
@@ -142,7 +142,7 @@ public class BscScanBinanceApplication {
                             String EPIC = INDEXS.get(idx);
                             binance_service.checkCapital(EPIC);
                         }
-                        checkCoinChartWD(binance_service, coin, idx, size);
+                        check_Crypto_WD(binance_service, coin, idx, size);
 
                         wait(SLEEP_MINISECONDS);
 
@@ -169,7 +169,7 @@ public class BscScanBinanceApplication {
         }
     }
 
-    private static void checkCoinChartWD(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
+    private static void check_Crypto_WD(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
         key += Utils.getStringValue(coin.getSymbol()) + "_";
         key += Utils.getCurrentYyyyMmDd_HH();
