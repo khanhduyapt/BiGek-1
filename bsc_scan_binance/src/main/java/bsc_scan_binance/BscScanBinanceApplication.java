@@ -72,9 +72,6 @@ public class BscScanBinanceApplication {
             int pre_blog15minute = -1;
             int cur_blog15minute = -1;
 
-            String curChangeDailyChart = "";
-            String preChangeDailyChart = "";
-
             List<String> INDEXS = new ArrayList<String>();
             INDEXS.addAll(Utils.EPICS_INDEXS);
             INDEXS.addAll(Utils.EPICS_FOREX_EUR);
@@ -86,6 +83,35 @@ public class BscScanBinanceApplication {
             if (app_flag != Utils.const_app_flag_webonly) {
                 List<CandidateCoin> list = gecko_service.getList(callFormBinance);
 
+                for (int index = 0; index < list.size(); index++) {
+                    try {
+                        CandidateCoin coin = list.get(index);
+
+                        boolean done = true;
+                        if (!done) {
+                            for (String EPIC : INDEXS) {
+                                System.out.println(Utils.getTimeHHmm() + "init " + EPIC);
+                                binance_service.init_DXY_index(EPIC);
+                                wait(SLEEP_MINISECONDS);
+                            }
+                        }
+                        System.out.println(Utils.getTimeHHmm() + "init " + coin.getSymbol());
+
+                        gecko_service.loadData(coin.getGeckoid());
+                        binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
+                        checkCoinChartWD(binance_service, coin, index, list.size());
+
+                        wait(SLEEP_MINISECONDS);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //----------------------------------------------
+                //----------------------------------------------
+                //----------------------------------------------
+
                 int idx = 0;
                 int size = list.size();
                 Date start_time = Calendar.getInstance().getTime();
@@ -93,61 +119,21 @@ public class BscScanBinanceApplication {
                     CandidateCoin coin = list.get(idx);
 
                     try {
-                        curChangeDailyChart = Utils.getYyyyMmDdHH_ChangeDailyChart();
-                        if (!Objects.equals(curChangeDailyChart, preChangeDailyChart)) {
-                            preChangeDailyChart = curChangeDailyChart;
-
-                            System.out.println(Utils.getTimeHHmm() + "init BTC");
-                            binance_service.init_DXY_Crypto("bitcoin", "BTC");
-                            wait(SLEEP_MINISECONDS);
-
-                            System.out.println(Utils.getTimeHHmm() + "init ETH");
-                            binance_service.init_DXY_Crypto("ethereum", "ETH");
-                            wait(SLEEP_MINISECONDS);
-
-                            System.out.println(Utils.getTimeHHmm() + "init BNB");
-                            binance_service.init_DXY_Crypto("binancecoin", "BNB");
-                            wait(SLEEP_MINISECONDS);
-
-                            System.out.println(Utils.getTimeHHmm() + "init " + coin.getSymbol());
-                            binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
-
-                            //----------------------------------------------
-                            boolean done = true;
-                            if (!done) {
-                                for (String EPIC : INDEXS) {
-                                    System.out.println(Utils.getTimeHHmm() + "init " + EPIC);
-                                    binance_service.init_DXY_index(EPIC);
-                                    wait(SLEEP_MINISECONDS);
-                                }
-                            }
-                            //----------------------------------------------
-
-                            try {
-                                gecko_service.loadData(coin.getGeckoid());
-                            } catch (Exception e) {
-                                System.out.println("gecko_service.LoadData:[" + coin.getGeckoid() + "]");
-                                e.printStackTrace();
-                            }
-                        }
-
                         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
                         if (pre_blog15minute != cur_blog15minute) {
                             pre_blog15minute = cur_blog15minute;
 
-                            System.out.println(Utils.getTimeHHmm() + "BTC bitcoin");
-
+                            System.out.println(Utils.getTimeHHmm() + "Check BTC(15m)");
                             binance_service.getChartWD("bitcoin", "BTC");
                             wait(SLEEP_MINISECONDS);
 
-                            System.out.println(Utils.getTimeHHmm() + "ETH ethereum");
+                            System.out.println(Utils.getTimeHHmm() + "Check ETH(15m)");
                             binance_service.getChartWD("ethereum", "ETH");
                             wait(SLEEP_MINISECONDS);
 
-                            System.out.println(Utils.getTimeHHmm() + "BNB binancecoin");
+                            System.out.println(Utils.getTimeHHmm() + "Check BNB(15m)");
                             binance_service.getChartWD("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
-
                         }
 
                         // ----------------------------------------------------------
@@ -156,8 +142,9 @@ public class BscScanBinanceApplication {
                             String EPIC = INDEXS.get(idx);
                             binance_service.checkCapital(EPIC);
                         }
+                        checkCoinChartWD(binance_service, coin, idx, size);
 
-                        load(binance_service, coin, idx, size);
+                        wait(SLEEP_MINISECONDS);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -175,7 +162,6 @@ public class BscScanBinanceApplication {
                         idx += 1;
                     }
 
-                    wait(SLEEP_MINISECONDS);
                 }
             }
         } catch (Exception e) {
@@ -183,7 +169,7 @@ public class BscScanBinanceApplication {
         }
     }
 
-    private static void load(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
+    private static void checkCoinChartWD(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
         key += Utils.getStringValue(coin.getSymbol()) + "_";
         key += Utils.getCurrentYyyyMmDd_HH();
