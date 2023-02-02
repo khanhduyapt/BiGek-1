@@ -2740,21 +2740,7 @@ public class BinanceServiceImpl implements BinanceService {
             Boolean ma20_up = ma20_1.compareTo(ma20_2) > 0;
 
             if ((ma3_up == ma10_up) && (ma10_up == ma20_up)) {
-                if (Objects.equals("DXY", KEY)) {
-                    chart_D = ma10_up ? Utils.CHAR_LONG : Utils.CHAR_SHORT;
-                } else if (KEY.indexOf("USD") > 2) {
-                    // USDCAD US Dollar / Canadian dollar
-                    // USDCHF US Dollar / Swiss Franc
-                    // USDCNH US Dollar / Chinese Yuan
-                    // USDJPY US Dollar / Japanese Yen
-                    chart_D = ma10_up ? Utils.CHAR_LONG : Utils.CHAR_SHORT;
-                } else {
-                    // EURUSD Euro / US Dollar
-                    // AUDUSD Australian Dollar / US Dollar
-                    // GBPUSD British Pound / US Dollar
-                    // NZDUSD New Zealand Dollar / US Dollar
-                    chart_D = ma10_up ? Utils.CHAR_SHORT : Utils.CHAR_LONG;
-                }
+                chart_D = ma10_up ? Utils.CHAR_LONG : Utils.CHAR_SHORT;
             }
         }
 
