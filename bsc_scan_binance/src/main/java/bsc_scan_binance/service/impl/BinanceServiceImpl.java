@@ -2814,9 +2814,9 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String start_strend = "";
-        BigDecimal ma_1 = Utils.calcMA(list, 10, 0);
-        BigDecimal ma_2 = Utils.calcMA(list, 10, 2);
-        BigDecimal ma_3 = Utils.calcMA(list, 10, 5);
+        BigDecimal ma_1 = Utils.calcMA(list, 10, 1);
+        BigDecimal ma_2 = Utils.calcMA(list, 10, 3);
+        BigDecimal ma_3 = Utils.calcMA(list, 10, 8);
         BigDecimal ma50_1 = Utils.calcMA(list, 50, 1);
 
         if ((ma_1.compareTo(ma_2) > 0) && (ma_3.compareTo(ma_2) > 0)) {
