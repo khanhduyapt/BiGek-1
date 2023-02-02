@@ -109,7 +109,7 @@ public class BscScanBinanceApplication {
 
                 int crypto_size = crypto_list.size();
                 for (index_crypto = 0; index_crypto < crypto_size; index_crypto++) {
-                    if (index_forex / 30 == 20) {
+                    if (index_crypto % 30 == 20) {
                         forex_list = binance_service.getForexSamePhaseList();
                         cry_list = binance_service.getCryptoSamePhaseList();
                     }
@@ -119,29 +119,33 @@ public class BscScanBinanceApplication {
                         check_Forex_15m(binance_service, forex_list);
 
                         // ----------------------------------------------
+                        if (index_crypto % 3 == 1) {
+                            if (index_forex < capital_list.size()) {
+                                String EPIC = capital_list.get(index_forex);
 
-                        if (index_forex < capital_list.size()) {
-                            String EPIC = capital_list.get(index_forex);
+                                if (!done_1_round) {
+                                    binance_service.init_DXY_index(EPIC);
+                                }
+                                binance_service.checkCapital(EPIC);
 
-                            if (!done_1_round) {
-                                binance_service.init_DXY_index(EPIC);
+                                String msg = Utils.getTimeHHmm() + EPIC;
+                                msg += "(" + (index_forex + 1) + "/" + capital_list.size() + ")";
+                                System.out.println(msg);
+
+                                index_forex += 1;
+                            } else {
+                                index_forex = 0;
+                                done_1_round = true;
                             }
-                            binance_service.checkCapital(EPIC);
-
-                            String msg = Utils.getTimeHHmm() + EPIC;
-                            msg += "(" + (index_forex + 1) + "/" + capital_list.size() + ")";
-                            System.out.println(msg);
-
-                            index_forex += 1;
-                        } else {
-                            index_forex = 0;
-                            done_1_round = true;
                         }
 
+                        // ----------------------------------------------
                         CandidateCoin coin = crypto_list.get(index_crypto);
                         gecko_service.loadData(coin.getGeckoid());
                         binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
                         check_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
+
+                        // ----------------------------------------------
 
                         wait(SLEEP_MINISECONDS_INIT);
                     } catch (Exception e) {
@@ -156,30 +160,31 @@ public class BscScanBinanceApplication {
                 index_forex = 0;
                 Date start_time = Calendar.getInstance().getTime();
                 while (index_crypto < crypto_size) {
-                    if (index_forex / 30 == 20) {
+                    if (index_crypto % 30 == 20) {
                         forex_list = binance_service.getForexSamePhaseList();
                         cry_list = binance_service.getCryptoSamePhaseList();
                     }
-
-                    CandidateCoin coin = crypto_list.get(index_crypto);
 
                     try {
                         check_Blog15(binance_service, cry_list);
                         check_Forex_15m(binance_service, forex_list);
 
-                        // ----------------------------------------------------------
+                        // ----------------------------------------------
+                        if (index_crypto % 3 == 1) {
+                            if (index_forex < capital_list.size()) {
+                                String EPIC = capital_list.get(index_forex);
+                                check_Forex_4h(binance_service, EPIC);
 
-                        if (index_forex < capital_list.size()) {
-                            String EPIC = capital_list.get(index_forex);
-                            check_Forex_4h(binance_service, EPIC);
-
-                            index_forex += 1;
-                        } else {
-                            index_forex = 0;
+                                index_forex += 1;
+                            } else {
+                                index_forex = 0;
+                            }
                         }
 
+                        CandidateCoin coin = crypto_list.get(index_crypto);
                         check_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
 
+                        // ----------------------------------------------
                         wait(SLEEP_MINISECONDS);
 
                     } catch (Exception e) {
