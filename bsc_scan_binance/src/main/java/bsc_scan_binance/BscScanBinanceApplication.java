@@ -184,7 +184,7 @@ public class BscScanBinanceApplication {
             reload = true;
         }
         if (reload) {
-            String msg = Utils.getTimeHHmm() + coin.getSymbol() + " " + coin.getGeckoid();
+            String msg = Utils.getTimeHHmm() + coin.getSymbol();
             msg += "(" + (idx + 1) + "/" + size + ")";
 
             System.out.println(msg);
