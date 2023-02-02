@@ -133,7 +133,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_DANGER_CZ_KILL_LONG = "CZ_KILL_LONG";
     private static final String EVENT_BTC_RANGE = "BTC_RANGE";
 
-    //********************************************************************************
+    // ********************************************************************************
     private static final String EVENT_TREND_1W1D_FX = "1W1D_FX";
     private static final String EVENT_TREND_1W1D_CRYPTO = "1W1D_CRYPTO";
     private static final String EVENT_DH_STR_D_FX = "DH4H1_STR_D_FX";
@@ -142,7 +142,7 @@ public class BinanceServiceImpl implements BinanceService {
     private static final String EVENT_DH_STR_H_CRYPTO = "DH4H1_STR_H_CRYPTO";
     private static final String EVENT_DH_TREND_FX = "DH4H1_D_TREND_FX";
     private static final String EVENT_DH_TREND_CRYPTO = "DH4H1_D_TREND_CRYPTO";
-    //********************************************************************************
+    // ********************************************************************************
 
     private static final String EVENT_PUMP = "Pump_";
     private static final String EVENT_MSG_PER_HOUR = "MSG_PER_HOUR";
@@ -1132,7 +1132,7 @@ public class BinanceServiceImpl implements BinanceService {
 
                 css.setName(name);
 
-                //css.setPumping_history(name);
+                // css.setPumping_history(name);
                 css.setRange_position(dto.getTrend_d() + ", " + dto.getTrend_h1());
 
                 boolean isSideway = false;
@@ -2961,9 +2961,8 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         if (Utils.isNotBlank(start_strend)) {
-            fundingHistoryRepository
-                    .save(createPumpDumpEntity(event_dh_str_h_or_d, epic_or_symbol, epic_or_symbol, start_strend,
-                            true));
+            fundingHistoryRepository.save(
+                    createPumpDumpEntity(event_dh_str_h_or_d, epic_or_symbol, epic_or_symbol, start_strend, true));
         }
 
         return start_strend;
@@ -3003,17 +3002,18 @@ public class BinanceServiceImpl implements BinanceService {
                 String supper_long = start_d1 + start_h1;
 
                 String append = Utils.getMmDD_TimeHHmm();
-                append += Utils.calc_BUF_LO_HI_BUF(list_1h, start_h1);
+                String trend = Objects.equals(Utils.CHAR_LONG, start_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+                append += Utils.calc_BUF_LO_HI_BUF(list_1h, trend);
                 if (Objects.equals(Utils.CHAR_LONG + Utils.CHAR_LONG, supper_long)) {
                     append += Utils.new_line_from_service + "_____D1H1M15_LONG_____";
                 }
                 append += Utils.new_line_from_service + "(Remark) D:" + trend_d1 + ",H1:" + start_h1;
 
-                //if (Objects.equals(trend_d1, start_h1)) {
-                //    String EVENT_ID_DH = Utils.getCurrentYyyyMmDdHHByChart(list_1h) + EPIC;
-                //    String msg = Utils.getTimeHHmm() + EPIC + "(d:" + trend_d1 + ",h1: " + start_h1 + ")";
-                //    sendMsgPerHour(EVENT_ID_DH, msg, true);
-                //}
+                if (Objects.equals(trend_d1, start_h1)) {
+                    String EVENT_ID_DH = Utils.getCurrentYyyyMmDdHHByChart(list_1h) + EPIC;
+                    String msg = Utils.getTimeHHmm() + EPIC + "(d:" + trend_d1 + ",h1: " + start_h1 + ")";
+                    sendMsgPerHour(EVENT_ID_DH, msg, true);
+                }
 
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, EPIC, EPIC, append, true));
             }

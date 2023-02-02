@@ -59,11 +59,12 @@ public class BscScanBinanceApplication {
             String hostname = InetAddress.getLocalHost().getHostName();
 
             // Debug
+            String cty = "PC";
+            String home = "DESKTOP-L4M1JU2";
             // app_flag = Utils.const_app_flag_msg_on;
-            if (Objects.equals("PC", hostname)) {
+            if (Objects.equals(home, hostname)) {
                 app_flag = Utils.const_app_flag_all_and_msg;
             } else {
-                // DESKTOP-L4M1JU2
                 app_flag = Utils.const_app_flag_all_coin;
             }
 
@@ -108,8 +109,7 @@ public class BscScanBinanceApplication {
 
                 int crypto_size = crypto_list.size();
                 for (index_crypto = 0; index_crypto < crypto_size; index_crypto++) {
-
-                    if (index_forex / 50 == 0) {
+                    if (index_forex / 30 == 20) {
                         forex_list = binance_service.getForexSamePhaseList();
                         cry_list = binance_service.getCryptoSamePhaseList();
                     }
@@ -156,8 +156,7 @@ public class BscScanBinanceApplication {
                 index_forex = 0;
                 Date start_time = Calendar.getInstance().getTime();
                 while (index_crypto < crypto_size) {
-
-                    if (index_forex / 50 == 0) {
+                    if (index_forex / 30 == 20) {
                         forex_list = binance_service.getForexSamePhaseList();
                         cry_list = binance_service.getCryptoSamePhaseList();
                     }
@@ -249,7 +248,7 @@ public class BscScanBinanceApplication {
     private static void check_Forex_4h(BinanceService binance_service, String EPIC) {
         String key = Utils.getStringValue(EPIC) + "_";
         key += Utils.getStringValue(EPIC) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH_Blog4h();
+        key += Utils.getCurrentYyyyMmDd_HH_Blog2h();
 
         boolean reload = false;
         if (keys_dict.containsKey(key)) {
@@ -270,7 +269,7 @@ public class BscScanBinanceApplication {
     private static void check_Crypto_4h(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
         key += Utils.getStringValue(coin.getSymbol()) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH_Blog4h();
+        key += Utils.getCurrentYyyyMmDd_HH_Blog2h();
 
         boolean reload = false;
         if (keys_dict.containsKey(key)) {

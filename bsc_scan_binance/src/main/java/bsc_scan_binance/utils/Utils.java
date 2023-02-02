@@ -101,130 +101,24 @@ public class Utils {
     public static final String CAPITAL_TIME_DAY = "DAY";
     public static final String CAPITAL_TIME_WEEK = "WEEK";
 
-    // US30 US Wall Street 30 (USA 30, Dow Jones)
-    // US500 US 500 (S&P)
-    // HK50 Hong Kong 50
-    // UK100 UK 100
-    // FR40 France 40 (France)
-    // DXY US Dollar Index
     public static final List<String> EPICS_INDEXS = Arrays.asList("DXY", "GOLD", "OIL_CRUDE", "US30", "US500", "UK100",
             "HK50", "FR40");
 
-    // EURAUD Euro / Australian Dollar
-    // EURCAD Euro / Canadian dollar
-    // EURCHF Euro / Swiss Franc
-    // EURGBP Euro / British Pound
-    // EURJPY Euro / Japanese Yen
-    // EURMXN Euro / Mexican Peso
-    // EURNZD Euro / New Zealand Dollar
-    // EURUSD Euro / US Dollar
     public static final List<String> EPICS_FOREX_EUR = Arrays.asList("EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY",
             "EURMXN", "EURNZD", "EURUSD");
 
-    // AUDCAD Australian Dollar / Canadian Dollar
-    // AUDCHF Australian Dollar / Swiss Franc
-    // AUDCNH Australian Dollar / Chinese Yuan
-    // AUDJPY Australian Dollar / Japanese Yen
-    // AUDMXN Australian Dollar / Mexican Peso
-    // AUDNZD Australian Dollar / New Zealand Dollar
-    // AUDSGD Australian Dollar / Singapore Dollar
-    // AUDUSD Australian Dollar / US Dollar
     public static final List<String> EPICS_FOREX_AUD = Arrays.asList("AUDCAD", "AUDCHF", "AUDCNH", "AUDJPY", "AUDMXN",
             "AUDNZD", "AUDSGD", "AUDUSD");
 
-    // GBPAUD British Pound / Australian Dollar
-    // GBPCAD British Pound / Canadian dollar
-    // GBPCHF British Pound / Swiss Franc
-    // GBPJPY British Pound / Japanese Yen
-    // GBPMXN British Pound / Mexican Peso
-    // GBPNZD British Pound / New Zealand Dollar
-    // GBPUSD British Pound / US Dollar
     public static final List<String> EPICS_FOREX_GBP = Arrays.asList("GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPMXN",
             "GBPNZD", "GBPUSD");
 
-    // CADCHF Canadian dollar / Swiss Franc
-    // CADJPY Canadian dollar / Japanese Yen
-    // CADSGD Canadian Dollar / Singapore Dollar
-    // CHFHKD Swiss Franc / Hong Kong Dollar
-    // CHFJPY Swiss Franc / Japanese Yen
-    // CHFSGD Swiss Franc / Singapore Dollar
-    // CNHHKD Chinese yuan / Hong Kong Dollar
-    // CNHJPY Chinese Yuan / Japanese Yen
     public static final List<String> EPICS_FOREX_CAD = Arrays.asList("CADCHF", "CADJPY", "CADSGD", "CHFHKD", "CHFJPY",
             "CHFSGD", "CNHHKD", "CNHJPY");
 
-    // NZDCAD New Zealand Dollar / Canadian dollar
-    // NZDCHF New Zealand Dollar / Swiss Franc
-    // NZDJPY New Zealand Dollar / Japanese Yen
-    // NZDSGD New Zealand Dollar / Singapore Dollar
-    // NZDUSD New Zealand Dollar / US Dollar
-    // USDCAD US Dollar / Canadian dollar
-    // USDCHF US Dollar / Swiss Franc
-    // USDCNH US Dollar / Chinese Yuan
-    // USDJPY US Dollar / Japanese Yen
     public static final List<String> EPICS_FOREX_DOLLAR = Arrays.asList("NZDCAD", "NZDCHF", "NZDJPY", "NZDSGD",
             "NZDUSD", "USDCAD", "USDCHF", "USDCNH", "USDJPY");
 
-    //AUDHKD  Australian Dollar / Hong Kong Dollar
-    //AUDPLN  Australian Dollar / Polish Zloty
-    //AUDZAR  Australian Dollar / Rand
-    //CADCNH  Canadian Dollar / Chinese yuan
-    //CADHKD  Canadian Dollar / Hong Kong Dollar
-    //CADMXN  Canadian Dollar / Mexican Peso
-    //CADNOK  Canadian dollar / Norwegian Krone
-    //CADPLN  Canadian dollar / Polish Zloty
-    //CADTRY  Canadian Dollar / Turkish Lira
-    //CADZAR  Canadian Dollar / Rand
-    //CHFCNH  Swiss Franc / Chinese yuan
-    //CHFCZK  Swiss Franc / Czech Koruna
-    //CHFDKK  Swiss Franc / Danish Krone
-    //CHFMXN  Swiss Franc / Mexican Peso
-    //CHFNOK  Swiss Franc / Norwegian Krone
-    //CHFPLN  Swiss Franc / Polish Zloty
-    //CHFSEK  Swiss Franc / Swedish Krona
-    //CHFTRY  Swiss Franc / Turkish Lira
-    //CHFZAR  Swiss Franc / Rand
-    //DKKJPY  Danish Krone / Yen
-    //EURCZK  Euro / Czech Koruna
-    //EURDKK  Euro / Danish Krone
-    //EURILS  Euro / New Israeli Sheqel
-    //EURPLN  Euro / Polish Zloty
-    //EURRON  Euro / Romanian Leu
-    //EURSGD  Euro / Singapore Dollar
-    //GBPCNH  Pound Sterling / Chinese yuan
-    //GBPCZK  British Pound / Czech Koruna
-    //GBPDKK  British Pound / Danish Krone
-    //GBPHKD  British Pound / Hong Kong Dollar
-    //GBPHUF  British Pound / Hungarian Forint
-    //GBPNOK  British Pound / Norwegian Krone
-    //GBPPLN  British Pound / Polish Zloty
-    //GBPSEK  British Pound / Swedish Krona
-    //GBPSGD  British Pound / Singapore Dollar
-    //GBPTRY  British Pound / Turkish lira
-    //GBPZAR  British Pound / South African Rand
-    //HKDMXN  Hong Kong Dollar / Mexican Peso
-    //HKDTRY  Hong Kong Dollar / Turkish Lira
-    //NOKSEK  Norwegian Krone / Swedish Krona
-    //NOKTRY  Norwegian Krone / Turkish Lira
-    //NZDCNH  New Zealand Dollar / Chinese yuan
-    //NZDHKD  New Zealand Dollar / Hong Kong Dollar
-    //NZDMXN  New Zealand Dollar / Mexican Peso
-    //NZDPLN  New Zealand Dollar / Zloty
-    //NZDSEK  New Zealand Dollar / Swedish Krona
-    //NZDTRY  New Zealand Dollar / Turkish Lira
-    //PLNSEK  Zloty / Swedish Krona
-    //PLNTRY  Zloty / Turkish Lira
-    //SEKMXN  Swedish Krona / Mexican Peso
-    //SEKTRY  Swedish Krona / Turkish Lira
-    //SGDHKD  Singapore Dollar / Hong Kong Dollar
-    //SGDMXN  Singapore Dollar / Mexican Peso
-    //TRYJPY  Turkish Lira / Japanese Yen
-    //USDCZK  US Dollar / Czech Koruna
-    //USDDKK  US Dollar / Danish Krone
-    //USDHKD  US Dollar / Hong Kong Dollar
-    //USDILS  US Dollar / Israeli New Shekel
-    //USDRON  US Dollar / Romanian Leu
-    //USDTRY  US Dollar / Turkish Lira
     public static final List<String> EPICS_FOREX_OTHERS = Arrays.asList("AUDHKD", "AUDPLN", "AUDZAR", "CADCNH",
             "CADHKD", "CADMXN", "CADNOK", "CADPLN", "CADTRY", "CADZAR", "CHFCNH", "CHFCZK", "CHFDKK", "CHFMXN",
             "CHFNOK", "CHFPLN", "CHFSEK", "CHFTRY", "CHFZAR", "DKKJPY", "EURCZK", "EURDKK", "EURILS", "EURPLN",
@@ -233,7 +127,6 @@ public class Utils {
             "NZDPLN", "NZDSEK", "NZDTRY", "PLNSEK", "PLNTRY", "SEKMXN", "SEKTRY", "SGDHKD", "SGDMXN", "TRYJPY",
             "USDCZK", "USDDKK", "USDHKD", "USDILS", "USDRON", "USDTRY");
 
-
     public static String sql_ForexHistoryResponse = " "
             + "SELECT DISTINCT ON (epic)                                                                \n"
             + "    tmp.epic,                                                                            \n"
@@ -241,7 +134,7 @@ public class Utils {
             + "    tmp.trend_h1 as h,                                                                   \n"
             + "    (case when tmp.trend_d  = 'L' then '(D)Long'  when tmp.trend_d = 'S' then '(D)Short' when tmp.trend_d = 'o' then '(D)Sideway' else '' end)    as trend_d,  \n"
             + "    (case when tmp.trend_h1 = 'L' then '(H1)Long' when tmp.trend_h1 = 'S' then '(H1)Short' else '' end)                                           as trend_h1, \n"
-            + "    (select append.note from funding_history append where append.event_time = concat('1W1D_FX_', append.gecko_id) and append.gecko_id = tmp.epic) as note      \n "
+            + "    (select append.note from funding_history append where append.event_time = concat('1W1D_FX_', append.gecko_id) and append.gecko_id = tmp.epic) as note      \n"
             + "FROM                                                                                     \n"
             + "(                                                                                        \n"
             + "    SELECT                                                                               \n"
@@ -253,7 +146,6 @@ public class Utils {
             + ") tmp                                                                                    \n"
             + "WHERE (tmp.trend_h1 is not null) and (tmp.trend_d = tmp.trend_h1)                        \n"
             + "ORDER BY tmp.epic                                                                        \n";
-
 
     public static String sql_OrdersProfitResponse = ""
             + " SELECT * from (                                                                             \n"
@@ -2494,7 +2386,7 @@ public class Utils {
         BigDecimal HI = low_heigh.get(1);
 
         String result = "";
-        if (trend.contains(TREND_LONG)) {
+        if (trend.contains(TREND_LONG) || Objects.equals(Utils.CHAR_LONG, trend)) {
             buf = roundDefault(low_heigh_SL.get(0).subtract(range));
             result += "Buf:" + getPercentToEntry(LO, buf, true);
             result += ",Lo:" + getPercentToEntry(entry, LO, true);
