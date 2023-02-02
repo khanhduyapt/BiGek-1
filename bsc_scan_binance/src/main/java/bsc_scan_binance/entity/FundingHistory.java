@@ -3,10 +3,14 @@ package bsc_scan_binance.entity;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 
+import bsc_scan_binance.response.ForexHistoryResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +20,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "funding_history")
+
+@SqlResultSetMapping(name = "ForexHistoryResponse", classes = {
+        @ConstructorResult(targetClass = ForexHistoryResponse.class, columns = {
+                @ColumnResult(name = "epic", type = String.class),
+                @ColumnResult(name = "trend_d", type = String.class),
+                @ColumnResult(name = "trend_h1", type = String.class),
+        })
+})
 
 public class FundingHistory {
 

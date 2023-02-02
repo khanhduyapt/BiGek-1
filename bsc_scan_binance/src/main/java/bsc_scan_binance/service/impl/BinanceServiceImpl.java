@@ -65,6 +65,7 @@ import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.CandidateTokenResponse;
 import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.EntryCssResponse;
+import bsc_scan_binance.response.ForexHistoryResponse;
 import bsc_scan_binance.response.FundingResponse;
 import bsc_scan_binance.response.GeckoVolumeUpPre4hResponse;
 import bsc_scan_binance.response.OrdersProfitResponse;
@@ -1114,38 +1115,22 @@ public class BinanceServiceImpl implements BinanceService {
                 index += 1;
             }
 
-            List<FundingHistory> list_fx = fundingHistoryRepository.findAllStartFX();
-            for (FundingHistory dto : list_fx) {
+            List<ForexHistoryResponse> list_fx = getForexList();
+            for (ForexHistoryResponse dto : list_fx) {
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
 
-                String EVENT_ID = EVENT_TREND_1W1D_FX + "_" + dto.getSymbol();
-                FundingHistory append = fundingHistoryRepository
-                        .findById(new FundingHistoryKey(EVENT_ID, dto.getSymbol())).orElse(null);
-                if (!Objects.equals(null, append)) {
+                String trading_view = "https://vn.tradingview.com/chart/?symbol=CAPITALCOM%3A" + dto.getEpic();
 
-                    css.setTrend(dto.getNote());
-                }
+                css.setSymbol(dto.getEpic());
+                css.setBinance_trade(trading_view);
+                css.setName(dto.getTrend_d() + dto.getTrend_h1());
 
-                css.setSymbol(dto.getSymbol());
-                css.setBinance_trade("https://vn.tradingview.com/chart/?symbol=CAPITALCOM%3A" + dto.getSymbol());
+                css.setTrading_view(trading_view);
+                css.setToken_btc_link(trading_view);
 
                 list.add(css);
                 index += 1;
             }
-
-            // if ((count_stop_long > 0) || Utils.isNotBlank(msg_position)) {
-            // String EVENT_ID = EVENT_COMPRESSED_CHART + "_POSITION_" +
-            // Utils.getCurrentYyyyMmDd_Blog4h();
-            // msg_position = msg_position.replace(" ", "");
-            // if (msg_position.length() > 100) {
-            // msg_position = msg_position.substring(0, 100) + "...";
-            // }
-            //
-            // sendMsgPerHour(EVENT_ID, Utils.new_line_from_service + Utils.TREND_STOP_LONG
-            // + "(" + count_stop_long
-            // + "):Total(" + list.size() + ")" + Utils.new_line_from_service + "Position:"
-            // + msg_position);
-            // }
 
             return list;
 
@@ -1155,6 +1140,48 @@ public class BinanceServiceImpl implements BinanceService {
             e.printStackTrace();
             return new ArrayList<CandidateTokenCssResponse>();
         }
+    }
+
+    public List<ForexHistoryResponse> getForexList() {
+        try {
+            String sql = " "
+                    + "SELECT DISTINCT ON (epic)                                                                \n"
+                    + "    tmp.epic,                                                                            \n"
+                    + "    (case when tmp.trend_d  = 'L' then '(D)Long'  when tmp.trend_d = 'S' then '(D)Short' else '' end) trend_d,       \n"
+                    + "    (case when tmp.trend_h1 = 'L' then '(H1)Long' when tmp.trend_h1 = 'S' then '(H1)Short' else '' end) trend_h1     \n"
+                    + "FROM                                                                                     \n"
+                    + "(                                                                                        \n"
+                    + "    SELECT                                                                               \n"
+                    + "        str_d.symbol as epic,                                                            \n"
+                    + "        str_d.note   as trend_d,                                                         \n"
+                    + "        (select str_h.note from funding_history str_h where event_time = '" + EVENT_DH_STR_H_FX
+                    + "' and str_h.gecko_id = str_d.gecko_id) as trend_h1  \n"
+                    + "    FROM funding_history str_d                                                           \n"
+                    + "    WHERE str_d.event_time = '" + EVENT_DH_STR_D_FX + "'                               \n"
+                    + "    UNION                                                                                \n"
+                    + "    SELECT                                                                               \n"
+                    + "        str_h.symbol as epic,                                                            \n"
+                    + "        (select str_d.note from funding_history str_d where event_time = '" + EVENT_DH_STR_D_FX
+                    + "' and str_d.gecko_id = str_h.gecko_id) as trend_d,  \n"
+                    + "        str_h.note   as trend_h1                                                         \n"
+                    + "    FROM funding_history str_h                                                           \n"
+                    + "    WHERE str_h.event_time = '" + EVENT_DH_STR_H_FX
+                    + "'                                            \n"
+                    + ") tmp                                                                                    \n"
+                    + "ORDER BY tmp.epic                                                                        \n";
+
+            Query query = entityManager.createNativeQuery(sql, "ForexHistoryResponse");
+            @SuppressWarnings("unchecked")
+            List<ForexHistoryResponse> results = query.getResultList();
+
+            return results;
+        } catch (
+
+        Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<ForexHistoryResponse>();
     }
 
     private Long getValue(String value) {
