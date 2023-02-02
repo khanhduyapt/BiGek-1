@@ -253,7 +253,7 @@ public class BscScanBinanceApplication {
     private static void check_Forex_4h(BinanceService binance_service, String EPIC) {
         String key = Utils.getStringValue(EPIC) + "_";
         key += Utils.getStringValue(EPIC) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH_Blog2h();
+        key += Utils.getCurrentYyyyMmDd_HH();
 
         boolean reload = false;
         if (keys_dict.containsKey(key)) {
@@ -274,7 +274,7 @@ public class BscScanBinanceApplication {
     private static void check_Crypto_4h(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
         key += Utils.getStringValue(coin.getSymbol()) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH_Blog2h();
+        key += Utils.getCurrentYyyyMmDd_HH();
 
         boolean reload = false;
         if (keys_dict.containsKey(key)) {
