@@ -137,7 +137,8 @@ public class BinanceServiceImpl implements BinanceService {
     // DH4H1 BTC SS -> Search short m15.
     private static final String EVENT_DH_STR_D = "DH4H1_STR_D";
     private static final String EVENT_DH_STR_H = "DH4H1_STR_H";
-    private static final String EVENT_DH_TREND = "DH4H1_D_TREND";
+    private static final String EVENT_DH_TREND_FOREX = "DH4H1_D_TREND_FOREX";
+    private static final String EVENT_DH_TREND_CRYPTO = "DH4H1_D_TREND_CRYPTO";
     private static final String EVENT_PUMP = "Pump_";
     private static final String EVENT_MSG_PER_HOUR = "MSG_PER_HOUR";
     private static final String SEPARATE_D1_AND_H1 = "1DH1";
@@ -2689,7 +2690,7 @@ public class BinanceServiceImpl implements BinanceService {
             return;
         }
 
-        createTrend_D1(list_days, symbol);
+        createTrend_D1(EVENT_DH_TREND_CRYPTO, list_days, symbol);
         createNewTrendCycle(EVENT_DH_STR_D, list_days, symbol);
 
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
@@ -2819,10 +2820,11 @@ public class BinanceServiceImpl implements BinanceService {
     @Transactional
     public void init_DXY_index(String EPIC) {
         List<BtcFutures> list_days = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_DAY, 30);
-        createTrend_D1(list_days, EPIC);
+        createTrend_D1(EVENT_DH_TREND_FOREX, list_days, EPIC);
     }
 
-    public String createTrend_D1(List<BtcFutures> list_days, String KEY_or_SYMBOL) {
+    public String createTrend_D1(String event_dh_trend_crypto_or_forex, List<BtcFutures> list_days,
+            String key_or_symbol) {
         String chart_D = Utils.CHAR_OPPOSITE;
 
         if (!CollectionUtils.isEmpty(list_days) && list_days.size() >= 20) {
@@ -2844,15 +2846,15 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         fundingHistoryRepository.save(
-                createPumpDumpEntity(EVENT_DH_TREND, KEY_or_SYMBOL, KEY_or_SYMBOL, chart_D, true));
+                createPumpDumpEntity(event_dh_trend_crypto_or_forex, key_or_symbol, key_or_symbol, chart_D, true));
 
         return chart_D;
     }
 
-    public String getTrend_D1(String KEY) {
+    public String getTrend_D1(String event_dh_trend_crypto_or_forex, String key_or_symbol) {
         String chart_D = "";
 
-        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH_TREND, KEY);
+        FundingHistoryKey id = new FundingHistoryKey(event_dh_trend_crypto_or_forex, key_or_symbol);
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
         if (!Objects.equals(null, entity)) {
             chart_D = entity.getNote();
@@ -2904,7 +2906,7 @@ public class BinanceServiceImpl implements BinanceService {
     // The maximum request rate is 10 per second -> 1 minute = 60 requests.
     @Override
     public void checkCapital(String EPIC) {
-        String trend_d1 = getTrend_D1(EPIC);
+        String trend_d1 = getTrend_D1(EVENT_DH_TREND_FOREX, EPIC);
         if (Utils.isBlank(trend_d1) || Objects.equals(Utils.CHAR_OPPOSITE, trend_d1)) {
             return;
         }
@@ -2935,7 +2937,7 @@ public class BinanceServiceImpl implements BinanceService {
             sendMsgKillLongShort(gecko_id, symbol, "");
         }
 
-        String trend_d1 = getTrend_D1(symbol);
+        String trend_d1 = getTrend_D1(EVENT_DH_TREND_CRYPTO, symbol);
         if (Utils.isBlank(trend_d1) || Objects.equals(Utils.CHAR_OPPOSITE, trend_d1)) {
             return "";
         }
