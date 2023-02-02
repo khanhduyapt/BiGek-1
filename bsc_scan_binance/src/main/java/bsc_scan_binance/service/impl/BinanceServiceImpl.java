@@ -1119,18 +1119,41 @@ public class BinanceServiceImpl implements BinanceService {
             for (ForexHistoryResponse dto : list_fx) {
                 CandidateTokenCssResponse css = new CandidateTokenCssResponse();
 
-                String trading_view = "https://vn.tradingview.com/chart/?symbol=CAPITALCOM%3A" + dto.getEpic();
-
-                css.setSymbol(dto.getEpic());
-                css.setBinance_trade(trading_view);
-                css.setName(dto.getTrend_d() + dto.getTrend_h1());
-
+                String name = dto.getEpic();
                 if (BscScanBinanceApplication.forex_naming_dict.containsKey(dto.getEpic())) {
-                    css.setPumping_history(BscScanBinanceApplication.forex_naming_dict.get(dto.getEpic()));
+                    name = BscScanBinanceApplication.forex_naming_dict.get(dto.getEpic());
                 }
 
+                String trading_view = "https://vn.tradingview.com/chart/?symbol=CAPITALCOM%3A" + dto.getEpic();
+                css.setSymbol(dto.getEpic());
+                css.setBinance_trade(trading_view);
                 css.setTrading_view(trading_view);
                 css.setToken_btc_link(trading_view);
+
+                css.setName(name);
+
+                //css.setPumping_history(name);
+                css.setRange_position(dto.getTrend_d() + ", " + dto.getTrend_h1());
+
+                boolean isSideway = false;
+                if (!Objects.equals(dto.getD(), dto.getH())) {
+                    isSideway = true;
+                }
+                css.setOco_opportunity(dto.getEpic() + " : " + name);
+
+                String note = Utils.getStringValue(dto.getNote());
+                if (note.contains(Utils.new_line_from_service)) {
+                    css.setRange_backer(note.substring(0, note.indexOf(Utils.new_line_from_service)));
+                } else {
+                    css.setRange_backer(note);
+                }
+
+                if (isSideway) {
+                    css.setRange_position_css("text-danger");
+                    css.setPumping_history_css("text-danger");
+                } else {
+                    css.setRange_position_css(CSS_PRICE_WHITE);
+                }
 
                 list.add(css);
                 index += 1;
@@ -1151,29 +1174,13 @@ public class BinanceServiceImpl implements BinanceService {
             String sql = " "
                     + "SELECT DISTINCT ON (epic)                                                                \n"
                     + "    tmp.epic,                                                                            \n"
-                    + "    (case when tmp.trend_d  = 'L' then '(D)Long'  when tmp.trend_d = 'S' then '(D)Short' when tmp.trend_d = 'o' then '(D)Sideway' else '' end) trend_d,       \n"
-                    + "    (case when tmp.trend_h1 = 'L' then '(H1)Long' when tmp.trend_h1 = 'S' then '(H1)Short' else '' end) trend_h1     \n"
+                    + "    tmp.trend_d  as d,                                                                   \n"
+                    + "    tmp.trend_h1 as h,                                                                   \n"
+                    + "    (case when tmp.trend_d  = 'L' then '(D)Long'  when tmp.trend_d = 'S' then '(D)Short' when tmp.trend_d = 'o' then '(D)Sideway' else '' end)    as trend_d,  \n"
+                    + "    (case when tmp.trend_h1 = 'L' then '(H1)Long' when tmp.trend_h1 = 'S' then '(H1)Short' else '' end)                                           as trend_h1, \n"
+                    + "    (select append.note from funding_history append where append.event_time = concat('1W1D_FX_', append.gecko_id) and append.gecko_id = tmp.epic) as note      \n "
                     + "FROM                                                                                     \n"
                     + "(                                                                                        \n"
-                    + "    SELECT                                                                               \n"
-                    + "        str_d.symbol as epic,                                                            \n"
-                    + "        str_d.note   as trend_d,                                                         \n"
-                    + "        (select str_h.note from funding_history str_h where event_time = '" + EVENT_DH_STR_H_FX
-                    + "' and str_h.gecko_id = str_d.gecko_id) as trend_h1  \n"
-                    + "    FROM funding_history str_d                                                           \n"
-                    + "    WHERE str_d.event_time = '" + EVENT_DH_STR_D_FX + "'                               \n"
-
-                    + "    UNION                                                                                \n"
-
-                    + "    SELECT                                                                               \n"
-                    + "        str_h.symbol as epic,                                                            \n"
-                    + "        (select str_d.note from funding_history str_d where event_time = '" + EVENT_DH_STR_D_FX
-                    + "' and str_d.gecko_id = str_h.gecko_id) as trend_d,  \n"
-                    + "        str_h.note   as trend_h1                                                         \n"
-                    + "    FROM funding_history str_h                                                           \n"
-                    + "    WHERE str_h.event_time = '" + EVENT_DH_STR_H_FX + "'                               \n"
-
-                    + "    UNION                                                                                \n"
                     + "    SELECT                                                                               \n"
                     + "        str_h.symbol as epic,                                                            \n"
                     + "        (select str_d.note from funding_history str_d where event_time = 'DH4H1_D_TREND_FX' and str_d.gecko_id = str_h.gecko_id) as trend_d,   \n"

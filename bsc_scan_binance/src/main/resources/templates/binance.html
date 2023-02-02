@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8" http-equiv="refresh" content="1800">
+<meta charset="UTF-8">
 <title>Wanda</title>
 <link rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
@@ -216,7 +216,6 @@ p {
             <div style="font-size: 0.7rem !important;">
               <span th:text="${token.range_backer}"   th:classappend="${token.range_backer_css}"></span>
             </div>
-
             <div style="font-size: 0.75rem !important;">
               <span th:text="${token.range_total_w}"   th:classappend="${token.range_total_w_css}"></span>
             </div>
@@ -225,7 +224,7 @@ p {
           <td style="text-align: right; min-width: 190px !important; max-width: 190px !important;" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}">
             <div th:classappend="${token.btc_warning_css}">
               <span th:text="${token.current_price} + '$'"></span>
-              <a th:target="_blank" th:href="${token.token_btc_link}">BTC</a>
+              <a th:target="_blank" th:href="${token.token_btc_link}" th:classappend="${#strings.isEmpty(token.gecko_id) ? 'hide': ''}">BTC</a>
             </div>
             <div style="font-size: 0.8rem !important;">
               Avg14d: <span th:text="${token.avg_price + '$'}"></span>

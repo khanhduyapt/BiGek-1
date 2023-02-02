@@ -24,8 +24,11 @@ import lombok.NoArgsConstructor;
 @SqlResultSetMapping(name = "ForexHistoryResponse", classes = {
         @ConstructorResult(targetClass = ForexHistoryResponse.class, columns = {
                 @ColumnResult(name = "epic", type = String.class),
+                @ColumnResult(name = "d", type = String.class),
+                @ColumnResult(name = "h", type = String.class),
                 @ColumnResult(name = "trend_d", type = String.class),
                 @ColumnResult(name = "trend_h1", type = String.class),
+                @ColumnResult(name = "note", type = String.class),
         })
 })
 

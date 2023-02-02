@@ -1,5 +1,6 @@
 package bsc_scan_binance;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -51,10 +52,15 @@ public class BscScanBinanceApplication {
                 app_flag = Utils.const_app_flag_all_coin;
             }
 
+            String hostname = InetAddress.getLocalHost().getHostName();
+
             // Debug
             // app_flag = Utils.const_app_flag_msg_on;
-            app_flag = Utils.const_app_flag_all_and_msg;
-            // app_flag = Utils.const_app_flag_all_coin;
+            if (Objects.equals("PC", hostname)) {
+                app_flag = Utils.const_app_flag_all_and_msg;
+            } else {
+                app_flag = Utils.const_app_flag_all_coin;
+            }
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
@@ -222,6 +228,24 @@ public class BscScanBinanceApplication {
     }
 
     private static void initForex_naming_dict() {
+        forex_naming_dict.put("DXY", "US Dollar Index");
+        forex_naming_dict.put("OIL_CRUDE", "US Crude Oil");
+        forex_naming_dict.put("US100", "US Tech 100 (Nasdaq)");
+        forex_naming_dict.put("US30", "US Wall Street 30 (USA 30, Dow Jones)");
+        forex_naming_dict.put("US500", "US 500 (S&P)");
+        forex_naming_dict.put("DE40", "Germany 40 (Europe, Dax)");
+        forex_naming_dict.put("NIFTY50", "India 50");
+        forex_naming_dict.put("HK50", "Hong Kong 50");
+        forex_naming_dict.put("UK100", "UK 100");
+        forex_naming_dict.put("VIX", "VIX Volatility Index");
+        forex_naming_dict.put("FR40", "France 40 (France)");
+        forex_naming_dict.put("RTY", "US Russell 2000");
+        forex_naming_dict.put("J225", "Japan 225");
+        forex_naming_dict.put("DXY", "US Dollar Index");
+        forex_naming_dict.put("AU200", "Australia 200");
+        forex_naming_dict.put("IT40", "Italy 40");
+        forex_naming_dict.put("SG25", "Singapore 25");
+
         forex_naming_dict.put("AUDCAD", "Australian Dollar / Canadian Dollar");
         forex_naming_dict.put("AUDCHF", "Australian Dollar / Swiss Franc");
         forex_naming_dict.put("AUDCNH", "Australian Dollar / Chinese Yuan");
