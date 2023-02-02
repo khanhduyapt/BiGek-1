@@ -3104,9 +3104,14 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String trend_d1 = getPrifixOfTrend(EVENT_DH_TREND_CRYPTO, symbol);
+        if (Utils.isBlank(trend_d1)) {
+            return "";
+        }
+
+        List<BtcFutures> list_h1 = Utils.loadData(symbol, TIME_1h, 60);
+        String char_h1 = createNewTrendCycleByVector(EVENT_DH_STR_H_CRYPTO, list_h1, symbol);
         String char_d1 = getNewCycleTrend(EVENT_DH_STR_D_CRYPTO, symbol);
-        String char_h1 = getNewCycleTrend(EVENT_DH_STR_H_CRYPTO, symbol);
-        if (Utils.isBlank(trend_d1 + char_d1 + char_h1)) {
+        if (Utils.isBlank(char_d1 + char_h1)) {
             return "";
         }
 
