@@ -2637,7 +2637,8 @@ public class Utils {
     }
 
     public static String getTrendPrifix(String trend, int maFast, int maSlow) {
-        String check = Objects.equals(trend, Utils.TREND_LONG) ? maFast + TREND_LONG_UP + maSlow + " 💹"
+        String check = Objects.equals(trend, Utils.TREND_LONG) || Objects.equals(trend, Utils.CHAR_LONG)
+                ? maFast + TREND_LONG_UP + maSlow + " 💹"
                 : maFast + TREND_SHORT_DN + maSlow + " 📉";
 
         return "(" + check + " )";
