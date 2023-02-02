@@ -3104,19 +3104,19 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String trend_d1 = getPrifixOfTrend(EVENT_DH_TREND_CRYPTO, symbol);
-        String start_h1 = getPrifixOfTrend(EVENT_DH_STR_H_CRYPTO, symbol);
-        if (Utils.isBlank(trend_d1) || Utils.isBlank(start_h1)) {
+        String char_d1 = getNewCycleTrend(EVENT_DH_STR_D_CRYPTO, symbol);
+        String char_h1 = getNewCycleTrend(EVENT_DH_STR_H_CRYPTO, symbol);
+        if (Utils.isBlank(trend_d1 + char_d1 + char_h1)) {
             return "";
         }
 
-        String start_d1 = getNewCycleTrend(EVENT_DH_STR_D_CRYPTO, symbol);
-        String supper_long = start_d1 + start_h1;
+        String supper_long = char_d1 + char_h1;
         if (Objects.equals(Utils.CHAR_LONG + Utils.CHAR_LONG, supper_long)) {
 
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             sendScapMsg(list_15m, symbol, Utils.TREND_LONG, "_____D1H1M15_LONG_____");
 
-        } else if (Objects.equals(Utils.CHAR_LONG, start_h1)) {
+        } else if (Objects.equals(Utils.CHAR_LONG, char_h1)) {
 
             if (binanceFuturesRepository.existsById(gecko_id)) {
 
@@ -3125,10 +3125,10 @@ public class BinanceServiceImpl implements BinanceService {
 
             }
 
-        } else if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+        } else if ("_BTC_ETH_BNB_".contains("_" + symbol + "_") && Utils.isNotBlank(char_h1)) {
 
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
-            String trend = Objects.equals(Utils.CHAR_LONG, start_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+            String trend = Objects.equals(Utils.CHAR_LONG, char_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
             sendScapMsg(list_15m, symbol, trend, Utils.calc_BUF_LO_HI_BUF(list_15m, Utils.TREND_LONG));
 
         }
