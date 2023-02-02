@@ -2420,16 +2420,12 @@ public class Utils {
         return result;
     }
 
-    public static String analysisTakerVolume(List<BtcFutures> list_days, List<BtcFutures> list_h4,
-            List<BtcFutures> list_h1) {
-
+    public static String analysisTakerVolume(List<BtcFutures> list_days, List<BtcFutures> list_h4) {
         String taker = "";
-        String vol_h1 = Utils.analysisTakerVolume_sub(list_h1, 50);
         String vol_h4 = Utils.analysisTakerVolume_sub(list_h4, 50);
         String vol_d1 = Utils.analysisTakerVolume_sub(list_days, 30);
-        if (Utils.isNotBlank(vol_h1 + vol_h4 + vol_d1)) {
+        if (Utils.isNotBlank(vol_h4 + vol_d1)) {
             taker += "Taker:";
-            taker += Utils.isNotBlank(vol_h1) ? " (H1)" + vol_h1 : "";
             taker += Utils.isNotBlank(vol_h4) ? " (H4)" + vol_h4 : "";
             taker += Utils.isNotBlank(vol_d1) ? " (D)" + vol_d1 : "";
         }

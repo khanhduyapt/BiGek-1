@@ -43,5 +43,5 @@ public interface BinanceService {
 
     void init_DXY_index(String EPIC);
 
-    void init_DXY_Crypto(String symbol);
+    void init_DXY_Crypto(String gecko_id, String symbol);
 }

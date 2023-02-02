@@ -98,28 +98,29 @@ public class BscScanBinanceApplication {
                             preChangeDailyChart = curChangeDailyChart;
 
                             System.out.println(Utils.getTimeHHmm() + "init BTC");
-                            binance_service.init_DXY_Crypto("BTC");
+                            binance_service.init_DXY_Crypto("bitcoin", "BTC");
                             wait(SLEEP_MINISECONDS);
 
                             System.out.println(Utils.getTimeHHmm() + "init ETH");
-                            binance_service.init_DXY_Crypto("ETH");
+                            binance_service.init_DXY_Crypto("ethereum", "ETH");
                             wait(SLEEP_MINISECONDS);
 
                             System.out.println(Utils.getTimeHHmm() + "init BNB");
-                            binance_service.init_DXY_Crypto("BNB");
+                            binance_service.init_DXY_Crypto("binancecoin", "BNB");
                             wait(SLEEP_MINISECONDS);
 
                             System.out.println(Utils.getTimeHHmm() + "init " + coin.getSymbol());
-                            binance_service.init_DXY_Crypto(coin.getSymbol());
+                            binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
 
                             //----------------------------------------------
-
-                            for (String EPIC : INDEXS) {
-                                System.out.println(Utils.getTimeHHmm() + "init " + EPIC);
-                                binance_service.init_DXY_index(EPIC);
-                                wait(SLEEP_MINISECONDS);
+                            boolean done = true;
+                            if (!done) {
+                                for (String EPIC : INDEXS) {
+                                    System.out.println(Utils.getTimeHHmm() + "init " + EPIC);
+                                    binance_service.init_DXY_index(EPIC);
+                                    wait(SLEEP_MINISECONDS);
+                                }
                             }
-
                             //----------------------------------------------
 
                             try {
