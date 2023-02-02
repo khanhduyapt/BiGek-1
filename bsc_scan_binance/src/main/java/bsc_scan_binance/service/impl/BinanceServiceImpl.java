@@ -2886,19 +2886,20 @@ public class BinanceServiceImpl implements BinanceService {
         return "";
     }
 
-    public String createTrend_H1(List<BtcFutures> list_1h, String KEY) {
+    public String createNewCycleTrend_H1(List<BtcFutures> list_1h, String epic_or_symbol) {
         String start_H = startNewCycleLongOrShort(list_1h);
         if (Utils.isNotBlank(start_H)) {
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH_STR_H, KEY, KEY, start_H, true));
+            fundingHistoryRepository
+                    .save(createPumpDumpEntity(EVENT_DH_STR_H, epic_or_symbol, epic_or_symbol, start_H, true));
         }
 
         return start_H;
     }
 
-    public String getTrend_H1(String KEY) {
+    public String getNewCycleTrend(String EVENT_DH_STR_H0rD, String KEY) {
         String chart_H = "";
 
-        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH_STR_H, KEY);
+        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH_STR_H0rD, KEY);
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
         if (!Objects.equals(null, entity)) {
             chart_H = entity.getNote();
@@ -2920,13 +2921,17 @@ public class BinanceServiceImpl implements BinanceService {
             return;
         }
 
-        String trend_h1 = createTrend_H1(list_1h, EPIC);
-        if (Utils.isBlank(trend_h1) || Objects.equals(Utils.CHAR_OPPOSITE, trend_h1)) {
+        String start_h1 = createNewCycleTrend_H1(list_1h, EPIC);
+        if (Utils.isBlank(start_h1) || Objects.equals(Utils.CHAR_OPPOSITE, start_h1)) {
+            return;
+        }
+
+        if (Objects.equals(trend_d1, start_h1)) {
             return;
         }
 
         List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
-        String trend = Objects.equals(Utils.CHAR_LONG, trend_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
+        String trend = Objects.equals(Utils.CHAR_LONG, start_h1) ? Utils.TREND_LONG : Utils.TREND_SHORT;
 
         sendScapMsg(list_15m, EPIC, trend, Utils.calc_BUF_LO_HI_BUF(list_1h, trend));
     }
@@ -2947,18 +2952,23 @@ public class BinanceServiceImpl implements BinanceService {
             return "";
         }
 
-        String trend_h1 = createTrend_H1(list_h1, symbol);
-        if (Utils.isBlank(trend_h1) || Objects.equals(Utils.CHAR_OPPOSITE, trend_h1)) {
+        String start_h1 = createNewCycleTrend_H1(list_h1, symbol);
+        if (Utils.isBlank(start_h1) || Objects.equals(Utils.CHAR_OPPOSITE, start_h1)) {
             return "";
         }
 
-        String supper_long = trend_d1 + trend_h1;
+        if (Objects.equals(trend_d1, start_h1)) {
+            return "";
+        }
+
+        String start_d1 = getNewCycleTrend(EVENT_DH_STR_D, symbol);
+        String supper_long = start_d1 + start_h1;
         if (Objects.equals(Utils.CHAR_LONG + Utils.CHAR_LONG, supper_long)) {
 
             List<BtcFutures> list_15m = Utils.loadData(symbol, TIME_15m, 50);
             sendScapMsg(list_15m, symbol, Utils.TREND_LONG, "_____D1H1M15_LONG_____");
 
-        } else if (Objects.equals(Utils.CHAR_LONG, trend_h1)) {
+        } else if (Objects.equals(Utils.CHAR_LONG, start_h1)) {
 
             if (binanceFuturesRepository.existsById(gecko_id)) {
 
