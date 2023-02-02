@@ -2903,7 +2903,7 @@ public class BinanceServiceImpl implements BinanceService {
 
     public String createTrend_D1_byMa3_10_20(String event_dh_trend_crypto_or_forex, List<BtcFutures> list_days,
             String key_or_symbol) {
-        String char_D1 = Utils.CHAR_OPPOSITE;
+        String char_D1 = "";
 
         if (!CollectionUtils.isEmpty(list_days) && list_days.size() >= 20) {
             BigDecimal ma3_1 = Utils.calcMA(list_days, 3, 1);
@@ -2944,9 +2944,9 @@ public class BinanceServiceImpl implements BinanceService {
     public String createNewTrendCycleByVector(String event_dh_str_h_or_d, List<BtcFutures> list,
             String epic_or_symbol) {
         String start_strend = "";
-        BigDecimal ma_1 = Utils.calcMA(list, 10, 1);
-        BigDecimal ma_2 = Utils.calcMA(list, 10, 3);
-        BigDecimal ma_3 = Utils.calcMA(list, 10, 6);
+        BigDecimal ma_1 = Utils.calcMA(list, 10, 0);
+        BigDecimal ma_2 = Utils.calcMA(list, 10, 2);
+        BigDecimal ma_3 = Utils.calcMA(list, 10, 5);
         BigDecimal ma50_1 = Utils.calcMA(list, 50, 1);
 
         if ((ma_1.compareTo(ma_2) > 0) && (ma_3.compareTo(ma_2) > 0)) {
@@ -3012,13 +3012,6 @@ public class BinanceServiceImpl implements BinanceService {
                     append += Utils.new_line_from_service + "_____D1H1M15_LONG_____";
                 }
                 append += Utils.new_line_from_service + "(Remark) D:" + char_d1 + ",H1:" + char_h1;
-
-                if (Objects.equals(char_d1, char_h1)) {
-                    // String EVENT_ID_DH = Utils.getCurrentYyyyMmDdHHByChart(list_1h) + EPIC;
-                    // String msg = "(" + trend + ")" + EPIC + "(d:" + trend_d1 + ",h1: " + start_h1
-                    // + ")";
-                    // sendMsgPerHour(EVENT_ID_DH, msg, true);
-                }
 
                 fundingHistoryRepository.save(createPumpDumpEntity(EVENT_ID, EPIC, EPIC, append, true));
             }
@@ -3091,7 +3084,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String trend_d1 = getPrifixOfTrend(EVENT_DH_TREND_CRYPTO, symbol);
-        if (Utils.isBlank(trend_d1) || Objects.equals(Utils.CHAR_OPPOSITE, trend_d1)) {
+        if (Utils.isBlank(trend_d1)) {
             return "";
         }
 
@@ -3101,7 +3094,7 @@ public class BinanceServiceImpl implements BinanceService {
         }
 
         String start_h1 = createNewTrendCycleByVector(EVENT_DH_STR_H_CRYPTO, list_h1, symbol);
-        if (Utils.isBlank(start_h1) || Objects.equals(Utils.CHAR_OPPOSITE, start_h1)) {
+        if (Utils.isBlank(start_h1)) {
             return "";
         }
 

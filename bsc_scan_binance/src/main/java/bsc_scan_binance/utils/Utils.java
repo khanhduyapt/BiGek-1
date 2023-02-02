@@ -79,8 +79,6 @@ public class Utils {
     public static final String CHAR_MONEY = "💰";
     public static final String CHAR_LONG = "L";
     public static final String CHAR_SHORT = "S";
-    public static final String CHAR_NORMAL = "n";
-    public static final String CHAR_OPPOSITE = "o";
 
     public static final int MA_FAST = 6;
     public static final int MA_INDEX_H1_START_LONG = 50;
@@ -171,7 +169,6 @@ public class Utils {
             + "        str_h.note   as trend_h1                                                         \n"
             + "    FROM funding_history str_h                                                           \n"
             + "    WHERE str_h.event_time = 'DH4H1_STR_M15_FX'                                          \n"
-
 
             + ") tmp                                                                                    \n"
             + "WHERE (tmp.trend_h1 is not null) and (tmp.trend_d = tmp.trend_h1)                        \n"
