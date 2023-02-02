@@ -2681,7 +2681,7 @@ public class BinanceServiceImpl implements BinanceService {
     }
 
     // "l:Long, s:Short, n:normal"
-    private String initLongOrShort(List<BtcFutures> list) {
+    private String initLongOrShort_H1(List<BtcFutures> list) {
         BigDecimal ma_1 = Utils.calcMA(list, 10, 1);
         BigDecimal ma_2 = Utils.calcMA(list, 10, 2);
         BigDecimal ma_3 = Utils.calcMA(list, 10, 3);
@@ -2699,28 +2699,18 @@ public class BinanceServiceImpl implements BinanceService {
             }
         }
 
-        return Utils.CHAR_NORMAL;
+        return "";
     }
 
     @Override
     @Transactional
     public void init_DXY_Crypto(String gecko_id, String symbol) {
+
         List<BtcFutures> list_days = Utils.loadData(symbol, TIME_1d, 30);
-        createHistoryReverseOf_D1(list_days, symbol);
-
-        String chart_d = initLongOrShort(list_days);
-        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH_STR_D, symbol);
-
-        if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_d)) {
-            fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH_STR_D, symbol, symbol, chart_d, true));
-        }
-
-        // -------------------------- INIT WEBSITE --------------------------
-        String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
-
         if (CollectionUtils.isEmpty(list_days)) {
             return;
         }
+        createHistoryReverseOf_D1(list_days, symbol);
 
         List<BtcFutures> list_weeks = Utils.loadData(symbol, TIME_1w, 10);
         if (CollectionUtils.isEmpty(list_weeks)) {
@@ -2737,6 +2727,9 @@ public class BinanceServiceImpl implements BinanceService {
             return;
         }
 
+        // -------------------------- INIT WEBSITE --------------------------
+
+        String EVENT_ID = EVENT_TREND_1W1D + "_" + symbol;
         BigDecimal current_price = list_days.get(0).getCurrPrice();
 
         String type = "";
@@ -2849,7 +2842,7 @@ public class BinanceServiceImpl implements BinanceService {
         createHistoryReverseOf_D1(list_days, EPIC);
     }
 
-    public void createHistoryReverseOf_D1(List<BtcFutures> list_days, String KEY_or_SYMBOL) {
+    public String createHistoryReverseOf_D1(List<BtcFutures> list_days, String KEY_or_SYMBOL) {
         String chart_D = Utils.CHAR_OPPOSITE;
 
         if (!CollectionUtils.isEmpty(list_days) && list_days.size() >= 20) {
@@ -2872,30 +2865,33 @@ public class BinanceServiceImpl implements BinanceService {
 
         fundingHistoryRepository.save(
                 createPumpDumpEntity(EVENT_DH_INDEX, KEY_or_SYMBOL, KEY_or_SYMBOL, chart_D, true));
+
+        return chart_D;
     }
 
     public String getHistoryReverseOf_D1(String KEY) {
-        String chart_D = Utils.CHAR_OPPOSITE;
+        String chart_D = "";
 
         FundingHistoryKey id = new FundingHistoryKey(EVENT_DH_INDEX, KEY);
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
         if (!Objects.equals(null, entity)) {
             chart_D = entity.getNote();
         }
+
         return chart_D;
     }
 
-    public void createHistoryReverseOf_H1(List<BtcFutures> list_1h, String KEY) {
-        String chart_H = initLongOrShort(list_1h);
-        FundingHistoryKey id = new FundingHistoryKey(EVENT_DH_STR_H, KEY);
-
-        if (!fundingHistoryRepository.existsById(id) || !Objects.equals(Utils.CHAR_NORMAL, chart_H)) {
+    public String createHistoryReverseOf_H1(List<BtcFutures> list_1h, String KEY) {
+        String chart_H = initLongOrShort_H1(list_1h);
+        if (Utils.isNotBlank(chart_H)) {
             fundingHistoryRepository.save(createPumpDumpEntity(EVENT_DH_STR_H, KEY, KEY, chart_H, true));
         }
+
+        return chart_H;
     }
 
     public String getHistoryReverseOf_H1(String KEY) {
-        String chart_H = Utils.CHAR_OPPOSITE;
+        String chart_H = "";
 
         FundingHistoryKey id = new FundingHistoryKey(EVENT_DH_STR_H, KEY);
         FundingHistory entity = fundingHistoryRepository.findById(id).orElse(null);
@@ -2948,8 +2944,7 @@ public class BinanceServiceImpl implements BinanceService {
             return "";
         }
 
-        createHistoryReverseOf_H1(list_h1, symbol);
-        String char_H = getHistoryReverseOf_H1(symbol);
+        String char_H = createHistoryReverseOf_H1(list_h1, symbol);
         if (Utils.isBlank(char_H) || Objects.equals(Utils.CHAR_OPPOSITE, char_H)) {
             return "";
         }
