@@ -26,4 +26,8 @@ public interface FundingHistoryRepository extends JpaRepository<FundingHistory, 
 
     @Query(value = "SELECT m.* FROM funding_history m WHERE event_time not like '%1W1D%' and event_time not like '%DH4H1%' ", nativeQuery = true)
     public List<FundingHistory> clearTrash();
+
+    @Query(value = "SELECT m.* FROM funding_history m WHERE event_time like '%DH4H1%STR%FX'", nativeQuery = true)
+    public List<FundingHistory> findAllStartFX();
+
 }

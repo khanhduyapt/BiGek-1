@@ -27,6 +27,7 @@ public class BscScanBinanceApplication {
                                                                 // all_and_msg
     public static String callFormBinance = "";
     public static String TAKER_TOKENS = "_";
+    public static int SLEEP_MINISECONDS_INIT = 3000;
     public static int SLEEP_MINISECONDS = 6000;
     private static Hashtable<String, String> keys_dict = new Hashtable<String, String>();
 
@@ -72,6 +73,7 @@ public class BscScanBinanceApplication {
             }
 
             // --------------------Debug--------------------
+            boolean done_1_round = false;
             int index_forex = 0;
             int index_crypto = 0;
 
@@ -96,7 +98,9 @@ public class BscScanBinanceApplication {
                         if (index_forex < capital_list.size()) {
                             String EPIC = capital_list.get(index_forex);
 
-                            binance_service.init_DXY_index(EPIC);
+                            if (!done_1_round) {
+                                binance_service.init_DXY_index(EPIC);
+                            }
                             binance_service.checkCapital(EPIC);
 
                             String msg = Utils.getTimeHHmm() + EPIC;
@@ -106,6 +110,7 @@ public class BscScanBinanceApplication {
                             index_forex += 1;
                         } else {
                             index_forex = 0;
+                            done_1_round = true;
                         }
 
                         CandidateCoin coin = crypto_list.get(index_crypto);
@@ -113,7 +118,7 @@ public class BscScanBinanceApplication {
                         binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
                         check_Crypto_WD(binance_service, coin, index_crypto, crypto_size);
 
-                        wait(SLEEP_MINISECONDS);
+                        wait(SLEEP_MINISECONDS_INIT);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -124,7 +129,6 @@ public class BscScanBinanceApplication {
                 //----------------------------------------------
 
                 index_forex = 0;
-
                 Date start_time = Calendar.getInstance().getTime();
                 while (index_crypto < crypto_size) {
                     CandidateCoin coin = crypto_list.get(index_crypto);
