@@ -2591,14 +2591,16 @@ public class Utils {
         String l_m3x50 = Utils.checkMaXCuttingUpY(list, 3, 50);
         String l_m10x20 = Utils.checkMaXCuttingUpY(list, 10, 20);
         String l_m10x50 = Utils.checkMaXCuttingUpY(list, 10, 50);
-        String trend_L = l_m3x10 + "_" + l_m3x20 + "_" + l_m3x50 + "_" + l_m10x20 + l_m10x50;
+        String l_m20x50 = Utils.checkMaXCuttingUpY(list, 20, 50);
+        String trend_L = l_m3x10 + "_" + l_m3x20 + "_" + l_m3x50 + "_" + l_m10x20 + "_" + l_m10x50 + "_" + l_m20x50;
 
         String s_m3x10 = Utils.checkMaXCuttingDownY(list, 3, 10);
         String s_m3x20 = Utils.checkMaXCuttingDownY(list, 3, 20);
         String s_m3x50 = Utils.checkMaXCuttingDownY(list, 3, 50);
         String s_m10x20 = Utils.checkMaXCuttingDownY(list, 10, 20);
         String s_m10x50 = Utils.checkMaXCuttingDownY(list, 10, 50);
-        String trend_S = s_m3x10 + "_" + s_m3x20 + "_" + s_m3x50 + "_" + s_m10x20 + s_m10x50;
+        String s_m20x50 = Utils.checkMaXCuttingDownY(list, 20, 50);
+        String trend_S = s_m3x10 + "_" + s_m3x20 + "_" + s_m3x50 + "_" + s_m10x20 + "_" + s_m10x50 + "_" + s_m20x50;
 
         String trend = trend_L + "_" + trend_S;
 
