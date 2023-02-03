@@ -2541,6 +2541,14 @@ public class Utils {
         return false;
     }
 
+    private static String checkXCutUpY(BigDecimal maX_1, BigDecimal maX_2, BigDecimal maY_1, BigDecimal maY_2) {
+        if ((maX_1.compareTo(maX_2) > 0) && (maX_1.compareTo(maY_1) > 0) && (maY_2.compareTo(maX_2) > 0)) {
+            return TREND_LONG;
+        }
+
+        return "";
+    }
+
     public static String checkMaXCuttingUpY(List<BtcFutures> list, int maFast, int maSlow) {
         if (list.size() < maSlow) {
             return "";
@@ -2558,6 +2566,13 @@ public class Utils {
             return TREND_LONG;
         }
 
+        return "";
+    }
+
+    private static String checkXCutDownY(BigDecimal maX_1, BigDecimal maX_2, BigDecimal maY_1, BigDecimal maY_2) {
+        if ((maX_1.compareTo(maX_2) < 0) && (maX_1.compareTo(maY_1) < 0) && (maY_2.compareTo(maX_2) < 0)) {
+            return TREND_SHORT;
+        }
         return "";
     }
 
@@ -2586,20 +2601,34 @@ public class Utils {
             return "";
         }
 
-        String l_m3x10 = Utils.checkMaXCuttingUpY(list, 3, 10);
-        String l_m3x20 = Utils.checkMaXCuttingUpY(list, 3, 20);
-        String l_m3x50 = Utils.checkMaXCuttingUpY(list, 3, 50);
-        String l_m10x20 = Utils.checkMaXCuttingUpY(list, 10, 20);
-        String l_m10x50 = Utils.checkMaXCuttingUpY(list, 10, 50);
-        String l_m20x50 = Utils.checkMaXCuttingUpY(list, 20, 50);
+        int str = 1;
+        int end = 5;
+        BigDecimal ma3_1 = calcMA(list, 3, str);
+        BigDecimal ma3_2 = calcMA(list, 3, end);
+
+        BigDecimal ma10_1 = calcMA(list, 10, str);
+        BigDecimal ma10_2 = calcMA(list, 10, end);
+
+        BigDecimal ma20_1 = calcMA(list, 20, str);
+        BigDecimal ma20_2 = calcMA(list, 20, end);
+
+        BigDecimal ma50_1 = calcMA(list, 50, str);
+        BigDecimal ma50_2 = calcMA(list, 50, end);
+
+        String l_m3x10 = Utils.checkXCutUpY(ma3_1, ma3_2, ma10_1, ma10_2);
+        String l_m3x20 = Utils.checkXCutUpY(ma3_1, ma3_2, ma20_1, ma20_2);
+        String l_m3x50 = Utils.checkXCutUpY(ma3_1, ma3_2, ma50_1, ma50_2);
+        String l_m10x20 = Utils.checkXCutUpY(ma10_1, ma10_2, ma20_1, ma20_2);
+        String l_m10x50 = Utils.checkXCutUpY(ma10_1, ma10_2, ma50_1, ma50_2);
+        String l_m20x50 = Utils.checkXCutUpY(ma20_1, ma20_2, ma50_1, ma50_2);
         String trend_L = l_m3x10 + "_" + l_m3x20 + "_" + l_m3x50 + "_" + l_m10x20 + "_" + l_m10x50 + "_" + l_m20x50;
 
-        String s_m3x10 = Utils.checkMaXCuttingDownY(list, 3, 10);
-        String s_m3x20 = Utils.checkMaXCuttingDownY(list, 3, 20);
-        String s_m3x50 = Utils.checkMaXCuttingDownY(list, 3, 50);
-        String s_m10x20 = Utils.checkMaXCuttingDownY(list, 10, 20);
-        String s_m10x50 = Utils.checkMaXCuttingDownY(list, 10, 50);
-        String s_m20x50 = Utils.checkMaXCuttingDownY(list, 20, 50);
+        String s_m3x10 = Utils.checkXCutDownY(ma3_1, ma3_2, ma10_1, ma10_2);
+        String s_m3x20 = Utils.checkXCutDownY(ma3_1, ma3_2, ma20_1, ma20_2);
+        String s_m3x50 = Utils.checkXCutDownY(ma3_1, ma3_2, ma50_1, ma50_2);
+        String s_m10x20 = Utils.checkXCutDownY(ma10_1, ma10_2, ma20_1, ma20_2);
+        String s_m10x50 = Utils.checkXCutDownY(ma10_1, ma10_2, ma50_1, ma50_2);
+        String s_m20x50 = Utils.checkXCutDownY(ma20_1, ma20_2, ma50_1, ma50_2);
         String trend_S = s_m3x10 + "_" + s_m3x20 + "_" + s_m3x50 + "_" + s_m10x20 + "_" + s_m10x50 + "_" + s_m20x50;
 
         String trend = trend_L + "_" + trend_S;
