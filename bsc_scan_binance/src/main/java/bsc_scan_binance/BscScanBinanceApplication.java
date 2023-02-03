@@ -70,7 +70,6 @@ public class BscScanBinanceApplication {
             } else {
                 app_flag = Utils.const_app_flag_all_coin;
             }
-
             // Debug:
             //app_flag = Utils.const_app_flag_all_and_msg;
 
