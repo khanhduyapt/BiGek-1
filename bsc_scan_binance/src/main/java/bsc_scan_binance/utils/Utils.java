@@ -77,8 +77,6 @@ public class Utils {
     public static final String TREND_STOP_LONG = "Stop:Long";
 
     public static final String CHAR_MONEY = "💰";
-    public static final String CHAR_LONG = "L";
-    public static final String CHAR_SHORT = "S";
 
     public static final int MA_FAST = 6;
     public static final int MA_INDEX_H1_START_LONG = 50;
@@ -2465,7 +2463,7 @@ public class Utils {
         BigDecimal HI = low_heigh.get(1);
 
         String result = "";
-        if (trend.contains(TREND_LONG) || Objects.equals(Utils.CHAR_LONG, trend)) {
+        if (trend.contains(TREND_LONG)) {
             buf = roundDefault(low_heigh_SL.get(0).subtract(range));
             result += "Buf:" + getPercentToEntry(LO, buf, true);
             result += ",Lo:" + getPercentToEntry(entry, LO, true);
@@ -2543,60 +2541,80 @@ public class Utils {
         return false;
     }
 
-    public static String check3CuttingXforH1(List<BtcFutures> list, int maSlowIndex) {
-        if (list.size() < maSlowIndex) {
+    public static String checkMaXCuttingUpY(List<BtcFutures> list, int maFast, int maSlow) {
+        if (list.size() < maSlow) {
             return "";
         }
 
-        BigDecimal ma_X_c = calcMA(list, maSlowIndex, 1);
-        BigDecimal ma3_1 = calcMA(list, MA_FAST, 1); // list.get(1).getPrice_open_candle();
-        BigDecimal ma3_2 = calcMA(list, MA_FAST, 2); // list.get(2).getPrice_open_candle();
+        int str = 1;
+        int end = 2;
+        BigDecimal ma3_1 = calcMA(list, maFast, str);
+        BigDecimal ma3_2 = calcMA(list, maFast, end);
 
-        if (maSlowIndex < 20) {
-            boolean isAboveMa50 = Utils.isAboveMALine(list, 50, 1);
-            boolean isAboveMa10 = Utils.isAboveMALine(list, 10, 1);
+        BigDecimal ma50_1 = calcMA(list, maSlow, str);
+        BigDecimal ma50_2 = calcMA(list, maSlow, end);
 
-            if (!isAboveMa50 && !isAboveMa10 && (ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma_X_c) > 0)
-                    && (ma_X_c.compareTo(ma3_2) > 0)) {
-                return TREND_LONG;
-            }
-
-            if (isAboveMa50 && isAboveMa10 && (ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma_X_c) < 0)
-                    && (ma_X_c.compareTo(ma3_2) < 0)) {
-                return TREND_SHORT;
-            }
-
-        } else if (maSlowIndex < 50) {
-            boolean m15IsAboveMa50 = Utils.isAboveMALine(list, 50, 1);
-
-            if (!m15IsAboveMa50 && (ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma_X_c) > 0)
-                    && (ma_X_c.compareTo(ma3_2) > 0)) {
-                return TREND_LONG;
-            }
-
-            if (m15IsAboveMa50 && (ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma_X_c) < 0)
-                    && (ma_X_c.compareTo(ma3_2) < 0)) {
-                return TREND_SHORT;
-            }
-        } else {
-            if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(ma3_2) > 0)) {
-                return TREND_LONG;
-            }
-
-            if (ma3_1.compareTo(ma_X_c) < 0) {
-                BigDecimal close1 = list.get(1).getPrice_close_candle();
-                BigDecimal close2 = list.get(2).getPrice_close_candle();
-                if ((close1.compareTo(ma_X_c) > 0) && (ma_X_c.compareTo(close2) > 0)) {
-                    return TREND_LONG;
-                }
-            }
-
-            if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma_X_c) < 0) && (ma_X_c.compareTo(ma3_2) < 0)) {
-                return TREND_SHORT;
-            }
+        if ((ma3_1.compareTo(ma3_2) > 0) && (ma3_1.compareTo(ma50_1) > 0) && (ma50_2.compareTo(ma3_2) > 0)) {
+            return TREND_LONG;
         }
 
         return "";
+    }
+
+    public static String checkMaXCuttingDownY(List<BtcFutures> list, int maFast, int maSlow) {
+        if (list.size() < maSlow) {
+            return "";
+        }
+
+        int str = 1;
+        int end = 2;
+        BigDecimal ma3_1 = calcMA(list, maFast, str);
+        BigDecimal ma3_2 = calcMA(list, maFast, end);
+
+        BigDecimal ma50_1 = calcMA(list, maSlow, str);
+        BigDecimal ma50_2 = calcMA(list, maSlow, end);
+
+        if ((ma3_1.compareTo(ma3_2) < 0) && (ma3_1.compareTo(ma50_1) < 0) && (ma50_2.compareTo(ma3_2) < 0)) {
+            return TREND_SHORT;
+        }
+
+        return "";
+    }
+
+    public static String switchTrend(List<BtcFutures> list) {
+        String result = "";
+
+        if (CollectionUtils.isEmpty(list)) {
+            return "";
+        }
+
+        BigDecimal ma_3_1 = Utils.calcMA(list, 3, 1);
+        BigDecimal ma50_1 = Utils.calcMA(list, 50, 1);
+
+        //find SHORT
+        if (ma50_1.compareTo(ma_3_1) > 0) {
+            String m3x10 = Utils.checkMaXCuttingUpY(list, 3, 10);
+            String m3x20 = Utils.checkMaXCuttingUpY(list, 3, 20);
+            String m3x50 = Utils.checkMaXCuttingUpY(list, 3, 50);
+            String m10x20 = Utils.checkMaXCuttingUpY(list, 10, 20);
+
+            String trend = m3x10 + "_" + m3x20 + "_" + m3x50 + "_" + m10x20;
+            if (trend.contains(Utils.TREND_LONG)) {
+                result = Utils.TREND_LONG;
+            }
+        } else {
+            String m3x10 = Utils.checkMaXCuttingDownY(list, 3, 10);
+            String m3x20 = Utils.checkMaXCuttingDownY(list, 3, 20);
+            String m3x50 = Utils.checkMaXCuttingDownY(list, 3, 50);
+            String m10x20 = Utils.checkMaXCuttingDownY(list, 10, 20);
+
+            String trend = m3x10 + "_" + m3x20 + "_" + m3x50 + "_" + m10x20;
+            if (trend.contains(Utils.TREND_SHORT)) {
+                result = Utils.TREND_SHORT;
+            }
+        }
+
+        return result;
     }
 
     public static boolean checkClosePriceAndMa_StartFindLong(List<BtcFutures> list) {
@@ -2689,7 +2707,7 @@ public class Utils {
     }
 
     public static String getTrendPrifix(String trend, int maFast, int maSlow) {
-        String check = Objects.equals(trend, Utils.TREND_LONG) || Objects.equals(trend, Utils.CHAR_LONG)
+        String check = Objects.equals(trend, Utils.TREND_LONG)
                 ? maFast + TREND_LONG_UP + maSlow + " 💹"
                 : maFast + TREND_SHORT_DN + maSlow + " 📉";
 

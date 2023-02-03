@@ -62,7 +62,7 @@ public class BscScanBinanceApplication {
             String cty = "PC";
             String home = "DESKTOP-L4M1JU2";
             // app_flag = Utils.const_app_flag_msg_on;
-            if (Objects.equals(cty, hostname)) {
+            if (Objects.equals(home, hostname)) {
                 app_flag = Utils.const_app_flag_all_and_msg;
             } else {
                 app_flag = Utils.const_app_flag_all_coin;
