@@ -105,59 +105,12 @@ public class BscScanBinanceApplication {
                 List<CandidateCoin> crypto_list = gecko_service.getList(callFormBinance);
                 List<ForexHistoryResponse> forex_list = binance_service.getForexSamePhaseList();
                 List<ForexHistoryResponse> cry_list = binance_service.getCryptoSamePhaseList();
+
                 int crypto_size = crypto_list.size();
-
-                /* for (index_crypto = 0; index_crypto < crypto_size; index_crypto++) {
-                    if (index_crypto % 30 == 20) {
-                        forex_list = binance_service.getForexSamePhaseList();
-                        cry_list = binance_service.getCryptoSamePhaseList();
-                    }
-
-                    try {
-                        cur_blog15m = Utils.getCurrentMinute_Blog15minutes();
-                        if (pre_blog15m != cur_blog15m) {
-                            pre_blog15m = cur_blog15m;
-                            //TODO: check_Blog15(binance_service, cry_list);
-                            //TODO: check_Forex_15m(binance_service, forex_list);
-                        }
-
-                        // ----------------------------------------------
-                        //if (index_crypto % 3 == 1) {
-                        if (index_forex < capital_list.size()) {
-                            String EPIC = capital_list.get(index_forex);
-
-                            String init = init_Forex_4h(binance_service, EPIC);
-                            check_Forex_15m(binance_service, EPIC);
-
-                            String msg = Utils.getTimeHHmm() + EPIC;
-                            msg += "(" + (index_forex + 1) + "/" + capital_list.size() + ")" + init;
-                            System.out.println(msg);
-
-                            index_forex += 1;
-                        } else {
-                            index_forex = 0;
-                        }
-                        //}
-
-                        // ----------------------------------------------
-                        //                        CandidateCoin coin = crypto_list.get(index_crypto);
-                        //                        gecko_service.loadData(coin.getGeckoid());
-                        //                        binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
-                        //                        check_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
-
-                        // ----------------------------------------------
-
-                        wait(SLEEP_MINISECONDS_INIT);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                 }
-                 */
-                // ----------------------------------------------
-                // ----------------------------------------------
-                // ----------------------------------------------
+                int forex_size = capital_list.size();
 
                 index_forex = 0;
+                int time = SLEEP_MINISECONDS_INIT;
                 Date start_time = Calendar.getInstance().getTime();
                 while (index_crypto < crypto_size) {
                     if (index_crypto % 30 == 20) {
@@ -170,14 +123,10 @@ public class BscScanBinanceApplication {
                         //TODO: check_Forex_15m(binance_service, forex_list);
 
                         // ----------------------------------------------
-                        if (index_forex < capital_list.size()) {
+                        if (index_forex < forex_size) {
                             String EPIC = capital_list.get(index_forex);
 
-                            String init = init_Forex_4h(binance_service, EPIC);
-                            String msg = Utils.getTimeHHmm() + EPIC;
-                            msg += "(" + (index_forex + 1) + "/" + capital_list.size() + ")" + init;
-                            System.out.println(msg);
-
+                            init_Forex_4h(binance_service, EPIC, index_forex, forex_size);
                             check_Forex_15m(binance_service, EPIC);
 
                             index_forex += 1;
@@ -185,10 +134,16 @@ public class BscScanBinanceApplication {
                             index_forex = 0;
                         }
 
-                        //CandidateCoin coin = crypto_list.get(index_crypto);
-                        //check_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
+                        // ----------------------------------------------
+
+                        {
+                            CandidateCoin coin = crypto_list.get(index_crypto);
+                            init_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
+                            check_Crypto_15m(binance_service, coin.getGeckoid(), coin.getSymbol());
+                        }
 
                         // ----------------------------------------------
+
                         wait(SLEEP_MINISECONDS);
 
                     } catch (Exception e) {
@@ -202,6 +157,9 @@ public class BscScanBinanceApplication {
 
                         System.out.println("reload: " + Utils.getMmDD_TimeHHmm() + ", spend:"
                                 + TimeUnit.MILLISECONDS.toMinutes(diff) + " Minutes.");
+
+                        time = SLEEP_MINISECONDS_INIT;
+
                         index_crypto = 0;
                     } else {
                         index_crypto += 1;
@@ -214,7 +172,7 @@ public class BscScanBinanceApplication {
         }
     }
 
-    private static void check_Blog15(BinanceService binance_service, List<ForexHistoryResponse> crypto_list) {
+    private static void check_CryptoList_15m(BinanceService binance_service, List<ForexHistoryResponse> crypto_list) {
         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
         if (pre_blog15minute != cur_blog15minute) {
             pre_blog15minute = cur_blog15minute;
@@ -247,15 +205,13 @@ public class BscScanBinanceApplication {
             pre_blog15_forex = cur_blog15_forex;
 
             for (ForexHistoryResponse dto : forex_list) {
-                System.out.println(Utils.getTimeHHmm() + "checkSamePhaseForex15m: " + dto.getEpic());
-                binance_service.checkSamePhaseForex15m(dto.getEpic());
+                check_Forex_15m(binance_service, dto.getEpic());
                 wait(SLEEP_MINISECONDS);
             }
         }
     }
 
-    private static String init_Forex_4h(BinanceService binance_service, String EPIC) {
-        String result = "";
+    private static void init_Forex_4h(BinanceService binance_service, String EPIC, int idx, int size) {
         String key = Utils.getStringValue(EPIC) + "_";
         key += Utils.getCurrentYyyyMmDd_HH_Blog4h();
 
@@ -271,10 +227,12 @@ public class BscScanBinanceApplication {
             reload = true;
         }
         if (reload) {
-            result = binance_service.initForex(EPIC);
-        }
+            String init = binance_service.initForex(EPIC);
 
-        return result;
+            String msg = Utils.getTimeHHmm() + EPIC;
+            msg += "(" + (idx + 1) + "/" + size + ")" + init;
+            System.out.println(msg);
+        }
     }
 
     private static void check_Forex_15m(BinanceService binance_service, String EPIC) {
@@ -297,7 +255,7 @@ public class BscScanBinanceApplication {
         }
     }
 
-    private static void check_Crypto_4h(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
+    private static void init_Crypto_4h(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
         key += Utils.getStringValue(coin.getSymbol()) + "_";
         key += Utils.getCurrentYyyyMmDd_HH_Blog4h();
@@ -313,13 +271,33 @@ public class BscScanBinanceApplication {
             keys_dict.put(key, key);
             reload = true;
         }
+
         if (reload) {
+            String init = binance_service.initCrypto(coin.getGeckoid(), coin.getSymbol());
+
             String msg = Utils.getTimeHHmm() + coin.getSymbol();
-            msg += "(" + (idx + 1) + "/" + size + ")";
-
+            msg += "(" + (idx + 1) + "/" + size + ")" + init;
             System.out.println(msg);
+        }
+    }
 
-            binance_service.getChartWD(coin.getGeckoid(), coin.getSymbol());
+    private static void check_Crypto_15m(BinanceService binance_service, String gecko_id, String symbol) {
+        String key = Utils.getStringValue(gecko_id) + "_";
+        key += Utils.getCurrentYyyyMmDd_HH() + Utils.getCurrentMinute_Blog15minutes();
+
+        boolean reload = false;
+        if (keys_dict.containsKey(key)) {
+            if (!Objects.equals(key, keys_dict.get(key))) {
+                keys_dict.put(key, key);
+
+                reload = true;
+            }
+        } else {
+            keys_dict.put(key, key);
+            reload = true;
+        }
+        if (reload) {
+            binance_service.checkSamePhaseCrypto15m(symbol);
         }
     }
 
