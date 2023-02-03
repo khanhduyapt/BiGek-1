@@ -115,26 +115,28 @@ public class BscScanBinanceApplication {
                     }
 
                     try {
-                        check_15m(binance_service, crypto_list_15m, forex_list_15m);
-
+                        if (Utils.isBusinessTime()) {
+                            check_15m(binance_service, crypto_list_15m, forex_list_15m);
+                        }
                         // ----------------------------------------------
                         if (index_forex < forex_size) {
                             String EPIC = capital_list.get(index_forex);
-
                             init_Forex_4h(binance_service, EPIC, index_forex, forex_size);
-                            check_Forex_15m(binance_service, EPIC);
+                            if (Utils.isBusinessTime()) {
+                                check_Forex_15m(binance_service, EPIC);
+                            }
 
                             index_forex += 1;
                         } else {
                             index_forex = 0;
                         }
-
                         // ----------------------------------------------
-
                         {
                             CandidateCoin coin = token_list.get(index_crypto);
                             init_Crypto_4h(binance_service, coin, index_crypto, total);
-                            check_Crypto_15m(binance_service, coin.getSymbol());
+                            if (Utils.isBusinessTime()) {
+                                check_Crypto_15m(binance_service, coin.getSymbol());
+                            }
                         }
 
                         // ----------------------------------------------
