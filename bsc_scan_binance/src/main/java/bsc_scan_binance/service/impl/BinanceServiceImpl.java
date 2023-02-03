@@ -2759,16 +2759,20 @@ public class BinanceServiceImpl implements BinanceService {
         String char_D1 = "";
 
         if (!CollectionUtils.isEmpty(list_days) && list_days.size() >= 20) {
-            BigDecimal ma3_1 = Utils.calcMA(list_days, 3, 1);
-            BigDecimal ma3_2 = Utils.calcMA(list_days, 3, 3);
+            int ma1 = 3;
+            int ma2 = 5;
+            int ma3 = 10;
+
+            BigDecimal ma3_1 = Utils.calcMA(list_days, ma1, 1);
+            BigDecimal ma3_2 = Utils.calcMA(list_days, ma1, 3);
             Boolean ma3_up = ma3_1.compareTo(ma3_2) > 0;
 
-            BigDecimal ma10_1 = Utils.calcMA(list_days, 10, 1);
-            BigDecimal ma10_2 = Utils.calcMA(list_days, 10, 3);
+            BigDecimal ma10_1 = Utils.calcMA(list_days, ma2, 1);
+            BigDecimal ma10_2 = Utils.calcMA(list_days, ma2, 3);
             Boolean ma10_up = ma10_1.compareTo(ma10_2) > 0;
 
-            BigDecimal ma20_1 = Utils.calcMA(list_days, 20, 1);
-            BigDecimal ma20_2 = Utils.calcMA(list_days, 20, 3);
+            BigDecimal ma20_1 = Utils.calcMA(list_days, ma3, 1);
+            BigDecimal ma20_2 = Utils.calcMA(list_days, ma3, 3);
             Boolean ma20_up = ma20_1.compareTo(ma20_2) > 0;
 
             if ((ma3_up == ma10_up) && (ma10_up == ma20_up)) {
