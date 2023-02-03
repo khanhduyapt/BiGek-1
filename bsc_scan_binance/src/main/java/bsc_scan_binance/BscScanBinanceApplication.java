@@ -59,11 +59,20 @@ public class BscScanBinanceApplication {
             String cty = "PC";
             String home = "DESKTOP-L4M1JU2";
             // app_flag = Utils.const_app_flag_msg_on;
-            if (Objects.equals(home, hostname)) {
-                app_flag = Utils.const_app_flag_all_and_msg;
+            if (Objects.equals(cty, hostname) || Objects.equals(home, hostname)) {
+                if (Utils.isWorkingTime() && Objects.equals(cty, hostname)) {
+                    app_flag = Utils.const_app_flag_all_and_msg;
+                }
+
+                if (!Utils.isWorkingTime() && Objects.equals(home, hostname)) {
+                    app_flag = Utils.const_app_flag_all_and_msg;
+                }
             } else {
                 app_flag = Utils.const_app_flag_all_coin;
             }
+
+            // Debug:
+            //app_flag = Utils.const_app_flag_all_and_msg;
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------

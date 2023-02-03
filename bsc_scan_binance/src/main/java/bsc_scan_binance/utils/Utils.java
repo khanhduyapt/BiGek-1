@@ -787,6 +787,15 @@ public class Utils {
         }
     }
 
+    public static boolean isWorkingTime() {
+        int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
+        if ((9 <= hh && hh <= 18)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public static boolean isBusinessTime() {
         int hh = Utils.getIntValue(Utils.convertDateToString("HH", Calendar.getInstance().getTime()));
         if ((23 <= hh || hh <= 7)) {
