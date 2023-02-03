@@ -40,13 +40,11 @@ public interface BinanceService {
 
     public void clearTrash();
 
-    public void checkCapital(String EPIC);
-
     public void checkSamePhaseForex15m(String EPIC);
 
     public void checkSamePhaseCrypto15m(String symbol);
 
-    public void init_DXY_index(String EPIC);
+    public String initForex(String EPIC);
 
     public void init_DXY_Crypto(String gecko_id, String symbol);
 

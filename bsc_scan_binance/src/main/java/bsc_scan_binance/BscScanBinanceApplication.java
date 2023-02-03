@@ -62,7 +62,7 @@ public class BscScanBinanceApplication {
             String cty = "PC";
             String home = "DESKTOP-L4M1JU2";
             // app_flag = Utils.const_app_flag_msg_on;
-            if (Objects.equals(home, hostname)) {
+            if (Objects.equals(cty, hostname)) {
                 app_flag = Utils.const_app_flag_all_and_msg;
             } else {
                 app_flag = Utils.const_app_flag_all_coin;
@@ -89,7 +89,6 @@ public class BscScanBinanceApplication {
             }
 
             // --------------------Debug--------------------
-            boolean done_1_round = false;
             int index_forex = 0;
             int index_crypto = 0;
 
@@ -106,44 +105,45 @@ public class BscScanBinanceApplication {
                 List<CandidateCoin> crypto_list = gecko_service.getList(callFormBinance);
                 List<ForexHistoryResponse> forex_list = binance_service.getForexSamePhaseList();
                 List<ForexHistoryResponse> cry_list = binance_service.getCryptoSamePhaseList();
-
                 int crypto_size = crypto_list.size();
-                for (index_crypto = 0; index_crypto < crypto_size; index_crypto++) {
+
+                /* for (index_crypto = 0; index_crypto < crypto_size; index_crypto++) {
                     if (index_crypto % 30 == 20) {
                         forex_list = binance_service.getForexSamePhaseList();
                         cry_list = binance_service.getCryptoSamePhaseList();
                     }
 
                     try {
-                        check_Blog15(binance_service, cry_list);
-                        check_Forex_15m(binance_service, forex_list);
-
-                        // ----------------------------------------------
-                        if (index_crypto % 3 == 1) {
-                            if (index_forex < capital_list.size()) {
-                                String EPIC = capital_list.get(index_forex);
-
-                                if (!done_1_round) {
-                                    binance_service.init_DXY_index(EPIC);
-                                }
-                                binance_service.checkCapital(EPIC);
-
-                                String msg = Utils.getTimeHHmm() + EPIC;
-                                msg += "(" + (index_forex + 1) + "/" + capital_list.size() + ")";
-                                System.out.println(msg);
-
-                                index_forex += 1;
-                            } else {
-                                index_forex = 0;
-                                done_1_round = true;
-                            }
+                        cur_blog15m = Utils.getCurrentMinute_Blog15minutes();
+                        if (pre_blog15m != cur_blog15m) {
+                            pre_blog15m = cur_blog15m;
+                            //TODO: check_Blog15(binance_service, cry_list);
+                            //TODO: check_Forex_15m(binance_service, forex_list);
                         }
 
                         // ----------------------------------------------
-                        CandidateCoin coin = crypto_list.get(index_crypto);
-                        gecko_service.loadData(coin.getGeckoid());
-                        binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
-                        check_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
+                        //if (index_crypto % 3 == 1) {
+                        if (index_forex < capital_list.size()) {
+                            String EPIC = capital_list.get(index_forex);
+
+                            String init = init_Forex_4h(binance_service, EPIC);
+                            check_Forex_15m(binance_service, EPIC);
+
+                            String msg = Utils.getTimeHHmm() + EPIC;
+                            msg += "(" + (index_forex + 1) + "/" + capital_list.size() + ")" + init;
+                            System.out.println(msg);
+
+                            index_forex += 1;
+                        } else {
+                            index_forex = 0;
+                        }
+                        //}
+
+                        // ----------------------------------------------
+                        //                        CandidateCoin coin = crypto_list.get(index_crypto);
+                        //                        gecko_service.loadData(coin.getGeckoid());
+                        //                        binance_service.init_DXY_Crypto(coin.getGeckoid(), coin.getSymbol());
+                        //                        check_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
 
                         // ----------------------------------------------
 
@@ -151,8 +151,8 @@ public class BscScanBinanceApplication {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-
+                 }
+                 */
                 // ----------------------------------------------
                 // ----------------------------------------------
                 // ----------------------------------------------
@@ -166,23 +166,27 @@ public class BscScanBinanceApplication {
                     }
 
                     try {
-                        check_Blog15(binance_service, cry_list);
-                        check_Forex_15m(binance_service, forex_list);
+                        //TODO: check_Blog15(binance_service, cry_list);
+                        //TODO: check_Forex_15m(binance_service, forex_list);
 
                         // ----------------------------------------------
-                        if (index_crypto % 3 == 1) {
-                            if (index_forex < capital_list.size()) {
-                                String EPIC = capital_list.get(index_forex);
-                                check_Forex_4h(binance_service, EPIC);
+                        if (index_forex < capital_list.size()) {
+                            String EPIC = capital_list.get(index_forex);
 
-                                index_forex += 1;
-                            } else {
-                                index_forex = 0;
-                            }
+                            String init = init_Forex_4h(binance_service, EPIC);
+                            String msg = Utils.getTimeHHmm() + EPIC;
+                            msg += "(" + (index_forex + 1) + "/" + capital_list.size() + ")" + init;
+                            System.out.println(msg);
+
+                            check_Forex_15m(binance_service, EPIC);
+
+                            index_forex += 1;
+                        } else {
+                            index_forex = 0;
                         }
 
-                        CandidateCoin coin = crypto_list.get(index_crypto);
-                        check_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
+                        //CandidateCoin coin = crypto_list.get(index_crypto);
+                        //check_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
 
                         // ----------------------------------------------
                         wait(SLEEP_MINISECONDS);
@@ -236,24 +240,24 @@ public class BscScanBinanceApplication {
         }
     }
 
-    private static void check_Forex_15m(BinanceService binance_service, List<ForexHistoryResponse> forex_list) {
+    private static void check_ForexList_15m(BinanceService binance_service, List<ForexHistoryResponse> forex_list) {
         cur_blog15_forex = Utils.getCurrentMinute_Blog15minutes();
 
         if (pre_blog15_forex != cur_blog15_forex) {
             pre_blog15_forex = cur_blog15_forex;
 
             for (ForexHistoryResponse dto : forex_list) {
-                System.out.println(Utils.getTimeHHmm() + "Check " + dto.getEpic() + "(15m)");
+                System.out.println(Utils.getTimeHHmm() + "checkSamePhaseForex15m: " + dto.getEpic());
                 binance_service.checkSamePhaseForex15m(dto.getEpic());
                 wait(SLEEP_MINISECONDS);
             }
         }
     }
 
-    private static void check_Forex_4h(BinanceService binance_service, String EPIC) {
+    private static String init_Forex_4h(BinanceService binance_service, String EPIC) {
+        String result = "";
         String key = Utils.getStringValue(EPIC) + "_";
-        key += Utils.getStringValue(EPIC) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH();
+        key += Utils.getCurrentYyyyMmDd_HH_Blog4h();
 
         boolean reload = false;
         if (keys_dict.containsKey(key)) {
@@ -267,14 +271,36 @@ public class BscScanBinanceApplication {
             reload = true;
         }
         if (reload) {
-            binance_service.checkCapital(EPIC);
+            result = binance_service.initForex(EPIC);
+        }
+
+        return result;
+    }
+
+    private static void check_Forex_15m(BinanceService binance_service, String EPIC) {
+        String key = Utils.getStringValue(EPIC) + "_";
+        key += Utils.getCurrentYyyyMmDd_HH() + Utils.getCurrentMinute_Blog15minutes();
+
+        boolean reload = false;
+        if (keys_dict.containsKey(key)) {
+            if (!Objects.equals(key, keys_dict.get(key))) {
+                keys_dict.put(key, key);
+
+                reload = true;
+            }
+        } else {
+            keys_dict.put(key, key);
+            reload = true;
+        }
+        if (reload) {
+            binance_service.checkSamePhaseForex15m(EPIC);
         }
     }
 
     private static void check_Crypto_4h(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
         String key = Utils.getStringValue(coin.getGeckoid()) + "_";
         key += Utils.getStringValue(coin.getSymbol()) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH();
+        key += Utils.getCurrentYyyyMmDd_HH_Blog4h();
 
         boolean reload = false;
         if (keys_dict.containsKey(key)) {
