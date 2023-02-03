@@ -46,7 +46,7 @@ public interface BinanceService {
 
     public String initForex(String EPIC);
 
-    public void init_DXY_Crypto(String gecko_id, String symbol);
+    public void initCrypto(String gecko_id, String symbol);
 
     public List<ForexHistoryResponse> getForexSamePhaseList();
 

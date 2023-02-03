@@ -120,11 +120,13 @@ public class Utils {
 
     public static final List<String> EPICS_FOREX_OTHERS = Arrays.asList("AUDHKD", "AUDPLN", "AUDZAR", "CADCNH",
             "CADHKD", "CADMXN", "CADNOK", "CADPLN", "CADTRY", "CADZAR", "CHFCNH", "CHFCZK", "CHFDKK", "CHFMXN",
-            "CHFNOK", "CHFPLN", "CHFSEK", "CHFTRY", "CHFZAR", "DKKJPY", "EURCZK", "EURDKK", "EURILS", "EURPLN",
+            "CHFNOK", "CHFPLN", "CHFSEK", "CHFTRY", "CHFZAR", "DKKJPY", "EURCZK", "EURILS", "EURPLN",
             "EURRON", "EURSGD", "GBPCNH", "GBPCZK", "GBPDKK", "GBPHKD", "GBPHUF", "GBPNOK", "GBPPLN", "GBPSEK",
             "GBPSGD", "GBPTRY", "GBPZAR", "HKDMXN", "HKDTRY", "NOKSEK", "NOKTRY", "NZDCNH", "NZDHKD", "NZDMXN",
             "NZDPLN", "NZDSEK", "NZDTRY", "PLNSEK", "PLNTRY", "SEKMXN", "SEKTRY", "SGDHKD", "SGDMXN", "TRYJPY",
-            "USDCZK", "USDDKK", "USDHKD", "USDILS", "USDRON", "USDTRY");
+            "USDCZK", "USDDKK", "USDHKD", "USDILS", "USDRON", "USDTRY"
+    //, "EURDKK"
+    );
 
     public static String sql_CryptoHistoryResponse = " "
             + "SELECT DISTINCT ON (epic)                                                                \n"
@@ -163,7 +165,7 @@ public class Utils {
             + "    FROM funding_history str_h                                                           \n"
             + "    WHERE str_h.event_time = 'DH4H1_STR_H_FX'                                           \n"
             + ") tmp                                                                                    \n"
-           // + " WHERE (tmp.trend_h is not null) and (tmp.trend_d = tmp.trend_h)                       \n"
+            // + " WHERE (tmp.trend_h is not null) and (tmp.trend_d = tmp.trend_h)                       \n"
             + "ORDER BY tmp.epic                                                                        \n";
 
     public static String sql_OrdersProfitResponse = ""
