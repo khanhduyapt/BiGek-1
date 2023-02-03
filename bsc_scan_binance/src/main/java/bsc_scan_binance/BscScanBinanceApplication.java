@@ -37,9 +37,6 @@ public class BscScanBinanceApplication {
     private static int pre_blog15minute = -1;
     private static int cur_blog15minute = -1;
 
-    private static int pre_blog15_forex = -1;
-    private static int cur_blog15_forex = -1;
-
     public static void main(String[] args) {
         try {
             initForex_naming_dict();
@@ -202,7 +199,7 @@ public class BscScanBinanceApplication {
                     check_Forex_15m(binance_service, forex_list.get(index).getEpic());
                 }
 
-                wait(SLEEP_MINISECONDS);
+                wait(SLEEP_MINISECONDS_INIT);
             }
         }
     }
