@@ -2634,7 +2634,10 @@ public class BinanceServiceImpl implements BinanceService {
     @Override
     @Transactional
     public String getChartWD(String gecko_id, String symbol) {
-        return initCrypto(gecko_id, symbol.toUpperCase());
+        if ("_BTC_ETH_BNB_".contains("_" + symbol + "_")) {
+            sendMsgKillLongShort(gecko_id, symbol, "");
+        }
+        return "";
     }
 
     private void sendMsgPerHour(String EVENT_ID, String msg_content, boolean isOnlyMe) {
@@ -2809,7 +2812,6 @@ public class BinanceServiceImpl implements BinanceService {
             List<BtcFutures> list_15m = Utils.loadCapitalData(EPIC, Utils.CAPITAL_TIME_MINUTE_15, 50);
             sendScapMsg(list_15m, EPIC, trend, "");
         }
-
     }
 
     @Override

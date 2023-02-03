@@ -89,8 +89,6 @@ public class BscScanBinanceApplication {
             }
 
             // --------------------Debug--------------------
-            int index_forex = 0;
-            int index_crypto = 0;
 
             List<String> capital_list = new ArrayList<String>();
             capital_list.addAll(Utils.EPICS_INDEXS);
@@ -102,25 +100,25 @@ public class BscScanBinanceApplication {
             capital_list.addAll(Utils.EPICS_FOREX_OTHERS);
 
             if (app_flag != Utils.const_app_flag_webonly) {
-                List<CandidateCoin> crypto_list = gecko_service.getList(callFormBinance);
-                List<ForexHistoryResponse> forex_list = binance_service.getForexSamePhaseList();
-                List<ForexHistoryResponse> cry_list = binance_service.getCryptoSamePhaseList();
+                List<CandidateCoin> token_list = gecko_service.getList(callFormBinance);
+                List<ForexHistoryResponse> forex_list_15m = binance_service.getForexSamePhaseList();
+                List<ForexHistoryResponse> crypto_list_15m = binance_service.getCryptoSamePhaseList();
 
-                int crypto_size = crypto_list.size();
+                int total = token_list.size();
+
+                int index_forex = 0;
+                int index_crypto = 0;
                 int forex_size = capital_list.size();
-
-                index_forex = 0;
                 int time = SLEEP_MINISECONDS_INIT;
                 Date start_time = Calendar.getInstance().getTime();
-                while (index_crypto < crypto_size) {
+                while (index_crypto < total) {
                     if (index_crypto % 30 == 20) {
-                        forex_list = binance_service.getForexSamePhaseList();
-                        cry_list = binance_service.getCryptoSamePhaseList();
+                        forex_list_15m = binance_service.getForexSamePhaseList();
+                        crypto_list_15m = binance_service.getCryptoSamePhaseList();
                     }
 
                     try {
-                        //TODO: check_Blog15(binance_service, cry_list);
-                        //TODO: check_Forex_15m(binance_service, forex_list);
+                        check_15m(binance_service, crypto_list_15m, forex_list_15m);
 
                         // ----------------------------------------------
                         if (index_forex < forex_size) {
@@ -137,20 +135,20 @@ public class BscScanBinanceApplication {
                         // ----------------------------------------------
 
                         {
-                            CandidateCoin coin = crypto_list.get(index_crypto);
-                            init_Crypto_4h(binance_service, coin, index_crypto, crypto_size);
-                            check_Crypto_15m(binance_service, coin.getGeckoid(), coin.getSymbol());
+                            CandidateCoin coin = token_list.get(index_crypto);
+                            init_Crypto_4h(binance_service, coin, index_crypto, total);
+                            check_Crypto_15m(binance_service, coin.getSymbol());
                         }
 
                         // ----------------------------------------------
 
-                        wait(SLEEP_MINISECONDS);
+                        wait(time);
 
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    if (Objects.equals(index_crypto, crypto_size - 1)) {
+                    if (Objects.equals(index_crypto, total - 1)) {
                         Date curr_time = Calendar.getInstance().getTime();
                         long diff = curr_time.getTime() - start_time.getTime();
                         start_time = Calendar.getInstance().getTime();
@@ -172,7 +170,9 @@ public class BscScanBinanceApplication {
         }
     }
 
-    private static void check_CryptoList_15m(BinanceService binance_service, List<ForexHistoryResponse> crypto_list) {
+    private static void check_15m(BinanceService binance_service, List<ForexHistoryResponse> crypto_list,
+            List<ForexHistoryResponse> forex_list) {
+
         cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
         if (pre_blog15minute != cur_blog15minute) {
             pre_blog15minute = cur_blog15minute;
@@ -189,23 +189,19 @@ public class BscScanBinanceApplication {
             binance_service.getChartWD("binancecoin", "BNB");
             wait(SLEEP_MINISECONDS);
 
-            for (ForexHistoryResponse dto : crypto_list) {
-                System.out.println(Utils.getTimeHHmm() + "Check " + dto.getEpic() + "(15m)");
-                binance_service.checkSamePhaseCrypto15m(dto.getEpic());
-                wait(SLEEP_MINISECONDS);
-            }
+            int crypto_size = crypto_list.size();
+            int forex_size = forex_list.size();
+            int max = crypto_size > forex_size ? crypto_size : forex_size;
 
-        }
-    }
+            for (int index = 0; index < max; index++) {
+                if (index < crypto_size) {
+                    check_Crypto_15m(binance_service, crypto_list.get(index).getEpic());
+                }
 
-    private static void check_ForexList_15m(BinanceService binance_service, List<ForexHistoryResponse> forex_list) {
-        cur_blog15_forex = Utils.getCurrentMinute_Blog15minutes();
+                if (index < forex_size) {
+                    check_Forex_15m(binance_service, forex_list.get(index).getEpic());
+                }
 
-        if (pre_blog15_forex != cur_blog15_forex) {
-            pre_blog15_forex = cur_blog15_forex;
-
-            for (ForexHistoryResponse dto : forex_list) {
-                check_Forex_15m(binance_service, dto.getEpic());
                 wait(SLEEP_MINISECONDS);
             }
         }
@@ -281,8 +277,8 @@ public class BscScanBinanceApplication {
         }
     }
 
-    private static void check_Crypto_15m(BinanceService binance_service, String gecko_id, String symbol) {
-        String key = Utils.getStringValue(gecko_id) + "_";
+    private static void check_Crypto_15m(BinanceService binance_service, String symbol) {
+        String key = Utils.getStringValue(symbol) + "_";
         key += Utils.getCurrentYyyyMmDd_HH() + Utils.getCurrentMinute_Blog15minutes();
 
         boolean reload = false;
