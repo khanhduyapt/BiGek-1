@@ -12,6 +12,6 @@ public class ForexHistoryResponse {
     private String d = "";
     private String h = "";
     private String trend_d = "";
-    private String trend_h1 = "";
+    private String trend_h = "";
     private String note = "";
 }
