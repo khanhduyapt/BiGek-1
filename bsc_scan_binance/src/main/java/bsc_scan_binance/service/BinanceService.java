@@ -2,7 +2,6 @@ package bsc_scan_binance.service;
 
 import java.util.List;
 
-import bsc_scan_binance.entity.Orders;
 import bsc_scan_binance.response.CandidateTokenCssResponse;
 import bsc_scan_binance.response.DepthResponse;
 import bsc_scan_binance.response.EntryCssResponse;
@@ -13,10 +12,6 @@ public interface BinanceService {
     List<CandidateTokenCssResponse> getList(Boolean isOrderByBynaceVolume);
 
     public void monitorProfit();
-
-    public void monitorBollingerBandwidth(Boolean isCallFormBot);
-
-    List<Orders> getOrderList();
 
     public String loadPremarket();
 
@@ -36,19 +31,44 @@ public interface BinanceService {
 
     public String getBitfinexLongShortBtc();
 
-    public String getChartWD(String gecko_id, String symbol);
-
     public void clearTrash();
-
-    public void checkSamePhaseForex15m(String EPIC);
-
-    public void checkSamePhaseCrypto15m(String symbol);
-
-    public String initForex(String EPIC);
 
     public String initCrypto(String gecko_id, String symbol);
 
     public List<ForexHistoryResponse> getForexSamePhaseList();
 
     public List<ForexHistoryResponse> getCryptoSamePhaseList();
+
+    boolean isFutureCoin(String gecko_id);
+
+    public String initForexTrend(String EPIC, String CAPITAL_TIME_XX);
+
+    public String sendMsgKillLongShort(String symbol);
+
+    public String initCryptoTrend(String symbol);
+
+    public boolean hasConnectTimeOutException();
+
+    public void createReport();
+
+    public int controlMt5(List<String> CAPITAL_LIST);
+
+    public void deleteConnectTimeOutException();
+
+    public void saveMt5Data(String filename, Integer MINUTES_OF_XX);
+
+    public void saveDailyPivotData();
+
+    public void sendMsgPerHour_OnlyMe(String EVENT_ID, String msg_content);
+
+    public void logMsgPerHour(String epic_id, String log, Integer MINUTES_OF_Xx);
+
+    public void closeTrade_by_SL_TP();
+
+    public void initTradeList();
+
+    public void CloseTickets();
+
+    public void get_total_loss_today();
+
 }

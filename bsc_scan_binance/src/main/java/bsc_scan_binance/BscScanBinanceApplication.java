@@ -1,6 +1,9 @@
 package bsc_scan_binance;
 
+import java.io.File;
 import java.net.InetAddress;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -13,33 +16,43 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import bsc_scan_binance.entity.CandidateCoin;
-import bsc_scan_binance.response.ForexHistoryResponse;
+import bsc_scan_binance.entity.Mt5OpenTrade;
 import bsc_scan_binance.service.BinanceService;
-import bsc_scan_binance.service.CoinGeckoService;
 import bsc_scan_binance.service.impl.WandaBot;
 import bsc_scan_binance.utils.Utils;
 
 @SpringBootApplication
 public class BscScanBinanceApplication {
     public static int app_flag = Utils.const_app_flag_all_coin; // 1: msg_on; 2: msg_off; 3: web only; 4: all coin; 5:
-                                                                // all_and_msg
+
     public static String callFormBinance = "";
     public static String TAKER_TOKENS = "_";
-    public static int SLEEP_MINISECONDS_INIT = 3000;
-    public static int SLEEP_MINISECONDS = 6000;
-    private static Hashtable<String, String> keys_dict = new Hashtable<String, String>();
+    public static int SLEEP_MINISECONDS = 1800; // Gecko=wait(6000);
+    private static Hashtable<String, LocalTime> keys_dict = new Hashtable<String, LocalTime>();
     public static Hashtable<String, String> forex_naming_dict = new Hashtable<String, String>();
+    public static Hashtable<String, String> linked_2_ftmo = new Hashtable<String, String>();
+    public static Hashtable<String, String> dic_comment = new Hashtable<String, String>();
+    public static Hashtable<String, Integer> watting_dict = new Hashtable<String, Integer>();
+    public static String hostname = " ";
+    public static ApplicationContext applicationContext;
+    public static WandaBot wandaBot;
+    public static TelegramBotsApi telegramBotsApi;
+    public static String EPICS_OUTPUTED_LOG = "INIT";
+    public static String EPICS_OUTPUT_MSG = "INIT";
 
-    private static int pre_blog15minute = -1;
-    private static int cur_blog15minute = -1;
+    public static List<Mt5OpenTrade> mt5_open_trade_List = new ArrayList<Mt5OpenTrade>();
+    public static Hashtable<String, Mt5OpenTrade> waitingM05list = new Hashtable<String, Mt5OpenTrade>();
+    public static List<String> msg_open_trade_stocks = new ArrayList<String>();
+    public static Hashtable<String, String> mt5_close_ticket_dict = new Hashtable<String, String>();
 
     public static void main(String[] args) {
         try {
             initForex_naming_dict();
+            hostname = InetAddress.getLocalHost().getHostName().toUpperCase();
+            if (hostname.length() > 2) {
+                hostname = hostname.substring(0, 2);
+            }
 
             System.out.println("Start "
                     + Utils.convertDateToString("yyyy-MM-dd HH:mm:ss", Calendar.getInstance().getTime()) + " ---->");
@@ -53,258 +66,355 @@ public class BscScanBinanceApplication {
                 app_flag = Utils.const_app_flag_all_coin;
             }
 
-            String hostname = InetAddress.getLocalHost().getHostName();
-
-            // Debug
-            String cty = "PC";
-            String home = "DESKTOP-L4M1JU2";
+            // Debug36
+            // String cty = "PC";
+            // String home = "DESKTOP-L4M1JU2";
             // app_flag = Utils.const_app_flag_msg_on;
-            if (Objects.equals(cty, hostname) || Objects.equals(home, hostname)) {
-                if (Utils.isWorkingTime() && Objects.equals(cty, hostname)) {
-                    app_flag = Utils.const_app_flag_all_and_msg;
-                }
-
-                if (!Utils.isWorkingTime() && Objects.equals(home, hostname)) {
-                    app_flag = Utils.const_app_flag_all_and_msg;
-                }
-            } else {
-                app_flag = Utils.const_app_flag_all_coin;
-            }
-            // Debug:
-            //app_flag = Utils.const_app_flag_all_and_msg;
+            // app_flag = Utils.const_app_flag_all_and_msg; // Debug
+            app_flag = Utils.const_app_flag_all_coin;
+            // app_flag = Utils.const_app_flag_Future_msg_off;
 
             System.out.println("app_flag:" + app_flag + " (1: msg_on; 2: msg_off; 3: web only; 4: all coin)");
             // --------------------Init--------------------
-            ApplicationContext applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
-            CoinGeckoService gecko_service = applicationContext.getBean(CoinGeckoService.class);
+            applicationContext = SpringApplication.run(BscScanBinanceApplication.class, args);
             BinanceService binance_service = applicationContext.getBean(BinanceService.class);
 
             if (app_flag == Utils.const_app_flag_msg_on || app_flag == Utils.const_app_flag_all_and_msg) {
-                WandaBot wandaBot = applicationContext.getBean(WandaBot.class);
-
-                try {
-
-                    TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
-                    telegramBotsApi.registerBot(wandaBot);
-
-                    binance_service.clearTrash();
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
-                }
+                // try {
+                // wandaBot = applicationContext.getBean(WandaBot.class);
+                // TelegramBotsApi telegramBotsApi = new
+                // TelegramBotsApi(DefaultBotSession.class);
+                // // https://github.com/PauloGaldo/telegram-bot
+                // //
+                // https://stackoverflow.com/questions/68059105/register-webhook-tg-bot-using-spring-boot
+                // // telegramBotsApi.registerBot(bot, setWebhook);
+                // telegramBotsApi.registerBot(wandaBot);
+                // initTelegramBotsApi();
+                //
+                // binance_service.clearTrash();
+                // } catch (TelegramApiException e) {
+                // e.printStackTrace();
+                // }
             }
 
-            // --------------------Debug--------------------
-
-            List<String> capital_list = new ArrayList<String>();
-            capital_list.addAll(Utils.EPICS_INDEXS);
-            capital_list.addAll(Utils.EPICS_FOREX_EUR);
-            capital_list.addAll(Utils.EPICS_FOREX_AUD);
-            capital_list.addAll(Utils.EPICS_FOREX_GBP);
-            capital_list.addAll(Utils.EPICS_FOREX_CAD);
-            capital_list.addAll(Utils.EPICS_FOREX_DOLLAR);
-            capital_list.addAll(Utils.EPICS_FOREX_OTHERS);
+            // ----------------------------------------
+            binance_service.clearTrash();
+            binance_service.createReport();
+            binance_service.deleteConnectTimeOutException();
+            // ----------------------------------------
+            List<String> CAPITAL_LIST = new ArrayList<String>();
+            CAPITAL_LIST.addAll(Utils.EPICS_METALS);
+            CAPITAL_LIST.addAll(Utils.EPICS_CRYPTO_CFD);
+            CAPITAL_LIST.addAll(Utils.EPICS_INDEXS_CFD);
+            CAPITAL_LIST.addAll(Utils.EPICS_FOREXS_ALL);
+            // CAPITAL_LIST.addAll(Utils.EPICS_STOCKS);
 
             if (app_flag != Utils.const_app_flag_webonly) {
-                List<CandidateCoin> token_list = gecko_service.getList(callFormBinance);
-                List<ForexHistoryResponse> forex_list_15m = binance_service.getForexSamePhaseList();
-                List<ForexHistoryResponse> crypto_list_15m = binance_service.getCryptoSamePhaseList();
-
-                int total = token_list.size();
-
-                int index_forex = 0;
                 int index_crypto = 0;
-                int forex_size = capital_list.size();
-                int time = SLEEP_MINISECONDS_INIT;
+                int round_crypto = 0;
+                int total = Utils.ALL_COINS_BINANCE.size();
                 Date start_time = Calendar.getInstance().getTime();
+
+                File log = new File(Utils.getReportFilePath());
+                System.out.println(log.getAbsolutePath());
+
+                log = new File(Utils.getDraftLogFile());
+                System.out.println(log.getAbsolutePath());
+
+                System.out.println(Utils.getMt5DataFolder() + "HistoryToday.csv");
+                System.out.println();
+
+                String mt5_open_trade_file = Utils.getMt5DataFolder() + "OpenTrade.csv";
+                Utils.delete_file(mt5_open_trade_file);
+
+                binance_service.get_total_loss_today();
+
                 while (index_crypto < total) {
-                    if (index_crypto % 30 == 20) {
-                        forex_list_15m = binance_service.getForexSamePhaseList();
-                        crypto_list_15m = binance_service.getCryptoSamePhaseList();
-                    }
-
                     try {
-                        if (Utils.isBusinessTime()) {
-                            check_15m(binance_service, crypto_list_15m, forex_list_15m);
+                        if (isReloadAfter(1, "MsgKillZone")) {
+                            alertMsgKillZone(binance_service);
                         }
-                        // ----------------------------------------------
-                        if (index_forex < forex_size) {
-                            String EPIC = capital_list.get(index_forex);
-                            init_Forex_4h(binance_service, EPIC, index_forex, forex_size);
-                            if (Utils.isBusinessTime()) {
-                                check_Forex_15m(binance_service, EPIC);
-                            }
 
-                            index_forex += 1;
-                        } else {
-                            index_forex = 0;
-                        }
-                        // ----------------------------------------------
+                        //if (Utils.isWeekday() && Utils.isAllowSendMsg())
                         {
-                            CandidateCoin coin = token_list.get(index_crypto);
-                            init_Crypto_4h(binance_service, coin, index_crypto, total);
-                            if (Utils.isBusinessTime()) {
-                                check_Crypto_15m(binance_service, coin.getSymbol());
+
+                            if (isReloadAfter(Utils.MINUTES_RELOAD_CSV_DATA, "MT5_DATA")) {
+                                binance_service.saveMt5Data("AureliusIronheart.csv", Utils.MINUTES_RELOAD_CSV_DATA);
+                                binance_service.saveMt5Data("TimeBreaker.csv", Utils.MINUTES_RELOAD_CSV_DATA);
+                                binance_service.saveDailyPivotData();
+
+                                if (isReloadAfter(Utils.MINUTES_OF_1H, "MT5_DATA_STOCKS")) {
+                                    binance_service.saveMt5Data("Stocks.csv", Utils.MINUTES_OF_1H);
+                                }
+
+                                for (String EPIC : CAPITAL_LIST) {
+                                    if (Utils.EPICS_STOCKS.contains(EPIC)) {
+                                        if (isReloadAfter(Utils.MINUTES_OF_30, "MT5_DATA_STOCKS_" + EPIC)) {
+                                            //binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_W1);
+                                            //binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_D1);
+                                            //binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_H4);
+                                            binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_H1);
+                                            binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_15);
+                                        }
+                                    } else {
+                                        if (isReloadAfter(Utils.MINUTES_OF_15, "MT5_DATA_FOREX_" + EPIC)) {
+                                            //binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_W1);
+                                            //binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_D1);
+                                            //binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_H4);
+                                        }
+
+                                        binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_H4);
+                                        binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_H1);
+                                        binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_15);
+                                        binance_service.initForexTrend(EPIC, Utils.CAPITAL_TIME_03);
+                                    }
+                                }
+
+                                binance_service.initTradeList();
+                                control_Mt5(binance_service);
+                                binance_service.monitorProfit();
                             }
                         }
 
-                        // ----------------------------------------------
+                        if (isReloadAfter(Utils.MINUTES_RELOAD_CSV_DATA, "MT5_SL_TP")) {
+                            binance_service.initTradeList();
+                            binance_service.closeTrade_by_SL_TP();
+                            binance_service.CloseTickets();
+                        }
 
-                        wait(time);
+                        // ---------------------------------------------------------
+                        if (isReloadAfter((Utils.MINUTES_OF_15), "INIT_CRYPTO")) {
+                            binance_service.sendMsgKillLongShort("BTC");
+                            binance_service.sendMsgKillLongShort("ETH");
+                            binance_service.sendMsgKillLongShort("BNB");
+                        }
 
+                        // String SYMBOL = Utils.ALL_COINS_BINANCE.get(index_crypto).toUpperCase();
+                        // if (isReloadAfter(getWattingTime(SYMBOL), "CHECK_CRYPTO_" + SYMBOL)) {
+                        // String crypto_time = binance_service.initCryptoTrend(SYMBOL);
+                        // setWattingTime(SYMBOL, crypto_time);
+                        // }
+
+                        // ---------------------------------------------------------
+                        if (isReloadAfter(Utils.MINUTES_RELOAD_CSV_DATA, "CREATE_REPORT")) {
+                            binance_service.createReport();
+                        }
+
+                        wait(SLEEP_MINISECONDS);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                     if (Objects.equals(index_crypto, total - 1)) {
                         Date curr_time = Calendar.getInstance().getTime();
                         long diff = curr_time.getTime() - start_time.getTime();
                         start_time = Calendar.getInstance().getTime();
 
-                        System.out.println("reload: " + Utils.getMmDD_TimeHHmm() + ", spend:"
-                                + TimeUnit.MILLISECONDS.toMinutes(diff) + " Minutes.");
+                        String msg = "round:" + round_crypto + ", reload: " + Utils.getMmDD_TimeHHmm() + ", spend:"
+                                + TimeUnit.MILLISECONDS.toMinutes(diff) + " Minutes.";
 
-                        time = SLEEP_MINISECONDS_INIT;
-
+                        round_crypto += 1;
                         index_crypto = 0;
+
+                        if (round_crypto % 10 == 0) {
+                            System.out.println(msg);
+                        }
                     } else {
                         index_crypto += 1;
                     }
-
                 }
             }
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
+            initTelegramBotsApi();
+            System.out.println("Duydk:" + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private static void check_15m(BinanceService binance_service, List<ForexHistoryResponse> crypto_list,
-            List<ForexHistoryResponse> forex_list) {
+    public static void control_Mt5(BinanceService binance_service) {
+        mt5_open_trade_List = new ArrayList<Mt5OpenTrade>();
+        waitingM05list = new Hashtable<String, Mt5OpenTrade>();
+        msg_open_trade_stocks = new ArrayList<String>();
+        try {
+            String mt5_open_trade_file = Utils.getMt5DataFolder() + "OpenTrade.csv";
+            File myScap = new File(mt5_open_trade_file);
+            myScap.delete();
+        } catch (Exception e) {
+        }
 
-        cur_blog15minute = Utils.getCurrentMinute_Blog15minutes();
-        if (pre_blog15minute != cur_blog15minute) {
-            pre_blog15minute = cur_blog15minute;
+        String pre_epics = EPICS_OUTPUT_MSG;
+        // --------------------------------------------------------------------------
+        File myScap = new File(Utils.getDraftLogFile());
+        myScap.delete();
+        EPICS_OUTPUTED_LOG = "";
+        // --------------------------------------------------------------------------
+        EPICS_OUTPUT_MSG = "";
+        // --------------------------------------------------------------------------
+        Utils.logWritelnDraft("");
+        binance_service.controlMt5(Utils.EPICS_METALS);
+        Utils.logWritelnDraft("...");
 
-            System.out.println(Utils.getTimeHHmm() + "Check BTC(15m)");
-            binance_service.getChartWD("bitcoin", "BTC");
-            wait(SLEEP_MINISECONDS);
+        binance_service.controlMt5(Utils.EPICS_INDEXS_CFD);
+        Utils.logWritelnDraft("");
 
-            System.out.println(Utils.getTimeHHmm() + "Check ETH(15m)");
-            binance_service.getChartWD("ethereum", "ETH");
-            wait(SLEEP_MINISECONDS);
+        binance_service.controlMt5(Utils.EPICS_FOREXS_AUDx);
+        Utils.logWritelnDraft("");
 
-            System.out.println(Utils.getTimeHHmm() + "Check BNB(15m)");
-            binance_service.getChartWD("binancecoin", "BNB");
-            wait(SLEEP_MINISECONDS);
+        binance_service.controlMt5(Utils.EPICS_FOREXS_CADx);
+        Utils.logWritelnDraft("");
 
-            int crypto_size = crypto_list.size();
-            int forex_size = forex_list.size();
-            int max = crypto_size > forex_size ? crypto_size : forex_size;
+        binance_service.controlMt5(Utils.EPICS_FOREXS_EURx);
+        Utils.logWritelnDraft("");
 
-            for (int index = 0; index < max; index++) {
-                if (index < crypto_size) {
-                    check_Crypto_15m(binance_service, crypto_list.get(index).getEpic());
+        binance_service.controlMt5(Utils.EPICS_FOREXS_GBPx);
+        Utils.logWritelnDraft("");
+
+        binance_service.controlMt5(Utils.EPICS_FOREXS_NZDx);
+        Utils.logWritelnDraft("");
+
+        binance_service.controlMt5(Utils.EPICS_FOREXS_USDx);
+        binance_service.controlMt5(Utils.EPICS_FOREXS_ALL);
+        binance_service.controlMt5(Utils.EPICS_CRYPTO_CFD);
+        Utils.logWritelnDraft("...");
+
+        // --------------------------------------------------------------------------
+        // Utils.logWritelnDraftFooter();
+        // binance_service.controlMt5(Utils.EPICS_STOCKS_EUR);
+        // Utils.logWritelnDraft("...");
+        // binance_service.controlMt5(Utils.EPICS_STOCKS);
+        // Utils.logWritelnDraftFooter();
+        // --------------------------------------------------------------------------
+        String cur_epics = EPICS_OUTPUT_MSG;
+        String[] arr = cur_epics.split("_");
+        String add_new = "";
+        int count = 0;
+        for (String epic : arr) {
+            if (!pre_epics.contains(epic)) {
+                count += 1;
+                if (Utils.isNotBlank(add_new)) {
+                    add_new += ",";
                 }
-
-                if (index < forex_size) {
-                    check_Forex_15m(binance_service, forex_list.get(index).getEpic());
-                }
-
-                wait(SLEEP_MINISECONDS_INIT);
+                add_new += epic + "   ";
             }
+        }
+        if (Utils.isNotBlank(add_new)) {
+            String msg = "(Forex30: " + count + "):   " + add_new;
+            Utils.logWritelnDraft("");
+            Utils.logWritelnDraft(msg);
+
+            String EVENT_ID = "FX_M_30" + Utils.getCurrentYyyyMmDd_HH();
+            binance_service.sendMsgPerHour_OnlyMe(EVENT_ID, msg);
         }
     }
 
-    private static void init_Forex_4h(BinanceService binance_service, String EPIC, int idx, int size) {
-        String key = Utils.getStringValue(EPIC) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH_Blog4h();
+    public static void alertMsgKillZone(BinanceService binance_service) {
+        if (!Utils.isWeekday()) {
+            return;
+        }
+        LocalTime kill_zone_ld = LocalTime.parse("13:45:00"); // to: 14:15
+        LocalTime kill_zone_ny = LocalTime.parse("18:45:00"); // to: 19:15
+        LocalTime cur_time = LocalTime.now();
+
+        String EVENT_ID = "KILL_ZONE_" + Utils.getCurrentYyyyMmDd_HH_Blog15m();
+
+        long elapsedMinutes_ld = Duration.between(kill_zone_ld, cur_time).toMinutes();
+        if ((0 <= elapsedMinutes_ld) && (elapsedMinutes_ld <= 30) && isReloadAfter(60, "Start_London_Kill_Zone")) {
+            binance_service.sendMsgPerHour_OnlyMe(EVENT_ID, "Start_London_Kill_Zone");
+        }
+
+        long elapsedMinutes_ny = Duration.between(kill_zone_ny, cur_time).toMinutes();
+        if ((0 <= elapsedMinutes_ny) && (elapsedMinutes_ny <= 30) && isReloadAfter(60, "Start_NewYork_Kill_Zone")) {
+            // binance_service.sendMsgPerHour_OnlyMe(EVENT_ID, "Start_NewYork_Kill_Zone");
+        }
+
+        // ---------------------------------------------------------------------------
+        LocalTime close_Tokyo_Orders = LocalTime.parse("16:15:00"); // to: 15:45
+        LocalTime close_London_Orders = LocalTime.parse("19:30:00"); // to: 23:45
+        LocalTime close_NewYork_Orders = LocalTime.parse("22:30:00"); // to: 02:45
+
+        long close_Tokyo = Duration.between(close_Tokyo_Orders, cur_time).toMinutes();
+        if ((0 <= close_Tokyo) && (close_Tokyo <= 30) && isReloadAfter(15, "Close_Tokyo_Orders")) {
+            binance_service.sendMsgPerHour_OnlyMe(EVENT_ID, "Close_Tokyo_Orders + (Đóng lệnh về đón con)");
+        }
+
+        long close_London = Duration.between(close_London_Orders, cur_time).toMinutes();
+        if ((0 <= close_London) && (close_London <= 30) && isReloadAfter(60, "Close_London_Orders")) {
+            // binance_service.sendMsgPerHour_OnlyMe(EVENT_ID, "Close_London_Orders");
+        }
+
+        long close_NewYork = Duration.between(close_NewYork_Orders, cur_time).toMinutes();
+        if ((0 <= close_NewYork) && (close_NewYork <= 30) && isReloadAfter(60, "Close_NewYork_Orders")) {
+            binance_service.sendMsgPerHour_OnlyMe(EVENT_ID, "close_NewYork_Orders");
+        }
+    }
+
+    public static void initTelegramBotsApi() {
+        System.out.println("____________________initTelegramBotsApi" + Utils.getTimeHHmm() + "____________________");
+    }
+
+    public static Integer getWattingTime(String SYMBOL) {
+        Integer time = Utils.MINUTES_OF_05;
+        if (watting_dict.containsKey(SYMBOL)) {
+            time = watting_dict.get(SYMBOL);
+        }
+
+        return time;
+    }
+
+    public static void setWattingTime(String SYMBOL, String CRYPTO_TIME_xx) {
+        Integer time = Utils.MINUTES_OF_15;
+        switch (CRYPTO_TIME_xx) {
+        case Utils.CRYPTO_TIME_05:
+            time = Utils.MINUTES_OF_15;
+            break;
+        case Utils.CRYPTO_TIME_15:
+            time = Utils.MINUTES_OF_15;
+            break;
+        case Utils.CRYPTO_TIME_H1:
+            time = Utils.MINUTES_OF_1H;
+            break;
+        case Utils.CRYPTO_TIME_H4:
+        case Utils.CRYPTO_TIME_D1:
+        case Utils.CRYPTO_TIME_W1:
+            time = Utils.MINUTES_OF_4H;
+            break;
+        default:
+            time = Utils.MINUTES_OF_1H;
+            break;
+        }
+        watting_dict.put(SYMBOL, time);
+    }
+
+    public static boolean isReloadAfter(long minutes, String geckoid_or_epic) {
+        LocalTime cur_time = LocalTime.now();
+        String key = Utils.getStringValue(geckoid_or_epic);
 
         boolean reload = false;
         if (keys_dict.containsKey(key)) {
-            if (!Objects.equals(key, keys_dict.get(key))) {
-                keys_dict.put(key, key);
+            LocalTime pre_time = keys_dict.get(key);
+
+            long elapsedMinutes = Duration.between(pre_time, cur_time).toMinutes();
+
+            if (minutes <= elapsedMinutes) {
+                keys_dict.put(key, cur_time);
 
                 reload = true;
             }
         } else {
-            keys_dict.put(key, key);
-            reload = true;
-        }
-        if (reload) {
-            String init = binance_service.initForex(EPIC);
-
-            String msg = Utils.getTimeHHmm() + EPIC;
-            msg += "(" + (idx + 1) + "/" + size + ")" + init;
-            System.out.println(msg);
-        }
-    }
-
-    private static void check_Forex_15m(BinanceService binance_service, String EPIC) {
-        String key = Utils.getStringValue(EPIC) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH() + Utils.getCurrentMinute_Blog15minutes();
-
-        boolean reload = false;
-        if (keys_dict.containsKey(key)) {
-            if (!Objects.equals(key, keys_dict.get(key))) {
-                keys_dict.put(key, key);
-
-                reload = true;
-            }
-        } else {
-            keys_dict.put(key, key);
-            reload = true;
-        }
-        if (reload) {
-            binance_service.checkSamePhaseForex15m(EPIC);
-        }
-    }
-
-    private static void init_Crypto_4h(BinanceService binance_service, CandidateCoin coin, int idx, int size) {
-        String key = Utils.getStringValue(coin.getGeckoid()) + "_";
-        key += Utils.getStringValue(coin.getSymbol()) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH_Blog4h();
-
-        boolean reload = false;
-        if (keys_dict.containsKey(key)) {
-            if (!Objects.equals(key, keys_dict.get(key))) {
-                keys_dict.put(key, key);
-
-                reload = true;
-            }
-        } else {
-            keys_dict.put(key, key);
+            keys_dict.put(key, cur_time);
             reload = true;
         }
 
-        if (reload) {
-            String init = binance_service.initCrypto(coin.getGeckoid(), coin.getSymbol());
-
-            String msg = Utils.getTimeHHmm() + coin.getSymbol();
-            msg += "(" + (idx + 1) + "/" + size + ")" + init;
-            System.out.println(msg);
-        }
-    }
-
-    private static void check_Crypto_15m(BinanceService binance_service, String symbol) {
-        String key = Utils.getStringValue(symbol) + "_";
-        key += Utils.getCurrentYyyyMmDd_HH() + Utils.getCurrentMinute_Blog15minutes();
-
-        boolean reload = false;
-        if (keys_dict.containsKey(key)) {
-            if (!Objects.equals(key, keys_dict.get(key))) {
-                keys_dict.put(key, key);
-
-                reload = true;
-            }
-        } else {
-            keys_dict.put(key, key);
-            reload = true;
-        }
-        if (reload) {
-            binance_service.checkSamePhaseCrypto15m(symbol);
-        }
+        return reload;
     }
 
     private static void initForex_naming_dict() {
+        linked_2_ftmo.put(Utils.LINKED_NAME_2_USOIL, "USOIL");
+        linked_2_ftmo.put(Utils.LINKED_NAME_2_US100, "US100");
+        linked_2_ftmo.put(Utils.LINKED_NAME_2_GER40, "GER40");
+        linked_2_ftmo.put(Utils.LINKED_NAME_2_EU50, "EU50");
+
         forex_naming_dict.put("DXY", "US Dollar Index");
         forex_naming_dict.put("OIL_CRUDE", "US Crude Oil");
         forex_naming_dict.put("US100", "US Tech 100 (Nasdaq)");
