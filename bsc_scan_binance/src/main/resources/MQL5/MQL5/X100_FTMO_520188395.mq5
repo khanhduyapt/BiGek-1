@@ -185,7 +185,7 @@ string ARR_SYMBOLS_USD[] =
    ,"EURAUD","EURCAD","EURCHF","GBPCHF","EURNZD","GBPNZD"
    ,"EURGBP","EURUSD","GBPUSD","NZDUSD"
    ,"USDCAD","USDCHF"
-   ,"BTCUSD","USOIL","US30","US500","US100","GER40","JP225" //"USOIL","US30","US500","FR40","JP225"
+   ,"BTCUSD","USOIL.cash","US30.cash","US500.cash","US100.cash","GER40.cash","JP225.cash" //"USOIL","US30","US500","FR40","JP225"
   };
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -218,6 +218,7 @@ int OnInit()
    double top_price = ChartGetDouble(0, CHART_PRICE_MAX);
    double bot_price = ChartGetDouble(0, CHART_PRICE_MIN);
    double LM=GetGlobalVariable(GLOBAL_VAR_LM+cur_symbol);
+
    if(LM<bot_price || LM>top_price)
      {
       double amp_w1,amp_d1,amp_h4,amp_h1;
@@ -710,21 +711,20 @@ void DrawButtons()
 
       string trend_by_ma10_w1=get_trend_by_ma(symbol,PERIOD_W1,10,0);
       string trend_by_ma10_d1=get_trend_by_ma(symbol,PERIOD_D1,10,1);
-      string trend_by_ma20_h4=get_trend_by_ma(symbol,PERIOD_H4,20,0);
-      if(trend_by_ma10_w1==trend_by_ma10_d1 && trend_by_ma10_w1==trend_by_ma20_h4)
+      string trend_by_ma10_h4=get_trend_by_ma(symbol,PERIOD_H4,10,1);
+      if(trend_by_ma10_w1==trend_by_ma10_d1)
         {
-         lblBtn10="WDH4:"+trend_by_ma10_w1+" "+lblBtn10;
+         lblBtn10="WD"+(trend_by_ma10_w1==trend_by_ma10_h4?"H4":"")+" "+trend_by_ma10_w1+" "+lblBtn10;
          clrBackground=trend_by_ma10_w1==TREND_BUY?clrActiveBtn:clrActiveSell;
         }
-      if(StringFind(strBSL,"$")>0)
-         clrBackground=clrLightGray;
-      clrBackground=is_cur_tab?clrPowderBlue:clrBackground;
-
-      if(trend_by_ma10_w1!=trend_by_ma10_d1)
+      else
         {
-         clrText=clrGray;
+         clrText=clrLightGray;
          clrBackground=clrWhite;
         }
+
+      //clrBackground=is_cur_tab?clrPowderBlue:clrBackground;
+
 
       createButton(BtnD10+symbol,lblBtn10+symbol,x+(btn_width+5)*count,is_cur_tab && (index > 0)?y-7:y,btn_width
                    ,(index==0)?btn_heigh:is_cur_tab?btn_heigh+15:btn_heigh,clrText,clrBackground,6,SUB_WINDOW);
@@ -934,7 +934,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
      {
       CandleData arrHeiken_D1[];
       get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,15,true,false);
-      string trend_by_ma10_d1=arrHeiken_D1[0].trend_by_ma10;
+      string trend_by_ma10_d1=get_trend_by_ma(symbol,PERIOD_D1,10,1);
 
 
       if(is_cur_tab)
@@ -1041,259 +1041,151 @@ void LoadTradeBySeqEvery5min()
       bool is_allow_alert = allow_send_alert(symbol);
       string total_comments="";
       string strBSL=CountBSL(symbol,total_comments);
-      bool is_can_open_trade=strBSL==""?true:false;
       //----------------------------------------------------------------------------------------------------
-      CandleData arrHeiken_D1[];
-      get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,15,true,false);
-
-      CandleData arrHeiken_H4[];
-      get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,50,true,true);
-
-      CandleData arrHeiken_H1[];
-      get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,50,true,true);
-
-      CandleData arrHeiken_15[];
-      get_arr_heiken(symbol,PERIOD_M15,arrHeiken_15,50,true,true);
-
       string trend_by_ma10_w1=get_trend_by_ma(symbol,PERIOD_W1,10,0);
-      string trend_by_ma10_d1=arrHeiken_D1[0].trend_by_ma10;
-      string trend_by_ma10_h4=arrHeiken_H4[0].trend_by_ma10;
-      string trend_by_ma10_h1=arrHeiken_H1[1].trend_by_ma10;
-      //string trend_heiken_h1 = arrHeiken_H1[1].trend_heiken;
-
-      bool allow_notice_h1=allow_PushMessage(symbol,FILE_MSG_LIST_H1);
-      bool allow_notice_h4=allow_PushMessage(symbol,FILE_MSG_LIST_H4);
-      bool allow_notice_d1B=allow_PushMessage("B."+symbol,FILE_MSG_LIST_D1);
-      bool allow_notice_d1S=allow_PushMessage("S."+symbol,FILE_MSG_LIST_D1);
-      //
-      //      if(allow_notice_d1 && arrHeiken_D1[0].count_ma10<=3)
-      //        {
-      //         string msg=symbol+" D1 Ma10("+IntegerToString(arrHeiken_D1[0].count_ma10)+") "+trend_by_ma10_d1;
-      //         Alert(get_vnhour()+" "+msg);
-      //         PushMessage(msg,FILE_MSG_LIST_D1);
-      //         allow_notice_d1=false;
-      //        }
-      //
-      //      if(allow_notice_d1 && 1<arrHeiken_D1[0].count_heiken && arrHeiken_D1[0].count_heiken<=3)
-      //        {
-      //         string msg=symbol+" D1 Hei("+IntegerToString(arrHeiken_D1[0].count_heiken)+") "+arrHeiken_D1[0].trend_heiken;
-      //         if(is_can_open_trade)
-      //            Alert(get_vnhour()+" "+msg);
-      //         PushMessage(msg,FILE_MSG_LIST_D1);
-      //         allow_notice_d1=false;
-      //        }
-      //
-      //      if(allow_notice_d1 && arrHeiken_D1[1].count_heiken<=2)
-      //        {
-      //         string msg=symbol+" D1 Hei("+IntegerToString(arrHeiken_D1[1].count_heiken)+") "+arrHeiken_D1[1].trend_heiken;
-      //         if(is_can_open_trade)
-      //            Alert(get_vnhour()+" "+msg);
-      //         PushMessage(msg,FILE_MSG_LIST_D1);
-      //         allow_notice_d1=false;
-      //        }
-
-      //      if(allow_notice_h4 && trend_by_ma10_w1==trend_by_ma10_h4 && arrHeiken_H4[0].allow_trade_now_by_seq_051020)
-      //        {
-      //         string msg=symbol+" H4 Seq051020 "+trend_by_ma10_w1;
-      //         if(is_can_open_trade)
-      //            Alert(get_vnhour()+" "+msg);
-      //         PushMessage(msg,FILE_MSG_LIST_H4);
-      //         allow_notice_h4=false;
-      //        }
-      //
-      //      if(allow_notice_h4 && trend_by_ma10_w1==arrHeiken_H4[1].trend_by_ma10 && trend_by_ma10_w1==arrHeiken_H4[1].trend_by_ma20 && arrHeiken_H4[1].count_ma20<=3)
-      //        {
-      //         string msg_OK=symbol+" H4Ma20("+IntegerToString(arrHeiken_H4[0].count_ma20)+") " + trend_by_ma10_w1;
-      //         if(is_can_open_trade)
-      //            Alert(get_vnhour()+" "+msg_OK);
-      //         PushMessage(msg_OK,FILE_MSG_LIST_H4);
-      //         allow_notice_h4=false;
-      //        }
-
-      double ma05_1 = arrHeiken_H1[1].ma05;
-      double ma05_2 = arrHeiken_H1[2].ma05;
-      double ma10_1 = arrHeiken_H1[1].ma10;
-      double ma10_2 = arrHeiken_H1[2].ma10;
-      double ma20_1 = arrHeiken_H1[1].ma20;
-      double ma20_2 = arrHeiken_H1[2].ma20;
-      double ma50_1 = arrHeiken_H1[1].ma50;
-      double ma50_2 = arrHeiken_H1[2].ma50;
-      // Kiểm tra xem MA6 có giao cắt với MA20 không
-      bool h1_ma5_cutting_ma10_buy = (ma05_1 > ma10_1 && ma05_2 < ma10_2);
-      bool h1_ma5_cutting_ma10_sel = (ma05_1 < ma10_1 && ma05_2 > ma10_2);
-
-      bool h1_ma5_cutting_ma20_buy = (ma05_1 > ma20_1 && ma05_2 < ma20_2);
-      bool h1_ma5_cutting_ma20_sel = (ma05_1 < ma20_1 && ma05_2 > ma20_2);
-
-      bool h1_ma5_cutting_ma50_buy = (ma05_1 > ma50_1 && ma05_2 < ma50_2);
-      bool h1_ma5_cutting_ma50_sel = (ma05_1 < ma50_1 && ma05_2 > ma50_2);
-
-
-      string str_cutting="";
-      str_cutting+=trend_by_ma10_d1==TREND_BUY && h1_ma5_cutting_ma10_buy?" 5B10":"";
-      str_cutting+=trend_by_ma10_d1==TREND_BUY && h1_ma5_cutting_ma20_buy?" 5B20":"";
-      str_cutting+=trend_by_ma10_d1==TREND_BUY && h1_ma5_cutting_ma50_buy?" 5B50":"";
-
-      str_cutting+=trend_by_ma10_d1==TREND_SEL && h1_ma5_cutting_ma10_sel?" 5S10":"";
-      str_cutting+=trend_by_ma10_d1==TREND_SEL && h1_ma5_cutting_ma20_sel?" 5S20":"";
-      str_cutting+=trend_by_ma10_d1==TREND_SEL && h1_ma5_cutting_ma50_sel?" 5S50":"";
-
-      if(allow_notice_h1)
+      string trend_by_ma10_d1=get_trend_by_ma(symbol,PERIOD_D1,10,1);
+      string trend_by_ma10_h4=get_trend_by_ma(symbol,PERIOD_H4,10,1);
+      bool is_same_wd=(trend_by_ma10_w1==trend_by_ma10_d1);
+      bool is_same_wdh4 = is_same_wd && (trend_by_ma10_w1==trend_by_ma10_h4);
+      if(is_same_wd)
         {
-         if(is_allow_trade_by_macd_extremes(symbol,PERIOD_M5,trend_by_ma10_d1))
+         CandleData arrHeiken_15[];
+         get_arr_heiken(symbol,PERIOD_M15,arrHeiken_15,50,true,true);
+
+         bool is_can_open_trade=(strBSL=="") && is_same_wd?true:false;
+
+         bool allow_notice_d1B=allow_PushMessage("B."+symbol,FILE_MSG_LIST_D1);
+         bool allow_notice_d1S=allow_PushMessage("S."+symbol,FILE_MSG_LIST_D1);
+
+         if(allow_notice_d1B || allow_notice_d1S)
            {
-            if(allow_notice_h1 && is_allow_trade_by_macd_extremes(symbol,PERIOD_H1,trend_by_ma10_d1))
+            double m15_ma05_1 = arrHeiken_15[1].ma05;
+            double m15_ma05_2 = arrHeiken_15[2].ma05;
+            double m15_ma50_1 = arrHeiken_15[1].ma50;
+            double m15_ma50_2 = arrHeiken_15[2].ma50;
+            bool m15_ma5_cutting_ma50_buy = (m15_ma05_1 > m15_ma50_1 && m15_ma05_2 < m15_ma50_2);
+            bool m15_ma5_cutting_ma50_sel = (m15_ma05_1 < m15_ma50_1 && m15_ma05_2 > m15_ma50_2);
+
+            if((allow_notice_d1B && m15_ma5_cutting_ma50_buy) || (allow_notice_d1S && m15_ma5_cutting_ma50_sel))
               {
-               string msg=symbol+" Macd H1M5 Extremes "+trend_by_ma10_d1;
+               string msg=(m15_ma5_cutting_ma50_buy?"B.":"S.")+symbol+" M15 ";
+               if(m15_ma5_cutting_ma50_buy)
+                  msg+=" 15 cut 50 ("+TREND_BUY+")";
+               if(m15_ma5_cutting_ma50_sel)
+                  msg+=" 15 cut 50 ("+TREND_SEL+")";
+
+               if((m15_ma5_cutting_ma50_buy && trend_by_ma10_d1==TREND_BUY) ||
+                  (m15_ma5_cutting_ma50_sel && trend_by_ma10_d1==TREND_SEL))
+                 {
+                  Alert(get_vnhour()+" "+msg);
+
+                  last_symbol=symbol;
+
+                  PushMessage(msg,FILE_MSG_LIST_D1);
+                 }
+              }
+           }
+
+         if(is_same_wdh4)
+           {
+            CandleData arrHeiken_H4[];
+            get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,50,true,true);
+
+            CandleData arrHeiken_H1[];
+            get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,50,true,true);
+
+            string trend_by_ma10_h1=arrHeiken_H1[1].trend_by_ma10;
+
+            bool allow_notice_h4=allow_PushMessage(symbol,FILE_MSG_LIST_H4);
+            bool allow_notice_h1=allow_PushMessage(symbol,FILE_MSG_LIST_H1);
+            bool allow_notice_seq_h1=allow_PushMessage(symbol,FILE_MSG_SEQ_H1);
+            //----------------------------------------------------------------------------------------------------
+
+            if(allow_notice_h4 && arrHeiken_H4[1].count_ma10<=3 && is_same_symbol(trend_by_ma10_d1, trend_by_ma10_h4))
+              {
+               string msg_OK=symbol+" H4Ma10("+IntegerToString(arrHeiken_H4[0].count_ma10)+") " + trend_by_ma10_d1;
+               if(is_can_open_trade)
+                  Alert(get_vnhour()+" "+msg_OK);
+               PushMessage(msg_OK,FILE_MSG_LIST_H4);
+               allow_notice_h4=false;
+              }
+
+            if(allow_notice_h4 && arrHeiken_H4[1].count_heiken<=3 && is_same_symbol(trend_by_ma10_d1, arrHeiken_H4[1].trend_heiken))
+              {
+               string msg_OK=symbol+" H4Hei("+IntegerToString(arrHeiken_H4[1].count_heiken)+") " + trend_by_ma10_d1;
+               if(is_can_open_trade)
+                  Alert(get_vnhour()+" "+msg_OK);
+               PushMessage(msg_OK,FILE_MSG_LIST_H4);
+               allow_notice_h4=false;
+              }
+
+            //----------------------------------------------------------------------------------------------------
+
+            if(allow_notice_h1 && allow_trade_now_by_stoc(symbol,PERIOD_H1,trend_by_ma10_d1,21,7,7,1))
+              {
+               string msg=symbol+" H1(21,7,7) = D."+trend_by_ma10_d1;
                if(is_can_open_trade)
                   Alert(get_vnhour()+" "+msg);
+
                PushMessage(msg,FILE_MSG_LIST_H1);
                allow_notice_h1=false;
-              }
-
-            if(allow_notice_h1 && is_allow_trade_by_macd_extremes(symbol,PERIOD_M15,trend_by_ma10_d1))
-              {
-               string msg=symbol+" Macd M15M5 Extremes "+trend_by_ma10_d1;
-               if(is_can_open_trade)
-                  Alert(get_vnhour()+" "+msg);
-               PushMessage(msg,FILE_MSG_LIST_H1);
-               allow_notice_h1=false;
-              }
-           }
-        }
-
-      if(trend_by_ma10_d1==arrHeiken_D1[0].trend_by_ma05
-         || trend_by_ma10_d1==arrHeiken_D1[1].trend_by_ma10
-         || trend_by_ma10_d1==arrHeiken_D1[1].trend_heiken
-         || trend_by_ma10_d1==arrHeiken_D1[0].trend_heiken)
-        {
-         string trend_by_ma50_h4=arrHeiken_H4[0].close>arrHeiken_H4[0].ma50?TREND_BUY:TREND_SEL;
-         string trend_by_ma20_h4=arrHeiken_H4[0].close>arrHeiken_H4[0].ma20?TREND_BUY:TREND_SEL;
-         string trend_by_ma20_vs_ma50_h4=arrHeiken_H4[0].ma20>arrHeiken_H4[0].ma50?TREND_BUY:TREND_SEL;
-         string trend_by_ma50_h1=arrHeiken_H1[0].close>arrHeiken_H1[0].ma50?TREND_BUY:TREND_SEL;
-         bool is_contact_ma50_H4=arrHeiken_H4[0].low < arrHeiken_H4[0].ma50 && arrHeiken_H4[0].ma50<arrHeiken_H4[0].high;
-
-         string trend_by_seq_h1="";
-         if(is_same_symbol(arrHeiken_H1[0].trend_ma05vs10, arrHeiken_H1[0].trend_ma10vs20) && trend_by_ma10_h1==arrHeiken_H1[0].trend_heiken)
-            trend_by_seq_h1=arrHeiken_H1[0].trend_ma10vs20;
-
-         string trend_by_seq_h4="";
-         if(is_same_symbol(arrHeiken_H4[0].trend_ma05vs10, arrHeiken_H4[0].trend_ma10vs20) && trend_by_ma10_h4==arrHeiken_H4[0].trend_heiken)
-            trend_by_seq_h4=arrHeiken_H4[0].trend_ma10vs20;
-
-         bool allow_notice_15=allow_PushMessage(symbol,FILE_MSG_LIST_M15);
-         bool allow_notice_sl=allow_PushMessage(symbol,FILE_MSG_LIST_SL);
-         bool allow_notice_seq_h1=allow_PushMessage(symbol,FILE_MSG_SEQ_H1);
-
-         //if(allow_notice_h4 && trend_by_ma10_d1==trend_by_ma10_h4 && arrHeiken_H4[0].allow_trade_now_by_seq_051020)
-         //  {
-         //   string msg=symbol+" H4 Seq051020 "+trend_by_ma10_d1;
-         //   if(is_can_open_trade)
-         //      Alert(get_vnhour()+" "+msg);
-         //   PushMessage(msg,FILE_MSG_LIST_H4);
-         //   allow_notice_h4=false;
-         //  }
-
-         //if(allow_notice_h4 && trend_by_ma10_d1==trend_by_ma20_h4 && trend_by_ma10_d1==trend_by_ma10_h4 && arrHeiken_H4[1].count_ma20<=2)
-         //  {
-         //   string msg_OK=symbol+" H4Ma20("+IntegerToString(arrHeiken_H4[0].count_ma20)+") " + trend_by_ma20_h4;
-         //   if(is_can_open_trade)
-         //      Alert(get_vnhour()+" "+msg_OK);
-         //   PushMessage(msg_OK,FILE_MSG_LIST_H4);
-         //   allow_notice_h4=false;
-         //  }
-
-         //if(allow_notice_h4 && trend_by_ma10_d1==trend_by_ma10_h4 && arrHeiken_H4[1].count_ma10<=2)
-         //  {
-         //   string msg_OK=symbol+" H4Ma10("+IntegerToString(arrHeiken_H4[0].count_ma10)+") " + trend_by_ma10_h4;
-         //   if(is_can_open_trade)
-         //      Alert(get_vnhour()+" "+msg_OK);
-         //   PushMessage(msg_OK,FILE_MSG_LIST_H4);
-         //   allow_notice_h4=false;
-         //  }
-
-         if(allow_notice_seq_h1 && trend_by_ma10_d1==trend_by_seq_h1
-            //&& trend_by_ma10_d1==trend_heiken_h1
-           )
-            if(arrHeiken_H1[1].count_ma10<=5 ||  arrHeiken_H1[1].count_ma20<=3)
-              {
-               string msg_OK=symbol+" Seq051020 H1 "+trend_by_seq_h1;
-               if(is_same_symbol(trend_by_seq_h4, trend_by_seq_h1))
-                  msg_OK+=" (+H4)";
-               PushMessage(msg_OK,FILE_MSG_SEQ_H1);
-               allow_notice_seq_h1=false;
-              }
-
-         if(allow_notice_seq_h1 && trend_by_ma10_d1==trend_by_ma10_h1
-            //&& trend_by_ma10_d1==trend_heiken_h1
-            && arrHeiken_H1[0].allow_trade_now_by_seq_102050)
-           {
-            string trend_by_seq_102050=arrHeiken_H1[0].trend_by_seq_102050;
-              {
-               string msg=symbol+" H1 Seq102050 "+trend_by_seq_102050;
-               //if(is_can_open_trade)
-               //   Alert(get_vnhour()+" "+msg);
-               PushMessage(msg,FILE_MSG_SEQ_H1);
-               allow_notice_h1=false;
-              }
-           }
-
-         if(allow_notice_seq_h1 && trend_by_ma10_d1==trend_by_ma10_h1
-            //&& trend_by_ma10_d1==trend_heiken_h1
-            && arrHeiken_H1[0].allow_trade_now_by_seq_051020)
-           {
-            string msg=symbol+" H1 Seq051020 "+trend_by_ma10_d1;
-            //if(is_can_open_trade)
-            //   Alert(get_vnhour()+" "+msg);
-            PushMessage(msg,FILE_MSG_SEQ_H1);
-            allow_notice_h1=false;
-           }
-        }
-      //----------------------------------------------------------------------------------------------------
-      //----------------------------------------------------------------------------------------------------
-      //----------------------------------------------------------------------------------------------------
-      if(allow_notice_d1B || allow_notice_d1S)
-        {
-         double m15_ma05_1 = arrHeiken_15[1].ma05;
-         double m15_ma05_2 = arrHeiken_15[2].ma05;
-         double m15_ma50_1 = arrHeiken_15[1].ma50;
-         double m15_ma50_2 = arrHeiken_15[2].ma50;
-         bool m15_ma5_cutting_ma50_buy = (m15_ma05_1 > m15_ma50_1 && m15_ma05_2 < m15_ma50_2);
-         bool m15_ma5_cutting_ma50_sel = (m15_ma05_1 < m15_ma50_1 && m15_ma05_2 > m15_ma50_2);
-
-         if((allow_notice_d1B && m15_ma5_cutting_ma50_buy) || (allow_notice_d1S && m15_ma5_cutting_ma50_sel))
-           {
-            string msg=(m15_ma5_cutting_ma50_buy?"B.":"S.")+symbol+" M15 ";
-            if(m15_ma5_cutting_ma50_buy)
-               msg+=" 05 cut 50 ("+TREND_BUY+")";
-            if(m15_ma5_cutting_ma50_sel)
-               msg+=" 05 cut 50 ("+TREND_SEL+")";
-
-            if((m15_ma5_cutting_ma50_buy && trend_by_ma10_d1==TREND_BUY) ||
-               (m15_ma5_cutting_ma50_sel && trend_by_ma10_d1==TREND_SEL))
-              {
-               msg+=" = D."+IntegerToString(arrHeiken_D1[0].count_ma10);
-               Alert(get_vnhour()+" "+msg);
 
                last_symbol=symbol;
               }
 
-            PushMessage(msg,FILE_MSG_LIST_D1);
+
+            if(allow_notice_h1)
+               if(is_allow_trade_by_macd_extremes(symbol,PERIOD_M15,trend_by_ma10_d1) &&
+                  is_allow_trade_by_macd_extremes(symbol,PERIOD_M5,trend_by_ma10_d1))
+                 {
+                  string msg=symbol+" Macd M15M5 Extremes "+trend_by_ma10_d1;
+                  if(is_can_open_trade)
+                     Alert(get_vnhour()+" "+msg);
+
+                  PushMessage(msg,FILE_MSG_LIST_H1);
+                  allow_notice_h1=false;
+
+                  last_symbol=symbol;
+                 }
+
+            //----------------------------------------------------------------------------------------------------
+
+            string trend_by_seq_h1="";
+            if(is_same_symbol(arrHeiken_H1[0].trend_ma05vs10, arrHeiken_H1[0].trend_ma10vs20) && trend_by_ma10_h1==arrHeiken_H1[0].trend_heiken)
+               trend_by_seq_h1=arrHeiken_H1[0].trend_ma10vs20;
+
+            string trend_by_seq_h4="";
+            if(is_same_symbol(arrHeiken_H4[0].trend_ma05vs10, arrHeiken_H4[0].trend_ma10vs20) && trend_by_ma10_h4==arrHeiken_H4[0].trend_heiken)
+               trend_by_seq_h4=arrHeiken_H4[0].trend_ma10vs20;
+
+            if(allow_notice_seq_h1 && trend_by_ma10_d1==arrHeiken_H1[0].trend_heiken
+               && arrHeiken_H1[0].allow_trade_now_by_seq_051020)
+              {
+               string msg=symbol+" H1 Seq051020 "+trend_by_ma10_d1;
+               if(is_same_symbol(trend_by_seq_h4, trend_by_seq_h1))
+                  msg+=" (+H4)";
+
+               if(is_can_open_trade)
+                  Alert(get_vnhour()+" "+msg);
+               PushMessage(msg,FILE_MSG_SEQ_H1);
+               allow_notice_seq_h1=false;
+
+               last_symbol=symbol;
+              }
+
+            if(allow_notice_seq_h1 && trend_by_ma10_d1==trend_by_seq_h1)
+               if(arrHeiken_H1[1].count_ma10<=5 ||  arrHeiken_H1[1].count_ma20<=3)
+                 {
+                  string msg_OK=symbol+" Seq051020 H1 "+trend_by_seq_h1;
+                  if(is_same_symbol(trend_by_seq_h4, trend_by_seq_h1))
+                     msg_OK+=" (+H4)";
+                  PushMessage(msg_OK,FILE_MSG_SEQ_H1);
+                  allow_notice_seq_h1=false;
+                 }
            }
         }
-
-      if(allow_notice_h4) //&& is_same_symbol(arrHeiken_15[0].trend_heiken, trend_by_ma10_d1)
-         if(allow_trade_now_by_stoc(symbol,PERIOD_M15,trend_by_ma10_d1,21,7,7,0))
-           {
-            string msg=symbol+" M15(21,7,7) = D."+trend_by_ma10_d1+"."+IntegerToString(arrHeiken_D1[0].count_ma10);
-            if(is_can_open_trade)
-               Alert(get_vnhour()+" "+msg);
-
-            PushMessage(msg,FILE_MSG_LIST_H4);
-            allow_notice_h4=false;
-
-            last_symbol=symbol;
-           }
+      //----------------------------------------------------------------------------------------------------
+      //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
@@ -1671,7 +1563,13 @@ void LoadTradeBySeqEvery5min()
    CreateMessagesBtn(BtnSeqD1_);
 
    if(last_symbol!="")
-      OpenChartWindow(last_symbol,PERIOD_M15);
+     {
+      //int intPeriod = (int)GetGlobalVariable(BtnOptionPeriod);
+      //if(intPeriod==-1)
+      //   intPeriod = PERIOD_D1;
+      //
+      //OpenChartWindow(last_symbol,(ENUM_TIMEFRAMES)intPeriod);
+     }
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -4572,29 +4470,10 @@ void OnChartEvent(const int     id,      // event ID
             TP=LM-amp_sl;
            }
 
-
          CandleData arrHeiken_H4[];
          get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,50,true,true);
 
-         CandleData arrHeiken_H1[];
-         get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,50,true,true);
-
-         string trend_by_seq_h1="";
-         if(is_same_symbol(arrHeiken_H1[0].trend_ma05vs10, arrHeiken_H1[0].trend_ma10vs20))
-            trend_by_seq_h1=arrHeiken_H1[0].trend_ma10vs20;
-
-         string trend_by_seq_h4="";
-         if(is_same_symbol(arrHeiken_H4[0].trend_ma05vs10, arrHeiken_H4[0].trend_ma10vs20))
-            trend_by_seq_h4=arrHeiken_H4[0].trend_ma10vs20;
-
-         if(trend_by_seq_h1==trend_by_seq_h4 && trend_by_seq_h4==get_trend_reverse(trend_now))
-           {
-            string msg=get_vnhour()+" "+symbol+" (Seq051020) H4+H1 NotAllow "+trend_now;
-            Alert(msg);
-            return;
-           }
-
-         string trend_by_ma50_h4=arrHeiken_H4[0].close>arrHeiken_H4[0].ma50?TREND_BUY:TREND_SEL;
+         string trend_by_ma50_h4=bid>arrHeiken_H4[0].ma50?TREND_BUY:TREND_SEL;
          if(trend_now!=arrHeiken_H4[0].trend_by_ma10 && trend_now!=arrHeiken_H4[0].trend_by_ma20 && trend_now!=trend_by_ma50_h4)
            {
             string msg=get_vnhour()+" "+symbol+" (Ma10|Ma20|Ma50) H4 NotAllow "+trend_now;
@@ -4610,12 +4489,10 @@ void OnChartEvent(const int     id,      // event ID
             return;
            }
 
-         string trend_ma10_h1=arrHeiken_H1[1].trend_by_ma10;
-
          double volume=calc_volume_by_amp(symbol,amp_sl,risk);
          string msg=get_vntime()+trend+" "+symbol+" risk:"+DoubleToString(risk,1)+" Vol:"+DoubleToString(volume,2)
                     +"\n"+comment_market+"?"
-                    +"    (Ma10) H1: "+trend_ma10_h1 + ((is_same_symbol(trend,TREND_BUY) || is_same_symbol(trend,TREND_SEL)) &&  is_same_symbol(trend,trend_ma10_h1)==false?" >>> (Ma10) H1 not allow "+trend:"")
+                    +"    (Ma10) H4: "+arrHeiken_H4[0].trend_by_ma10 + ((is_same_symbol(trend,TREND_BUY) || is_same_symbol(trend,TREND_SEL)) &&  is_same_symbol(trend,arrHeiken_H4[0].trend_by_ma10)==false?" >>> (Ma10) H4 not allow "+trend:"")
                     +"\n(Yes) " + trend
                     +"\n(No) Market: "+ trend_now;
          int result=MessageBox(msg,"Confirm",MB_YESNOCANCEL);

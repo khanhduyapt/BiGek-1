@@ -346,7 +346,7 @@ if __name__ == "__main__":
     # Lấy thư mục hiện tại của chương trình
     # current_folder = os.getcwd()
     # output_folder = os.path.join(current_folder, "Files")
-    output_folder = r"D:\01_Projects\ScanBinance\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\Files"
+    output_folder = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\Files"
     if not os.path.exists(output_folder):
         print(f"Folder not exists: {output_folder}. Creating it...")
         os.makedirs(output_folder)
@@ -364,7 +364,7 @@ if __name__ == "__main__":
     #     ("HOSE", "HPG"),
     #     ("HOSE", "QCG")
     # ]
-    file_name = r"D:\01_Projects\ScanBinance\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
+    file_name = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
     # save_symbols_to_file_if_not_exist(file_name, default_symbols)
     symbols = load_symbols_from_file(file_name)
 
