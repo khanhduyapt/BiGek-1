@@ -134,6 +134,7 @@ const string MASK_RevD10="(R.V)";
 const string MASK_COUNT_TRI= "(:3)";
 const string MASK_ALLOW_TRIPPLE="(3X)";
 const string MASK_POSITION="(P.O.S)";
+const string MASK_WEEKLY="(=W1)";
 const int BTN_WIDTH_STANDA=180;
 int count_closed_today=0;
 double MAXIMUM_DOUBLE=999999999;
@@ -1029,12 +1030,18 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
 
    int start_x=chart_width/2+500;
-   createButton(BtnSaveTrendline,"Save Trendline",    start_x+100,chart_heigh-35,100,30,clrBlack,clrActiveBtn);
-   createButton(BtnAddSword+"Buy", "\\ Buy",          start_x+210,chart_heigh-35,40,30,clrBlack,clrPaleTurquoise);
-   createButton(BtnAddSword+"Sel", "/ Sel",           start_x+260,chart_heigh-35,40,30,clrBlack,clrLightPink);
-   createButton(BtnHorTrendline, "-----",             start_x+310,chart_heigh-35,40,30,clrBlack,clrWhite);
-   createButton(BtnAddTrendline, "Clone",             start_x+360,chart_heigh-35,40,30,clrBlack,clrWhite);
-   createButton(BtnClearTrendline, "Delete Trendline",start_x+410,chart_heigh-35,100,30,clrBlack,clrLightGray);
+   createButton(BtnSaveTrendline,"Save",        start_x+200-50*1,chart_heigh-35,90,30,clrBlack,clrPaleTurquoise);
+   createButton(BtnAddSword+"30_Buy", "30.B",   start_x+200+50*1,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   createButton(BtnAddSword+"45_Buy", "45.B",   start_x+200+50*2,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   createButton(BtnAddSword+"60_Buy", "60.B",   start_x+200+50*3,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+
+   createButton(BtnAddSword+"30_Sel", "30.S",   start_x+200+50*4,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   createButton(BtnAddSword+"45_Sel", "45.S",   start_x+200+50*5,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   createButton(BtnAddSword+"60_Sel", "60.S",   start_x+200+50*6,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+
+   createButton(BtnHorTrendline,   "-----",     start_x+200+50*7,chart_heigh-35,40,30,clrBlack,clrWhite);
+   createButton(BtnAddTrendline,   "Clone",     start_x+200+50*8,chart_heigh-35,40,30,clrBlack,clrWhite);
+   createButton(BtnClearTrendline, "Delete",    start_x+200+50*9,chart_heigh-35,40,30,clrBlack,clrLightGray);
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -1143,7 +1150,7 @@ void LoadTradeBySeqEvery5min()
            {
             string msg=symbol+" H1 Seq "+trend_ma05_vs_ma50_h1;
             if(is_same_symbol(trend_by_ma10_w1, trend_ma05_vs_ma50_h1))
-               msg+=" =W1";
+               msg+=" "+MASK_WEEKLY;
 
             Alert(get_vnhour()+" "+msg);
             last_symbol=symbol;
@@ -3614,7 +3621,7 @@ void OnChartEvent(const int     id,      // event ID
 
       if(is_same_symbol(sparam,BtnAddSword))
         {
-         AddSword(is_same_symbol(sparam,"Buy")?TREND_BUY:TREND_SEL);
+         AddSword(sparam);
          return;
         }
 
@@ -5402,14 +5409,15 @@ void CreateMessagesBtn(string BtnSeq___)
       if(BtnSeq___==BtnMsgR1C4_)
         {
          clrBackground=clrWhite;
-         if(is_same_symbol(lable,"(+H4)"))
+         if(is_same_symbol(lable,"(+H4)") || is_same_symbol(lable,MASK_WEEKLY))
             clrBackground=is_same_symbol(lable,TREND_BUY)?clrHoneydew:clrMistyRose;
 
          if(strCountBSL!="")
             clrBackground=clrLightGray;
         }
 
-      clrBackground=is_same_symbol(lable,Symbol())?clrPowderBlue:clrBackground;
+      if(BtnSeq___==BtnMsgR1C4_)
+         clrBackground=is_same_symbol(lable,Symbol())?clrPowderBlue:clrBackground;
 
       createButton(BtnSeq___+append1Zero(index),strCountBSL+lable,x_position,y_position+index*20,250,18,clrBlack,clrBackground,6);
      }
@@ -6777,7 +6785,7 @@ void AddTrendline(bool is_add_new=false)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void AddSword(string trend)
+void AddSword(string btn_name)
   {
    double amp_w1,amp_d1,amp_h4,amp_h1;
    GetAmpAvgL15(Symbol(),amp_w1,amp_d1,amp_h4,amp_h1);
@@ -6805,14 +6813,31 @@ void AddSword(string trend)
          end_time = start_time + TIME_OF_ONE_W1_CANDLE*3;
       end_price = _price;
 
+      double price_2=_price - (is_same_symbol(btn_name,TREND_BUY)?amp_d1*1.5:-amp_d1*1.5);
 
-      double price_2=_price - (is_same_symbol(trend,TREND_BUY)?amp_d1*1.5:-amp_d1*1.5);
       int x_2, y_2;
       if(ChartTimePriceToXY(0,0,start_time,price_2, x_2, y_2))
         {
          int heigh=MathAbs(y_1-y_2);
          int x_3=x_2+heigh;
          int y_3=y_2;
+
+         if(is_same_symbol(btn_name,TREND_BUY))
+           {
+            if(is_same_symbol(btn_name,"30_Buy"))
+               x_3=(int)(x_2+heigh/2);
+
+            if(is_same_symbol(btn_name,"60_Buy"))
+               y_3=(int)(y_2-heigh/2);
+           }
+         else
+           {
+            if(is_same_symbol(btn_name,"30_Sel"))
+               x_3=(int)(x_2+heigh/2);
+
+            if(is_same_symbol(btn_name,"60_Sel"))
+               y_3=(int)(y_2+heigh/2);
+           }
 
          if(ChartXYToTimePrice(0, x_3, y_3, _sub_windows, _time, _price))
            {
@@ -6869,7 +6894,7 @@ void LoadTrendlines()
          ObjectSetInteger(0, trendline_name, OBJPROP_WIDTH,3);
          ObjectSetInteger(0, trendline_name, OBJPROP_RAY, false);
          ObjectSetInteger(0, trendline_name, OBJPROP_SELECTABLE, true);
-         ObjectSetInteger(0, trendline_name, OBJPROP_SELECTED, true);
+         ObjectSetInteger(0, trendline_name, OBJPROP_SELECTED, false);
         }
      }
 
