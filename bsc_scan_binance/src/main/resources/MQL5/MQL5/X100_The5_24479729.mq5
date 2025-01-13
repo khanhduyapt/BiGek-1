@@ -28,8 +28,9 @@ string telegram_url="https://api.telegram.org";
 #define LINE_RR_11       "LINE_RR 1:1"
 #define LINE_RR_12       "LINE_RR 1:2"
 #define LINE_RR_13       "LINE_RR 1:3"
-#define GLOBAL_LINE_TIMER_ "GLOBAL_LINE_TIMER_"
-#define FIBO_TIME_ZONE_    "FiboTimeZone_"
+#define GLOBAL_LINE_TIMER_1 "GLOBAL_LINE_TIMER_1_"
+#define GLOBAL_LINE_TIMER_2 "GLOBAL_LINE_TIMER_2_"
+#define FIBO_TIME_ZONE_     "FiboTimeZone_"
 //Nếu giá trị biến không phải hôm nay thì Alert, âm là Sell, dương là Buy.
 #define GLOBAL_VAR_051020H4_  "GLOBAL_VAR_051020H4_"// -yyMMddhhmm
 #define GLOBAL_VAR_051020H1_  "GLOBAL_VAR_051020H1_"// -yyMMddhhmm
@@ -220,7 +221,6 @@ int OnInit()
       Draw_Ma(cur_symbol,PERIOD_W1, 10,22,20,true);
       Draw_Ma(cur_symbol,PERIOD_D1, 20,20,50);
       Draw_Ma(cur_symbol,PERIOD_D1, 10,15,50);
-      //DrawFiboTimeZone52H4(cur_symbol);
      }
    else
      {
@@ -240,6 +240,9 @@ int OnInit()
          create_label("count_stoch",TimeCurrent(),50,"Stoc.No."+append1Zero(calnde) + "." + trend,trend,true,10,false,2);
         }
      }
+
+   if(Period()==PERIOD_H4)
+      DrawFiboTimeZone52H4(cur_symbol);
 
    if(Period()>PERIOD_D1)
       ObjectsDeleteAll(0);
@@ -335,12 +338,12 @@ void OnTick()
 
       //-------------------------------------------------------------------------------
       bool reload=false;
-      int size = getArraySymbolsSize();
       double risk_1L = Risk_1L();
 
       bool is_exit_time=is_exit_trade_time();
       bool is_exit_all_weekend=is_exit_all_by_weekend();
 
+      int size = getArraySymbolsSize();
       for(int index = 0; index < size; index++)
         {
          string temp_symbol = getSymbolAtIndex(index);
@@ -358,7 +361,7 @@ void OnTick()
          double amp_w1,amp_d1,amp_h4,amp_h1;
          GetAmpAvgL15(temp_symbol,amp_w1,amp_d1,amp_h4,amp_h1);
 
-         if(is_exit_time)
+         if(is_exit_all_weekend)
            {
             CloseLimitOrder(temp_symbol,TREND_BUY);
             CloseLimitOrder(temp_symbol,TREND_SEL);
@@ -723,7 +726,7 @@ void DrawButtons()
       if(is_same_symbol(strBSL,MASK_EXIT))
          clrText=clrRed;
 
-      //clrBackground=is_cur_tab?clrPowderBlue:clrBackground;
+      clrBackground=is_cur_tab?(is_same_symbol(lblBtn10,TREND_BUY)?clrPowderBlue:clrTomato):clrBackground;
 
       createButton(BtnD10+symbol,lblBtn10+symbol,x+(btn_width+5)*count,is_cur_tab && (index > 0)?y-7:y,btn_width
                    ,(index==0)?btn_heigh:is_cur_tab?btn_heigh+15:btn_heigh,clrText,clrBackground,6,SUB_WINDOW);
@@ -850,16 +853,25 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
    double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
    int digits = (int)SymbolInfoInteger(symbol,SYMBOL_DIGITS);
    bool is_cur_tab=is_same_symbol(symbol,Symbol());
-   double line_timer=GetGlobalVariable(GLOBAL_LINE_TIMER_+symbol);
 
    string total_comments="";
    string strBSL=CountBSL(symbol,total_comments,true);//Alert(total_comments);
 
-   if(line_timer<=0)
+   double vline_timer_1=GetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol);
+   if(vline_timer_1<=0 || vline_timer_1<0.1 || is_same_symbol((string)(datetime)vline_timer_1,"1970"))
      {
-      line_timer=(double)(TimeCurrent()+TIME_OF_ONE_H4_CANDLE);
-      SetGlobalVariable(GLOBAL_LINE_TIMER_+symbol,line_timer);
+      vline_timer_1=(double)(TimeCurrent()-TIME_OF_ONE_W1_CANDLE);
+      SetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol,vline_timer_1);
      }
+
+   double vline_timer_2=GetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol);
+   if(vline_timer_2<=0 || vline_timer_2<0.1 || is_same_symbol((string)(datetime)vline_timer_2,"1970"))
+     {
+      vline_timer_2=(double)(TimeCurrent()+TIME_OF_ONE_H4_CANDLE);
+      SetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol,vline_timer_2);
+     }
+
+//Alert((string)(datetime)vline_timer_1, (string)(datetime)vline_timer_2);
 
    if(LM<=0 || SL<=0 || is_reset_sl)
      {
@@ -1069,8 +1081,8 @@ void LoadTradeBySeqEvery5min()
       CandleData arrHeiken_H1[];
       get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,55,true,true);
 
-      double h4_low_1  = MathMin(MathMin(arrHeiken_H4[0].low,arrHeiken_H4[1].low),MathMin(arrHeiken_H4[2].low,arrHeiken_H4[3].low));
-      double h4_hig_1  = MathMax(MathMax(arrHeiken_H4[0].high,arrHeiken_H4[1].high),MathMax(arrHeiken_H4[2].high,arrHeiken_H4[3].high));
+      double h4_low_1  = MathMin(MathMin(arrHeiken_H4[0].low,arrHeiken_H4[1].low),arrHeiken_H4[2].low);
+      double h4_hig_1  = MathMax(MathMax(arrHeiken_H4[0].high,arrHeiken_H4[1].high),arrHeiken_H4[2].high);
 
       double h4_ma20_1 = arrHeiken_H4[1].ma20;
       double h4_ma50_1 = arrHeiken_H4[1].ma50;
@@ -1646,86 +1658,153 @@ void CheckTrendlineUpdates(bool re_draw=false)
 //+------------------------------------------------------------------+
 void UpdateGlobalTimeOnChange(string symbol)
   {
-   datetime base_time = (datetime)GetGlobalVariable(GLOBAL_LINE_TIMER_+symbol);
-   if(base_time<=0)
-      base_time=TimeCurrent();
+   datetime vline_timer_1=(datetime)GetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol);
+   if(vline_timer_1<=0)
+      vline_timer_1=(datetime)(TimeCurrent()-TIME_OF_ONE_W1_CANDLE);
 
-   datetime new_time = (datetime)ObjectGetInteger(0, GLOBAL_LINE_TIMER_, OBJPROP_TIME);
+   datetime vline_timer_2=(datetime)GetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol);
+   if(vline_timer_2<=0)
+      vline_timer_2=(datetime)(TimeCurrent()+TIME_OF_ONE_H4_CANDLE);
 
-   if(base_time != new_time)
+   datetime new_time_1 = (datetime)ObjectGetInteger(0, GLOBAL_LINE_TIMER_1, OBJPROP_TIME);
+   datetime new_time_2 = (datetime)ObjectGetInteger(0, GLOBAL_LINE_TIMER_2, OBJPROP_TIME);
+
+   bool re_draw=false;
+   if(vline_timer_1 != new_time_1)
      {
-      SetGlobalVariable(GLOBAL_LINE_TIMER_+symbol, new_time);
-      DrawFiboTimeZone52H4(symbol);
+      SetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol, new_time_1);
+      re_draw=true;
      }
+
+   if(vline_timer_2 != new_time_2)
+     {
+      SetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol, new_time_2);
+      re_draw=true;
+     }
+
+   if(re_draw)
+      DrawFiboTimeZone52H4(symbol);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double GetClosePriceAtTime(string symbol, datetime base_time)
+  {
+   int candle_index = iBarShift(symbol, PERIOD_D1, base_time);
+
+   if(candle_index >= 0)
+      return iClose(symbol, PERIOD_D1, candle_index);
+   else
+      return 0;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 void DrawFiboTimeZone52H4(string symbol)
   {
-   return;
-
    int width=3;
    if(Period()>PERIOD_H4)
      {
       width=1;
       DeleteAllObjectsWithPrefix(FIBO_TIME_ZONE_);
      }
+
    if(Period()<PERIOD_D1)
      {
-      Print(get_vntime()+"DrawFiboTimeZone52H4");
+
       string fibo_name = FIBO_TIME_ZONE_+symbol;
-      string global_name = GLOBAL_LINE_TIMER_+symbol;
-      datetime base_time = (datetime)GetGlobalVariable(global_name);
 
-      create_dragable_vertical_line(GLOBAL_LINE_TIMER_,base_time,clrBlue,STYLE_SOLID,width);
+      datetime base_time_1 = (datetime)GetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol);
+      datetime base_time_2 = (datetime)GetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol);
 
-      if(!ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time, 0))
+      if(StringLen((string)base_time_1)<4 || is_same_symbol((string)(datetime)base_time_1,"1970"))
+        {
+         base_time_1=TimeCurrent()-TIME_OF_ONE_W1_CANDLE;
+         SetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol,base_time_1);
+        }
+
+      if(StringLen((string)base_time_2)<4 || is_same_symbol((string)(datetime)base_time_2,"1970"))
+        {
+         base_time_2=TimeCurrent()+TIME_OF_ONE_H4_CANDLE;
+         SetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol,base_time_2);
+        }
+
+      Print(get_vntime()+"DrawFiboTimeZone52H4:"+(string)base_time_1 + ","+(string)base_time_2);
+
+      create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,base_time_1,clrDimGray,STYLE_SOLID,5);
+      create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,base_time_2,clrLightGray,STYLE_SOLID,5);
+
+      double price1=GetClosePriceAtTime(symbol, base_time_1);
+      double price2=GetClosePriceAtTime(symbol, base_time_2);
+
+      if(price1 < price2)
+        {
+         int candle_index1 = iBarShift(symbol, PERIOD_D1, base_time_1);
+         int candle_index2 = iBarShift(symbol, PERIOD_D1, base_time_2);
+         price1=iLow(symbol, PERIOD_D1, candle_index1);
+         price2=iHigh(symbol, PERIOD_D1, candle_index2);
+
+         DrawFibonacciFan1("Fibo_Fan_"+TREND_BUY, base_time_1, price1,base_time_2,price2, clrBlue);
+         DrawFibonacciFan1("Fibo_Fan_"+TREND_SEL, base_time_1, price2,base_time_2,price1, clrFireBrick);
+        }
+      else
+        {
+         int candle_index1 = iBarShift(symbol, PERIOD_D1, base_time_1);
+         int candle_index2 = iBarShift(symbol, PERIOD_D1, base_time_2);
+         price1=iHigh(symbol, PERIOD_D1, candle_index1);
+         price2=iLow(symbol, PERIOD_D1, candle_index2);
+
+         DrawFibonacciFan1("Fibo_Fan_"+TREND_SEL, base_time_1, price1,base_time_2,price2, clrFireBrick);
+         DrawFibonacciFan1("Fibo_Fan_"+TREND_BUY, base_time_1, price2,base_time_2,price1, clrBlue);
+        }
+
+
+      if(!ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time_1, 0))
         {
          Print("Error: Unable to create Fibonacci Time Zone.");
          return;
         }
 
-      int candle_distance = 53;
-      datetime interval = CalculateIntervalUsingITime(symbol,base_time,candle_distance);
-      double top_price = ChartGetDouble(0, CHART_PRICE_MIN)+(iHigh(symbol,PERIOD_H1,1)-iLow(symbol,PERIOD_H1,1))/3;
-
+      //int candle_distance = 53;
+      //datetime interval = CalculateIntervalUsingITime(symbol,base_time,candle_distance);
+      //double top_price = ChartGetDouble(0, CHART_PRICE_MIN)+(iHigh(symbol,PERIOD_H1,1)-iLow(symbol,PERIOD_H1,1))/3;
       //DrawDragableLine("Candles52H4",base_time,top_price,interval/8);
-
       //---------------------------------------------------------------------------------------------------------------
-
-      string fibo_4_seasons=fibo_name+"4_seasons";
-      ObjectDelete(0, fibo_4_seasons);
-      ObjectCreate(0, fibo_4_seasons, OBJ_FIBOTIMES, 0, base_time, 0, base_time + interval, 0);
-
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_COLOR, clrFireBrick);
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_STYLE, STYLE_SOLID);
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_WIDTH, 1);
-
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_BACK, false);
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_SELECTABLE, true);
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_SELECTED, true);
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_RAY_RIGHT, true);
-
-      double levels_4seasons[] = {0,0.236, 0.5, 0.764, 1
-                                  ,-0.236,-0.5,-0.764,-1
-                                 };
-      int levels_4seasons_count = ArraySize(levels_4seasons);
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELS, levels_4seasons_count);
-
-      for(int i = 0; i < levels_4seasons_count; i++)
+      width=1;
+      if(false)
         {
-         ObjectSetDouble(0, fibo_4_seasons, OBJPROP_LEVELVALUE, i, levels_4seasons[i]);
-         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELCOLOR, i, clrFireBrick);
-         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELSTYLE, i, STYLE_SOLID);
-         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELWIDTH, i, 1);
-         ObjectSetString(0, fibo_4_seasons, OBJPROP_LEVELTEXT, i, DoubleToString(levels_4seasons[i], 3));
-        }
+         string fibo_4_seasons=fibo_name+"4_seasons";
+         ObjectDelete(0, fibo_4_seasons);
+         ObjectCreate(0, fibo_4_seasons, OBJ_FIBOTIMES, 0, base_time_1, 0, base_time_2, 0);
 
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_COLOR, clrFireBrick);
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_STYLE, STYLE_SOLID);
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_WIDTH, 1);
+
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_BACK, false);
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_SELECTABLE, true);
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_SELECTED, true);
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_RAY_RIGHT, true);
+
+         double levels_4seasons[] = {0,0.236, 0.5, 0.764, 1
+                                     ,-0.236,-0.5,-0.764,-1
+                                    };
+         int levels_4seasons_count = ArraySize(levels_4seasons);
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELS, levels_4seasons_count);
+
+         for(int i = 0; i < levels_4seasons_count; i++)
+           {
+            ObjectSetDouble(0, fibo_4_seasons, OBJPROP_LEVELVALUE, i, levels_4seasons[i]);
+            ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELCOLOR, i, clrFireBrick);
+            ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELSTYLE, i, STYLE_SOLID);
+            ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELWIDTH, i, 1);
+            ObjectSetString(0, fibo_4_seasons, OBJPROP_LEVELTEXT, i, DoubleToString(levels_4seasons[i], 3));
+           }
+        }
       //---------------------------------------------------------------------------------------------------------------
-      color clrColor=clrBlack;
+      color clrColor=clrBlue;
       ObjectDelete(0, fibo_name);
-      ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time, 0, base_time + interval, 0);
+      ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time_1, 0, base_time_2, 0);
 
       ObjectSetInteger(0, fibo_name, OBJPROP_COLOR, clrColor);
       ObjectSetInteger(0, fibo_name, OBJPROP_STYLE, STYLE_SOLID);
@@ -2285,8 +2364,8 @@ void Draw_Fibo(string symbol, ENUM_TIMEFRAMES TIMEFRAME)
       if(MathAbs(price1-price2)>amp_w1)
         {
          DrawFibonacciTimeZones(BOT_SHORT_NM+"TimeZone", date2, date1, price1);
-         DrawFibonacciFan(BOT_SHORT_NM+"_Fibo_Fan_S", date2, MathMin(price1, price2), date1, MathMax(price1, price2), TREND_SEL);
-         DrawFibonacciFan(BOT_SHORT_NM+"_Fibo_Fan_B", date2, MathMax(price1, price2), date1, MathMin(price1, price2), TREND_BUY);
+         //DrawFibonacciFan(BOT_SHORT_NM+"_Fibo_Fan_S", date2, MathMin(price1, price2), date1, MathMax(price1, price2), TREND_SEL);
+         //DrawFibonacciFan(BOT_SHORT_NM+"_Fibo_Fan_B", date2, MathMax(price1, price2), date1, MathMin(price1, price2), TREND_BUY);
         }
      }
   }
@@ -2594,6 +2673,39 @@ void DrawFibonacciRetracement(string name,datetime time1,double price1,datetime 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
+void DrawFibonacciFan1(string name,datetime time1,double price1,datetime time2,double price2, color clrColor)
+  {
+   Print(get_vntime()+" "+name + "; "+(string)time1 + "; "+(string)price1);
+
+   ObjectDelete(0,name);
+   ObjectCreate(0,name,OBJ_FIBOFAN,0,time1,price1,time2,price2);
+
+   ObjectSetInteger(0,name,OBJPROP_COLOR,clrColor);        // Màu của Fibonacci Fan
+   ObjectSetInteger(0,name,OBJPROP_STYLE,STYLE_SOLID);    // Kiểu đường kẻ
+   ObjectSetInteger(0,name,OBJPROP_WIDTH,1);              // Độ dày của đường kẻ
+
+   color clrLevelColor=clrBlack;
+   double levels[] = {0.0, 0.500, 0.500, 0.75, 1.0};
+
+   int size = ArraySize(levels);
+
+   ObjectSetInteger(0,name,OBJPROP_LEVELS,size);
+   for(int i = 0; i < size; i++)
+     {
+      ObjectSetDouble(0,name,OBJPROP_LEVELVALUE,i,levels[i]);
+      ObjectSetInteger(0,name,OBJPROP_LEVELCOLOR,i,clrColor);
+      ObjectSetInteger(0,name,OBJPROP_LEVELSTYLE,i,STYLE_SOLID);
+      ObjectSetInteger(0,name,OBJPROP_LEVELWIDTH,i,1);
+     }
+
+   ObjectSetInteger(0,name,OBJPROP_BACK,true);           // Hiển thị ở phía sau
+   ObjectSetInteger(0,name,OBJPROP_SELECTED,false);      // Không được chọn mặc định
+   ObjectSetInteger(0,name,OBJPROP_SELECTABLE,false);    // Có thể chọn được
+   ObjectSetInteger(0,name,OBJPROP_HIDDEN,true);         // Không ẩn
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void DrawFibonacciFan(string name,datetime time1,double price1,datetime time2,double price2,string TREND)
   {
    ObjectDelete(0,name);
@@ -2637,8 +2749,7 @@ void DrawFibonacciFan(string name,datetime time1,double price1,datetime time2,do
       ObjectSetInteger(0,name,OBJPROP_LEVELCOLOR,i,clrLevelColor);
       ObjectSetInteger(0,name,OBJPROP_LEVELSTYLE,i,STYLE_SOLID);
       ObjectSetInteger(0,name,OBJPROP_LEVELWIDTH,i,1);
-      //if(TREND==TREND_BUY)
-      //   ObjectSetString(0,name,OBJPROP_LEVELTEXT,i,format_double_to_string(levels[i]*100,1)); // DoubleToString(levels[i],1)
+      ObjectSetString(0,name,OBJPROP_LEVELTEXT,i,DoubleToString(levels[i],3));
      }
 
    ObjectSetInteger(0,name,OBJPROP_BACK,true);           // Hiển thị ở phía sau
@@ -3555,7 +3666,10 @@ void OnChartEvent(const int     id,      // event ID
   {
    if(id==CHARTEVENT_OBJECT_DRAG)
      {
-      if(is_same_symbol(sparam,GLOBAL_VAR_SL) || is_same_symbol(sparam,GLOBAL_VAR_LM) || is_same_symbol(sparam,GLOBAL_LINE_TIMER_))
+      if(is_same_symbol(sparam,GLOBAL_VAR_SL) || is_same_symbol(sparam,GLOBAL_VAR_LM)
+         || is_same_symbol(sparam,GLOBAL_LINE_TIMER_1)
+         || is_same_symbol(sparam,GLOBAL_LINE_TIMER_2)
+        )
         {
          string objName = ObjectGetString(0,sparam,OBJPROP_NAME);
          Print(sparam," was DRAG");
@@ -5419,6 +5533,9 @@ void CreateMessagesBtn(string BtnSeq___)
       if(BtnSeq___==BtnMsgR1C4_)
          clrBackground=is_same_symbol(lable,Symbol())?clrPowderBlue:clrBackground;
 
+      bool is_cur_tab = is_same_symbol(symbol,Symbol());
+      clrBackground=is_cur_tab?(is_same_symbol(lable,TREND_BUY)?clrPowderBlue:clrTomato):clrBackground;
+
       createButton(BtnSeq___+append1Zero(index),strCountBSL+lable,x_position,y_position+index*20,250,18,clrBlack,clrBackground,6);
      }
   }
@@ -6635,9 +6752,16 @@ void DrawDragableLine(string line_name, datetime base_time, double top_price, da
 //+------------------------------------------------------------------+
 string get_trendline_consistent_file_name()
   {
-   string file_name = "TREND_LINES_"+Symbol() + ".csv";
-   StringReplace(file_name,".cash","");
+   return "TREND_LINES_"+get_consistent_symbol(Symbol()) + ".csv";
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+string get_consistent_symbol(string symbol)
+  {
+   string file_name = symbol;
 
+   StringReplace(file_name,".cash","");
    StringReplace(file_name,"XTIUSD","USOIL");
    StringReplace(file_name,"SP500", "US500");
    StringReplace(file_name,"NAS100","US100");
@@ -6753,7 +6877,7 @@ void AddTrendline(bool is_add_new=false)
          end_price = _price;
 
 
-         double price_2=_price-amp_d1*1.5;
+         double price_2=_price-amp_d1;
          int x_2, y_2;
          if(ChartTimePriceToXY(0,0,start_time,price_2, x_2, y_2))
            {
@@ -6813,7 +6937,7 @@ void AddSword(string btn_name)
          end_time = start_time + TIME_OF_ONE_W1_CANDLE*3;
       end_price = _price;
 
-      double price_2=_price - (is_same_symbol(btn_name,TREND_BUY)?amp_d1*1.5:-amp_d1*1.5);
+      double price_2=_price - (is_same_symbol(btn_name,TREND_BUY)?amp_d1:-amp_d1);
 
       int x_2, y_2;
       if(ChartTimePriceToXY(0,0,start_time,price_2, x_2, y_2))
@@ -6887,14 +7011,30 @@ void LoadTrendlines()
       if(is_same_symbol((string)start_time,"1970"))
          continue;
 
-      // Tạo trendline trên chart
-      if(ObjectCreate(0, trendline_name, OBJ_TREND, 0, StringToTime(start_time), start_price, StringToTime(end_time), end_price))
+      if(is_same_symbol(trendline_name, GLOBAL_LINE_TIMER_1) && start_time!="")
         {
-         ObjectSetInteger(0, trendline_name, OBJPROP_COLOR, clrBlue);
-         ObjectSetInteger(0, trendline_name, OBJPROP_WIDTH,3);
-         ObjectSetInteger(0, trendline_name, OBJPROP_RAY, false);
-         ObjectSetInteger(0, trendline_name, OBJPROP_SELECTABLE, true);
-         ObjectSetInteger(0, trendline_name, OBJPROP_SELECTED, false);
+         int size = getArraySymbolsSize();
+         for(int index = 0; index < size; index++)
+           {
+            string symbol=get_consistent_symbol(getSymbolAtIndex(index));
+            if(is_same_symbol(trendline_name,symbol))
+              {
+               SetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol,(double)start_time);
+               SetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol,(double)end_time);
+              }
+           }
+        }
+      else
+        {
+         // Tạo trendline trên chart
+         if(ObjectCreate(0, trendline_name, OBJ_TREND, 0, StringToTime(start_time), start_price, StringToTime(end_time), end_price))
+           {
+            ObjectSetInteger(0, trendline_name, OBJPROP_COLOR, clrBlue);
+            ObjectSetInteger(0, trendline_name, OBJPROP_WIDTH,3);
+            ObjectSetInteger(0, trendline_name, OBJPROP_RAY, false);
+            ObjectSetInteger(0, trendline_name, OBJPROP_SELECTABLE, true);
+            ObjectSetInteger(0, trendline_name, OBJPROP_SELECTED, false);
+           }
         }
      }
 
@@ -6937,6 +7077,40 @@ void SaveTrendlinesToFile()
          FileWrite(file_handle, obj_name, start_time, start_price, end_time, end_price);
         }
      }
+
+//int size = getArraySymbolsSize();
+//for(int index = 0; index < size; index++)
+     {
+      string symbol = get_consistent_symbol(Symbol());
+      datetime base_time_1 = (datetime)GetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol);
+      datetime base_time_2 = (datetime)GetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol);
+
+      if(StringLen((string)base_time_1)<4 || is_same_symbol((string)(datetime)base_time_1,"1970"))
+        {
+         base_time_1=TimeCurrent()-TIME_OF_ONE_W1_CANDLE;
+         SetGlobalVariable(GLOBAL_LINE_TIMER_1+symbol,base_time_1);
+        }
+
+      if(StringLen((string)base_time_2)<4 || is_same_symbol((string)(datetime)base_time_2,"1970"))
+        {
+         base_time_2=TimeCurrent()+TIME_OF_ONE_H4_CANDLE;
+         SetGlobalVariable(GLOBAL_LINE_TIMER_2+symbol,base_time_2);
+        }
+
+      string obj_name=GLOBAL_LINE_TIMER_1+symbol;
+      datetime start_time = base_time_1;
+      double start_price = 0;
+      datetime end_time = base_time_2;
+      double end_price = 0;
+
+      Print("Trendline: ", obj_name,
+            " | Start: Time=", start_time, ", Price=", start_price,
+            " | End: Time=", end_time, ", Price=", end_price);
+
+      // Ghi thông tin trendline vào file
+      FileWrite(file_handle, obj_name, start_time, start_price, end_time, end_price);
+     }
+
 
    FileClose(file_handle); // Đóng file sau khi lưu xong
 //Print("Saving to file: ", TerminalInfoString(TERMINAL_COMMONDATA_PATH), "\\Files\\", file_name);
