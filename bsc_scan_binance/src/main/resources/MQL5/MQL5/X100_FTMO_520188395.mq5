@@ -121,7 +121,7 @@ string telegram_url="https://api.telegram.org";
 #define AVG_HEIGHT_H4 "AVG_HEIGHT_H4_"
 #define AVG_HEIGHT_H1 "AVG_HEIGHT_H1_"
 //-----------------------------------------------------------------------------
-const int MAXIMUM_OPENING=20;
+const int MAXIMUM_OPENING=25;
 const string TREND_BUY="BUY";
 const string TREND_SEL="SELL";
 const string TREND_LIMIT_BUY = "L.M.B.U.Y";
@@ -228,7 +228,7 @@ int OnInit()
    else
      {
       Draw_Ma(cur_symbol,PERIOD_MN1,10,25,16);
-      Draw_Ma(cur_symbol,PERIOD_W1, 10,22,30,true);
+      Draw_Ma(cur_symbol,PERIOD_W1, 10,22,52,true);
       if(Period()==PERIOD_H4)
         {
          //Draw_Ma(cur_symbol,PERIOD_D1,50,20,120);
@@ -244,7 +244,7 @@ int OnInit()
         }
      }
 
-   if(Period()<=PERIOD_H4)
+   if(Period()<=PERIOD_D1)
       DrawFiboTimeZone52H4(cur_symbol);
 
    if(Period()>PERIOD_D1)
@@ -276,9 +276,6 @@ int OnInit()
 
    init_sl_tp_trendline(false);
    DrawButtons();
-
-   if(Period()<PERIOD_D1)
-      Draw_Fibo(cur_symbol,PERIOD_D1);
 
    Comment(GetComments());
 
@@ -715,20 +712,21 @@ void DrawButtons()
       string trend_by_ma10_w1=get_trend_by_ma(symbol,PERIOD_W1,10,0);
       string trend_by_ma10_d1=get_trend_by_ma(symbol,PERIOD_D1,10,1);
       string trend_by_ma10_h4=get_trend_by_ma(symbol,PERIOD_H4,10,1);
-      if(trend_by_ma10_w1==trend_by_ma10_d1)
+
+      if(is_same_symbol(trend_by_ma10_w1, trend_by_ma10_d1))
         {
          lblBtn10="WD"+(trend_by_ma10_w1==trend_by_ma10_h4?"H4":"")+" "+trend_by_ma10_w1+" "+lblBtn10;
          clrBackground=trend_by_ma10_w1==TREND_BUY?clrActiveBtn:clrActiveSell;
         }
       else
         {
-         lblBtn10="W"+" "+trend_by_ma10_w1+" "+lblBtn10;
+         lblBtn10="D"+" "+trend_by_ma10_d1+" "+lblBtn10;
          clrText=clrLightGray;
          clrBackground=clrWhite;
         }
 
-      if(is_same_symbol(strBSL,MASK_EXIT))
-         clrText=clrRed;
+      //if(is_same_symbol(strBSL,MASK_EXIT))
+      //   clrText=clrRed;
 
       clrBackground=is_cur_tab?(is_same_symbol(lblBtn10,TREND_BUY)?clrPowderBlue:clrTomato):clrBackground;
 
@@ -794,6 +792,8 @@ void DrawButtons()
 
          is_allow_trade_by_macd_extremes(symbol,PERIOD_M15,"");
          is_allow_trade_by_macd_extremes(symbol,PERIOD_M5,"");
+
+         Draw_Fibo(symbol,PERIOD_D1);
         }
      }
 
@@ -935,6 +935,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
       CandleData arrHeiken_W1[];
       get_arr_heiken(symbol,PERIOD_W1,arrHeiken_W1,15,true,false);
       string trend_by_ma10_w1=arrHeiken_W1[0].trend_by_ma10;
+      string trend_by_ma10_d1=get_trend_by_ma(symbol,PERIOD_D1,10,1);
 
       if(is_cur_tab)
         {
@@ -967,29 +968,32 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
       if(strBSL!="")
          createButton(BtnReSetTPEntry,"Tp.Entry",start_group_reverse-270,y_start-10,60,20,clrBlack,clrWhite);
 
-      createButton(BtnTrendReverse,"Reverse",start_group_reverse-200,y_start-10,60,20,clrBlack,clrYellow);
+      createButton(BtnTrendReverse,"Reverse",start_group_reverse-150,y_start-10,60,20,clrBlack,clrYellow);
 
+      //createButton(BtnSuggestTrend,"W ("+getShortName(trend_by_ma10_w1)+"."+(string)arrHeiken_W1[0].count_ma10+") " + trend_by_ma10_w1
+      //             +" "+ DoubleToString(volme_by_amp_trade_now,2)+ "~"+(string)volme_by_amp_sl+".lot" + EST_SL
+      //             ,start_group_reverse-80,y_start-10,240,20,clrBlack
+      //             ,is_same_symbol(trend_by_ma10_w1,TREND_BUY)?clrActiveBtn:clrActiveSell);
 
-
-      createButton(BtnSuggestTrend,"W ("+getShortName(trend_by_ma10_w1)+"."+(string)arrHeiken_W1[0].count_ma10+") " + trend_by_ma10_w1
-                   +" "+ DoubleToString(volme_by_amp_trade_now,2)+ "~"+(string)volme_by_amp_sl+".lot" + EST_SL
-                   ,start_group_reverse-70,y_start-10,230,20,clrBlack
-                   ,is_same_symbol(trend_by_ma10_w1,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnFindR11,"1:1",start_group_reverse+170,y_start-10,        30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
-      createButton(BtnSetAmpTrade+"W1","W1",start_group_reverse+205,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
+      createButton(BtnSetAmpTrade+"2D","2D",start_group_reverse+205,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"D1","D1",start_group_reverse+240,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"H4","H4",start_group_reverse+275,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
 
+      color clrWeek = is_same_symbol(trend_by_ma10_w1,TREND_BUY)?clrActiveBtn:clrActiveSell;
+      createButton(BtnSuggestTrend,"W:"+ trend_by_ma10_w1,x_start-260,y_start-10,55,20,clrBlack,clrWeek);
+
       ObjectDelete(0,BtnFindBuy);
       ObjectDelete(0,BtnFindSel);
-      string lblTradeNow ="W "+
+
+      string lblTradeNow ="W"+(is_same_symbol(trend_by_ma10_w1,trend_by_ma10_d1)?".D":"")+" "+
                           "(Ma."+getShortName(trend_by_ma10_w1)+(string)arrHeiken_W1[0].count_ma10+") "
                           "(Hei."+getShortName(arrHeiken_W1[0].trend_heiken)+(string)arrHeiken_W1[0].count_heiken+")"
                           +" Now?";
       if(is_same_symbol(trend_by_ma10_w1,TREND_BUY))
-         createButton(BtnFindBuy,lblTradeNow,x_start-180,y_start-10,160,20,clrBlack,clrActiveBtn);
+         createButton(BtnFindBuy,lblTradeNow,x_start-200,y_start-10,180,20,clrBlack,clrWeek);
       else
-         createButton(BtnFindSel,lblTradeNow,x_start-180,y_start-10,160,20,clrBlack,clrActiveSell);
+         createButton(BtnFindSel,lblTradeNow,x_start-200,y_start-10,180,20,clrBlack,clrWeek);
 
       createButton(BtnSetPriceLimit+"(h1)10","(h1)10",x_start-15,y_start-20,50,18,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetPriceLimit+"(h1)20","(h1)20",x_start+40,y_start-20,50,18,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
@@ -1099,7 +1103,8 @@ void LoadTradeBySeqEvery5min()
          string msg=symbol+" H4 Ma("+IntegerToString(arrHeiken_H4[0].count_ma10)+") "
                     + " Hei("+IntegerToString(arrHeiken_H4[0].count_heiken)+") "
                     +trend_by_ma10_w1;
-         Alert(get_vnhour()+" "+msg);
+         if(is_allow_alert)
+            Alert(get_vnhour()+" "+msg);
          last_symbol=symbol;
          PushMessage(msg,FILE_MSG_LIST_R1C2);
          h4_notice_R1C2=false;
@@ -1114,7 +1119,8 @@ void LoadTradeBySeqEvery5min()
          if(stoc_candle_no<=5 && is_same_symbol(trend_by_ma10_w1,trend_stoc_h4))
            {
             string msg=symbol+" H4 (27,9,9) C."+append1Zero(stoc_candle_no) + "." + trend_stoc_h4;
-            Alert(get_vnhour()+" "+msg);
+            if(is_allow_alert)
+               Alert(get_vnhour()+" "+msg);
             last_symbol=symbol;
             PushMessage(msg,FILE_MSG_LIST_R1C2);
             h4_notice_R1C2=false;
@@ -1134,7 +1140,8 @@ void LoadTradeBySeqEvery5min()
       if(h1_touch_ma50 && h1_notice_R1C3)
         {
          string msg=symbol+" H1 | Ma50 ";
-         Alert(get_vnhour()+" "+msg);
+         if(is_allow_alert)
+            Alert(get_vnhour()+" "+msg);
          last_symbol=symbol;
          PushMessage(msg,FILE_MSG_LIST_R1C3);
          h1_notice_R1C3=false;
@@ -1152,8 +1159,8 @@ void LoadTradeBySeqEvery5min()
             string msg=symbol+" H1 Seq "+trend_ma20_vs_ma50_h1;
             if(is_same_symbol(trend_by_ma10_w1, trend_ma20_vs_ma50_h1))
                msg+=" "+MASK_WEEKLY;
-
-            Alert(get_vnhour()+" "+msg);
+            if(is_allow_alert)
+               Alert(get_vnhour()+" "+msg);
             last_symbol=symbol;
             PushMessage(msg,FILE_MSG_LIST_R1C4);
             h1_notice_R1C4=false;
@@ -1659,13 +1666,13 @@ double GetClosePriceAtTime(string symbol, datetime base_time)
 void DrawFiboTimeZone52H4(string symbol)
   {
    int width=3;
-   if(Period()>PERIOD_H4)
+//if(Period()>PERIOD_H4)
      {
       width=1;
       DeleteAllObjectsWithPrefix(FIBO_TIME_ZONE_);
      }
 
-   if(Period()<PERIOD_D1)
+//if(Period()<PERIOD_D1)
      {
       string fibo_name = FIBO_TIME_ZONE_+symbol;
 
@@ -1673,8 +1680,8 @@ void DrawFiboTimeZone52H4(string symbol)
       LoadTimelines(base_time_1, base_time_2);
 
       Print(get_vntime()+"DrawFiboTimeZone52H4:"+(string)base_time_1 + ","+(string)base_time_2);
-      create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,base_time_1,clrDimGray,STYLE_SOLID,5);
-      create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,base_time_2,clrGray,   STYLE_SOLID,5);
+      create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,base_time_1,clrSilver,STYLE_SOLID,5);
+      create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,base_time_2,clrLightGray,STYLE_SOLID,5);
 
 
       double price1=GetClosePriceAtTime(symbol, base_time_1);
@@ -1689,7 +1696,11 @@ void DrawFiboTimeZone52H4(string symbol)
 
          DrawFibonacciFan1("Fibo_Fan_"+TREND_BUY, base_time_1, price1,base_time_2,price2, clrBlue);
          DrawFibonacciFan1("Fibo_Fan_"+TREND_SEL, base_time_1, price2,base_time_2,price1, clrFireBrick);
-         create_label_simple("CoundD","  (S).D1->D2: "+IntegerToString(candle_index1-candle_index2)+" Days",(price1+price2)/2,clrRed,base_time_1);
+
+         create_label_simple("CoundD1","  (S) "+IntegerToString(candle_index1-candle_index2)+"D",(price1+price2)/2,clrRed,base_time_1);
+
+         double f=(double)candle_index2/(double)(candle_index1-candle_index2);
+         create_label_simple("CoundD2","  (S) "+IntegerToString(candle_index2)+"D " + DoubleToString(f,2),(price1+price2)/2,clrRed,base_time_2);
         }
       else
         {
@@ -1700,10 +1711,42 @@ void DrawFiboTimeZone52H4(string symbol)
 
          DrawFibonacciFan1("Fibo_Fan_"+TREND_SEL, base_time_1, price1,base_time_2,price2, clrFireBrick);
          DrawFibonacciFan1("Fibo_Fan_"+TREND_BUY, base_time_1, price2,base_time_2,price1, clrBlue);
-         create_label_simple("CoundD","  (B) .D1->D2: "+IntegerToString(candle_index1-candle_index2)+" Days",(price1+price2)/2,clrBlue,base_time_1);
+
+         create_label_simple("CoundD1","  (B) "+IntegerToString(candle_index1-candle_index2)+"D",(price1+price2)/2,clrBlue,base_time_1);
+
+         double f=(double)candle_index2/(double)(candle_index1-candle_index2);
+         create_label_simple("CoundD2","  (B) "+IntegerToString(candle_index2)+"D " + DoubleToString(f,2),(price1+price2)/2,clrBlue,base_time_2);
         }
+      //---------------------------------------------------------------------------------------------------------------
+      int width=1;
+      double levels_d1d2[] = {0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1
+                              , 1.382, 1.618, 2, 2.618
+                              ,-0.382,-0.618,-1,-1.618,-2.618
+                             };
+      string name = "Fibo_D1D2";
+      ObjectDelete(0,name);
+      ObjectCreate(0,name,OBJ_FIBO,0,base_time_1-TIME_OF_ONE_D1_CANDLE*3,price1,base_time_1+TIME_OF_ONE_D1_CANDLE*3,price2);
 
+      ObjectSetInteger(0,name,OBJPROP_COLOR,clrNONE);              // Màu của Fibonacci
+      ObjectSetInteger(0,name,OBJPROP_STYLE,STYLE_DOT);              // Kiểu đường kẻ (nét đứt)
+      ObjectSetInteger(0,name,OBJPROP_WIDTH,1);                     // Độ dày của đường kẻ
+      ObjectSetInteger(0,name,OBJPROP_BACK,false);
+      ObjectSetInteger(0,name,OBJPROP_RAY_LEFT,false);
+      ObjectSetInteger(0,name,OBJPROP_RAY_RIGHT,false);
+      ObjectSetInteger(0,name,OBJPROP_SELECTABLE,true);
+      ObjectSetInteger(0,name,OBJPROP_SELECTED,true);
 
+      int size_d1d2 = ArraySize(levels_d1d2);
+      ObjectSetInteger(0,name,OBJPROP_LEVELS,size_d1d2);
+      for(int i=0; i<size_d1d2; i++)
+        {
+         ObjectSetDouble(0,name,OBJPROP_LEVELVALUE,i,levels_d1d2[i]);
+         ObjectSetInteger(0,name,OBJPROP_LEVELCOLOR,i,clrBlack);
+         ObjectSetInteger(0,name,OBJPROP_LEVELSTYLE,i,STYLE_SOLID);
+         ObjectSetString(0,name,OBJPROP_LEVELTEXT,i,DoubleToString(1*MathAbs(levels_d1d2[i]),3)+"");
+         ObjectSetInteger(0,name,OBJPROP_LEVELWIDTH,i,width);
+        }
+      //---------------------------------------------------------------------------------------------------------------
       if(!ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time_1, 0))
         {
          Print("Error: Unable to create Fibonacci Time Zone.");
@@ -1714,7 +1757,7 @@ void DrawFiboTimeZone52H4(string symbol)
       //datetime interval = CalculateIntervalUsingITime(symbol,base_time,candle_distance);
       //double top_price = ChartGetDouble(0, CHART_PRICE_MIN)+(iHigh(symbol,PERIOD_H1,1)-iLow(symbol,PERIOD_H1,1))/3;
       //DrawDragableLine("Candles52H4",base_time,top_price,interval/8);
-      //---------------------------------------------------------------------------------------------------------------
+
       width=1;
       if(false)
         {
@@ -3903,7 +3946,7 @@ void OnChartEvent(const int     id,      // event ID
          double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
          double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
 
-         double amp_trade=amp_w1;
+         double amp_trade=amp_d1*2;
          if(is_same_symbol(sparam,"D1"))
             amp_trade=amp_d1;
          if(is_same_symbol(sparam,"H4"))
@@ -3989,12 +4032,10 @@ void OnChartEvent(const int     id,      // event ID
       if(is_same_symbol(sparam,BtnReSetTPEntry))
         {
          string buttonLabel = ObjectGetString(0,sparam,OBJPROP_TEXT);
-         //string msg = symbol+"    "+buttonLabel+"?\n";
-         //int result = MessageBox(msg,"Confirm",MB_YESNOCANCEL);
-         //if(result==IDYES)
-           {
+         string msg = symbol+"    "+buttonLabel+"?\n";
+         int result = MessageBox(msg,"Confirm",MB_YESNOCANCEL);
+         if(result==IDYES)
             ModifyTpEntry(symbol);
-           }
 
          OnInit();
          return;
@@ -6750,7 +6791,7 @@ void AddFiboline()
   {
    double amp_w1,amp_d1,amp_h4,amp_h1;
    GetAmpAvgL15(Symbol(),amp_w1,amp_d1,amp_h4,amp_h1);
-   double price_offset = amp_d1;
+   double price_offset = amp_d1*2;
 
    datetime start_time = 0;
    datetime end_time = 0;
@@ -6774,7 +6815,7 @@ void AddFiboline()
 
       int width=2;
       color clrColor=clrBlack;
-      double levels[] = {0, 0.236, 0.382, 0.5, 0.618, 1};
+      double levels[] = {0, 0.236, 0.382, 0.5, 0.618, 0.764, 1};
       string name = MANUAL_TRENDFIBO_ + TimeToString(TimeCurrent(), TIME_DATE | TIME_MINUTES | TIME_SECONDS);
 
       ObjectDelete(0,name);
@@ -6833,7 +6874,7 @@ void LoadFibolines()
         {
          int width=1;
          color clrColor=clrBlack;
-         double levels[] = {0, 0.236, 0.382, 0.5, 0.618, 1
+         double levels[] = {0, 0.236, 0.382, 0.5, 0.618, 0.764, 1
                             , 1.382, 1.618, 2, 2.618
                             ,-0.382,-0.618,-1,-1.618,-2.618
                            };
@@ -7311,6 +7352,7 @@ void ClearTrendlinesFromFile()
    FileClose(file_handle);
 
 //-----------------------------------------------------------------------
+//return;
 
    file_name = get_fiboline_consistent_file_name(); // File lưu trendline cho từng biểu đồ
    file_handle = FileOpen(file_name, FILE_WRITE | FILE_CSV, ';'); // | FILE_COMMON
