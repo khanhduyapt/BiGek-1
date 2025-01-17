@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                                      Solomon.mq5  |
+//|                                                      Solomon.mq5 |
 //|                                   Copyright 2024,MetaQuotes Ltd. |
 //|                                             https://www.mql5.com |
 //+------------------------------------------------------------------+
@@ -367,12 +367,6 @@ void LoadSLTPEvery5min(bool allow_alert=true)
       double amp_w1,amp_d1,amp_h4,amp_h1;
       GetAmpAvgL15(temp_symbol,amp_w1,amp_d1,amp_h4,amp_h1);
 
-      if(is_exit_all_weekend)
-        {
-         CloseLimitOrder(temp_symbol,TREND_BUY);
-         CloseLimitOrder(temp_symbol,TREND_SEL);
-        }
-
       //string arrNoticeSymbols_SL_1R[];
       string total_comments_cur_symbol="";
       for(int i = PositionsTotal()-1; i >= 0; i--)
@@ -417,7 +411,9 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                string FILE_MSG_LIST_SL=FILE_MSG_LIST_R1C5;
                bool allow_notice_sl=allow_PushMessage(temp_symbol,FILE_MSG_LIST_SL);
                //-------------------------------------------------------------------
-               bool is_exit_by_seq_51020_h4h1 = is_same_symbol(trend_reverse,arrHeiken_H1[0].trend_heiken) &&
+               bool is_exit_by_seq_51020_h4h1 = is_same_symbol(trend_reverse,arrHeiken_D1[0].trend_by_ma10) &&
+
+                                                is_same_symbol(trend_reverse,arrHeiken_H1[0].trend_heiken) &&
                                                 is_same_symbol(trend_reverse,arrHeiken_H1[1].trend_heiken) &&
                                                 is_same_symbol(trend_reverse,arrHeiken_H1[1].trend_by_ma10) &&
                                                 is_same_symbol(trend_reverse,arrHeiken_H1[1].trend_by_ma20) &&
@@ -473,12 +469,12 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                      if(is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_by_ma10)
                         && is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_heiken))
                        {
-                        m_trade.PositionClose(m_position.Ticket());
+                        //m_trade.PositionClose(m_position.Ticket());
                         string msg=" (EXIT "+TREND_TYPE+" By.WD.H4H1="+trend_by_ma10_d1+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)+"$";
                         PushMessage(msg,FILE_MSG_LIST_SL);
                         reload=true;
                         allow_notice_sl=false;
-                        SendTelegramMessage(temp_symbol,trend_by_ma10_d1,msg);
+                        //SendTelegramMessage(temp_symbol,trend_by_ma10_d1,msg);
                        }
                     }
                  }
@@ -528,18 +524,14 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                     }
                  }
                //-------------------------------------------------------------------
-               if(is_exit_all_weekend)
+               if(is_exit_all_weekend && temp_profit>0)
                  {
-                  ModifyTpEntry(temp_symbol);
+                  ClosePositivePosition(temp_symbol,TREND_TYPE);
 
-                  if(is_exit_by_seq_51020_h4h1)
-                    {
-                     m_trade.PositionClose(m_position.Ticket());
-                     SendTelegramMessage(temp_symbol,TREND_TYPE,"(WEEKEND)"+msg);
-                     PushMessage("(WEEKEND)"+msg,FILE_MSG_LIST_SL);
-                     reload=true;
-                     continue;
-                    }
+                  string msg=" (WEEKEND Exit "+TREND_TYPE+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)+"$";
+                  PushMessage(msg,FILE_MSG_LIST_SL);
+                  reload=true;
+                  allow_notice_sl=false;
                  }
                //-------------------------------------------------------------------
                //HARD_SL 1R
@@ -4782,6 +4774,15 @@ void OnChartEvent(const int     id,      // event ID
                TP-=amp_sl;
            }
 
+         bool is_d10_nowt_allow=false;
+
+         CandleData arrHeiken_D1[];
+         get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,15,true,true);
+         if(is_same_symbol(arrHeiken_D1[0].trend_by_ma10,trend_now) == false)
+           {
+            is_d10_nowt_allow=true;
+           }
+
          CandleData arrHeiken_H4[];
          get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,50,true,true);
 
@@ -4789,13 +4790,37 @@ void OnChartEvent(const int     id,      // event ID
          string msg=get_vntime()+trend+" "+symbol+" risk:"+DoubleToString(risk,1)+" Vol:"+DoubleToString(volume,2)
                     +"\n"+comment_market+"?"
                     +"    (Ma10) H4: "+arrHeiken_H4[0].trend_by_ma10 + ((is_same_symbol(trend,TREND_BUY) || is_same_symbol(trend,TREND_SEL)) &&  is_same_symbol(trend,arrHeiken_H4[0].trend_by_ma10)==false?" >>> (Ma10) H4 not allow "+trend:"")
-                    +"\n(Yes) " + trend
+                    +"\n(Yes) " + trend + " LIMIT"
                     +"\n(No) Market: "+ trend_now;
          int result=MessageBox(msg,"Confirm",MB_YESNOCANCEL);
 
 
          if(result==IDYES)
            {
+            if(is_d10_nowt_allow)
+              {
+               double amp_w1,amp_d1,amp_h4,amp_h1;
+               GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
+
+               if(is_same_symbol(comment_market+trend_now,TREND_BUY))
+                 {
+                  trend=TREND_LIMIT_BUY;
+                  LM=MathMin(iLow(symbol,PERIOD_D1,1), iLow(symbol,PERIOD_D1,0));
+                  if(LM+amp_h4>bid)
+                     LM=bid-amp_h4;
+                  SL=LM-amp_sl;
+                 }
+               else
+                 {
+                  trend=TREND_LIMIT_SEL;
+                  LM=MathMax(iHigh(symbol,PERIOD_D1,1), iHigh(symbol,PERIOD_D1,0));
+                  if(LM-amp_h4<ask)
+                     LM=ask+amp_h4;
+                  SL=LM+amp_sl;
+                 }
+              }
+            //Alert(LM,"  ", SL);
+            //return;
             bool market_ok = Open_Position(symbol,trend,volume,SL,LM,TP,comment_market,comment_market);
 
             ObjectsDeleteAll(0);
@@ -4805,11 +4830,9 @@ void OnChartEvent(const int     id,      // event ID
 
          if(result==IDNO)
            {
-            CandleData arrHeiken_D1[];
-            get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,50,true,true);
-            if(is_same_symbol(arrHeiken_D1[0].trend_by_ma10+arrHeiken_D1[0].trend_heiken,trend_now) == false)
+            if(is_d10_nowt_allow)
               {
-               string msg=get_vnhour()+" "+symbol+" (Hei|Ma10) D1 NotAllow "+trend_now;
+               string msg=get_vnhour()+" "+symbol+" (Ma10) D0 NotAllow "+trend_now;
                Alert(msg);
                return;
               }
@@ -6873,7 +6896,10 @@ bool is_exit_all_by_weekend()
 
    const ENUM_DAY_OF_WEEK day_of_week=(ENUM_DAY_OF_WEEK)vietnamDateTime.day_of_week;
 
-   if(day_of_week==SATURDAY && 2 <= currentHour)
+   if(day_of_week==FRIDAY && 22 <= currentHour)
+      return true;
+
+   if(day_of_week==SATURDAY && currentHour>=0)
       return true;
 
    return false;
