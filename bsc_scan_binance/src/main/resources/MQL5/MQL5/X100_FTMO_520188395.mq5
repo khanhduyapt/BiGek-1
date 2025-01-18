@@ -1017,9 +1017,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
    int x_start = chart_width-150;
    if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
      {
-      if(IsButtonExist(BtnSLHere)==false)
-
-         createButton(BtnSLHere,"SL(Here): "+" (" + DoubleToString(MathAbs(SL-LM),digits)+")",x_start-15, y_start-10,160,20,clrBlack,clrYellow);
+      createButton(BtnSLHere,"" + DoubleToString(MathAbs(SL-LM),digits)+"",x_start-15, y_start-10,160,20,clrBlack,clrYellow);
 
       createButton(BtnFindSL,"SL?",x_start-50, y_start-10,30,20,clrBlack,clrYellow);
      }
@@ -1073,7 +1071,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
       color clrDaily = is_same_symbol(trend_by_ma10_d1,TREND_BUY)?clrActiveBtn:clrActiveSell;
       color clrWeek = is_same_symbol(trend_by_ma10_w1,TREND_BUY)?clrActiveBtn:clrActiveSell;
-      createButton(BtnSuggestTrend,"D."+trend_by_ma10_d1+"."+IntegerToString(arrHeiken_D1[1].count_ma10),x_start-310,y_start-10,65,20,clrBlack,clrDaily);
+      createButton(BtnSuggestTrend,"D"+IntegerToString(arrHeiken_D1[1].count_ma10)+"."+trend_by_ma10_d1+"?",x_start-310,y_start-10,65,20,clrBlack,clrDaily);
 
       ObjectDelete(0,BtnFindBuy);
       ObjectDelete(0,BtnFindSel);
