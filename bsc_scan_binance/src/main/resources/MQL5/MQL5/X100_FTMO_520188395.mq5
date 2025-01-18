@@ -1859,7 +1859,7 @@ void DrawFiboTimeZone52H4()
          DrawFibonacciFan1("Fibo_Fan_"+TREND_SEL, base_time_1, price2,base_time_2,price1, clrFireBrick);
 
          //D1->D2
-         create_label_simple("CoundD1","  (S) "+IntegerToString(candle_index1-candle_index2)+"D",(price1+price2)/2,clrRed,base_time_1);
+         create_label_simple("CoundD1","  (S) "+IntegerToString(candle_index1-candle_index2)+"D",MathMin(price1,price2),clrRed,base_time_1);
 
          //double f=(double)candle_index2/(double)(candle_index1-candle_index2);
          //create_label_simple("CoundD2","  (S) "+IntegerToString(candle_index2)+"D " + DoubleToString(f,2),(price1+price2)/2,clrRed,base_time_2);
@@ -1874,7 +1874,7 @@ void DrawFiboTimeZone52H4()
          DrawFibonacciFan1("Fibo_Fan_"+TREND_SEL, base_time_1, price1,base_time_2,price2, clrFireBrick);
          DrawFibonacciFan1("Fibo_Fan_"+TREND_BUY, base_time_1, price2,base_time_2,price1, clrBlue);
 
-         create_label_simple("CoundD1","  (B) "+IntegerToString(candle_index1-candle_index2)+"D",(price1+price2)/2,clrBlue,base_time_1);
+         create_label_simple("CoundD1","  (B) "+IntegerToString(candle_index1-candle_index2)+"D",MathMin(price1,price2),clrBlue,base_time_1);
 
          //double f=(double)candle_index2/(double)(candle_index1-candle_index2);
          //create_label_simple("CoundD2","  (B) "+IntegerToString(candle_index2)+"D " + DoubleToString(f,2),(price1+price2)/2,clrBlue,base_time_2);
