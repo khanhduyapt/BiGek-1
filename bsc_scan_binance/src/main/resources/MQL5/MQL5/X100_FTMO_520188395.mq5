@@ -77,6 +77,7 @@ string telegram_url="https://api.telegram.org";
 #define BtnFindSel                  "BtnFindSel"
 #define BtnFindR11                  "BtnFindR11"
 #define BtnSetPriceLimit            "BtnSetPriceLimit_"
+#define BtnFindSL                   "BtnFindSL"
 #define BtnSLHere                   "BtnSLHere"
 #define BtnSetAmpTrade              "BtnSetAmpTrade_"
 #define BtnSetAmpLM                 "BtnSetAmpLM"
@@ -1014,10 +1015,14 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    int x,y_start;
    int x_start = chart_width-150;
-   if(is_cur_tab && IsButtonExist(BtnSLHere)==false)
-      if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
+   if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
+     {
+      if(IsButtonExist(BtnSLHere)==false)
+
          createButton(BtnSLHere,"SL(Here): "+" (" + DoubleToString(MathAbs(SL-LM),digits)+")",x_start-15, y_start-10,160,20,clrBlack,clrYellow);
 
+      createButton(BtnFindSL,"SL?",x_start-50, y_start-10,30,20,clrBlack,clrYellow);
+     }
 
    if(ChartTimePriceToXY(0,0,time,LM,x,y_start))
      {
@@ -1060,11 +1065,6 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
          createButton(BtnReSetTPEntry,"Tp.Entry",start_group_reverse-270,y_start-10,60,20,clrBlack,clrWhite);
 
       createButton(BtnTrendReverse,"Reverse",start_group_reverse-150,y_start-10,60,20,clrBlack,clrYellow);
-
-      //createButton(BtnSuggestTrend,"W ("+getShortName(trend_by_ma10_w1)+"."+(string)arrHeiken_W1[0].count_ma10+") " + trend_by_ma10_w1
-      //             +" "+ DoubleToString(volme_by_amp_trade_now,2)+ "~"+(string)volme_by_amp_sl+".lot" + EST_SL
-      //             ,start_group_reverse-80,y_start-10,240,20,clrBlack
-      //             ,is_same_symbol(trend_by_ma10_w1,TREND_BUY)?clrActiveBtn:clrActiveSell);
 
       createButton(BtnSetAmpTrade+"3D","3D",start_group_reverse+170,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"2D","2D",start_group_reverse+205,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
@@ -4231,6 +4231,14 @@ void OnChartEvent(const int     id,      // event ID
          return;
         }
 
+      if(is_same_symbol(sparam,BtnFindSL))
+        {
+         FindSL();
+
+         OnInit();
+         return;
+        }
+
       if(is_same_symbol(sparam,BtnSLHere))
         {
          string trend="";
@@ -4961,6 +4969,57 @@ void OnChartEvent(const int     id,      // event ID
       ObjectSetInteger(0,sparam,OBJPROP_STATE,false);
       ChartRedraw();
      }
+  }
+
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void FindSL()
+  {
+   string symbol = Symbol();
+   double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
+   double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
+
+   CandleData arrHeiken_D1[];
+   get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,25,true,true);
+
+   double lowest=0.0,higest=0.0;
+   for(int idx=0; idx <= 10; idx++)
+     {
+      double low=arrHeiken_D1[idx].low;
+      double hig=arrHeiken_D1[idx].high;
+      if((idx==0) || (lowest==0) || (lowest>low))
+         lowest=low;
+      if((idx==0) || (higest==0) || (higest<hig))
+         higest=hig;
+     }
+
+   double amp_w1,amp_d1,amp_h4,amp_h1;
+   GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
+
+   if(LM>SL)//TREND_BUY
+     {
+      double amp_sl = MathAbs(LM-lowest);
+      if(amp_sl<amp_d1*2)
+         SL=LM-amp_d1*2;
+      else
+         SL=lowest;
+
+      SetGlobalVariable(GLOBAL_VAR_SL+symbol, SL);
+     }
+
+   if(LM<SL)//TREND_SEL
+     {
+      double amp_sl = MathAbs(higest-LM);
+      if(amp_sl<amp_d1*2)
+         SL=LM+amp_d1*2;
+      else
+         SL=higest;
+
+      SetGlobalVariable(GLOBAL_VAR_SL+symbol, higest);
+     }
+
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
