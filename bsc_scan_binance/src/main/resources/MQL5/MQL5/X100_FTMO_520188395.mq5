@@ -331,6 +331,12 @@ int OnInit()
             create_trend_line(lbl_name+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrColor,STYLE_SOLID,20);
            }
 
+         //if(i==0)
+         //  {
+         //   string lbl_name20="CountMa20D_"+appendZero100(i);
+         //   color clrColor20=is_same_symbol(arrHeiken_D1[i].trend_by_ma20,TREND_BUY)?clrBlue:clrRed;
+         //   create_label_simple(lbl_name20,IntegerToString(arrHeiken_D1[i].count_ma20),arrHeiken_D1[i].ma20,clrColor20,arrHeiken_D1[i].time);
+         //  }
         }
      }
 
@@ -4995,12 +5001,13 @@ void FindSL()
 
    double amp_w1,amp_d1,amp_h4,amp_h1;
    GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
+   double min_amp_sl=amp_d1*1.5;
 
    if(LM>SL)//TREND_BUY
      {
       double amp_sl = MathAbs(LM-lowest);
-      if(amp_sl<amp_d1*2)
-         SL=LM-amp_d1*2;
+      if(amp_sl<min_amp_sl)
+         SL=LM-min_amp_sl;
       else
          SL=lowest;
 
@@ -5010,8 +5017,8 @@ void FindSL()
    if(LM<SL)//TREND_SEL
      {
       double amp_sl = MathAbs(higest-LM);
-      if(amp_sl<amp_d1*2)
-         SL=LM+amp_d1*2;
+      if(amp_sl<min_amp_sl)
+         SL=LM+min_amp_sl;
       else
          SL=higest;
 
@@ -8383,7 +8390,7 @@ void get_arr_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,CandleData &candleA
 
          string trend_by_ma20="";
          string trend_by_ma50="";
-         if(is_calc_seq102050 && loop>40 && index<20)
+         if(is_calc_seq102050 && loop>40 && index<loop-20)
            {
             double ma20=cal_MA(closePrices,20,index);
             trend_by_ma20 =(mid>ma20) ? TREND_BUY : (mid<ma20) ? TREND_SEL : "";
@@ -8443,7 +8450,7 @@ void get_arr_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,CandleData &candleA
                break;
            }
 
-         int count_ma20=0;
+         int count_ma20=1;
          if(is_calc_seq102050)
             for(int j=index+1; j<length+1; j++)
               {
