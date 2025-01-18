@@ -311,9 +311,9 @@ int OnInit()
    init_sl_tp_trendline(false);
    DrawButtons();
 
-   if(Period()>=PERIOD_D1)
+   if(Period()>=PERIOD_H4)
      {
-      int size=Period()==PERIOD_D1?180:120;
+      int size=Period()<=PERIOD_D1?180:120;
       CandleData arrHeiken_D1[];
       get_arr_heiken(cur_symbol,Period(),arrHeiken_D1,size,true,false);
       int size_d1 = ArraySize(arrHeiken_D1)-10;
