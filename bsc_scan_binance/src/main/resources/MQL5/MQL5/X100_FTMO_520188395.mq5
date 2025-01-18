@@ -323,13 +323,14 @@ int OnInit()
          color clrColor=is_same_symbol(arrHeiken_D1[i].trend_by_ma10,TREND_BUY)?clrBlue:clrRed;
          double mid = (arrHeiken_D1[i].open+arrHeiken_D1[i].close)/2;
 
-         create_label_simple(lbl_name,IntegerToString(arrHeiken_D1[i].count_ma10),mid,clrColor,arrHeiken_D1[i].time);
+
 
          if(is_same_symbol(",7,13,21,34,52,", ","+IntegerToString(arrHeiken_D1[i].count_ma10)+","))
            {
             ObjectSetInteger(0,lbl_name,OBJPROP_FONTSIZE,12);
-            create_trend_line(lbl_name+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrColor,STYLE_SOLID,20);
+            create_trend_line(lbl_name+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrYellow,STYLE_SOLID,20,false,false,true,false);
            }
+         create_label_simple(lbl_name,IntegerToString(arrHeiken_D1[i].count_ma10),mid,clrColor,arrHeiken_D1[i].time);
 
          //if(i==0)
          //  {
