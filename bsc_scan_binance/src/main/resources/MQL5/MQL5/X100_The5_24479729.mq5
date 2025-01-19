@@ -7115,7 +7115,7 @@ void AddSupportResistance()
    double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
    double price_offset=MathAbs(SL-LM);
 
-   for(int i=-5;i<=5;i++)
+   for(int i=-10;i<=10;i++)
       create_dragable_trendline(MANUAL_SUPPRESIS_+append1Zero(i),clrYellowGreen,LM+price_offset*i,STYLE_SOLID,2,false);
 
    string file_name = get_SupportResistance_file_name();
