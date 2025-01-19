@@ -95,6 +95,7 @@ string telegram_url="https://api.telegram.org";
 #define BtnNoticeMaCross            "NoticeMaCross_"// NoticeMaCross+symbol+_H1=8510
 #define BtnAddSword                 "btn_add_sword_"
 #define BtnFiboline                 "btn_add_fiboline_"
+#define BtnSupportResistance        "btn_add_Support_Resistance"
 #define BtnHorTrendline             "btn_add_hor_trendline"
 #define BtnAddTrendline             "btn_add_trendline"
 #define BtnSaveTrendline            "btn_save_trendline"
@@ -115,6 +116,7 @@ string telegram_url="https://api.telegram.org";
 #define TP_WHEN_HeiMa50 50.0
 #define MANUAL_TRENDLINE_ "MANUAL_TRENDLINE_"
 #define MANUAL_TRENDFIBO_ "MANUAL_TRENDFIBO_"
+#define MANUAL_SUPPRESIS_ "MANUAL_SUPPRESIS_"
 //-----------------------------------------------------------------------------
 #define BtnScheduleT2 "BtnScheduleT2_"
 #define BtnScheduleT3 "BtnScheduleT3_"
@@ -252,6 +254,7 @@ int OnInit()
 
    LoadTrendlines();
    LoadFibolines();
+   LoadSupportResistance();
 
    if(Period()<PERIOD_H4)
      {
@@ -325,10 +328,7 @@ int OnInit()
          double mid = (arrHeiken_D1[i].open+arrHeiken_D1[i].close)/2;
 
          if(is_same_symbol(",7,13,21,34,52,", ","+IntegerToString(arrHeiken_D1[i].count_ma10)+","))
-           {
-            ObjectSetInteger(0,lbl_name,OBJPROP_FONTSIZE,12);
             create_trend_line(lbl_name+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrYellow,STYLE_SOLID,20,false,false,true,false);
-           }
 
          create_label_simple(lbl_name,IntegerToString(arrHeiken_D1[i].count_ma10),mid,clrColor,arrHeiken_D1[i].time);
         }
@@ -997,13 +997,13 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
    create_dragable_trendline(LINE_RR_12,clrNavy,rr12,STYLE_SOLID,2);
    create_dragable_trendline(LINE_RR_13,clrBlue, rr13,STYLE_SOLID,2);
 
-   if(false)
+   if(true)
      {
       int _sub_windows;
       datetime _time;
       double _price;
       if(ChartXYToTimePrice(0,chart_width/2,chart_heigh/2,_sub_windows,_time,_price))
-         for(int rr=-20;rr<=20;rr++)
+         for(int rr=-3;rr<=6;rr++)
            {
             double rr14=trend==TREND_BUY?LM+amp_sl*rr:LM-amp_sl*rr;
             string LINE_RR_14="LINE_RR 1:"+(string)rr;
@@ -1125,23 +1125,46 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
    createButton(BtnClearChart,"Clear Chart",chart_width/2+120,chart_heigh-35,105,30,clrBlack,clrLightGray);
 
 
-   int start_x=chart_width-50*18;
-   createButton(BtnSaveTrendline,"Save",        start_x+200-50*0,chart_heigh-35,90,30,clrBlack,clrPaleTurquoise);
+   int start_x=chart_width-50*15;
+   int counter = 0;
+   createButton(BtnSaveTrendline,"Save",        start_x-50*counter,chart_heigh-35,90,30,clrBlack,clrPaleTurquoise);
 
-   createButton(BtnFiboline+"_Buy", "Fibo",     start_x+200+50*2,chart_heigh-35,40,30,clrBlack,clrWhite);
+   if(Period()==PERIOD_W1)
+     {
+      counter+=2;
+      createButton(BtnSupportResistance, "SuRe",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+      counter+=1;
+      createButton(BtnFiboline, "Fibo",            start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+     }
+   else
+     {
+      counter+=2;
+      createButton(BtnFiboline, "Fibo",            start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+     }
 
-   createButton(BtnAddSword+"30_Buy", "30.B",   start_x+200+50*3,chart_heigh-35,40,30,clrBlack,clrLightCyan);
-   createButton(BtnAddSword+"45_Buy", "45.B",   start_x+200+50*4,chart_heigh-35,40,30,clrBlack,clrLightCyan);
-   createButton(BtnAddSword+"60_Buy", "60.B",   start_x+200+50*5,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   counter+=1;
+   createButton(BtnAddSword+"30_Buy", "30.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   counter+=1;
+   createButton(BtnAddSword+"45_Buy", "45.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   counter+=1;
+   createButton(BtnAddSword+"60_Buy", "60.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   counter+=1;
 
-   createButton(BtnAddSword+"30_Sel", "30.S",   start_x+200+50*6,chart_heigh-35,40,30,clrBlack,clrMistyRose);
-   createButton(BtnAddSword+"45_Sel", "45.S",   start_x+200+50*7,chart_heigh-35,40,30,clrBlack,clrMistyRose);
-   createButton(BtnAddSword+"60_Sel", "60.S",   start_x+200+50*8,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   createButton(BtnAddSword+"30_Sel", "30.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   counter+=1;
+   createButton(BtnAddSword+"45_Sel", "45.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   counter+=1;
+   createButton(BtnAddSword+"60_Sel", "60.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   counter+=1;
 
-   createButton(BtnHorTrendline,   "-----",     start_x+200+50* 9,chart_heigh-35,40,30,clrBlack,clrWhite);
-   createButton(BtnAddTrendline,   "Clone",     start_x+200+50*10,chart_heigh-35,40,30,clrBlack,clrWhite);
-   createButton(BtnClearTrendline, "Delete",    start_x+200+50*11,chart_heigh-35,40,30,clrBlack,clrLightGray);
-   createButton(BtnResetTimeline,  "RsTime",    start_x+200+50*12,chart_heigh-35,50,30,clrBlack,clrLightGray);
+   createButton(BtnHorTrendline,   "-----",     start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+   counter+=1;
+   createButton(BtnAddTrendline,   "Clone",     start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+   counter+=1;
+   createButton(BtnClearTrendline, "Delete",    start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightGray);
+   counter+=1;
+   createButton(BtnResetTimeline,  "RsTime",    start_x+50*counter,chart_heigh-35,50,30,clrBlack,clrLightGray);
+   counter+=1;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -3868,6 +3891,12 @@ void OnChartEvent(const int     id,      // event ID
          return;
         }
 
+      if(is_same_symbol(sparam,BtnSupportResistance))
+        {
+         AddSupportResistance();
+         return;
+        }
+
       if(is_same_symbol(sparam,BtnFiboline))
         {
          AddFiboline();
@@ -4982,8 +5011,12 @@ void FindSL()
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
    double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
 
+   ENUM_TIMEFRAMES TF= PERIOD_D1;
+   if(Period()==PERIOD_W1)
+      TF=PERIOD_W1;
+
    CandleData arrHeiken_D1[];
-   get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,25,true,true);
+   get_arr_heiken(symbol,TF,arrHeiken_D1,25,true,true);
 
    double lowest=0.0,higest=0.0;
    for(int idx=0; idx <= 10; idx++)
@@ -7020,6 +7053,14 @@ void DrawDragableLine(string line_name, datetime base_time, double top_price, da
    ObjectSetInteger(0, line_name, OBJPROP_SELECTABLE, true);    // Có thể chọn
    ObjectSetInteger(0, line_name, OBJPROP_SELECTED, true);      // Tự động được chọn
   }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+string get_SupportResistance_file_name()
+  {
+   return "TREND_SUP_RESIS_"+get_consistent_symbol(Symbol()) + ".csv";
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -7056,6 +7097,76 @@ string get_consistent_symbol(string symbol)
    StringReplace(file_name,"JPN225","JP225");
 
    return file_name;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void AddSupportResistance()
+  {
+   string symbol=Symbol();
+   double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
+   double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
+   double price_offset=MathAbs(SL-LM);
+
+   for(int i=-5;i<=5;i++)
+      create_dragable_trendline(MANUAL_SUPPRESIS_+append1Zero(i),clrYellowGreen,LM+price_offset*i,STYLE_SOLID,1,false);
+
+   string file_name = get_SupportResistance_file_name();
+   int file_handle = FileOpen(file_name, FILE_WRITE | FILE_CSV, ';'); // | FILE_COMMON
+
+   if(file_handle == INVALID_HANDLE)
+     {
+      Print("Failed to open file for saving: ", file_name, ", Error: ", GetLastError());
+      return;
+     }
+
+   datetime _time=TimeCurrent();
+
+   int total_objects = ObjectsTotal(0); // Lấy tổng số đối tượng trên chart
+   for(int i = 0; i < total_objects; i++)
+     {
+      string obj_name = ObjectName(0,i); // Lấy tên đối tượng
+      if(is_same_symbol(obj_name, MANUAL_SUPPRESIS_))  // Kiểm tra đầu ngữ
+        {
+         double start_price = ObjectGetDouble(0, obj_name, OBJPROP_PRICE, 0);
+
+         // Ghi thông tin trendline vào file
+         FileWrite(file_handle, obj_name, _time, start_price, _time, start_price);
+        }
+     }
+   FileClose(file_handle);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void LoadSupportResistance()
+  {
+   string file_name = get_SupportResistance_file_name();
+   int file_handle = FileOpen(file_name, FILE_READ | FILE_CSV, ';');
+
+   if(file_handle == INVALID_HANDLE)
+      return;
+
+   while(!FileIsEnding(file_handle))
+     {
+      string trendline_name;
+      string start_time, end_time;
+      double start_price, end_price;
+
+      // Đọc dữ liệu từ file
+      trendline_name = FileReadString(file_handle);
+      start_time = FileReadString(file_handle);
+      start_price = FileReadNumber(file_handle);
+      end_time = FileReadString(file_handle);
+      end_price = FileReadNumber(file_handle);
+
+      if(is_same_symbol(trendline_name, MANUAL_SUPPRESIS_))
+        {
+         create_dragable_trendline(trendline_name,clrYellowGreen,start_price,STYLE_SOLID,1,false);
+        }
+     }
+
+   FileClose(file_handle); // Đóng file sau khi đọc xong
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
