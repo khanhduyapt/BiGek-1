@@ -4681,8 +4681,12 @@ void OnChartEvent(const int     id,      // event ID
                WriteFileContent(FILE_MSG_LIST_R1C4,"");
                WriteFileContent(FILE_MSG_LIST_R1C5,"");
 
-               LoadTradeBySeqEvery5min(false);
-               LoadSLTPEvery5min(false);
+               bool is_hide_mode=GetGlobalVariable(BtnHideDrawMode)==AUTO_TRADE_ONN;
+               if(is_hide_mode == false)
+                 {
+                  LoadTradeBySeqEvery5min(false);
+                  LoadSLTPEvery5min(false);
+                 }
 
                OnInit();
                return;
