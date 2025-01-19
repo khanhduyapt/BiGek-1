@@ -336,7 +336,9 @@ int OnInit()
             create_trend_line(lbl_name+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrLightGray,STYLE_SOLID,20,false,false,true,false);
 
          if(is_same_symbol(",7,13,21,34,52,", key_ma10))
-            create_trend_line(lbl_name+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrYellow,STYLE_SOLID,20,false,false,true,false);
+            //create_heiken_candle(lbl_name+"_",arrHeiken_D1[i].time,arrHeiken_D1[i].time+TIME_OF_ONE_D1_CANDLE,
+            //arrHeiken_D1[i].open,arrHeiken_D1[i].close,arrHeiken_D1[i].low,arrHeiken_D1[i].high,clrYellow,true);
+            create_trend_line(lbl_name+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrYellow,STYLE_SOLID,15,false,false,true,false);
 
          create_label_simple(lbl_name,IntegerToString(arrHeiken_D1[i].count_ma10),mid,clrColor,arrHeiken_D1[i].time);
         }
@@ -2332,6 +2334,10 @@ void Reset_Fibo_Timelines()
   {
    string symbol=Symbol();
    ENUM_TIMEFRAMES TIMEFRAME=PERIOD_D1;
+
+   if(Period()==PERIOD_W1)
+      TIMEFRAME=PERIOD_W1;
+
    string PREFIX = "CHANNEL_" + get_time_frame_name(TIMEFRAME) + "_";
    double lowest_5p = MAXIMUM_DOUBLE;
 
