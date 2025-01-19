@@ -57,6 +57,7 @@ string telegram_url="https://api.telegram.org";
 #define BtnMsgR2C2_                 "BtnMsgR2C2_"
 #define BtnClearMessageR2C1         "BtnClearMessageR2C1"
 #define BtnClearMessageR2C2         "BtnClearMessageR2C2"
+#define BtnHideDrawMode             "BtnHideDrawMode"
 #define BtnMacdMode                 "BtnMacdMode"
 #define BtnColorMode                "BtnColorMode"
 #define BtnClearChart               "BtnClearChart"
@@ -250,7 +251,7 @@ int OnInit()
    if(ChartNext(chartID) != -1)
       ChartClose(chartID);
 
-   DeleteAllObjectsWithPrefix(BOT_SHORT_NM);
+   ObjectsDeleteAll(0);
 
    LoadTrendlines();
    LoadFibolines();
@@ -281,38 +282,39 @@ int OnInit()
         }
      }
 
-//if(Period()<=PERIOD_D1)
-   DrawFiboTimeZone52H4();
-
-//if(Period()>PERIOD_D1)
-//   ObjectsDeleteAll(0);
-
-   double top_price = ChartGetDouble(0, CHART_PRICE_MAX);
-   double bot_price = ChartGetDouble(0, CHART_PRICE_MIN);
-   double LM=GetGlobalVariable(GLOBAL_VAR_LM+cur_symbol);
-
-   if(LM<bot_price || LM>top_price)
+   bool is_hide_mode=GetGlobalVariable(BtnHideDrawMode)==AUTO_TRADE_ONN;
+   if(is_hide_mode == false)
      {
-      double amp_w1,amp_d1,amp_h4,amp_h1;
-      GetAmpAvgL15(cur_symbol,amp_w1,amp_d1,amp_h4,amp_h1);
+      double top_price = ChartGetDouble(0, CHART_PRICE_MAX);
+      double bot_price = ChartGetDouble(0, CHART_PRICE_MIN);
+      double LM=GetGlobalVariable(GLOBAL_VAR_LM+cur_symbol);
 
-      double mid = (top_price+bot_price)/2;
-      double SL=GetGlobalVariable(GLOBAL_VAR_SL+cur_symbol);
+      if(LM<bot_price || LM>top_price)
+        {
+         double amp_w1,amp_d1,amp_h4,amp_h1;
+         GetAmpAvgL15(cur_symbol,amp_w1,amp_d1,amp_h4,amp_h1);
 
-      if(LM>SL)
-        {
-         SetGlobalVariable(GLOBAL_VAR_LM+cur_symbol,mid);
-         SetGlobalVariable(GLOBAL_VAR_SL+cur_symbol,mid-amp_d1);
+         double mid = (top_price+bot_price)/2;
+         double SL=GetGlobalVariable(GLOBAL_VAR_SL+cur_symbol);
+
+         if(LM>SL)
+           {
+            SetGlobalVariable(GLOBAL_VAR_LM+cur_symbol,mid);
+            SetGlobalVariable(GLOBAL_VAR_SL+cur_symbol,mid-amp_d1);
+           }
+         else
+           {
+            SetGlobalVariable(GLOBAL_VAR_LM+cur_symbol,mid);
+            SetGlobalVariable(GLOBAL_VAR_SL+cur_symbol,mid+amp_d1);
+           }
         }
-      else
-        {
-         SetGlobalVariable(GLOBAL_VAR_LM+cur_symbol,mid);
-         SetGlobalVariable(GLOBAL_VAR_SL+cur_symbol,mid+amp_d1);
-        }
+
+      init_sl_tp_trendline(false);
      }
 
-   init_sl_tp_trendline(false);
+
    DrawButtons();
+   DrawFiboTimeZone52H4();
 
    if(Period()>=PERIOD_H4)
      {
@@ -760,10 +762,10 @@ void DrawButtons()
 
          createButton(BtnExitAllTrade,"Exit All",25,chart_heigh-35,48,30,clrBlack,clrLightGray);
 
-         bool IS_MACD_DOT=GetGlobalVariable("IS_MACD_DOT")==AUTO_TRADE_ONN;
-         createButton(BtnMacdMode,"Macd",25+110+1,chart_heigh-35,48,30,clrBlack,IS_MACD_DOT?clrActiveBtn:clrLightGray,6);
+         bool IS_MACD_DOT=GetGlobalVariable(BtnMacdMode)==AUTO_TRADE_ONN;
+         createButton(BtnMacdMode,"Macd",25+110+1,chart_heigh-35,45,30,clrBlack,IS_MACD_DOT?clrActiveBtn:clrLightGray,6);
 
-         bool IS_MONOCHROME_MODE=GetGlobalVariable("IS_MONOCHROME_MODE")==AUTO_TRADE_ONN;
+         bool IS_MONOCHROME_MODE=GetGlobalVariable(BtnColorMode)==AUTO_TRADE_ONN;
          createButton(BtnColorMode,"Color",5+BTN_WIDTH_STANDA,chart_heigh-35,50,30,clrBlack,IS_MONOCHROME_MODE?clrLightGray:clrActiveBtn,6);
 
          color clr_notice_m5=wait_trend_m5==TREND_BUY?clrActiveBtn:wait_trend_m5==TREND_SEL?clrActiveSell:clrLightGray;
@@ -868,19 +870,19 @@ void DrawButtons()
          Draw_Heiken_H(symbol,PERIOD_H1,clrLightGray,true,true,true);
          Draw_Heiken_H(symbol,PERIOD_H4,clrSilver,true,true,false);
         }
+     }
 
-      bool IS_MACD_DOT=GetGlobalVariable("IS_MACD_DOT")==AUTO_TRADE_ONN;
-      if(IS_MACD_DOT)
-        {
-         if(Period()>=PERIOD_W1)
-            Draw_MACD_Extremes(symbol,PERIOD_W1,60,false,1,STYLE_DOT);
+   bool IS_MACD_DOT=GetGlobalVariable(BtnMacdMode)==AUTO_TRADE_ONN;
+   if(IS_MACD_DOT)
+     {
+      if(Period()>=PERIOD_W1)
+         Draw_MACD_Extremes(symbol,PERIOD_W1,60,false,1,STYLE_DOT);
 
-         Draw_MACD_Extremes(symbol,PERIOD_H4,40,false,1,STYLE_DOT);
-         Draw_MACD_Extremes(symbol,PERIOD_H1,30,false,1,STYLE_DOT);
+      Draw_MACD_Extremes(symbol,PERIOD_H4,40,false,1,STYLE_DOT);
+      Draw_MACD_Extremes(symbol,PERIOD_H1,30,false,1,STYLE_DOT);
 
-         is_allow_trade_by_macd_extremes(symbol,PERIOD_M15,"");
-         is_allow_trade_by_macd_extremes(symbol,PERIOD_M5,"");
-        }
+      is_allow_trade_by_macd_extremes(symbol,PERIOD_M15,"");
+      is_allow_trade_by_macd_extremes(symbol,PERIOD_M5,"");
      }
 
    CreateMessagesBtn(BtnMsgR2C1_);
@@ -931,6 +933,55 @@ void DrawButtons()
    createButton(BtnCloseWhen_+"HeiMa10",cur_tp+" Hei+Ma10",chart_width/2-155+000,10,120,30,clrBlack,tp_when==TP_WHEN_HeiMa10?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
    createButton(BtnCloseWhen_+"HeiMa20",cur_tp+" Hei+Ma20",chart_width/2-155+130,10,120,30,clrBlack,tp_when==TP_WHEN_HeiMa20?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
    createButton(BtnCloseWhen_+"HeiMa50",cur_tp+" Hei+Ma50",chart_width/2-155+260,10,120,30,clrBlack,tp_when==TP_WHEN_HeiMa50?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
+
+//--------------------------------------------------------------------------------------------
+
+   int start_x=(int)(chart_width-50*15.5);
+   int counter = 0;
+   createButton(BtnSaveTrendline,"Save",        start_x-50*counter,chart_heigh-35,90,30,clrBlack,clrPaleTurquoise);
+
+   if(Period()==PERIOD_W1)
+     {
+      counter+=2;
+      createButton(BtnSupportResistance, "SuRe",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+      counter+=1;
+      createButton(BtnFiboline, "Fibo",            start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+     }
+   else
+     {
+      counter+=2;
+      createButton(BtnFiboline, "Fibo",            start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+     }
+
+   counter+=1;
+   createButton(BtnAddSword+"30_Buy", "30.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   counter+=1;
+   createButton(BtnAddSword+"45_Buy", "45.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   counter+=1;
+   createButton(BtnAddSword+"60_Buy", "60.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
+   counter+=1;
+
+   createButton(BtnAddSword+"30_Sel", "30.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   counter+=1;
+   createButton(BtnAddSword+"45_Sel", "45.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   counter+=1;
+   createButton(BtnAddSword+"60_Sel", "60.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
+   counter+=1;
+
+   createButton(BtnHorTrendline,   "-----",     start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+   counter+=1;
+   createButton(BtnAddTrendline,   "Clone",     start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
+   counter+=1;
+   createButton(BtnClearTrendline, "Delete",    start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightGray);
+   counter+=1;
+   createButton(BtnResetTimeline,  "RsTime",    start_x+50*counter,chart_heigh-35,50,30,clrBlack,clrLightGray);
+   counter+=1;
+   bool is_hide_mode=GetGlobalVariable(BtnHideDrawMode)==AUTO_TRADE_ONN;
+   createButton(BtnHideDrawMode,"Hide",         start_x+50*counter+10,chart_heigh-35,40,30,clrBlack,is_hide_mode?clrActiveBtn:clrLightGray);
+
+//--------------------------------------------------------------------------------------------
+
+   createButton(BtnClearChart,"Clear Chart",chart_width/2+120,chart_heigh-35,105,30,clrBlack,clrLightGray);
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -946,7 +997,6 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
    double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
    int digits = (int)SymbolInfoInteger(symbol,SYMBOL_DIGITS);
-
 
    string total_comments="";
    string strBSL=CountBSL(symbol,total_comments,true);
@@ -1122,49 +1172,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
       createButton(BtnOpen1L,"("+(string)opening+"/"+(string)MAXIMUM_OPENING+"L)  "
                    +symbol+" "+trend+" "+ DoubleToString(volme_by_amp_trade_now,2)+ "~"+DoubleToString(volme_by_amp_sl,2) +" lot"
                    ,chart_width/2-155,chart_heigh-35,265,30,clrBlack,bgColor1L);
-   createButton(BtnClearChart,"Clear Chart",chart_width/2+120,chart_heigh-35,105,30,clrBlack,clrLightGray);
 
-
-   int start_x=chart_width-50*15;
-   int counter = 0;
-   createButton(BtnSaveTrendline,"Save",        start_x-50*counter,chart_heigh-35,90,30,clrBlack,clrPaleTurquoise);
-
-   if(Period()==PERIOD_W1)
-     {
-      counter+=2;
-      createButton(BtnSupportResistance, "SuRe",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
-      counter+=1;
-      createButton(BtnFiboline, "Fibo",            start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
-     }
-   else
-     {
-      counter+=2;
-      createButton(BtnFiboline, "Fibo",            start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
-     }
-
-   counter+=1;
-   createButton(BtnAddSword+"30_Buy", "30.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
-   counter+=1;
-   createButton(BtnAddSword+"45_Buy", "45.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
-   counter+=1;
-   createButton(BtnAddSword+"60_Buy", "60.B",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightCyan);
-   counter+=1;
-
-   createButton(BtnAddSword+"30_Sel", "30.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
-   counter+=1;
-   createButton(BtnAddSword+"45_Sel", "45.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
-   counter+=1;
-   createButton(BtnAddSword+"60_Sel", "60.S",   start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrMistyRose);
-   counter+=1;
-
-   createButton(BtnHorTrendline,   "-----",     start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
-   counter+=1;
-   createButton(BtnAddTrendline,   "Clone",     start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrWhite);
-   counter+=1;
-   createButton(BtnClearTrendline, "Delete",    start_x+50*counter,chart_heigh-35,40,30,clrBlack,clrLightGray);
-   counter+=1;
-   createButton(BtnResetTimeline,  "RsTime",    start_x+50*counter,chart_heigh-35,50,30,clrBlack,clrLightGray);
-   counter+=1;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -2546,7 +2554,7 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size=2
       return;
      }
 
-   bool IS_MONOCHROME_MODE=GetGlobalVariable("IS_MONOCHROME_MODE")==AUTO_TRADE_ONN;
+   bool IS_MONOCHROME_MODE=GetGlobalVariable(BtnColorMode)==AUTO_TRADE_ONN;
 
    int highest_positive_index = -1; // Chỉ số của nến có Histogram cao nhất khi dương
    int lowest_negative_index = -1;  // Chỉ số của nến có Histogram thấp nhất khi âm
@@ -2869,7 +2877,7 @@ void DrawFibonacciFan(string name,datetime time1,double price1,datetime time2,do
    ObjectSetInteger(0,name,OBJPROP_WIDTH,1);              // Độ dày của đường kẻ
 
    color clrLevelColor = TREND==TREND_BUY?clrBlue:clrRed;
-   bool IS_MONOCHROME_MODE=GetGlobalVariable("IS_MONOCHROME_MODE")==AUTO_TRADE_ONN;
+   bool IS_MONOCHROME_MODE=GetGlobalVariable(BtnColorMode)==AUTO_TRADE_ONN;
    if(IS_MONOCHROME_MODE)
       clrLevelColor=clrBlack;
 //double levels[] = {0.0,0.236,0.382,0.5,0.618,0.764,0.882,1.0,1.118,1.236,1.382,1.5,1.618};
@@ -3187,7 +3195,7 @@ void Draw_Heiken_MWD(string symbol)
    datetime time_1w = iTime(symbol,PERIOD_W1,1)-iTime(symbol,PERIOD_W1,2);
    datetime time_1d = iTime(symbol,PERIOD_D1,1)-iTime(symbol,PERIOD_D1,2);
 //------------------------------------------------------------------------------------
-   bool IS_MONOCHROME_MODE=GetGlobalVariable("IS_MONOCHROME_MODE")!=AUTO_TRADE_ONN;
+   bool IS_MONOCHROME_MODE=GetGlobalVariable(BtnColorMode)!=AUTO_TRADE_ONN;
 //------------------------------------------------------------------------------------
    CandleData arrHeiken_mn1[];
    get_arr_heiken(symbol,PERIOD_MN1,arrHeiken_mn1,25,true,false);
@@ -3293,7 +3301,7 @@ void Draw_Ma(string symbol,ENUM_TIMEFRAMES timeframe, int ma, int width_ma10,int
       closePrices[i]=iClose(symbol,timeframe,i);
 
    int loop = length-ma;
-   bool IS_MONOCHROME_MODE=GetGlobalVariable("IS_MONOCHROME_MODE")==AUTO_TRADE_ONN;
+   bool IS_MONOCHROME_MODE=GetGlobalVariable(BtnColorMode)==AUTO_TRADE_ONN;
 
    for(int i = 0; i<loop; i++)
      {
@@ -3348,7 +3356,7 @@ void Draw_Heiken_H(string symbol,ENUM_TIMEFRAMES timeframe,color clrColor,bool d
       loop = length-50;
 
    int width_ma10=timeframe==PERIOD_W1?15:10;
-   bool IS_MONOCHROME_MODE=GetGlobalVariable("IS_MONOCHROME_MODE")==AUTO_TRADE_ONN;
+   bool IS_MONOCHROME_MODE=GetGlobalVariable(BtnColorMode)==AUTO_TRADE_ONN;
 
    for(int i = 0; i<loop; i++)
      {
@@ -3946,27 +3954,14 @@ void OnChartEvent(const int     id,      // event ID
          return;
         }
 
-      if(is_same_symbol(sparam,BtnMacdMode))
+      if(is_same_symbol(sparam,BtnMacdMode) || is_same_symbol(sparam,BtnColorMode) || is_same_symbol(sparam,BtnHideDrawMode))
         {
-         double MODE=GetGlobalVariable("IS_MACD_DOT");
+         double MODE=GetGlobalVariable(sparam);
 
          if(MODE==AUTO_TRADE_ONN)
-            SetGlobalVariable("IS_MACD_DOT",AUTO_TRADE_OFF);
+            SetGlobalVariable(sparam,AUTO_TRADE_OFF);
          else
-            SetGlobalVariable("IS_MACD_DOT",AUTO_TRADE_ONN);
-
-         OnInit();
-         return;
-        }
-
-      if(is_same_symbol(sparam,BtnColorMode))
-        {
-         double MODE=GetGlobalVariable("IS_MONOCHROME_MODE");
-
-         if(MODE==AUTO_TRADE_ONN)
-            SetGlobalVariable("IS_MONOCHROME_MODE",AUTO_TRADE_OFF);
-         else
-            SetGlobalVariable("IS_MONOCHROME_MODE",AUTO_TRADE_ONN);
+            SetGlobalVariable(sparam,AUTO_TRADE_ONN);
 
          OnInit();
          return;
@@ -7109,7 +7104,7 @@ void AddSupportResistance()
    double price_offset=MathAbs(SL-LM);
 
    for(int i=-5;i<=5;i++)
-      create_dragable_trendline(MANUAL_SUPPRESIS_+append1Zero(i),clrYellowGreen,LM+price_offset*i,STYLE_SOLID,1,false);
+      create_dragable_trendline(MANUAL_SUPPRESIS_+append1Zero(i),clrYellowGreen,LM+price_offset*i,STYLE_SOLID,2,false);
 
    string file_name = get_SupportResistance_file_name();
    int file_handle = FileOpen(file_name, FILE_WRITE | FILE_CSV, ';'); // | FILE_COMMON
@@ -7162,7 +7157,7 @@ void LoadSupportResistance()
 
       if(is_same_symbol(trendline_name, MANUAL_SUPPRESIS_))
         {
-         create_dragable_trendline(trendline_name,clrYellowGreen,start_price,STYLE_SOLID,1,false);
+         create_dragable_trendline(trendline_name,clrYellowGreen,start_price,STYLE_SOLID,2,false);
         }
      }
 
