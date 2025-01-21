@@ -1097,9 +1097,9 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    create_dragable_trendline(LINE_RR_11,clrNavy,rr11,STYLE_SOLID,2);
    create_dragable_trendline(LINE_RR_12,clrNavy,rr12,STYLE_SOLID,2);
-   create_dragable_trendline(LINE_RR_13,clrBlue, rr13,STYLE_SOLID,2);
+   create_dragable_trendline(LINE_RR_13,clrBlue,rr13,STYLE_SOLID,2);
 
-   if(Period()==PERIOD_W1)
+//bool is_hide_mode=GetGlobalVariable(BtnHideDrawMode)==AUTO_TRADE_ONN;
      {
       int _sub_windows;
       datetime _time;
@@ -1109,12 +1109,12 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
            {
             double rr14=trend==TREND_BUY?LM+amp_sl*rr:LM-amp_sl*rr;
             string LINE_RR_14="LINE_RR 1:"+(string)rr;
-            create_label_simple("RR"+(string)rr,""+(string)rr,rr14,clrBlack,_time);
+            create_label_simple("RR"+(string)rr,""+(string)rr+"",rr14,clrBlack,_time);
             ObjectSetInteger(0,"RR"+(string)rr,OBJPROP_ANCHOR,ANCHOR_CENTER);
             //create_trend_line("R_R"+(string)rr,_time,rr14,_time+1,rr14,clrSilver,STYLE_SOLID,20);
 
-            if(rr>3 || rr<0)
-               create_dragable_trendline(LINE_RR_14,clrFireBrick,rr14,STYLE_DOT,1,false);
+            //if(rr>3 || rr<0)
+            //   create_dragable_trendline(LINE_RR_14,clrFireBrick,rr14,STYLE_DOT,1,false);
            }
      }
 
@@ -1124,7 +1124,8 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
      {
       createButton(BtnSLHere,"" + DoubleToString(MathAbs(SL-LM),digits)+"",x_start-15, y_start-10,160,20,clrBlack,clrYellow);
 
-      createButton(BtnFindSL,"SL?",x_start-50, y_start-10,30,20,clrBlack,clrYellow);
+      createButton(BtnFindSL+"_D1","(D) SL?",x_start-125, y_start-10,50,20,clrBlack,clrYellow);
+      createButton(BtnFindSL+"_W1","(W) SL?",x_start- 70, y_start-10,50,20,clrBlack,clrYellow);
      }
 
    if(ChartTimePriceToXY(0,0,time,LM,x,y_start))
@@ -1322,7 +1323,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
            }
         }
 
-      if(arrHeiken_H4[1].count_ma10==1 && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[1].trend_by_ma10))
+      if(arrHeiken_H4[1].count_ma10==1)
         {
          bool h4_notice_R2C1=allow_PushMessage(symbol,FILE_MSG_LIST_R2C1);
          if(h4_notice_R2C1)
@@ -1843,8 +1844,6 @@ void DrawFiboTimeZone52H4()
    int width=1;
    DeleteAllObjectsWithPrefix(FIBO_TIME_ZONE_);
 
-
-
    string fibo_name = FIBO_TIME_ZONE_+symbol;
 
    datetime base_time_1, base_time_2;
@@ -1867,8 +1866,12 @@ void DrawFiboTimeZone52H4()
    ObjectDelete(0,"Fibo_Fan_"+TREND_SEL);
 
 //D1->D2
-   int candle_index1 = iBarShift(symbol, PERIOD_D1, base_time_1);
-   int candle_index2 = iBarShift(symbol, PERIOD_D1, base_time_2);
+   ENUM_TIMEFRAMES TF=PERIOD_D1;
+   if(Period()==PERIOD_W1)
+      TF=PERIOD_W1;
+
+   int candle_index1 = iBarShift(symbol, TF, base_time_1);
+   int candle_index2 = iBarShift(symbol, TF, base_time_2);
 
    bool is_hide_mode=GetGlobalVariable(BtnHideDrawMode)==AUTO_TRADE_ONN;
 
@@ -1877,10 +1880,10 @@ void DrawFiboTimeZone52H4()
         {
          if(price1 < price2)
            {
-            price1=iLow(symbol, PERIOD_D1, candle_index1);
-            price2=iHigh(symbol, PERIOD_D1, candle_index2);
+            price1=iLow(symbol, TF, candle_index1);
+            price2=iHigh(symbol, TF, candle_index2);
 
-            create_label_simple("CoundD1","  (D) "+IntegerToString(candle_index1-candle_index2)+"D",MathMin(price1,price2),clrRed,base_time_1);
+            create_label_simple("CoundD1","  (T) "+IntegerToString(candle_index1-candle_index2)+"c",MathMin(price1,price2),clrRed,base_time_1);
 
             if(false && is_hide_mode==false)
               {
@@ -1892,10 +1895,10 @@ void DrawFiboTimeZone52H4()
            }
          else
            {
-            price1=iHigh(symbol, PERIOD_D1, candle_index1);
-            price2=iLow(symbol, PERIOD_D1, candle_index2);
+            price1=iHigh(symbol, TF, candle_index1);
+            price2=iLow(symbol, TF, candle_index2);
 
-            create_label_simple("CoundD1","  (D) "+IntegerToString(candle_index1-candle_index2)+"D",MathMin(price1,price2),clrRed,base_time_1);
+            create_label_simple("CoundD1","  (T) "+IntegerToString(candle_index1-candle_index2)+"c",MathMin(price1,price2),clrRed,base_time_1);
 
             if(false && is_hide_mode==false)
               {
@@ -1903,7 +1906,7 @@ void DrawFiboTimeZone52H4()
                DrawFibonacciFan1("Fibo_Fan_"+TREND_BUY, base_time_1, price2,base_time_2,price1, clrBlue);
               }
             //double f=(double)candle_index2/(double)(candle_index1-candle_index2);
-            //create_label_simple("CoundD2","  (B) "+IntegerToString(candle_index2)+"D " + DoubleToString(f,2),(price1+price2)/2,clrBlue,base_time_2);
+            //create_label_simple("CoundD2","  (T) "+IntegerToString(candle_index2)+"D " + DoubleToString(f,2),(price1+price2)/2,clrBlue,base_time_2);
            }
         }
      }
@@ -3827,6 +3830,10 @@ double find_wait_price_ma20(string symbol, ENUM_TIMEFRAMES TF, string trend)
    for(int i=0; i<length; i++)
       closePrices[i]=iClose(symbol,TF,i);
 
+   int loop=21;
+   if(TF==PERIOD_W1)
+      loop=13;
+
    if(is_same_symbol(trend,TREND_BUY))//TREND_BUY
      {
       double min_ma20=MAXIMUM_DOUBLE;
@@ -4082,7 +4089,7 @@ void OnChartEvent(const int     id,      // event ID
 
          Set_LM_SL(symbol, trend_by_ma10_d1);
 
-         FindSL();
+         FindSL(PERIOD_W1);
 
          init_sl_tp_trendline(false);
 
@@ -4099,13 +4106,12 @@ void OnChartEvent(const int     id,      // event ID
          double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
          double amp_sl=MathAbs(SL-LM);
 
-         //LM=cal_MA_XX(symbol,PERIOD_D1,20,0);
-         //SetGlobalVariable(GLOBAL_VAR_LM+symbol,LM);
+         LM=find_wait_price_ma20(symbol, PERIOD_D1, LM>SL?TREND_SEL:TREND_BUY);
+         SetGlobalVariable(GLOBAL_VAR_LM+symbol,LM);
 
          SetGlobalVariable(GLOBAL_VAR_SL+symbol,SL<LM?LM+amp_sl:LM-amp_sl);
 
-         FindSL();
-
+         FindSL(PERIOD_W1);
          init_sl_tp_trendline(false);
 
          OnInit();
@@ -4114,49 +4120,53 @@ void OnChartEvent(const int     id,      // event ID
 
       if(is_same_symbol(sparam,BtnSetPriceLimit))
         {
+         string buttonLabel = ObjectGetString(0,sparam,OBJPROP_TEXT);
          double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
          double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
          double amp_trade=MathAbs(SL-LM);
 
-         CandleData arrHeiken_H1[];
-         if(is_same_symbol(sparam,"(h1)"))
-            get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,55,true,false);
+         if(is_same_symbol(sparam, "(D1)20") || is_same_symbol(buttonLabel, "(D1)20"))
+           {
+            //buttonLabel = ObjectGetString(0,BtnSuggestTrend,OBJPROP_TEXT);
+            //string trend_by_ma10_d1=is_same_symbol(buttonLabel,TREND_BUY)?TREND_BUY:TREND_SEL;
+
+            if(LM>SL)//TREND_BUY if(is_same_symbol(trend_by_ma10_d1,TREND_BUY))
+               SetGlobalVariable(GLOBAL_VAR_LM+symbol, find_wait_price_ma20(symbol,PERIOD_D1,TREND_BUY));
+
+            if(LM<SL)//TREND_SEL if(is_same_symbol(trend_by_ma10_d1,TREND_SEL))
+               SetGlobalVariable(GLOBAL_VAR_LM+symbol, find_wait_price_ma20(symbol,PERIOD_D1,TREND_SEL));
+           }
          else
-            get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H1,55,true,false);
-
-         double wait_price=arrHeiken_H1[0].ma50;
-         if(is_same_symbol(sparam,"10"))
-            wait_price=arrHeiken_H1[0].ma10;
-         if(is_same_symbol(sparam,"20"))
-            wait_price=arrHeiken_H1[0].ma20;
-
-         if(is_same_symbol(sparam, "(d1)20"))
            {
+            CandleData arrHeiken_H1[];
+            if(is_same_symbol(sparam,"(h1)"))
+               get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,55,true,false);
+            else
+               get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H1,55,true,false);
+
+            double wait_price=arrHeiken_H1[0].ma50;
+            if(is_same_symbol(sparam,"10"))
+               wait_price=arrHeiken_H1[0].ma10;
+            if(is_same_symbol(sparam,"20"))
+               wait_price=arrHeiken_H1[0].ma20;
+
+            SetGlobalVariable(GLOBAL_VAR_LM+symbol,wait_price);
+
+            string find_trend="";
             if(LM>SL)//TREND_BUY
-               wait_price=find_wait_price_ma20(symbol,PERIOD_D1,TREND_BUY);
-
+              {
+               find_trend=TREND_BUY;
+               SetGlobalVariable(GLOBAL_VAR_SL+symbol,wait_price-amp_trade);
+              }
             if(LM<SL)//TREND_SEL
-               wait_price=find_wait_price_ma20(symbol,PERIOD_D1,TREND_SEL);
-           }
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol,wait_price);
-
-         string find_trend="";
-         if(LM>SL)//TREND_BUY
-           {
-            find_trend=TREND_BUY;
-            SetGlobalVariable(GLOBAL_VAR_SL+symbol,wait_price-amp_trade);
-           }
-         if(LM<SL)//TREND_SEL
-           {
-            find_trend=TREND_SEL;
-            SetGlobalVariable(GLOBAL_VAR_SL+symbol,wait_price+amp_trade);
+              {
+               find_trend=TREND_SEL;
+               SetGlobalVariable(GLOBAL_VAR_SL+symbol,wait_price+amp_trade);
+              }
            }
 
-         if(is_same_symbol(sparam,"20"))
-           {
-            FindSL();
-            init_sl_tp_trendline(false);
-           }
+         FindSL(PERIOD_W1);
+         init_sl_tp_trendline(false);
 
          OnInit();
          return;
@@ -4311,7 +4321,10 @@ void OnChartEvent(const int     id,      // event ID
 
       if(is_same_symbol(sparam,BtnFindSL))
         {
-         FindSL();
+         if(is_same_symbol(sparam, "_D1"))
+            FindSL(PERIOD_D1);
+         else
+            FindSL(PERIOD_W1);
 
          OnInit();
          return;
@@ -4360,7 +4373,7 @@ void OnChartEvent(const int     id,      // event ID
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,bid+amp_d1*2);
            }
 
-         FindSL();
+         FindSL(PERIOD_W1);
 
          init_sl_tp_trendline(false);
          return;
@@ -5069,15 +5082,11 @@ void OnChartEvent(const int     id,      // event ID
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void FindSL()
+void FindSL(ENUM_TIMEFRAMES TF)
   {
    string symbol = Symbol();
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
    double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
-
-   ENUM_TIMEFRAMES TF= PERIOD_D1;
-   if(Period()==PERIOD_W1)
-      TF=PERIOD_W1;
 
    CandleData arrHeiken_D1[];
    get_arr_heiken(symbol,TF,arrHeiken_D1,25,true,true);
@@ -7229,7 +7238,10 @@ void LoadSupportResistance()
 
       if(is_same_symbol(trendline_name, MANUAL_SUPPRESIS_))
         {
-         create_dragable_trendline(trendline_name,clrYellowGreen,start_price,STYLE_SOLID,1,false);
+         if(is_same_symbol(trendline_name, append1Zero(0)))
+            create_dragable_trendline(trendline_name,clrBlue,start_price,STYLE_SOLID,1,false);
+         else
+            create_dragable_trendline(trendline_name,clrBlack,start_price,STYLE_SOLID,1,false);
         }
      }
 
