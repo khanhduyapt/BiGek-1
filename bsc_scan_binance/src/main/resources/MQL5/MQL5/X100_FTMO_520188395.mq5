@@ -839,7 +839,7 @@ void DrawButtons()
          if(is_same_symbol(trend_by_ma10_d1, trend_by_ma10_h4))
            {
             lblBtn10="DH4"+" "+trend_by_ma10_d1+" "+lblBtn10;
-            clrText=clrBlack;
+            clrText=clrLightGray;
             clrBackground=clrWhite;
            }
          else
@@ -850,8 +850,8 @@ void DrawButtons()
            }
         }
 
-      //if(is_same_symbol(strBSL,MASK_EXIT))
-      //   clrText=clrRed;
+      if(is_same_symbol(strBSL,MASK_EXIT) && is_same_symbol(strBSL,"$"))
+         clrText=clrRed;
 
       clrBackground=is_cur_tab?(is_same_symbol(lblBtn10,TREND_BUY)?clrPowderBlue:clrTomato):clrBackground;
 
@@ -1124,6 +1124,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
      {
       createButton(BtnSLHere,"" + DoubleToString(MathAbs(SL-LM),digits)+"",x_start-15, y_start-10,160,20,clrBlack,clrYellow);
 
+      createButton(BtnFindSL+"_H4","(H4)SL?",x_start-180, y_start-10,50,20,clrBlack,clrYellow);
       createButton(BtnFindSL+"_D1","(D) SL?",x_start-125, y_start-10,50,20,clrBlack,clrYellow);
       createButton(BtnFindSL+"_W1","(W) SL?",x_start- 70, y_start-10,50,20,clrBlack,clrYellow);
      }
@@ -1257,7 +1258,8 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       bool d3_notice_R1C1=allow_PushMessage(symbol,FILE_MSG_LIST_R1C1);
 
       if(d3_notice_R1C1
-         && arrHeiken_D1[1].count_ma10<=3
+         && (arrHeiken_D1[1].count_ma10<=2 || arrHeiken_D1[1].count_heiken<=2)
+         && is_same_symbol(trend_by_ma10_d1, arrHeiken_D1[0].trend_by_ma10)
          && is_same_symbol(trend_by_ma10_d1, arrHeiken_D1[0].trend_heiken))
         {
          string msg=symbol+" D " +trend_by_ma10_d1 + " No."+append1Zero(arrHeiken_D1[1].count_ma10);
@@ -1275,15 +1277,14 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
 
       if(is_eq_wd)
         {
-         CandleData arrHeiken_H1[];
-         get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,55,true,true);
-
-         if(arrHeiken_H4[1].count_ma10<=3 && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[1].trend_by_ma10))
+         if(arrHeiken_H4[0].count_ma10<=3
+            && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_by_ma10)
+            && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_heiken))
            {
             bool h4_notice_R1C2=allow_PushMessage(symbol,FILE_MSG_LIST_R1C2);
             if(h4_notice_R1C2)
               {
-               string msg=symbol+" Ma H4[1] C."+IntegerToString(arrHeiken_H4[1].count_ma10) + "." + trend_by_ma10_d1;
+               string msg=symbol+"WD Ma.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_ma10) + "." + trend_by_ma10_d1;
                if(is_allow_alert && allow_alert)
                   Alert(get_vnhour()+" "+msg);
                last_symbol=symbol;
@@ -1292,12 +1293,14 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
               }
            }
 
-         if(arrHeiken_H4[1].count_heiken<=3 && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[1].trend_heiken))
+         if(arrHeiken_H4[0].count_heiken<=3
+            && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_by_ma10)
+            && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_heiken))
            {
             bool h4_notice_R1C3=allow_PushMessage(symbol,FILE_MSG_LIST_R1C3);
             if(h4_notice_R1C3)
               {
-               string msg=symbol+" Hei H4[1] C."+IntegerToString(arrHeiken_H4[1].count_heiken) +" / Ma"+ IntegerToString(arrHeiken_H4[1].count_ma10) + "." + trend_by_ma10_d1;
+               string msg=symbol+"WD Hei.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_heiken) +" / Ma"+ IntegerToString(arrHeiken_H4[0].count_ma10) + "." + trend_by_ma10_d1;
                if(is_allow_alert && allow_alert)
                   Alert(get_vnhour()+" "+msg);
                last_symbol=symbol;
@@ -1305,30 +1308,17 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
                h4_notice_R1C3=false;
               }
            }
-
-         if(arrHeiken_H1[1].count_ma10<=3 &&
-            is_same_symbol(trend_by_ma10_d1,arrHeiken_H1[1].trend_by_ma10) &&
-            is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[1].trend_by_ma10))
-           {
-            bool h4_notice_R1C4=allow_PushMessage(symbol,FILE_MSG_LIST_R1C4);
-            if(h4_notice_R1C4)
-              {
-               string msg=symbol+" Hei H1[1] C."+IntegerToString(arrHeiken_H1[1].count_ma10) +" / H4[1].C"+ IntegerToString(arrHeiken_H4[1].count_ma10)  + "." + trend_by_ma10_d1;
-               if(is_allow_alert && allow_alert)
-                  Alert(get_vnhour()+" "+msg);
-               last_symbol=symbol;
-               PushMessage(msg,FILE_MSG_LIST_R1C4);
-               h4_notice_R1C4=false;
-              }
-           }
         }
 
-      if(arrHeiken_H4[1].count_ma10==1)
+      if(arrHeiken_H4[0].count_ma10<=2
+         && is_same_symbol(arrHeiken_D1[0].trend_by_ma10,arrHeiken_D1[0].trend_heiken)
+         && is_same_symbol(arrHeiken_D1[0].trend_by_ma10,arrHeiken_H4[0].trend_by_ma10)
+         && is_same_symbol(arrHeiken_D1[0].trend_by_ma10,arrHeiken_H4[0].trend_heiken))
         {
          bool h4_notice_R2C1=allow_PushMessage(symbol,FILE_MSG_LIST_R2C1);
          if(h4_notice_R2C1)
            {
-            string msg=symbol+" Ma H4[1] C."+IntegerToString(arrHeiken_H4[1].count_ma10) + "." + arrHeiken_H4[1].trend_by_ma10;
+            string msg=symbol+" D[0].H4[0] C."+IntegerToString(arrHeiken_H4[0].count_ma10) + "." + arrHeiken_D1[0].trend_by_ma10;
             if(is_allow_alert && allow_alert)
                Alert(get_vnhour()+" "+msg);
             last_symbol=symbol;
@@ -4321,10 +4311,13 @@ void OnChartEvent(const int     id,      // event ID
 
       if(is_same_symbol(sparam,BtnFindSL))
         {
-         if(is_same_symbol(sparam, "_D1"))
-            FindSL(PERIOD_D1);
+         if(is_same_symbol(sparam, "_H4"))
+            FindSL(PERIOD_H4);
          else
-            FindSL(PERIOD_W1);
+            if(is_same_symbol(sparam, "_D1"))
+               FindSL(PERIOD_D1);
+            else
+               FindSL(PERIOD_W1);
 
          OnInit();
          return;
@@ -5088,11 +5081,17 @@ void FindSL(ENUM_TIMEFRAMES TF)
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
    double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
 
+   int size=13;
+   if(TF==PERIOD_D1)
+      size=21;
+   if(TF==PERIOD_H4)
+      size=50;
+
    CandleData arrHeiken_D1[];
-   get_arr_heiken(symbol,TF,arrHeiken_D1,25,true,true);
+   get_arr_heiken(symbol,TF,arrHeiken_D1,size+10,true,true);
 
    double lowest=0.0,higest=0.0;
-   for(int idx=0; idx <= 20; idx++)
+   for(int idx=0; idx<=size; idx++)
      {
       double low=arrHeiken_D1[idx].low;
       double hig=arrHeiken_D1[idx].high;
@@ -5832,7 +5831,7 @@ void CreateMessagesBtn(string BtnSeq___)
       FILE_NAME_MSG_LIST=FILE_MSG_LIST_R2C1;
       x_position=COL_1;
       y_position=350;
-      prifix="R2C1 (Wait H1)";
+      prifix="R2C1 (H4Ma10c1)";
      }
 
    if(BtnSeq___==BtnMsgR2C2_)
@@ -5841,7 +5840,7 @@ void CreateMessagesBtn(string BtnSeq___)
       FILE_NAME_MSG_LIST=FILE_MSG_LIST_R2C2;
       x_position=COL_2;
       y_position=350;
-      prifix="R2C2 (Wait H4)";
+      prifix="R2C2 (Wait)";
      }
 //--------------------------------------------------------
    ObjectDelete(0,BtnClearMessage);
@@ -5866,7 +5865,7 @@ void CreateMessagesBtn(string BtnSeq___)
      }
 
    if(ArraySize(messageArray) > 0)
-      createButton(BtnClearMessage,"Clear " + prifix,x_position,y_position-20,120,18,clrBlack,clrLightGray,6);
+      createButton(BtnClearMessage,"Clear " + prifix,x_position,y_position-20,120,18,clrBlack,clrWhite,6);
 
    createButton(BtnClearMessageRxCx,"RxCx",COL_5+200,y_position-20,50,18,clrBlack,clrWhite,6);
 
@@ -5898,7 +5897,7 @@ void CreateMessagesBtn(string BtnSeq___)
       if(BtnSeq___==BtnMsgR1C4_)
          clrBackground=is_same_symbol(lable,Symbol())?clrPowderBlue:clrBackground;
 
-      if(BtnSeq___==BtnMsgR2C2_)
+      if(BtnSeq___==BtnMsgR2C1_ || BtnSeq___==BtnMsgR2C2_)
         {
          clrBackground=clrWhite;
          if(is_same_symbol(lable,"(WD)"))
@@ -5909,7 +5908,7 @@ void CreateMessagesBtn(string BtnSeq___)
       bool is_cur_tab = is_same_symbol(symbol,Symbol());
       clrBackground=is_cur_tab?(is_same_symbol(lable,TREND_BUY)?clrPowderBlue:clrTomato):clrBackground;
 
-      createButton(BtnSeq___+append1Zero(index),strCountBSL+lable,x_position,y_position+index*20,250,18,clrBlack,clrBackground,6);
+      createButton(BtnSeq___+append1Zero(index),strCountBSL+lable,x_position,y_position+index*20,250,18,clrBlack,clrBackground,6);//x_position==COL_1?200:250
      }
   }
 //+------------------------------------------------------------------+
@@ -6750,11 +6749,18 @@ double cal_MA(double& closePrices[],int ma_index,int candle_no=1)
   {
    int count=0;
    double ma=0.0;
+   int size = ArraySize(closePrices);
    for(int i=candle_no; i <= candle_no+ma_index; i++)
      {
-      count+=1;
-      ma+=closePrices[i];
+      if(i<size)
+        {
+         count+=1;
+         ma+=closePrices[i];
+        }
      }
+   if(count==0)
+      return 0;
+
    ma /= count;
 
    return ma;
@@ -7185,7 +7191,7 @@ void AddSupportResistance()
    double price_offset=MathAbs(SL-LM);
 
    for(int i=-15;i<=15;i++)
-      create_dragable_trendline(MANUAL_SUPPRESIS_+append1Zero(i),clrYellowGreen,LM+price_offset*i,STYLE_SOLID,2,false);
+      create_dragable_trendline(MANUAL_SUPPRESIS_+append1Zero(i),clrYellowGreen,LM+price_offset*i,STYLE_SOLID,1,false);
 
    string file_name = get_SupportResistance_file_name();
    int file_handle = FileOpen(file_name, FILE_WRITE | FILE_CSV, ';'); // | FILE_COMMON
@@ -7239,9 +7245,9 @@ void LoadSupportResistance()
       if(is_same_symbol(trendline_name, MANUAL_SUPPRESIS_))
         {
          if(is_same_symbol(trendline_name, append1Zero(0)))
-            create_dragable_trendline(trendline_name,clrBlue,start_price,STYLE_SOLID,1,false);
+            create_dragable_trendline(trendline_name,clrYellowGreen,start_price,STYLE_SOLID,1,false);
          else
-            create_dragable_trendline(trendline_name,clrBlack,start_price,STYLE_SOLID,1,false);
+            create_dragable_trendline(trendline_name,clrYellowGreen,start_price,STYLE_SOLID,1,false);
         }
      }
 
