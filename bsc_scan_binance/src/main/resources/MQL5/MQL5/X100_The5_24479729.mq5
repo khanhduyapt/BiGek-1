@@ -327,12 +327,12 @@ int OnInit()
      {
       int size=Period()<=PERIOD_D1?150:120;
       CandleData arrHeiken_D1[];
-      get_arr_heiken(cur_symbol,Period(),arrHeiken_D1,size,true,false);
+      get_arr_heiken(cur_symbol,Period(),arrHeiken_D1,size,true,true);
       int size_d1 = ArraySize(arrHeiken_D1)-10;
 
       for(int i = 0; i < size_d1; i++)
         {
-         string lbl_name="CountMa10D_"+appendZero100(i);
+         string lbl_Ma10="CountMa10D_"+appendZero100(i);
          color clrColor=is_same_symbol(arrHeiken_D1[i].trend_by_ma10,TREND_BUY)?clrBlue:clrRed;
          double mid = (arrHeiken_D1[i].open+arrHeiken_D1[i].close)/2;
 
@@ -340,14 +340,20 @@ int OnInit()
          string key_hei =","+IntegerToString(arrHeiken_D1[i].count_heiken)+",";
 
          if(is_same_symbol(",1,", key_hei) || is_same_symbol(",1,", key_ma10))
-            create_trend_line(lbl_name+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrLightGray,STYLE_SOLID,20,false,false,true,false);
+            create_trend_line(lbl_Ma10+"_",arrHeiken_D1[i].time,mid,arrHeiken_D1[i].time+1,mid,clrLightGray,STYLE_SOLID,20,false,false,true,false);
 
          if(is_same_symbol(",7,13,21,27,34,52,", key_ma10))
-            create_trend_line(lbl_name+"_",arrHeiken_D1[i].time
+            create_trend_line(lbl_Ma10+"_",arrHeiken_D1[i].time
                               ,mid,arrHeiken_D1[i].time+1
                               ,mid,clrYellow,STYLE_SOLID,15,false,false,true,false);
 
-         create_label_simple(lbl_name,IntegerToString(arrHeiken_D1[i].count_ma10),mid,clrColor,arrHeiken_D1[i].time);
+         create_label_simple(lbl_Ma10,IntegerToString(arrHeiken_D1[i].count_ma10),mid,clrColor,arrHeiken_D1[i].time);
+
+         if(i<=2)
+           {
+            color clrColorMa20=is_same_symbol(arrHeiken_D1[i].trend_by_ma20,TREND_BUY)?clrBlue:clrRed;
+            create_label_simple("CountMa20_"+appendZero100(i),IntegerToString(arrHeiken_D1[i].count_ma20),arrHeiken_D1[i].ma20,clrColorMa20,arrHeiken_D1[i].time);
+           }
         }
      }
 
@@ -847,7 +853,7 @@ void DrawButtons()
                    ,(index==0)?btn_heigh:is_cur_tab?btn_heigh+15:btn_heigh,clrText,clrBackground,6,SUB_WINDOW);
      }
 //--------------------------------------------------------------------------------------------
-   createButton("count_wd","WD "+append1Zero(count_wd)+"/"+append1Zero(size),chart_width/2+100,5,60,30,clrBlack,clrWhite,7,2);
+   createButton("count_wd","WD "+append1Zero(count_wd)+"/"+append1Zero(size),chart_width-100,5,60,20,clrBlack,clrWhite,7,2);
 
    btn_width=150;
    for(int index = 0; index < ArraySize(arrNoticeSymbols_D); index++)
@@ -1230,32 +1236,26 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       string total_comments="";
       string strBSL=CountBSL(symbol,total_comments);
       //----------------------------------------------------------------------------------------------------
-      CandleData arrHeiken_W1[];
-      get_arr_heiken(symbol,PERIOD_W1,arrHeiken_W1,15,true,true);
-
       CandleData arrHeiken_D1[];
       get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,25,true,true);
 
       CandleData arrHeiken_H4[];
       get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,55,true,true);
 
-      string trend_by_ma10_d1=get_trend_by_ma(symbol,PERIOD_D1,10,1);
-      string trend_by_ma10_h4=get_trend_by_ma(symbol,PERIOD_H4,10,1);
+      string trend_by_ma10_d1=arrHeiken_D1[1].trend_by_ma10;
+      string trend_by_ma10_h4=arrHeiken_H4[1].trend_by_ma10;
 
-      bool is_same_wd=is_same_symbol(trend_by_ma10_d1, arrHeiken_W1[1].trend_by_ma10) ||
-                      is_same_symbol(trend_by_ma10_d1, arrHeiken_W1[0].trend_by_ma10) ||
-                      is_same_symbol(trend_by_ma10_d1, arrHeiken_W1[0].trend_heiken);
+      bool is_same_d=is_same_symbol(trend_by_ma10_d1, arrHeiken_D1[0].trend_heiken) &&
+                     is_same_symbol(trend_by_ma10_d1, arrHeiken_D1[0].trend_by_ma10);
 
       bool is_count_d3=arrHeiken_D1[1].count_ma10<=3;
       bool d3_notice_R1C1=allow_PushMessage(symbol,FILE_MSG_LIST_R1C1);
 
       if(d3_notice_R1C1
-         && (arrHeiken_D1[1].count_ma10<=2)
+         && (arrHeiken_D1[0].count_ma10<=3)
          && is_same_symbol(trend_by_ma10_d1, arrHeiken_D1[0].trend_by_ma10))
         {
          string msg=symbol+" D " +trend_by_ma10_d1 + " No."+append1Zero(arrHeiken_D1[1].count_ma10);
-         if(is_same_wd)
-            msg+= " (WD)";
 
          if(is_allow_alert && allow_alert)
             Alert(get_vnhour()+" "+msg);
@@ -1264,7 +1264,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          d3_notice_R1C1=false;
         }
 
-      if(is_same_wd)
+      if(is_same_d)
         {
          if(arrHeiken_H4[0].count_ma10<=3 && arrHeiken_D1[1].count_ma10<=7
             && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_by_ma10)
@@ -1281,25 +1281,10 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
                h4_notice_R1C2=false;
               }
            }
-
-         //if(arrHeiken_H4[0].count_heiken<=3 && arrHeiken_D1[1].count_ma10<=7
-         //   && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_by_ma10)
-         //   && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_heiken))
-         //  {
-         //   bool h4_notice_R1C3=allow_PushMessage(symbol,FILE_MSG_LIST_R1C3);
-         //   if(h4_notice_R1C3)
-         //     {
-         //      string msg=symbol+"WD Hei.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_heiken) +" / Ma"+ IntegerToString(arrHeiken_H4[0].count_ma10) + "." + trend_by_ma10_d1;
-         //      if(is_allow_alert && allow_alert)
-         //         Alert(get_vnhour()+" "+msg);
-         //      last_symbol=symbol;
-         //      PushMessage(msg,FILE_MSG_LIST_R1C3);
-         //      h4_notice_R1C3=false;
-         //     }
-         //  }
         }
 
-      if(arrHeiken_H4[0].count_ma20<=2)
+      if(arrHeiken_H4[0].count_ma20<=3
+         && is_same_symbol(arrHeiken_D1[0].trend_by_ma10, arrHeiken_H4[0].trend_heiken))
         {
          bool h4_notice_R1C3=allow_PushMessage(symbol,FILE_MSG_LIST_R1C3);
          if(h4_notice_R1C3)
@@ -5757,7 +5742,7 @@ void CreateMessagesBtn(string BtnSeq___)
       BtnClearMessage=BtnClearMessageR1C3;
       FILE_NAME_MSG_LIST=FILE_MSG_LIST_R1C3;
       x_position=COL_3;
-      prifix="R1C3 (H4.Hei)";
+      prifix="R1C3 (H4.Ma20)";
      }
 
    if(BtnSeq___==BtnMsgR1C4_)
