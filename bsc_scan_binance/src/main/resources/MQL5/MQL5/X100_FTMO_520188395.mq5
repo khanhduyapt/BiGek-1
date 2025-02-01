@@ -450,7 +450,7 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                   && is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_heiken)
                   && is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_by_ma10))
                  {
-                  string msg=" (EXIT "+TREND_TYPE+" By.WDH4H1="+arrHeiken_W1[0].trend_by_ma10+") "+temp_symbol+" "+DoubleToString(temp_profit,1) +"$";
+                  string msg=" (EXIT_NOW "+TREND_TYPE+" By.WDH4H1="+arrHeiken_W1[0].trend_by_ma10+") "+temp_symbol+" "+DoubleToString(temp_profit,1) +"$";
                   PushMessage(msg,FILE_MSG_LIST_SL);
                   m_trade.PositionClose(m_position.Ticket());
                   SendTelegramMessage(temp_symbol,TREND_TYPE,msg);
@@ -471,7 +471,7 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                if(allow_notice_sl && is_same_symbol(trend_reverse,trend_by_ma10_d1)
                   && is_same_symbol(trend_reverse,arrHeiken_D1[0].trend_heiken))
                  {
-                  string msg=" (EXIT "+TREND_TYPE+" By.Ma10.D1="+trend_by_ma10_d1+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)
+                  string msg=" (Close "+TREND_TYPE+" By.Ma10.D1="+trend_by_ma10_d1+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)
                              +"$";
                   PushMessage(msg,FILE_MSG_LIST_SL);
                   reload=true;
@@ -486,30 +486,10 @@ void LoadSLTPEvery5min(bool allow_alert=true)
 
                   if(allow_notice_sl)
                     {
-                     string msg=" (EXIT "+TREND_TYPE+" By.Seq.H4H1="+arrHeiken_H4[1].trend_by_ma50+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)+"$";
+                     string msg=" (Close "+TREND_TYPE+" By.Seq.H4H1="+arrHeiken_H4[1].trend_by_ma50+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)+"$";
                      PushMessage(msg,FILE_MSG_LIST_SL);
                      reload=true;
                      allow_notice_sl=false;
-                    }
-
-                  if(false && is_same_symbol(trend_reverse,trend_by_ma10_d1)
-                     && is_same_symbol(trend_reverse,arrHeiken_D1[0].trend_by_ma10)
-                     && is_same_symbol(trend_reverse,arrHeiken_D1[0].trend_heiken))
-                    {
-
-                     CandleData arrHeiken_W1[];
-                     get_arr_heiken(temp_symbol,PERIOD_W1,arrHeiken_W1,25,true,true);
-
-                     if(is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_by_ma10)
-                        && is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_heiken))
-                       {
-                        //m_trade.PositionClose(m_position.Ticket());
-                        string msg=" (EXIT "+TREND_TYPE+" By.WD.H4H1="+trend_by_ma10_d1+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)+"$";
-                        PushMessage(msg,FILE_MSG_LIST_SL);
-                        reload=true;
-                        allow_notice_sl=false;
-                        //SendTelegramMessage(temp_symbol,trend_by_ma10_d1,msg);
-                       }
                     }
                  }
                //-------------------------------------------------------------------
@@ -525,7 +505,7 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                      is_same_symbol(trend_reverse,arrHeiken_H4[1].trend_by_ma20))
                      ClosePositivePosition(temp_symbol,TREND_TYPE);
                  }
-               if(is_same_symbol(comment, MASK_EXIT_WHEN_HeiMa50))
+               if(temp_profit>1 && is_same_symbol(comment, MASK_EXIT_WHEN_HeiMa50))
                  {
                   if(is_same_symbol(trend_reverse,arrHeiken_H4[1].trend_heiken) &&
                      is_same_symbol(trend_reverse,arrHeiken_H4[1].trend_by_ma50))
@@ -1293,7 +1273,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
             bool h4_notice_R1C2=allow_PushMessage(symbol,FILE_MSG_LIST_R1C2);
             if(h4_notice_R1C2)
               {
-               string msg=symbol+"WD Ma.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_ma10) + "." + trend_by_ma10_d1;
+               string msg=symbol+"WD Ma10.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_ma10) + "." + trend_by_ma10_d1;
                if(is_allow_alert && allow_alert)
                   Alert(get_vnhour()+" "+msg);
                last_symbol=symbol;
@@ -1302,37 +1282,34 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
               }
            }
 
-         if(arrHeiken_H4[0].count_heiken<=3 && arrHeiken_D1[1].count_ma10<=7
-            && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_by_ma10)
-            && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_heiken))
-           {
-            bool h4_notice_R1C3=allow_PushMessage(symbol,FILE_MSG_LIST_R1C3);
-            if(h4_notice_R1C3)
-              {
-               string msg=symbol+"WD Hei.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_heiken) +" / Ma"+ IntegerToString(arrHeiken_H4[0].count_ma10) + "." + trend_by_ma10_d1;
-               if(is_allow_alert && allow_alert)
-                  Alert(get_vnhour()+" "+msg);
-               last_symbol=symbol;
-               PushMessage(msg,FILE_MSG_LIST_R1C3);
-               h4_notice_R1C3=false;
-              }
-           }
+         //if(arrHeiken_H4[0].count_heiken<=3 && arrHeiken_D1[1].count_ma10<=7
+         //   && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_by_ma10)
+         //   && is_same_symbol(trend_by_ma10_d1,arrHeiken_H4[0].trend_heiken))
+         //  {
+         //   bool h4_notice_R1C3=allow_PushMessage(symbol,FILE_MSG_LIST_R1C3);
+         //   if(h4_notice_R1C3)
+         //     {
+         //      string msg=symbol+"WD Hei.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_heiken) +" / Ma"+ IntegerToString(arrHeiken_H4[0].count_ma10) + "." + trend_by_ma10_d1;
+         //      if(is_allow_alert && allow_alert)
+         //         Alert(get_vnhour()+" "+msg);
+         //      last_symbol=symbol;
+         //      PushMessage(msg,FILE_MSG_LIST_R1C3);
+         //      h4_notice_R1C3=false;
+         //     }
+         //  }
         }
 
-      if(arrHeiken_H4[0].count_ma10<=2 && arrHeiken_D1[1].count_ma10<=7
-         && is_same_symbol(arrHeiken_D1[0].trend_by_ma10,arrHeiken_D1[0].trend_heiken)
-         && is_same_symbol(arrHeiken_D1[0].trend_by_ma10,arrHeiken_H4[0].trend_by_ma10)
-         && is_same_symbol(arrHeiken_D1[0].trend_by_ma10,arrHeiken_H4[0].trend_heiken))
+      if(arrHeiken_H4[0].count_ma20<=2)
         {
-         bool h4_notice_R2C1=allow_PushMessage(symbol,FILE_MSG_LIST_R2C1);
-         if(h4_notice_R2C1)
+         bool h4_notice_R1C3=allow_PushMessage(symbol,FILE_MSG_LIST_R1C3);
+         if(h4_notice_R1C3)
            {
-            string msg=symbol+" D[0].H4[0] C."+IntegerToString(arrHeiken_H4[0].count_ma10) + "." + arrHeiken_D1[0].trend_by_ma10;
+            string msg=symbol+" Ma20.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_ma20) + "." + arrHeiken_H4[0].trend_by_ma20;
             if(is_allow_alert && allow_alert)
                Alert(get_vnhour()+" "+msg);
             last_symbol=symbol;
-            PushMessage(msg,FILE_MSG_LIST_R2C1);
-            h4_notice_R2C1=false;
+            PushMessage(msg,FILE_MSG_LIST_R1C3);
+            h4_notice_R1C3=false;
            }
         }
       //----------------------------------------------------------------------------------------------------
