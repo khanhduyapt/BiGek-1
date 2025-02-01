@@ -353,6 +353,9 @@ int OnInit()
            {
             color clrColorMa20=is_same_symbol(arrHeiken_D1[i].trend_by_ma20,TREND_BUY)?clrBlue:clrRed;
             create_label_simple("CountMa20_"+appendZero100(i),IntegerToString(arrHeiken_D1[i].count_ma20),arrHeiken_D1[i].ma20,clrColorMa20,arrHeiken_D1[i].time);
+
+            color clrColorMa50=is_same_symbol(arrHeiken_D1[i].trend_by_ma50,TREND_BUY)?clrBlue:clrRed;
+            create_label_simple("CountMa50_"+appendZero100(i),IntegerToString(arrHeiken_D1[i].count_ma50),arrHeiken_D1[i].ma50,clrColorMa50,arrHeiken_D1[i].time);
            }
         }
      }
@@ -1240,7 +1243,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,25,true,true);
 
       CandleData arrHeiken_H4[];
-      get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,55,true,true);
+      get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,65,true,true);
 
       string trend_by_ma10_d1=arrHeiken_D1[1].trend_by_ma10;
       string trend_by_ma10_h4=arrHeiken_H4[1].trend_by_ma10;
@@ -1295,6 +1298,21 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
             last_symbol=symbol;
             PushMessage(msg,FILE_MSG_LIST_R1C3);
             h4_notice_R1C3=false;
+           }
+        }
+
+      if(arrHeiken_H4[0].count_ma50<=5
+         && is_same_symbol(arrHeiken_H4[0].trend_by_ma50, arrHeiken_H4[0].trend_heiken))
+        {
+         bool h4_notice_R1C4=allow_PushMessage(symbol,FILE_MSG_LIST_R1C4);
+         if(h4_notice_R1C4)
+           {
+            string msg=symbol+" Ma50.H4[0] C."+IntegerToString(arrHeiken_H4[0].count_ma50) + "." + arrHeiken_H4[0].trend_by_ma50;
+            if(is_allow_alert && allow_alert)
+               Alert(get_vnhour()+" "+msg);
+            last_symbol=symbol;
+            PushMessage(msg,FILE_MSG_LIST_R1C4);
+            h4_notice_R1C4=false;
            }
         }
       //----------------------------------------------------------------------------------------------------
@@ -3080,6 +3098,7 @@ public:
    string            trend_by_ma20;
    double            ma05;
    string            trend_by_ma50;
+   int               count_ma50;
 
                      CandleData()
      {
@@ -3110,6 +3129,7 @@ public:
       trend_by_ma20="";
       ma05=0;
       trend_by_ma50="";
+      count_ma50=0;
      }
 
                      CandleData(
@@ -3118,7 +3138,7 @@ public:
       double ma10_,string trend_by_ma10_,int count_ma10_,string trend_vector_ma10_,
       string trend_by_ma05_,string trend_ma03vs05_,int count_ma3_vs_ma5_,
       string trend_by_seq_102050_,double ma50_,string trend_ma10vs20_,string trend_ma05vs10_,
-      double lowest_,  double higest_,bool allow_trade_now_by_seq_051020_,bool allow_trade_now_by_seq_102050_,double ma20_,int count_ma20_,string trend_by_ma20_,double ma05_,string trend_by_ma50_)
+      double lowest_,  double higest_,bool allow_trade_now_by_seq_051020_,bool allow_trade_now_by_seq_102050_,double ma20_,int count_ma20_,string trend_by_ma20_,double ma05_,string trend_by_ma50_, int count_ma50_)
      {
       time=t;
       open=o;
@@ -3147,6 +3167,7 @@ public:
       trend_by_ma20=trend_by_ma20_;
       ma05=ma05_;
       trend_by_ma50=trend_by_ma50_;
+      count_ma50=count_ma50_;
      }
   };
 //+------------------------------------------------------------------+
@@ -5750,7 +5771,7 @@ void CreateMessagesBtn(string BtnSeq___)
       BtnClearMessage=BtnClearMessageR1C4;
       FILE_NAME_MSG_LIST=FILE_MSG_LIST_R1C4;
       x_position=COL_4;
-      prifix="R1C4 (H1.Ma)";
+      prifix="R1C4 (H4.Ma50)";
      }
 
    if(BtnSeq___==BtnMsgR1C5_)
@@ -8406,7 +8427,7 @@ void get_arr_candlestick(string symbol,ENUM_TIMEFRAMES TIME_FRAME,CandleData &ca
       if(open>close)
          trend=TREND_SEL;
 
-      CandleData candle(time,open,high,low,close,trend,0,0,"",0,"","","",0,"",0,"","",0,0,false,false,0.0,0,"",0,"");
+      CandleData candle(time,open,high,low,close,trend,0,0,"",0,"","","",0,"",0,"","",0,0,false,false,0.0,0,"",0,"",0);
       candleArray[index]=candle;
      }
 
@@ -8448,7 +8469,7 @@ void get_arr_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,CandleData &candleA
       double pre_HaClose=iClose(symbol,TIME_FRAME,length+4);
       string pre_candle_trend=pre_HaClose>pre_HaOpen ? TREND_BUY : TREND_SEL;
 
-      CandleData candle(pre_HaTime,pre_HaOpen,pre_HaHigh,pre_HaLow,pre_HaClose,pre_candle_trend,0,0,"",0,"","","",0,"",0,"","",0,0,false,false,0,0,"",0,"");
+      CandleData candle(pre_HaTime,pre_HaOpen,pre_HaHigh,pre_HaLow,pre_HaClose,pre_candle_trend,0,0,"",0,"","","",0,"",0,"","",0,0,false,false,0,0,"",0,"",0);
       candleArray[length+4]=candle;
      }
 
@@ -8473,7 +8494,7 @@ void get_arr_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,CandleData &candleA
             break;
         }
 
-      CandleData candle_x(haTime,haOpen,haHigh,haLow,haClose,haTrend,count_heiken,0,"",0,"","","",0,"",0,"","",0,0,false,false,0,0,"",0,"");
+      CandleData candle_x(haTime,haOpen,haHigh,haLow,haClose,haTrend,count_heiken,0,"",0,"","","",0,"",0,"","",0,0,false,false,0,0,"",0,"",0);
       candleArray[index]=candle_x;
      }
 
@@ -8532,6 +8553,9 @@ void get_arr_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,CandleData &candleA
            {
             double ma20=cal_MA(closePrices,20,index);
             trend_by_ma20 =(mid>ma20) ? TREND_BUY : (mid<ma20) ? TREND_SEL : "";
+
+            double ma50=cal_MA(closePrices,50,index);
+            trend_by_ma50 =(mid>ma50) ? TREND_BUY : (mid<ma50) ? TREND_SEL : "";
            }
 
          double ma20=0;
@@ -8589,11 +8613,21 @@ void get_arr_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,CandleData &candleA
            }
 
          int count_ma20=1;
-         if(is_calc_seq102050)
+         if(is_calc_seq102050 && trend_by_ma20 != "")
             for(int j=index+1; j<length+1; j++)
               {
                if(trend_by_ma20==candleArray[j].trend_by_ma20)
                   count_ma20+=1;
+               else
+                  break;
+              }
+
+         int count_ma50=1;
+         if(is_calc_seq102050 && trend_by_ma50 != "")
+            for(int j=index+1; j<length+1; j++)
+              {
+               if(trend_by_ma50==candleArray[j].trend_by_ma50)
+                  count_ma50+=1;
                else
                   break;
               }
@@ -8610,7 +8644,7 @@ void get_arr_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,CandleData &candleA
          CandleData candle_x(cur_cancle.time,cur_cancle.open,cur_cancle.high,cur_cancle.low,cur_cancle.close,cur_cancle.trend_heiken
                              ,cur_cancle.count_heiken,ma10,trend_by_ma10,count_ma10,trend_vector_ma10
                              ,trend_by_ma05,trend_ma03vs05,count_ma3_vs_ma5,trend_by_seq_102050,ma50,trend_ma10vs20,trend_ma05vs10,lowest,higest,allow_trade_now_by_seq_051020,allow_trade_now_by_seq_102050
-                             ,ma20,count_ma20,trend_by_ma20,ma05,trend_by_ma50);
+                             ,ma20,count_ma20,trend_by_ma20,ma05,trend_by_ma50, count_ma50);
 
          candleArray[index]=candle_x;
         }
