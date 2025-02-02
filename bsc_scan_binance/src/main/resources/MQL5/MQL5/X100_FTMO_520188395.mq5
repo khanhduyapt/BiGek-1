@@ -362,7 +362,7 @@ int OnInit()
      }
 
    Comment(GetComments());
-
+   ChartRedraw();
    return(INIT_SUCCEEDED);
   }
 //+------------------------------------------------------------------+
@@ -1334,7 +1334,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
            }
         }
 
-      if(arrHeiken_H4[0].count_ma20<=3
+      if(arrHeiken_H4[0].count_ma20<=3 && arrHeiken_D1[0].count_ma10<=7
          && is_same_symbol(arrHeiken_D1[0].trend_by_ma10, arrHeiken_H4[0].trend_heiken))
         {
          bool h4_notice_R1C3=allow_PushMessage(symbol,FILE_MSG_LIST_R1C3);

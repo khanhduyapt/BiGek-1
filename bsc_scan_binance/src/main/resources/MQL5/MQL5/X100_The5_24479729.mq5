@@ -219,6 +219,7 @@ string ARR_SYMBOLS_USD[] =
    ,"EURAUD","EURCAD","EURCHF","GBPCHF","EURNZD","GBPNZD"
    ,"EURGBP","EURUSD","GBPUSD","NZDUSD"
    ,"USDCAD","USDCHF"
+   ,"BTCUSD","USOIL.cash","US30.cash","US500.cash","US100.cash","GER40.cash","JP225.cash" //"USOIL","US30","US500","FR40","JP225"
 //,"BTCUSD","USOIL.cash","US30.cash","US500.cash","US100.cash","GER40.cash","JP225.cash" //"USOIL","US30","US500","FR40","JP225"
    ,"BTCUSD","XTIUSD","US30","SP500","NAS100","DAX40","JPN225" //"USOIL","US30","US500","FR40","JP225"
   };
@@ -362,7 +363,7 @@ int OnInit()
      }
 
    Comment(GetComments());
-
+   ChartRedraw();
    return(INIT_SUCCEEDED);
   }
 //+------------------------------------------------------------------+
@@ -1334,7 +1335,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
            }
         }
 
-      if(arrHeiken_H4[0].count_ma20<=3
+      if(arrHeiken_H4[0].count_ma20<=3 && arrHeiken_D1[0].count_ma10<=7
          && is_same_symbol(arrHeiken_D1[0].trend_by_ma10, arrHeiken_H4[0].trend_heiken))
         {
          bool h4_notice_R1C3=allow_PushMessage(symbol,FILE_MSG_LIST_R1C3);
