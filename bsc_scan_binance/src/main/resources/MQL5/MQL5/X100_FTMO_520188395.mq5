@@ -98,6 +98,7 @@ string telegram_url="https://api.telegram.org";
 #define BtnSaveTrendline            "btn_save_trendline"
 #define BtnClearTrendline           "btn_clear_trendline"
 #define BtnResetTimeline            "btn_reset_timeline"
+#define BtnSetTimeHere              "Btn_SetTimeHere"
 #define HeivsMa10_BUY "811"
 #define HeivsMa20_BUY "812"
 #define HeivsMa50_BUY "815"
@@ -828,7 +829,9 @@ void DrawButtons()
    string symbol=Symbol();
 
    if(Period()<=PERIOD_D1)
-      Draw_MACD_Extremes(symbol,PERIOD_D1,20,true, 1,STYLE_SOLID);
+      Draw_MACD_Extremes(symbol,PERIOD_D1,17,true, 1,STYLE_SOLID);
+   if(Period()==PERIOD_W1)
+      Draw_MACD_Extremes(symbol,PERIOD_W1,20,true, 1,STYLE_SOLID);
 
    if(Period()<PERIOD_D1)
      {
@@ -851,11 +854,8 @@ void DrawButtons()
    bool IS_MACD_DOT=GetGlobalVariable(BtnMacdMode)==AUTO_TRADE_ONN;
    if(IS_MACD_DOT)
      {
-      if(Period()>=PERIOD_W1)
-         Draw_MACD_Extremes(symbol,PERIOD_W1,60,false,1,STYLE_DOT);
-
-      Draw_MACD_Extremes(symbol,PERIOD_H4,40,false,1,STYLE_DOT);
-      Draw_MACD_Extremes(symbol,PERIOD_H1,30,false,1,STYLE_DOT);
+      Draw_MACD_Extremes(symbol,PERIOD_H4,10,false,1,STYLE_DOT);
+      Draw_MACD_Extremes(symbol,PERIOD_H1,7,false,1,STYLE_DOT);
 
       is_allow_trade_by_macd_extremes(symbol,PERIOD_M15,"");
       is_allow_trade_by_macd_extremes(symbol,PERIOD_M5,"");
@@ -943,9 +943,11 @@ void DrawButtons()
 
    int start_x=(int)(chart_width-50*17.5);
    int counter = 0;
+
+   createButton(BtnSetTimeHere,  "Timer",       chart_width/2,chart_heigh-70,50,25,clrBlack,clrWhite);
    createButton(BtnResetTimeline,  "Rs.Time",   start_x+50*counter-50,chart_heigh-35,70,30,clrBlack,clrYellow);
    counter+=1;
-   createButton(BtnHideAngleMode,"Angle",       start_x+50*counter-20,chart_heigh-35,50,30,clrBlack,is_hide_angle?clrWhite:clrLightCyan);
+   createButton(BtnHideAngleMode,"Angle",       start_x+50*counter-20,chart_heigh-35,50,30,clrBlack,is_hide_angle?clrLightGray:clrLightCyan);
    counter+=1;
    createButton(BtnMacdMode,"Macd",             start_x+50*counter-10,chart_heigh-35,50,30,clrBlack,IS_MACD_DOT?clrActiveBtn:clrWhite);
    if(Period()>=PERIOD_W1)
@@ -1763,18 +1765,32 @@ double GetClosePriceAtTime(string symbol, datetime base_time)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
+void create_trend_angle(string lineName, datetime time1, double price1, datetime time2, double price2, double angle
+                        , color clrColor, bool is_ray=false, int STYLE=STYLE_SOLID)
+  {
+   ObjectDelete(0, lineName);
+
+   if(!ObjectCreate(0, lineName, OBJ_TRENDBYANGLE, 0, time1, price1, time2, price2))
+      return;
+
+   ObjectSetInteger(0, lineName, OBJPROP_COLOR,clrColor);
+   ObjectSetInteger(0, lineName, OBJPROP_WIDTH,2);
+//ObjectSetInteger(0, lineName, OBJPROP_RAY_LEFT,is_ray);
+   ObjectSetInteger(0, lineName, OBJPROP_RAY_RIGHT,is_ray);
+   ObjectSetDouble(0, lineName, OBJPROP_ANGLE,angle);
+   ObjectSetInteger(0, lineName, OBJPROP_STYLE,STYLE);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
   {
    string symbol=Symbol();
    int width=1;
    DeleteAllObjectsWithPrefix(FIBO_TIME_ZONE_);
+   datetime time_shift = iTime(symbol,Period(),1) - iTime(symbol,Period(),2);
 
-//D1->D2
-   ENUM_TIMEFRAMES TF=Period();//PERIOD_D1;
-//if(Period()==PERIOD_W1)
-//   TF=PERIOD_W1;
-//if(Period()==PERIOD_H4)
-//   TF=PERIOD_H4;
+   ENUM_TIMEFRAMES TF=Period();
 
    string fibo_name = FIBO_TIME_ZONE_+symbol;
 
@@ -1783,8 +1799,7 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
 
    Print(get_vntime()+"DrawFiboTimeZone52H4:"+(string)base_time_1 + ","+(string)base_time_2);
    create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,base_time_1,clrFireBrick,STYLE_SOLID,5);
-   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,base_time_2,clrLightGray,STYLE_SOLID,5);
-
+   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,base_time_2,clrGray,STYLE_SOLID,5);
 
    double price1=GetClosePriceAtTime(symbol, base_time_1);
    double price2=GetClosePriceAtTime(symbol, base_time_2);
@@ -1812,13 +1827,14 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
       if(higest<hig)
          higest=hig;
      }
+   double mid = (lowest+higest)/2;
 //Alert(candle_index1, "  ", candle_index2);// ->  43  26
 
    double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
    if(is_set_SL_LM)
      {
-      if(LM>SL)
+      if(LM>SL)//TREND_BUY
         {
          SetGlobalVariable(GLOBAL_VAR_LM+symbol, higest);
          SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest);
@@ -1833,15 +1849,38 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
       OnInit();
       return;
      }
+   int count_d = candle_index1-candle_index2;
+   create_label_simple("CoundD1",""+IntegerToString(count_d)+" "+get_time_frame_name(TF),lowest,clrRed,(base_time_1+base_time_2)/2);
 
    int x_start,y_start;
-   if(ChartTimePriceToXY(0,0,base_time_2,(lowest+higest)/2,x_start,y_start))
+   if(ChartTimePriceToXY(0,0,base_time_1,mid,x_start,y_start))
      {
-      createButton(BtnSetAmpTrade+"??","Amp",           x_start+ 5,y_start-30,35,20,clrBlack,clrYellow);
-      createButton(BtnRevRR,(LM>SL)?TREND_BUY:TREND_SEL,x_start+ 5,y_start-00,35,20,clrBlack,LM>SL?clrLightCyan:clrMistyRose);
+      createButton(BtnSetAmpTrade+"??","Amp",           x_start-50,y_start-25,35,20,clrBlack,clrYellow);
+      createButton(BtnRevRR,(LM>SL)?TREND_BUY:TREND_SEL,x_start-50,y_start-00,35,20,clrBlack,LM>SL?clrLightCyan:clrMistyRose);
      }
 
-   create_label_simple("CoundD1",""+IntegerToString(candle_index1-candle_index2)+" "+get_time_frame_name(TF),lowest,clrRed,(base_time_1+base_time_2)/2);
+   double amp_trade = (higest-lowest);
+   double mid_d2=(iLow(symbol, TF, candle_index2)+iHigh(symbol,TF, candle_index2))/2;
+   datetime mid_time = (datetime)(time_shift*count_d*1.618);
+
+//create_trend_angle("Angle_D1D2_S45", base_time_1, higest, base_time_2, lowest,-45, clrRed, false, STYLE_SOLID);
+//create_trend_angle("Angle_D1D2_B45", base_time_1, lowest, base_time_2, higest, 45, clrRed, false, STYLE_SOLID);
+   if(LM>SL)
+     {
+      create_trend_angle("Angle_D2Dx_B45", base_time_2, mid_d2, base_time_2+mid_time, mid_d2+amp_trade, 45, clrRed, false, STYLE_SOLID);
+     }
+
+   else
+     {
+      create_trend_angle("Angle_D2Dx_S45", base_time_2, mid_d2, base_time_2+mid_time, mid_d2-amp_trade,-45, clrRed, false, STYLE_SOLID);
+     }
+
+//create_trend_line("amp_trade_b",base_time_2+time_shift,mid_d2,base_time_2+time_shift,mid_d2+amp_trade,clrBlue,STYLE_SOLID,2);
+//create_trend_line("amp_trade_s",base_time_2+time_shift,mid_d2,base_time_2+time_shift,mid_d2-amp_trade,clrFireBrick,STYLE_SOLID,2);
+
+//create_heiken_candle("amp_trade_b",base_time_2,base_time_2+time_shift,mid_d2,mid_d2+amp_trade,0,0,clrPaleTurquoise,true);
+//create_heiken_candle("amp_trade_s",base_time_2,base_time_2+time_shift,mid_d2,mid_d2-amp_trade,0,0,clrLightPink,true);
+
 
    bool is_hide_angle=GetGlobalVariable(BtnHideAngleMode)==AUTO_TRADE_ONN;
 
@@ -1870,65 +1909,77 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
          //create_label_simple("CoundD2","  (T) "+IntegerToString(candle_index2)+"D " + DoubleToString(f,2),(price1+price2)/2,clrBlue,base_time_2);
         }
       //---------------------------------------------------------------------------------------------------------------
+      double levels_d1d2[] = {0,-3, 3,-4, 4,-5, 5
+                              , 0.382, 0.5, 0.618
+                              ,-0.382,-0.5,-0.618
+                              , 1, 1.382, 1.5, 1.618
+                              , 2, 2.382, 2.5, 2.618
+                              ,-1,-1.382,-1.5,-1.618
+                              ,-2,-2.382,-2.5,-2.618
+                             };
+      ObjectDelete(0,name);
+      ObjectCreate(0,name,OBJ_FIBO,0,base_time_1-time_shift,price1,base_time_1+time_shift,price2);
+
+      ObjectSetInteger(0,name,OBJPROP_COLOR,clrNONE);
+      ObjectSetInteger(0,name,OBJPROP_STYLE,STYLE_DOT);
+      ObjectSetInteger(0,name,OBJPROP_WIDTH,1);
+      ObjectSetInteger(0,name,OBJPROP_BACK,false);
+      ObjectSetInteger(0,name,OBJPROP_RAY_LEFT,false);
+      ObjectSetInteger(0,name,OBJPROP_RAY_RIGHT,false);
+      ObjectSetInteger(0,name,OBJPROP_SELECTABLE,true);
+      ObjectSetInteger(0,name,OBJPROP_SELECTED,true);
+
+      int size_d1d2 = ArraySize(levels_d1d2);
+      ObjectSetInteger(0,name,OBJPROP_LEVELS,size_d1d2);
+      for(int i=0; i<size_d1d2; i++)
         {
-         double levels_d1d2[] = {0,-3, 3,-4, 4,-5, 5
-                                 , 0.382, 0.5, 0.618
-                                 ,-0.382,-0.5,-0.618
-                                 , 1, 1.382, 1.5, 1.618
-                                 , 2, 2.382, 2.5, 2.618
-                                 ,-1,-1.382,-1.5,-1.618
-                                 ,-2,-2.382,-2.5,-2.618
-                                };
-         ObjectDelete(0,name);
-         ObjectCreate(0,name,OBJ_FIBO,0,base_time_1-TIME_OF_ONE_D1_CANDLE*1,price1,base_time_1+TIME_OF_ONE_D1_CANDLE*1,price2);
-
-         ObjectSetInteger(0,name,OBJPROP_COLOR,clrNONE);              // Màu của Fibonacci
-         ObjectSetInteger(0,name,OBJPROP_STYLE,STYLE_DOT);              // Kiểu đường kẻ (nét đứt)
-         ObjectSetInteger(0,name,OBJPROP_WIDTH,1);                     // Độ dày của đường kẻ
-         ObjectSetInteger(0,name,OBJPROP_BACK,false);
-         ObjectSetInteger(0,name,OBJPROP_RAY_LEFT,false);
-         ObjectSetInteger(0,name,OBJPROP_RAY_RIGHT,false);
-         ObjectSetInteger(0,name,OBJPROP_SELECTABLE,true);
-         ObjectSetInteger(0,name,OBJPROP_SELECTED,true);
-
-         int size_d1d2 = ArraySize(levels_d1d2);
-         ObjectSetInteger(0,name,OBJPROP_LEVELS,size_d1d2);
-         for(int i=0; i<size_d1d2; i++)
-           {
-            ObjectSetDouble(0,name,OBJPROP_LEVELVALUE,i,levels_d1d2[i]);
-            ObjectSetInteger(0,name,OBJPROP_LEVELCOLOR,i,clrBlack);
-            ObjectSetInteger(0,name,OBJPROP_LEVELSTYLE,i,STYLE_DOT);
-            ObjectSetString(0,name,OBJPROP_LEVELTEXT,i,DoubleToString(1*MathAbs(levels_d1d2[i]),3)+"");
-            ObjectSetInteger(0,name,OBJPROP_LEVELWIDTH,i,width);
-           }
+         ObjectSetDouble(0,name,OBJPROP_LEVELVALUE,i,levels_d1d2[i]);
+         ObjectSetInteger(0,name,OBJPROP_LEVELCOLOR,i,clrBlack);
+         ObjectSetInteger(0,name,OBJPROP_LEVELSTYLE,i,STYLE_DOT);
+         ObjectSetString(0,name,OBJPROP_LEVELTEXT,i,DoubleToString(1*MathAbs(levels_d1d2[i]),3)+"");
+         ObjectSetInteger(0,name,OBJPROP_LEVELWIDTH,i,width);
         }
      }
 //---------------------------------------------------------------------------------------------------------------
    if(candle_count>COUNT_MIN && is_hide_angle==false)
      {
-      string fibo_4_seasons=fibo_name+"4_seasons";
-      ObjectDelete(0, fibo_4_seasons);
-      ObjectCreate(0, fibo_4_seasons, OBJ_FIBOTIMES, 0, base_time_1, 0, base_time_2, 0);
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_COLOR, clrNONE);
-
-      double levels_4seasons[] = {0
-                                  ,-1.382,-1.5,-1.618
-                                  ,-0.382,-0.5,-0.618
-                                  , 0.382, 0.5, 0.618
-                                  , 1.382, 1.5, 1.618
-                                  , 2.382, 2.5, 2.618
-                                  , 3.382, 3.5, 3.618
-                                 };
-      int levels_4seasons_count = ArraySize(levels_4seasons);
-      ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELS, levels_4seasons_count);
-
-      for(int i = 0; i < levels_4seasons_count; i++)
+      int chart_heigh = (int) MathRound(ChartGetInteger(0,CHART_HEIGHT_IN_PIXELS));
+      int temp_windows;
+      datetime temp_time;
+      double temp_price;
+      if(ChartXYToTimePrice(0,0,chart_heigh-70,temp_windows,temp_time,temp_price))
         {
-         ObjectSetDouble(0, fibo_4_seasons, OBJPROP_LEVELVALUE, i, levels_4seasons[i]);
-         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELCOLOR, i, clrDimGray);
-         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELSTYLE, i, STYLE_DASHDOTDOT);
-         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELWIDTH, i, 1);
-         //ObjectSetString(0, fibo_4_seasons, OBJPROP_LEVELTEXT, i, DoubleToString(levels_4seasons[i], 3));
+         string fibo_4_seasons=fibo_name+"4_seasons";
+         ObjectDelete(0, fibo_4_seasons);
+         ObjectCreate(0, fibo_4_seasons, OBJ_FIBOTIMES, 0, base_time_1, temp_price, base_time_2, temp_price);
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_COLOR, clrNONE);
+
+         double levels_4seasons[] = {0,1,2,3,4,5,6,7,8,9
+                                     ,-1,-2,-3,-4,-5,-6,-7,-8,-9
+                                     ,-1.382,-1.5,-1.618
+                                     ,-0.382,-0.5,-0.618
+                                     , 0.382, 0.5, 0.618
+                                     , 1.382, 1.5, 1.618
+                                     , 2.382, 2.5, 2.618
+                                     , 3.382, 3.5, 3.618
+                                    };
+         int levels_4seasons_count = ArraySize(levels_4seasons);
+         ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELS, levels_4seasons_count);
+
+         for(int i = 0; i < levels_4seasons_count; i++)
+           {
+            ObjectSetDouble(0, fibo_4_seasons, OBJPROP_LEVELVALUE, i, levels_4seasons[i]);
+            ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELCOLOR, i, clrDimGray);
+            ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELSTYLE, i, STYLE_DOT);
+            ObjectSetInteger(0, fibo_4_seasons, OBJPROP_LEVELWIDTH, i, 1);
+            double d_fibo = levels_4seasons[i]*count_d;
+            if(levels_4seasons[i] > 1)
+               d_fibo -= count_d;
+            //if(levels_4seasons[i] < 0)
+            //   d_fibo += count_d;
+
+            ObjectSetString(0, fibo_4_seasons, OBJPROP_LEVELTEXT, i," "+DoubleToString(MathAbs(levels_4seasons[i]),2)+" ("+DoubleToString(MathAbs(d_fibo), 0)+")");
+           }
         }
      }
 //---------------------------------------------------------------------------------------------------------------
@@ -1936,16 +1987,10 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
      {
       color clrColor=clrBlue;
       ObjectDelete(0, fibo_name);
-      ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time_1, 0, base_time_2, 0);
+      ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time_1, higest, base_time_2, higest);
 
-      ObjectSetInteger(0, fibo_name, OBJPROP_COLOR, clrColor);
-      ObjectSetInteger(0, fibo_name, OBJPROP_STYLE, STYLE_SOLID);
-      ObjectSetInteger(0, fibo_name, OBJPROP_WIDTH, width);
-
+      ObjectSetInteger(0, fibo_name, OBJPROP_COLOR, clrNONE);
       ObjectSetInteger(0, fibo_name, OBJPROP_BACK, false);
-      ObjectSetInteger(0, fibo_name, OBJPROP_SELECTABLE, true);
-      ObjectSetInteger(0, fibo_name, OBJPROP_SELECTED, true);
-      ObjectSetInteger(0, fibo_name, OBJPROP_RAY_RIGHT, true);
 
       double levels[] = {0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
                          ,-1,-2,-3,-4,-5,-6,-7,-8,-9,-10,-11,-12,-13
@@ -1956,10 +2001,9 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
       for(int i = 0; i < levels_count; i++)
         {
          ObjectSetDouble(0, fibo_name, OBJPROP_LEVELVALUE, i, levels[i]);
-         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELCOLOR, i, clrColor);
+         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELCOLOR, i, clrDimGray);
          ObjectSetInteger(0, fibo_name, OBJPROP_LEVELSTYLE, i, STYLE_SOLID);
-         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELWIDTH, i, width);
-         ObjectSetString(0, fibo_name, OBJPROP_LEVELTEXT, i, DoubleToString(levels[i], 3));
+         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELWIDTH, i, 2);
         }
      }
   }
@@ -2367,14 +2411,14 @@ void Reset_Fibo_Timelines()
 
    Print(get_vntime()+"Reset Fibo Timelines:"+(string)base_time_1 + ","+(string)base_time_2);
    create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,base_time_1,clrFireBrick,STYLE_SOLID,5);
-   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,base_time_2,clrLightGray,STYLE_SOLID,5);
+   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,base_time_2,clrGray,STYLE_SOLID,5);
 
    SaveFibolinesToFile();
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size=20, bool draw_fan=false,int vertical_width=1,ENUM_LINE_STYLE STYLE=STYLE_SOLID)
+void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size, bool draw_fan=false,int vertical_width=1,ENUM_LINE_STYLE STYLE=STYLE_SOLID)
   {
    int dot=(int)MathMax(dot_size/3,7);
    string TF=get_time_frame_name(timeframe)+"";
@@ -2434,14 +2478,11 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size=2
                double low=iLow(symbol,timeframe,lowest_negative_index);
                datetime time=iTime(symbol, timeframe, lowest_negative_index);
 
-               create_trend_line(TF+"MACD_LOW_L" + appendZero100(lowest_negative_index)+"_",time,low,time-amp_time,low,clrBlue,STYLE_SOLID,10);
+               create_trend_line(TF+"MACD_LOW_L" + appendZero100(lowest_negative_index)+"_",time,low,time-amp_time,low,clrBlue,STYLE_SOLID,dot_size);
+               create_lable_simple2(TF+"MACD_LOW_B" + appendZero100(lowest_negative_index),"{"+StringSubstr(TF,0,3)+"}",low-candle_height,clrFireBrick,time,ANCHOR_CENTER);
 
                if(draw_fan)
                   create_vertical_line(TF+"MACD_LOW_V" + appendZero100(lowest_negative_index)+".",time,clrLightGreen,STYLE,vertical_width);
-
-               //if(timeframe>=PERIOD_H1)
-               create_lable_simple2(TF+"MACD_LOW_B" + appendZero100(lowest_negative_index),StringSubstr(TF,0,3),low-candle_height,clrFireBrick,time,ANCHOR_CENTER);
-
                if(timeframe==PERIOD_D1)
                   create_trend_line(TF+"MACD_LOW_D" + appendZero100(lowest_negative_index),time,low,time+1,low,clrDodgerBlue,STYLE_SOLID,dot); //
 
@@ -2477,14 +2518,11 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size=2
                double hig=iHigh(symbol,timeframe,highest_positive_index);
                datetime time=iTime(symbol, timeframe, highest_positive_index);
 
-               create_trend_line(TF+"MACD_HIG_L" + appendZero100(highest_positive_index)+"_",time,hig, time-amp_time,hig,clrRed,STYLE_SOLID,10);
+               create_trend_line(TF+"MACD_HIG_L" + appendZero100(highest_positive_index)+"_",time,hig, time-amp_time,hig,clrRed,STYLE_SOLID,dot_size);
+               create_lable_simple2(TF+"MACD_HIG_S" + appendZero100(highest_positive_index),"{"+StringSubstr(TF,0,3)+"}",hig+candle_height,clrBlue,time,ANCHOR_CENTER);
 
                if(draw_fan)
                   create_vertical_line(TF+"MACD_HIG_V" + appendZero100(highest_positive_index)+".", time,clrPink,STYLE,vertical_width);
-
-               //if(timeframe>=PERIOD_H1)
-               create_lable_simple2(TF+"MACD_HIG_S" + appendZero100(highest_positive_index),StringSubstr(TF,0,3),hig+candle_height,clrBlue,time,ANCHOR_CENTER);
-
                if(timeframe==PERIOD_D1)
                   create_trend_line(TF+"MACD_HIG_D" + appendZero100(highest_positive_index),time,hig,time+1,hig,clrTomato,STYLE_SOLID,dot); //
 
@@ -2682,12 +2720,10 @@ void DrawFibonacciFan1(string name,datetime time1,double price1,datetime time2,d
    ObjectDelete(0,name);
    ObjectCreate(0,name,OBJ_FIBOFAN,0,time1,price1,time2,price2);
 
-   ObjectSetInteger(0,name,OBJPROP_COLOR,clrNONE);        // Màu của Fibonacci Fan
-//ObjectSetInteger(0,name,OBJPROP_STYLE,STYLE_DOT);    // Kiểu đường kẻ
-//ObjectSetInteger(0,name,OBJPROP_WIDTH,1);              // Độ dày của đường kẻ
+   ObjectSetInteger(0,name,OBJPROP_COLOR,clrNONE);
 
    color clrLevelColor=clrBlack;
-   double levels[] = {0, 0.236, 0.382, 0.5, 0.618, 0.786, 0.882, 1};
+   double levels[] =  {0, 0.236, 0.382, 0.618};
 
    int size = ArraySize(levels);
 
@@ -3173,7 +3209,7 @@ void Draw_Ma10(string symbol,ENUM_TIMEFRAMES timeframe, int width_ma10,int lengt
       if(i<=7 && timeframe>Period())
         {
          color clrMid = mid>ma10_0?clrBlue:clrRed;
-         create_trend_line("Mid:"+TF+append1Zero(i),time0,mid,time0,mid,clrMid,STYLE_SOLID,int(width_ma10*2/3));
+         create_trend_line("Mid:"+TF+append1Zero(i),time0,mid,time0,mid,clrMid,STYLE_SOLID,5);
          create_label("Mid_"+TF+append1Zero(i),time0,mid," "+TF+"."+IntegerToString(arrHeiken_TF[i].count_heiken),arrHeiken_TF[0].trend_by_ma10,true,15,true);
 
          if(timeframe==PERIOD_W1)
@@ -3852,6 +3888,34 @@ void OnChartEvent(const int     id,      // event ID
          return;
         }
 
+      if(is_same_symbol(sparam,BtnSetTimeHere))
+        {
+
+
+         int chart_width = (int)MathRound(ChartGetInteger(0, CHART_WIDTH_IN_PIXELS));
+         int chart_heigh = (int)MathRound(ChartGetInteger(0, CHART_HEIGHT_IN_PIXELS));
+
+         double price;
+         int sub_windows;
+         datetime base_time;
+         if(ChartXYToTimePrice(0,chart_width/2, chart_heigh/2,sub_windows, base_time, price))
+           {
+            datetime time_shift = iTime(symbol,Period(),1) - iTime(symbol,Period(),2);
+            datetime base_time_1 = (datetime)(base_time - time_shift*3);
+            datetime base_time_2 = (datetime)(base_time + time_shift*9);
+
+            create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,base_time_1,clrFireBrick,STYLE_SOLID,5);
+            create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,base_time_2,clrGray,STYLE_SOLID,5);
+
+            Sleep100();
+            SaveTimelinesToFile(false);
+            Sleep100();
+            DrawFiboTimeZone52H4();
+           }
+
+         ChartRedraw();
+         return;
+        }
       if(is_same_symbol(sparam,BtnResetTimeline))
         {
          Reset_Fibo_Timelines();
@@ -5109,7 +5173,8 @@ void create_label_simple(
    string                  label="Label",
    double                  price=0,
    color                   clrColor=clrBlack,
-   datetime time_to=0
+   datetime time_to=0,
+   int sub_windows=0
 )
   {
    if(ALLOW_DRAW_BUTONS==false)
@@ -5118,7 +5183,7 @@ void create_label_simple(
    ObjectDelete(0,name);
    if(time_to==0)
       time_to=TimeCurrent()+TIME_OF_ONE_H4_CANDLE;                   // anchor point time
-   TextCreate(0,name,0,time_to,price,label,clrColor);
+   TextCreate(0,name,sub_windows,time_to,price,label,clrColor);
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -6496,13 +6561,14 @@ void create_heiken_candle(
    double                  high=0,              // anchor point price (top-right corner)
    const color             clr_fill=clrGray,        // fill color
    bool                    is_fill_body=false,
-   int                     boder_width=1
+   int                     boder_width=1,
+   int sub_windows=0
 )
   {
    string name_new=BOT_SHORT_NM+name;
 
    ObjectDelete(0,name_new);  // Delete any existing object with the same name
-   ObjectCreate(0,name_new,OBJ_RECTANGLE,0,time_from,open,time_to,close);
+   ObjectCreate(0,name_new,OBJ_RECTANGLE,sub_windows,time_from,open,time_to,close);
    ObjectSetInteger(0,name_new,OBJPROP_STYLE,STYLE_SOLID);      // Set border style to solid
    ObjectSetInteger(0,name_new,OBJPROP_HIDDEN,true);            // Set hidden property
    ObjectSetInteger(0,name_new,OBJPROP_BACK,true);              // Set background property
