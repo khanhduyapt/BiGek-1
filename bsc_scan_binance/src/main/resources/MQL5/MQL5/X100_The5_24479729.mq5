@@ -327,6 +327,11 @@ void DrawButtons()
 
    string arrNoticeSymbols_D[];
 
+   ObjectDelete(0,BtnFindSL+"_H4");
+   ObjectDelete(0,BtnFindSL+"_D1");
+   ObjectDelete(0,BtnFindSL+"_W1");
+   ObjectDelete(0,BtnSLHere);
+
    ObjectDelete(0,BtnSetAmpTrade+"Move");
    ObjectDelete(0,BtnSetPriceLimit+"(W1)10");
    ObjectDelete(0,BtnSetPriceLimit+"(D1)20");
@@ -471,6 +476,17 @@ void DrawButtons()
                int temp_x_start, temp_y_start;
                double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
                double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
+
+               if(ChartTimePriceToXY(0,0,TimeCurrent(),SL,temp_x_start,temp_y_start))
+                 {
+                  int temp_x_start_lm = chart_width-55*6;
+
+                  createButton(BtnFindSL+"_H4","(H4)SL?",temp_x_start_lm+55*0, temp_y_start-10,50,20,clrBlack,clrYellow);
+                  createButton(BtnFindSL+"_D1","(D) SL?",temp_x_start_lm+55*1, temp_y_start-10,50,20,clrBlack,clrYellow);
+                  createButton(BtnFindSL+"_W1","(W) SL?",temp_x_start_lm+55*2, temp_y_start-10,50,20,clrBlack,clrYellow);
+                  createButton(BtnSLHere,"" + DoubleToString(MathAbs(SL-LM),5)+"",temp_x_start_lm+55*3, temp_y_start-10,160,20,clrBlack,clrYellow);
+                 }
+
                if(ChartTimePriceToXY(0,0,TimeCurrent(),LM,temp_x_start,temp_y_start))
                  {
                   int temp_x_start_lm = chart_width-55*4;
@@ -1122,14 +1138,6 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    int x,y_start;
    int x_start = chart_width-150;
-   if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
-     {
-      createButton(BtnSLHere,"" + DoubleToString(MathAbs(SL-LM),digits)+"",x_start-15, y_start-10,160,20,clrBlack,clrYellow);
-
-      createButton(BtnFindSL+"_H4","(H4)SL?",x_start-200, y_start-10,50,20,clrBlack,clrYellow);
-      createButton(BtnFindSL+"_D1","(D) SL?",x_start-145, y_start-10,50,20,clrBlack,clrYellow);
-      createButton(BtnFindSL+"_W1","(W) SL?",x_start- 90, y_start-10,50,20,clrBlack,clrYellow);
-     }
 
    if(ChartTimePriceToXY(0,0,time,LM,x,y_start))
      {
@@ -1155,7 +1163,6 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
       createButton(BtnSetAmpTrade+"2D","2D", start_group_reverse+170+35*1,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"D1","D1", start_group_reverse+170+35*2,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
-      //createButton(BtnSetAmpTrade+"H4","H4", start_group_reverse+170+35*3,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"00","00", start_group_reverse+170+35*5,y_start-10,30,20,clrBlack,clrYellow);
      }
 
@@ -3966,7 +3973,7 @@ void OnChartEvent(const int     id,      // event ID
          SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM);
          init_sl_tp_trendline(false);
 
-         ChartRedraw();
+         DrawButtons();
          return;
         }
 
