@@ -341,15 +341,19 @@ def copy_files(source_folder, target_folder):
 
 if __name__ == "__main__":
     
-    output_folder_thinkpad_x1 = r"C:\Users\HomePC\AppData\Roaming\MetaQuotes\Terminal\53785E099C927DB68A545C249CDBCE06\MQL5\Files"
+    output_folder_thinkpad_x1 = r"C:\Users\DellE5270\AppData\Roaming\MetaQuotes\Terminal\53785E099C927DB68A545C249CDBCE06\MQL5\Files"
     output_folder_desktop_cty = r"C:\Users\Admin\AppData\Roaming\MetaQuotes\Terminal\53785E099C927DB68A545C249CDBCE06\MQL5\Files"
     # Lấy thư mục hiện tại của chương trình
     # current_folder = os.getcwd()
     # output_folder = os.path.join(current_folder, "Files")
     output_folder = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\Files"
+    file_name = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
+    
     if not os.path.exists(output_folder):
         print(f"Folder not exists: {output_folder}. Creating it...")
-        os.makedirs(output_folder)
+        #os.makedirs(output_folder)
+        output_folder = r"C:\BiGek-1\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\Files"
+        file_name = r"C:\BiGek-1\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
 
     # # Danh sách các cặp tên sàn và mã cổ phiếu
     # default_symbols = [
@@ -364,7 +368,6 @@ if __name__ == "__main__":
     #     ("HOSE", "HPG"),
     #     ("HOSE", "QCG")
     # ]
-    file_name = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
     # save_symbols_to_file_if_not_exist(file_name, default_symbols)
     symbols = load_symbols_from_file(file_name)
 
