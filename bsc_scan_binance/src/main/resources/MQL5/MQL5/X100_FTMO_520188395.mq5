@@ -491,7 +491,7 @@ void DrawButtons()
                  {
                   int temp_x_start_lm = chart_width-55*4;
                   string trend=(SL>LM)?TREND_SEL:TREND_BUY;
-                  string trend_w1 = arrHeiken_W1[1].trend_by_ma10;
+                  string trend_w1 = arrHeiken_W1[0].trend_by_ma10;
                   string trend_d1 = arrHeiken_D1[1].trend_by_ma10;
                   string trend_h4 = arrHeiken_H4[1].trend_by_ma20;
 
@@ -642,36 +642,12 @@ void DrawButtons()
    createButton(BtnNoticeMaCross+"_H1Ma10", str_H1Ma10,col_2,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa10_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa10_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
    createButton(BtnNoticeMaCross+"_H1Ma20", str_H1Ma20,col_3,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa20_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
    createButton(BtnNoticeMaCross+"_H1Ma50", str_H1Ma50,col_4,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa50_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
-//createButton(BtnNoticeMaCross+"_H11020", str_H11020,col_5,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa10vsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa10vsMa20_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
-//createButton(BtnNoticeMaCross+"_H12050", str_H12050,col_6,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa20vsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa20vsMa50_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
 
    bool is_period_h4=Period()==PERIOD_H4;
    createButton(BtnResetMaCross+"_H4","[Msg] Del",     col_1,init_y+45,65,25,clrBlack,is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
    createButton(BtnNoticeMaCross+"_H4Ma10", str_H4Ma10,col_2,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa10_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa10_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
    createButton(BtnNoticeMaCross+"_H4Ma20", str_H4Ma20,col_3,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa20_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
    createButton(BtnNoticeMaCross+"_H4Ma50", str_H4Ma50,col_4,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa50_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
-//createButton(BtnNoticeMaCross+"_H41020", str_H41020,col_5,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa10vsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa10vsMa20_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
-//createButton(BtnNoticeMaCross+"_H42050", str_H42050,col_6,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa20vsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa20vsMa50_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
-
-//   string cur_tp="(TP) "+get_current_timeframe_to_string();
-//   double tp_when=GetGlobalVariable(BtnCloseWhen_);
-//   int tp_counter = 0;
-//   int start_tp=(int)chart_width/2-155;
-//   createButton(BtnCloseWhen_+"HeiMa10",cur_tp+" Hei+Ma10",start_tp+130*tp_counter,10,120,30,clrBlack,tp_when==TP_WHEN_HeiMa10?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
-//   tp_counter+=1;
-//   createButton(BtnCloseWhen_+"HeiMa20",cur_tp+" Hei+Ma20",start_tp+130*tp_counter,10,120,30,clrBlack,tp_when==TP_WHEN_HeiMa20?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
-//   tp_counter+=1;
-//   createButton(BtnCloseWhen_+"HeiMa50",cur_tp+" Hei+Ma50",start_tp+130*tp_counter,10,120,30,clrBlack,tp_when==TP_WHEN_HeiMa50?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
-//
-//   tp_counter = 0;
-//   createButton(BtnCloseWhen_+"Ma10_07",cur_tp+" Ma10 No.07",start_tp+130*tp_counter,45,120,30,clrBlack,tp_when==TP_WHEN_Ma10_07?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
-//   tp_counter+=1;
-//   createButton(BtnCloseWhen_+"Ma10_13",cur_tp+" Ma10 No.13",start_tp+130*tp_counter,45,120,30,clrBlack,tp_when==TP_WHEN_Ma10_13?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
-//   tp_counter+=1;
-//   createButton(BtnCloseWhen_+"Ma10_21",cur_tp+" Ma10 No.21",start_tp+130*tp_counter,45,120,30,clrBlack,tp_when==TP_WHEN_Ma10_21?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
-//   tp_counter+=1;
-//   createButton(BtnCloseWhen_+"Ma10_27",cur_tp+" Ma10 No.27",start_tp+130*tp_counter,45,120,30,clrBlack,tp_when==TP_WHEN_Ma10_27?clrActiveBtn:clrLightGray,7,STOC_WINDOW);
-//   tp_counter+=1;
 
 //--------------------------------------------------------------------------------------------
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
@@ -747,6 +723,7 @@ void LoadSLTPEvery5min(bool allow_alert=true)
 
    bool is_sleep_time=is_exit_trade_time();
    bool is_exit_all_weekend=is_exit_all_by_weekend();
+   string FILE_MSG_LIST_SL=FILE_MSG_LIST_R1C5;
 
    int size = getArraySymbolsSize();
    for(int index = 0; index < size; index++)
@@ -766,7 +743,7 @@ void LoadSLTPEvery5min(bool allow_alert=true)
       double amp_w1,amp_d1,amp_h4,amp_h1;
       GetAmpAvgL15(temp_symbol,amp_w1,amp_d1,amp_h4,amp_h1);
 
-      //string arrNoticeSymbols_SL_1R[];
+      double total_profit_cur_symbol=0;
       string total_comments_cur_symbol="";
       for(int i = PositionsTotal()-1; i >= 0; i--)
         {
@@ -804,6 +781,8 @@ void LoadSLTPEvery5min(bool allow_alert=true)
 
                double temp_profit = m_position.Profit()+m_position.Swap()+m_position.Commission();
 
+               total_profit_cur_symbol += temp_profit;
+
                string msg = find_trend
                             +" "+temp_symbol
                             +" "+comment
@@ -814,16 +793,14 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                bool pass_7h=PassedWaitHours(m_position.Time(),7);
                bool pass_3d=PassedWaitHours(m_position.Time(),24*3);
                //-------------------------------------------------------------------
-               string FILE_MSG_LIST_SL=FILE_MSG_LIST_R1C5;
+
                bool allow_notice_sl=allow_PushMessage(temp_symbol,FILE_MSG_LIST_SL);
                //-------------------------------------------------------------------
                bool tp_now = is_same_symbol(trend_reverse,arrHeiken_H4[0].trend_heiken)
-                             && is_same_symbol(trend_reverse,arrHeiken_H4[0].trend_by_ma10)
-                             && is_same_symbol(trend_reverse,arrHeiken_H4[0].trend_by_seq_102050)
+                             && is_same_symbol(trend_reverse,arrHeiken_H4[0].trend_by_seq_051020)
 
                              && is_same_symbol(trend_reverse,arrHeiken_H1[0].trend_heiken)
-                             && is_same_symbol(trend_reverse,arrHeiken_H1[0].trend_by_ma10)
-                             && is_same_symbol(trend_reverse,arrHeiken_H1[0].trend_by_seq_102050);
+                             && is_same_symbol(trend_reverse,arrHeiken_H1[0].trend_by_seq_051020);
 
                bool exit_now = tp_now
                                && is_same_symbol(trend_reverse,trend_histogram_w1)
@@ -835,13 +812,26 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                                && is_same_symbol(trend_reverse,arrHeiken_H4[1].trend_by_ma50)
                                && is_same_symbol(trend_reverse,arrHeiken_H4[1].trend_by_ma10)
                                && is_same_symbol(trend_reverse,arrHeiken_H4[1].trend_heiken);
-               if(exit_now)
+
+               if(allow_notice_sl && exit_now)
                  {
-                  m_trade.PositionClose(m_position.Ticket());
-                  string msg=" (EXIT_NOW by D1.SeqH4H1 "+TREND_TYPE+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)+"$";
-                  PushMessage(msg,FILE_MSG_LIST_SL);
-                  reload=true;
-                  allow_notice_sl=false;
+                  CandleData arrHeiken_W1[];
+                  get_arr_heiken(temp_symbol,PERIOD_W1,arrHeiken_W1,25,true,true);
+
+                  if(is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_heiken)
+                     && is_same_symbol(trend_reverse,arrHeiken_W1[1].trend_heiken)
+                     && is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_by_ma05)
+                     && is_same_symbol(trend_reverse,arrHeiken_W1[1].trend_by_ma05)
+                     && is_same_symbol(trend_reverse,arrHeiken_W1[0].trend_by_ma10)
+                     && is_same_symbol(trend_reverse,arrHeiken_W1[1].trend_by_ma10)
+                    )
+                    {
+                     //m_trade.PositionClose(m_position.Ticket());
+                     string msg=" (EXIT_NOW by W1D1H4H1="+trend_reverse+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)+"$";
+                     PushMessage(msg,FILE_MSG_LIST_SL);
+                     reload=true;
+                     allow_notice_sl=false;
+                    }
                  }
 
                if(tp_now && temp_profit>0)
@@ -912,25 +902,6 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                      PushMessage("(SL_1R)"+msg,FILE_MSG_LIST_SL);
                      reload=true;
                     }
-                 }
-               //-------------------------------------------------------------------
-               //STOP LOSS 2R
-               if((risk_1L*2+temp_profit<0))
-                 {
-                  m_trade.PositionClose(m_position.Ticket());
-
-                  string msg = m_position.TypeDescription()
-                               +"    "+temp_symbol
-                               +"    "+m_position.Comment()
-                               +"    Profit: "+format_double_to_string(temp_profit,1)+"$";
-
-                  if(is_same_symbol(m_position.TypeDescription(),TREND_BUY))
-                     if(m_trade.PositionClose(m_position.Ticket()))
-                        SendTelegramMessage(temp_symbol,"STOP_LOSS","STOP_LOSS(2R) "+msg);
-
-                  if(is_same_symbol(m_position.TypeDescription(),TREND_SEL))
-                     if(m_trade.PositionClose(m_position.Ticket()))
-                        SendTelegramMessage(temp_symbol,"STOP_LOSS","STOP_LOSS(2R) "+msg);
                  }
                //-------------------------------------------------------------------
                if(temp_profit>0)
@@ -1023,6 +994,24 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                  }
               }
         }//for PositionsTotal
+      //-------------------------------------------------------------------
+      if(MathAbs(total_profit_cur_symbol)>0)
+         printf(temp_symbol + "    Profit: " + format_double_to_string(total_profit_cur_symbol,1)+"$");
+
+      //STOP LOSS 2R
+      if((risk_1L*1.25+total_profit_cur_symbol<0))
+        {
+         string msg = "STOP_LOSS(1.25R) "
+                      +"    "+temp_symbol
+                      +"    Profit: "+format_double_to_string(total_profit_cur_symbol,1)+"$";
+
+         ClosePositionByTrend(temp_symbol,TREND_BUY);
+         ClosePositionByTrend(temp_symbol,TREND_SEL);
+
+         PushMessage(msg,FILE_MSG_LIST_SL);
+
+         SendTelegramMessage(temp_symbol,"STOP_LOSS","STOP_LOSS(1.25R) "+msg);
+        }
       //-----------------------------------------------------------------------------------------------------------
       //-----------------------------------------------------------------------------------------------------------
       //-----------------------------------------------------------------------------------------------------------
@@ -1188,8 +1177,12 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
       bgColor1L=clrGray;
 
 //if(strBSL=="")
+   double lot_per_order;
+   int final_order_count;
+   CalculateOptimalOrders(volme_by_amp_trade_now, 10, lot_per_order, final_order_count);
+
    createButton(BtnOpen1L,"("+(string)opening+"/"+(string)MAXIMUM_OPENING+"L)  "
-                +symbol+" "+trend+" "+ DoubleToString(volme_by_amp_trade_now,2)+ "~"+DoubleToString(volme_by_amp_sl,2) +" lot"
+                +symbol+" "+trend+" "+ DoubleToString(volme_by_amp_trade_now,2)+ "lot ~ "+DoubleToString(lot_per_order,2) +"/"+IntegerToString(final_order_count)
                 ,chart_width/2-360+280+30,chart_heigh-35,285,30,clrBlack,bgColor1L);
   }
 //+------------------------------------------------------------------+
@@ -1209,62 +1202,100 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       string total_comments="";
       string strBSL=CountBSL(symbol,total_comments);
 
-      CandleData arrHeiken_H4[];
-      get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,65,true,true);
-
-      string trend_by_ma20_h4 = arrHeiken_H4[1].trend_by_ma20;
-      string trend_by_seq_051020_h4 = arrHeiken_H4[1].trend_by_seq_051020;
       string trend_histogram_w1 = ObjectGetString(0,BtnD10+symbol,OBJPROP_TEXT);
 
-      string trend_histogram_h4;
-      int count_histogram_h4;
-      DrawAndCountHistogram(arrHeiken_H4, trend_histogram_h4, count_histogram_h4, symbol, PERIOD_H4, false, 10, 100);
+      CandleData arrHeiken_W1[];
+      get_arr_heiken(symbol,PERIOD_W1,arrHeiken_W1,65,true,true);
+      string trend_ma10w = arrHeiken_W1[1].trend_by_ma10;
+      string trend_by_seq_051020_w1 = arrHeiken_W1[0].trend_by_seq_051020;
+
+      string msg_w1="";
+      if(msg_w1=="" && (trend_by_seq_051020_w1 != "")
+         && is_same_symbol(trend_histogram_w1, trend_by_seq_051020_w1))
+         msg_w1 = symbol+" Seq051020.Week["+append1Zero(arrHeiken_W1[0].count_ma10)+"] " + trend_by_seq_051020_w1;
+
+      if(msg_w1=="" && arrHeiken_W1[0].count_ma10<=2)
+         msg_w1 = symbol+" Week["+append1Zero(arrHeiken_W1[0].count_ma10)+"] " + arrHeiken_W1[0].trend_by_ma10;
+
+      if(msg_w1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
+        {
+         if(is_allow_alert && allow_alert)
+            Alert(get_vnhour()+" "+msg_w1);
+
+         last_symbol=symbol;
+         PushMessage(msg_w1,FILE_MSG_LIST_R1C1);
+        }
+      //----------------------------------------------------------------------------------------------------
+      CandleData arrHeiken_D1[];
+      get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,65,true,true);
+      string trend_by_seq_051020d = arrHeiken_D1[0].trend_by_seq_051020;
+
+      string msg_d1="";
+      if(msg_d1=="" && trend_by_seq_051020d != "")
+         msg_d1 = symbol+" Seq051020.Daily["+append1Zero(arrHeiken_D1[0].count_ma10)+"] " + trend_by_seq_051020d;
+
+      if(msg_d1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C2))
+        {
+         if(is_allow_alert && allow_alert)
+            Alert(get_vnhour()+" "+msg_d1);
+
+         last_symbol=symbol;
+         PushMessage(msg_d1,FILE_MSG_LIST_R1C2);
+        }
+      //----------------------------------------------------------------------------------------------------
+      CandleData arrHeiken_H4[];
+      get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,65,true,true);
+      string trend_by_ma10_h4 = arrHeiken_H4[1].trend_by_ma10;
+      string trend_by_seq_051020h4 = arrHeiken_H4[1].trend_by_seq_051020;
 
       string msg_h4="";
-      if(msg_h4=="" && (trend_by_seq_051020_h4 != "")
-         && is_same_symbol(trend_histogram_h4, trend_by_seq_051020_h4))
-         msg_h4 = symbol+" Seq051020.H4["+append1Zero(arrHeiken_H4[1].count_ma10)+"] " + trend_by_seq_051020_h4;
+      if(msg_h4=="" && trend_by_seq_051020h4 != ""
+         && is_same_symbol(trend_by_seq_051020h4, arrHeiken_D1[0].trend_heiken)
+         && is_same_symbol(trend_by_seq_051020h4, arrHeiken_D1[0].trend_by_ma05)
+         && is_same_symbol(trend_by_seq_051020h4, arrHeiken_D1[0].trend_by_ma10))
+        {
+         string trend_histogram_h4;
+         int count_histogram_h4;
+         DrawAndCountHistogram(arrHeiken_H4, trend_histogram_h4, count_histogram_h4, symbol, PERIOD_H4, false, 10, 100);
 
-      if(msg_h4 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
+         if(is_same_symbol(trend_histogram_h4, trend_by_seq_051020h4))
+            msg_h4 = symbol+" Seq051020.H4["+append1Zero(arrHeiken_H4[1].count_ma10)+"] " + trend_by_seq_051020h4;
+        }
+
+      if(msg_h4 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C3))
         {
          if(is_allow_alert && allow_alert)
             Alert(get_vnhour()+" "+msg_h4);
 
          last_symbol=symbol;
-         PushMessage(msg_h4,FILE_MSG_LIST_R1C1);
+         PushMessage(msg_h4,FILE_MSG_LIST_R1C3);
         }
       //----------------------------------------------------------------------------------------------------
-      CandleData arrHeiken_H1[];
-      get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,65,true,true);
 
-      string msg_h1="";
-      if(msg_h1=="" && arrHeiken_H1[0].allow_trade_now_by_seq_102050
-         && is_same_symbol(trend_histogram_w1, arrHeiken_H1[1].trend_by_ma20))
-         msg_h1 = symbol+" Seq.102050.H1 " + arrHeiken_H1[0].trend_by_ma20;
-
-      if(msg_h1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C2))
-        {
-         if(is_allow_alert && allow_alert)
-            Alert(get_vnhour()+" "+msg_h1);
-
-         last_symbol=symbol;
-         PushMessage(msg_h1,FILE_MSG_LIST_R1C2);
-        }
-      //----------------------------------------------------------------------------------------------------
-      string msg_h20_h4="";
-      if(msg_h20_h4=="" && arrHeiken_H4[1].count_ma20<=2
-         && is_same_symbol(trend_by_ma20_h4, arrHeiken_H4[0].trend_by_ma10)
-         && is_same_symbol(trend_by_ma20_h4, arrHeiken_H4[1].trend_by_ma10)
-        )
-         msg_h20_h4 = symbol+" Ma20.H4["+append1Zero(arrHeiken_H4[1].count_ma20)+"] " + trend_by_ma20_h4;
-      if(msg_h20_h4 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R2C1))
-        {
-         if(is_allow_alert && allow_alert)
-            Alert(get_vnhour()+" "+msg_h20_h4);
-
-         last_symbol=symbol;
-         PushMessage(msg_h20_h4,FILE_MSG_LIST_R2C1);
-        }
+      //if(is_same_symbol(trend_by_ma10_h4, arrHeiken_H4[0].trend_heiken)
+      //   && is_same_symbol(trend_by_ma10_h4, arrHeiken_D1[0].trend_heiken)
+      //   && is_same_symbol(trend_by_ma10_h4, arrHeiken_D1[0].trend_by_ma05)
+      //   && is_same_symbol(trend_by_ma10_h4, arrHeiken_D1[0].trend_by_ma10)
+      //  )
+      //  {
+      //   CandleData arrHeiken_H1[];
+      //   get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,65,true,true);
+      //
+      //   string trend_by_seq_051020h1 = arrHeiken_H1[1].trend_by_seq_051020;
+      //
+      //   string msg_h1="";
+      //   if(msg_h1=="" && is_same_symbol(trend_by_seq_051020h1, trend_by_ma10_h4))
+      //      msg_h1 = symbol+" Seq051020.H1 " + trend_by_seq_051020h1;
+      //
+      //   if(msg_h1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C4))
+      //     {
+      //      if(is_allow_alert && allow_alert)
+      //         Alert(get_vnhour()+" "+msg_h1);
+      //
+      //      last_symbol=symbol;
+      //      PushMessage(msg_h1,FILE_MSG_LIST_R1C4);
+      //     }
+      //  }
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
@@ -1517,7 +1548,8 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          //CandleData arrHeiken_H4[];
          //get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,55,true,true);
 
-         bool pass_heiken_buy=arrHeiken_H4[1].trend_heiken==TREND_BUY && arrHeiken_H4[0].trend_heiken==TREND_BUY;
+         bool pass_heiken_buy=arrHeiken_H4[1]
+                              .trend_heiken==TREND_BUY && arrHeiken_H4[0].trend_heiken==TREND_BUY;
          bool pass_heiken_sel=arrHeiken_H4[1].trend_heiken==TREND_SEL && arrHeiken_H4[0].trend_heiken==TREND_SEL;
 
          if(pass_heiken_buy && is_same_symbol(find_trend_H4,HeivsMa10_BUY) && arrHeiken_H4[1].close>arrHeiken_H4[1].ma10)
@@ -1790,7 +1822,7 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
    DeleteAllObjectsWithPrefix(FIBO_TIME_ZONE_);
    datetime time_shift = iTime(symbol,Period(),1) - iTime(symbol,Period(),2);
 
-   ENUM_TIMEFRAMES TF=PERIOD_W1;//Period();
+   ENUM_TIMEFRAMES TF= Period();
 
    string fibo_name = FIBO_TIME_ZONE_+symbol;
 
@@ -2232,6 +2264,44 @@ string find_trend_by_macd_extremes(string symbol, ENUM_TIMEFRAMES timeframe)
 
    return "300";
   }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void CalculateOptimalOrders(double volume, int max_orders, double &lot_per_order, int &final_order_count)
+  {
+   double min_lot = SymbolInfoDouble(Symbol(), SYMBOL_VOLUME_MIN); // Khối lượng lệnh tối thiểu (thường là 0.01)
+   double lot_step = SymbolInfoDouble(Symbol(), SYMBOL_VOLUME_STEP); // Bước nhảy của lot (thường là 0.01)
+
+// Nếu khối lượng nhỏ hơn lot tối thiểu hoặc không hợp lệ
+   if(volume < min_lot)
+     {
+      Print("Volume quá nhỏ, không thể chia lệnh.");
+      lot_per_order = 0;
+      final_order_count = 0;
+      return;
+     }
+
+   int order_count = MathMin(max_orders, int(volume / min_lot)); // Số lệnh tối đa có thể mở
+   if(order_count == 0)
+      order_count = 1; // Ít nhất phải có 1 lệnh
+
+   lot_per_order = NormalizeDouble(volume / order_count, 2); // Làm tròn đến 2 số thập phân
+   lot_per_order = MathMax(lot_per_order, min_lot); // Đảm bảo không nhỏ hơn lot tối thiểu
+
+   final_order_count = int(volume / lot_per_order); // Tính lại số lệnh chính xác
+   double total_volume = lot_per_order * final_order_count;
+
+// Nếu tổng volume bị lệch, điều chỉnh lại số lệnh
+   if(total_volume < volume)
+     {
+      final_order_count++; // Tăng thêm 1 lệnh nếu cần
+      if(final_order_count > max_orders)
+         final_order_count = max_orders; // Không vượt quá số lệnh tối đa
+     }
+
+   PrintFormat("Optimal Lot Per Order: %.2f, Total Orders: %d", lot_per_order, final_order_count);
+  }
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -4122,7 +4192,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             CandleData arrHeiken_W1[];
             get_arr_heiken(symbol,PERIOD_W1,arrHeiken_W1,50,true,true);
-            string trend_by_ma10_w1 = arrHeiken_W1[1].trend_by_ma10;
+            string trend_by_ma10_w1 = arrHeiken_W1[0].trend_by_ma10;
 
             SetGlobalVariable(GLOBAL_VAR_LM+symbol, find_wait_price_ma20(symbol,PERIOD_W1,trend_by_ma10_w1,10));
             FindSL(PERIOD_W1, trend_by_ma10_w1);
@@ -4898,13 +4968,18 @@ void OnChartEvent(const int     id,      // event ID
 
          bool show_defense=Period()>=PERIOD_D1;
 
-         double volume=calc_volume_by_amp(symbol,amp_sl,risk);
-         string msg=get_vntime()+trend+" "+symbol+" risk:"+DoubleToString(risk,1)+" Vol:"+DoubleToString(volume,2)
+         double lot_per_order;
+         int final_order_count;
+         CalculateOptimalOrders(calc_volume_by_amp(symbol,amp_sl,risk), 10, lot_per_order, final_order_count);
+
+         string msg=get_vntime()+trend+" "+symbol+" risk:"+DoubleToString(risk,1)
                     +"\n"+comment_mk1+"?"
                     +"    (Ma10) H4: "+arrHeiken_H4[0].trend_by_ma10 + ((is_same_symbol(trend,TREND_BUY) || is_same_symbol(trend,TREND_SEL)) &&  is_same_symbol(trend,arrHeiken_H4[0].trend_by_ma10)==false?" >>> (Ma10) H4 not allow "+trend:"")
                     +"\n(Yes) Market " + trend_now + " (1 attack)"
-                    +"\n        "  +comment_mk1;
-         if(show_defense)
+                    +"\n        "  +comment_mk1
+                    +"\n        "  +DoubleToString(lot_per_order,2) +"lot / "+IntegerToString(final_order_count) +"L";
+
+         if(false && show_defense)
             msg+="\n(No) Limit "+ trend_now + " (2 defense)"
                  +"\n        "+comment_no2
                  +"\n        "+comment_no3;
@@ -4912,126 +4987,51 @@ void OnChartEvent(const int     id,      // event ID
 
          if(result==IDYES)
            {
-            if(is_d10_nowt_allow)
+            if(is_d10_nowt_allow && trend_now!=arrHeiken_H4[0].trend_by_ma10 && trend_now!=arrHeiken_H4[0].trend_by_ma20 && trend_now!=trend_by_ma50_h4 && trend_now!=arrHeiken_H4[0].trend_heiken)
               {
-               string msg=get_vnhour()+" "+symbol+" (Ma10) D0 NotAllow "+trend_now;
-               Alert(msg);
-               return;
-              }
-
-            if(trend_now!=arrHeiken_H4[0].trend_by_ma10 && trend_now!=arrHeiken_H4[0].trend_by_ma20 && trend_now!=trend_by_ma50_h4 && trend_now!=arrHeiken_H4[0].trend_heiken)
-              {
-               string msg=get_vnhour()+" "+symbol+" (Hei|Ma10|Ma20|Ma50) H4 NotAllow "+trend_now;
+               string msg=get_vnhour()+" "+symbol+" H4(Hei|Ma10|Ma20|Ma50) || D0 NotAllow "+trend_now;
                Alert(msg);
                return;
               }
 
             amp_sl=MathAbs(bid-SL);
-            volume=calc_volume_by_amp(symbol,amp_sl,risk);
-            bool market_ok = Open_Position(symbol,trend_now,volume,SL,LM,TP,comment_mk1,comment_mk1);
 
-            ObjectsDeleteAll(0);
-            OnInit();
-            return;
-           }
+            bool market_ok = Open_Position(symbol,trend_now,lot_per_order,SL,LM,TP,comment_mk1,comment_mk1);
 
-         if(show_defense && result==IDNO)
-           {
-            int count_trade = 0;
-            double amp_sl_opening = 0;
-            double price_open=0;
-            string trading_trend="";
-            for(int i=PositionsTotal()-1; i>=0; i--)
-               if(m_position.SelectByIndex(i))
-                  if(is_same_symbol(m_position.Symbol(),symbol))
+            CloseLimitOrder(symbol,TREND_BUY);
+            CloseLimitOrder(symbol,TREND_SEL);
+
+            //if(market_ok)
+              {
+               double amp_step = amp_sl/final_order_count;
+
+               if(is_same_symbol(comment_mk1+trend_now,TREND_BUY))
+                 {
+                  for(int L=2;L<=final_order_count;L++)
                     {
-                     count_trade+=1;
-                     volume=m_position.Volume();
-                     price_open=m_position.PriceOpen();
-                     SL=m_position.StopLoss();
-                     trading_trend+=m_position.TypeDescription();
+                     Sleep100();
+                     string comment_L=create_comment(MASK_LIMIT,trend_now,L,count_ma10);
+                     double price_limit = bid-amp_step*(L-1);
+                     double price_sl = price_limit-amp_sl;
 
-                     if(m_position.StopLoss()>0)
-                        if(amp_sl_opening < MathAbs(m_position.StopLoss()-m_position.PriceOpen()))
-                           amp_sl_opening=MathAbs(m_position.StopLoss()-m_position.PriceOpen());
+                     m_trade.BuyLimit(lot_per_order,price_limit,symbol,price_sl,TP,0,0,comment_L);
                     }
+                 }
 
-            if(count_trade>0 && amp_sl_opening<=0)
-              {
-               Alert("Thiết đặt SL rồi mới đc đặt lệnh phòng thủ.");
-               return;
-              }
-            if(count_trade==0 || price_open==0)
-              {
-               Alert("Đánh lệnh tấn công trước rồi mới đặt lệnh phòng thủ.");
-               return;
-               //amp_sl_opening = MathMax(MathAbs(SL-bid),MathAbs(SL-LM));
-               //volume=calc_volume_by_amp(symbol,amp_sl_opening,risk);
-              }
-
-            bool allow_002=true, allow_003=true;
-            for(int i=OrdersTotal()-1; i>=0; i--)
-               if(m_order.SelectByIndex(i))
-                  if(is_same_symbol(m_order.Symbol(),symbol))
+               if(is_same_symbol(comment_mk1+trend_now,TREND_SEL))
+                 {
+                  for(int L=2;L<=final_order_count;L++)
                     {
-                     if(is_same_symbol(m_order.Comment(), "002"))
-                        allow_002=false;
+                     Sleep100();
+                     string comment_L=create_comment(MASK_LIMIT,trend_now,L,count_ma10);
+                     double price_limit = ask+amp_step*(L-1);
+                     double price_sl = price_limit+amp_sl;
 
-                     if(is_same_symbol(m_order.Comment(), "003"))
-                        allow_003=false;
+                     m_trade.SellLimit(lot_per_order,price_limit,symbol,price_sl,TP,0,0,comment_L);
                     }
-
-            double amp_wait=amp_sl_opening/2;
-
-            if(is_same_symbol(comment_mk1+trend_now,TREND_BUY) && is_same_symbol(trading_trend, TREND_BUY))
-              {
-               if(allow_002)
-                 {
-                  Sleep100();
-                  m_trade.BuyLimit(volume,ask-amp_wait*1,symbol,SL-amp_wait*1,ask+amp_wait*1,0,0,comment_no2);
-                 }
-               else
-                 {
-                  string msg=get_vnhour()+" "+symbol+" Realy Exist "+comment_no2;
-                  Alert(msg);
-                 }
-
-               if(allow_003)
-                 {
-                  Sleep100();
-                  m_trade.BuyLimit(volume,SL,symbol,SL-amp_wait*2,MathMax(ask, price_open),0,0,comment_no3);
-                 }
-               else
-                 {
-                  string msg=get_vnhour()+" "+symbol+" Realy Exist "+comment_no3;
-                  Alert(msg);
                  }
               }
 
-            if(is_same_symbol(comment_mk1+trend_now,TREND_SEL) && is_same_symbol(trading_trend, TREND_SEL))
-              {
-               if(allow_002)
-                 {
-                  Sleep100();
-                  m_trade.SellLimit(volume,bid+amp_wait*1,symbol,SL+amp_wait*1,bid-amp_wait*1,0,0,comment_no2);
-                 }
-               else
-                 {
-                  string msg=get_vnhour()+" "+symbol+" Realy Exist "+comment_no2;
-                  Alert(msg);
-                 }
-
-               if(allow_003)
-                 {
-                  Sleep100();
-                  m_trade.SellLimit(volume,SL,symbol,SL+amp_wait*2,MathMin(bid, price_open),0,0,comment_no3);
-                 }
-               else
-                 {
-                  string msg=get_vnhour()+" "+symbol+" Realy Exist "+comment_no3;
-                  Alert(msg);
-                 }
-              }
 
             ObjectsDeleteAll(0);
             OnInit();
@@ -5070,6 +5070,8 @@ void FindSL(ENUM_TIMEFRAMES TF, string TREND, int hard_size=0)
       size=50;
       amp_trade = amp_h4;
      }
+
+   amp_trade = amp_d1*2;
 
    if(hard_size>0)
       size=hard_size;
@@ -9195,10 +9197,10 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
      }
    if(is_same_symbol(symbol,"FR40") || is_same_symbol(symbol,"DAX40") || is_same_symbol(symbol,"GER40"))
      {
-      amp_w1=250.00;
-      amp_d1=150.00;
-      amp_h4=50.00;
-      amp_h1=30;
+      amp_w1=600.00;
+      amp_d1=300.00;
+      amp_h4=200.00;
+      amp_h1=150.00;
       return;
      }
    if(is_same_symbol(symbol,"JP225"))
