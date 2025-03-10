@@ -211,11 +211,11 @@ string ARR_SYMBOLS_CENT[] =
 string ARR_SYMBOLS_USD[] =
   {
    "XAUUSD"
-   ,"AUDJPY","NZDJPY","EURJPY","GBPJPY","USDJPY"
-   ,"AUDUSD","NZDUSD","EURAUD","EURNZD","EURGBP"
-   ,"GBPNZD","EURUSD","GBPUSD","USDCAD","USDCHF"
+   ,"AUDJPY","GBPJPY","USDJPY"//,"NZDJPY","EURJPY","NZDUSD","EURGBP","USDCHF","GBPUSD","BTCUSD"
+   ,"AUDUSD","EURAUD"//,"EURNZD"
+   ,"GBPNZD","EURUSD"//,"USDCAD"
 //,"BTCUSD","USOIL.cash","US30.cash","US500.cash","US100.cash","GER40.cash","JP225.cash" //"USOIL","US30","US500","FR40","JP225","XAGUSD"
-   ,"BTCUSD","SP500","JPN225"//,"XTIUSD","US30","NAS100","DAX40" //"USOIL","US30","US500","FR40","JP225"
+   ,"SP500","JPN225"//,"XTIUSD","US30","NAS100","DAX40" //"USOIL","US30","US500","FR40","JP225"
   };
 const string MAIN_PAIRS="US30,US500,SP500,US100,NAS100,DAX40,GER40, XAUUSD, USOIL, XTIUSD, BTCUSD, EURUSD, USDJPY, GBPUSD, USDCHF, AUDUSD, USDCAD, NZDUSD";
 //+------------------------------------------------------------------+
@@ -331,11 +331,6 @@ void DrawButtons()
    ObjectDelete(0,BtnFindSL+"_D1");
    ObjectDelete(0,BtnFindSL+"_W1");
    ObjectDelete(0,BtnSLHere);
-
-   ObjectDelete(0,BtnSetAmpTrade+"Move");
-   ObjectDelete(0,BtnSetPriceLimit+"(W1)10");
-   ObjectDelete(0,BtnSetPriceLimit+"(D1)20");
-   ObjectDelete(0,BtnSetPriceLimit+"(H4)20");
 
    int count_wd=0;
    string total_comments="";
@@ -495,10 +490,10 @@ void DrawButtons()
                   string trend_d1 = arrHeiken_D1[1].trend_by_ma10;
                   string trend_h4 = arrHeiken_H4[1].trend_by_ma20;
 
-                  createButton(BtnSetAmpTrade+"Move","Move",      temp_x_start_lm+55*0,temp_y_start-10,50,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
-                  createButton(BtnSetPriceLimit+"(W1)10","(W1)10",temp_x_start_lm+55*1,temp_y_start-10,50,20,clrBlack,is_same_symbol(trend_w1,TREND_BUY)?clrActiveBtn:clrActiveSell);
-                  createButton(BtnSetPriceLimit+"(D1)20","(D1)20",temp_x_start_lm+55*2,temp_y_start-10,50,20,clrBlack,is_same_symbol(trend_d1,TREND_BUY)?clrActiveBtn:clrActiveSell);
-                  createButton(BtnSetPriceLimit+"(H4)20","(H4)20",temp_x_start_lm+55*3,temp_y_start-10,50,20,clrBlack,is_same_symbol(trend_h4,TREND_BUY)?clrActiveBtn:clrActiveSell);
+                  createButton(BtnSetAmpTrade+"Move","Move",      temp_x_start_lm+55*0,temp_y_start-10,100,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
+                  createButton(BtnSetPriceLimit+"(W1)10","(W1)10",temp_x_start_lm+55*2,temp_y_start-10,100,20,clrBlack,is_same_symbol(trend_w1,TREND_BUY)?clrActiveBtn:clrActiveSell);
+                  //createButton(BtnSetPriceLimit+"(D1)20","(D1)20",temp_x_start_lm+55*2,temp_y_start-10,50,20,clrBlack,is_same_symbol(trend_d1,TREND_BUY)?clrActiveBtn:clrActiveSell);
+                  //createButton(BtnSetPriceLimit+"(H4)20","(H4)20",temp_x_start_lm+55*3,temp_y_start-10,50,20,clrBlack,is_same_symbol(trend_h4,TREND_BUY)?clrActiveBtn:clrActiveSell);
                  }
               }
         }
@@ -834,9 +829,9 @@ void LoadSLTPEvery5min(bool allow_alert=true)
                     }
                  }
 
-               if(tp_now && temp_profit>0)
+               if(allow_notice_sl && tp_now && temp_profit>0)
                  {
-                  m_trade.PositionClose(m_position.Ticket());
+                  //m_trade.PositionClose(m_position.Ticket());
                   string msg=" (TP_NOW by SeqH4H1 "+trend_reverse+") "+ " "+temp_symbol+" "+DoubleToString(temp_profit,1)+"$";
                   PushMessage(msg,FILE_MSG_LIST_SL);
                   reload=true;
@@ -995,18 +990,17 @@ void LoadSLTPEvery5min(bool allow_alert=true)
               }
         }//for PositionsTotal
       //-------------------------------------------------------------------
-      if(MathAbs(total_profit_cur_symbol)>0)
-         printf(temp_symbol + "    Profit: " + format_double_to_string(total_profit_cur_symbol,1)+"$");
+      //if(MathAbs(total_profit_cur_symbol)>0)
+      //   PushMessage(temp_symbol + "    Profit: " + format_double_to_string(total_profit_cur_symbol,1)+"$",FILE_MSG_LIST_R1C4);
 
-      //STOP LOSS 2R
-      if((risk_1L*1.25+total_profit_cur_symbol<0))
+      //STOP LOSS 1R
+      if((risk_1L+total_profit_cur_symbol<0))
         {
-         string msg = "STOP_LOSS(1.25R) "
-                      +"    "+temp_symbol
-                      +"    Profit: "+format_double_to_string(total_profit_cur_symbol,1)+"$";
+         double cur_loss = CloseLargestLosingPosition(temp_symbol);
 
-         ClosePositionByTrend(temp_symbol,TREND_BUY);
-         ClosePositionByTrend(temp_symbol,TREND_SEL);
+         string msg = "REDUCT_LOSS(1R) "
+                      +"    "+temp_symbol
+                      +"    Lossed: "+format_double_to_string(cur_loss,1)+"$";
 
          PushMessage(msg,FILE_MSG_LIST_SL);
 
@@ -1079,7 +1073,6 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    double risk=Risk_1L();
    double volme_by_amp_sl=calc_volume_by_amp(symbol,amp_sl,risk);
-   double volme_by_amp_trade_now=calc_volume_by_amp(symbol,amp_trade_now,risk);
 
    string strRev=get_trend_reverse(trend)+" "+(string)volme_by_amp_sl;
 
@@ -1179,10 +1172,10 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 //if(strBSL=="")
    double lot_per_order;
    int final_order_count;
-   CalculateOptimalOrders(volme_by_amp_trade_now, 10, lot_per_order, final_order_count);
+   CalculateOptimalOrders(volme_by_amp_sl, 10, lot_per_order, final_order_count);
 
    createButton(BtnOpen1L,"("+(string)opening+"/"+(string)MAXIMUM_OPENING+"L)  "
-                +symbol+" "+trend+" "+ DoubleToString(volme_by_amp_trade_now,2)+ "lot ~ "+DoubleToString(lot_per_order,2) +"/"+IntegerToString(final_order_count)
+                +symbol+" "+trend+" "+ DoubleToString(volme_by_amp_sl,2)+ "lot ~ "+DoubleToString(lot_per_order,2) +"/"+IntegerToString(final_order_count)
                 ,chart_width/2-360+280+30,chart_heigh-35,285,30,clrBlack,bgColor1L);
   }
 //+------------------------------------------------------------------+
@@ -4253,37 +4246,25 @@ void OnChartEvent(const int     id,      // event ID
          double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
          double bid=SymbolInfoDouble(symbol,SYMBOL_BID);
 
+         double amp_w1,amp_d1,amp_h4,amp_h1;
+         GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
+
          if(is_same_symbol(sparam,"Move"))
            {
-            double amp_trade = MathAbs(LM-SL);
+            double amp_trade = amp_d1*2;//MathAbs(LM-SL);
 
             if(LM>SL)//TREND_BUY
               {
-               if(LM+amp_trade<bid)
-                 {
-                  SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM);
-                  SetGlobalVariable(GLOBAL_VAR_LM+symbol,LM+amp_trade);
-                 }
-               else
-                 {
-                  SetGlobalVariable(GLOBAL_VAR_SL+symbol,bid-amp_trade);
-                  SetGlobalVariable(GLOBAL_VAR_LM+symbol,bid);
-                 }
+               SetGlobalVariable(GLOBAL_VAR_LM+symbol,bid);
+               SetGlobalVariable(GLOBAL_VAR_SL+symbol,bid-amp_trade);
               }
 
             if(LM<SL)//TREND_SEL
               {
-               if(LM-amp_trade>bid)
-                 {
-                  SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM);
-                  SetGlobalVariable(GLOBAL_VAR_LM+symbol,LM-amp_trade);
-                 }
-               else
-                 {
-                  SetGlobalVariable(GLOBAL_VAR_SL+symbol,bid+amp_trade);
-                  SetGlobalVariable(GLOBAL_VAR_LM+symbol,bid);
-                 }
+               SetGlobalVariable(GLOBAL_VAR_LM+symbol,bid);
+               SetGlobalVariable(GLOBAL_VAR_SL+symbol,bid+amp_trade);
               }
+
 
             OnInit();
             return;
@@ -4296,18 +4277,12 @@ void OnChartEvent(const int     id,      // event ID
             return;
            }
 
-         double amp_w1,amp_d1,amp_h4,amp_h1;
-         GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
 
-         double amp_trade=amp_d1*3;
-         if(is_same_symbol(sparam,"3D"))
-            amp_trade=amp_d1*3;
-         if(is_same_symbol(sparam,"2D"))
-            amp_trade=amp_d1*2;
+
+         double amp_trade=amp_d1*2;
          if(is_same_symbol(sparam,"D1"))
             amp_trade=amp_d1;
-         if(is_same_symbol(sparam,"H4"))
-            amp_trade=MathMax(amp_d1/2,amp_h4);
+
 
          if(LM>SL)//TREND_BUY
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM-amp_trade);
@@ -4989,9 +4964,9 @@ void OnChartEvent(const int     id,      // event ID
            {
             if(is_d10_nowt_allow && trend_now!=arrHeiken_H4[0].trend_by_ma10 && trend_now!=arrHeiken_H4[0].trend_by_ma20 && trend_now!=trend_by_ma50_h4 && trend_now!=arrHeiken_H4[0].trend_heiken)
               {
-               string msg=get_vnhour()+" "+symbol+" H4(Hei|Ma10|Ma20|Ma50) || D0 NotAllow "+trend_now;
-               Alert(msg);
-               return;
+               //string msg=get_vnhour()+" "+symbol+" H4(Hei|Ma10|Ma20|Ma50) || D0 NotAllow "+trend_now;
+               //Alert(msg);
+               //return;
               }
 
             amp_sl=MathAbs(bid-SL);
@@ -5092,21 +5067,18 @@ void FindSL(ENUM_TIMEFRAMES TF, string TREND, int hard_size=0)
 
    if(is_same_symbol(TREND, TREND_BUY))
      {
-      SL=lowest;
-      if(MathAbs(SL-LM) < amp_trade)
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol, SL+amp_trade);
-
-      SetGlobalVariable(GLOBAL_VAR_SL+symbol, SL);
+      if(MathAbs(lowest-LM) < amp_trade)
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, LM-amp_trade);
+      else
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest);
      }
 
    if(is_same_symbol(TREND, TREND_SEL))
      {
-      SL=higest;
-
-      if(MathAbs(SL-LM) < amp_trade)
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol, SL-amp_trade);
-
-      SetGlobalVariable(GLOBAL_VAR_SL+symbol, SL);
+      if(MathAbs(higest-LM) < amp_trade)
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, LM+amp_trade);
+      else
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, higest);
      }
 
   }
@@ -5243,13 +5215,13 @@ bool Open_Position(string symbol,string TREND_TYPE,double volume,double sl,doubl
             last_comment=m_position.Comment();
            }
 
-   for(int i=OrdersTotal()-1; i>=0; i--)
-      if(m_order.SelectByIndex(i))
-         if(is_same_symbol(m_order.Symbol(),symbol))
-           {
-            count_trade+=1;
-            last_comment=m_order.Comment();
-           }
+//for(int i=OrdersTotal()-1; i>=0; i--)
+//   if(m_order.SelectByIndex(i))
+//      if(is_same_symbol(m_order.Symbol(),symbol))
+//        {
+//         count_trade+=1;
+//         last_comment=m_order.Comment();
+//        }
 
    if(count_trade>0)
      {
@@ -5503,7 +5475,7 @@ void ModifyTpEntry(string symbol, bool allow_close=true)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void ModifySL(string symbol,string TREND,double sl_price)
+void ModifySL(string symbol,string TREND,double new_sl_price)
   {
    printf("ModifyTp: "+symbol);
    int digits=(int)SymbolInfoInteger(symbol,SYMBOL_DIGITS);
@@ -5518,7 +5490,18 @@ void ModifySL(string symbol,string TREND,double sl_price)
             int demm=1;
             while(demm<5)
               {
-               bool successful=m_trade.PositionModify(m_position.Ticket(),sl_price,m_position.TakeProfit());
+               double current_sl = m_position.StopLoss();
+               ENUM_POSITION_TYPE type = (ENUM_POSITION_TYPE)m_position.Type();
+
+               // Kiểm tra điều kiện cải thiện SL
+               if((type == POSITION_TYPE_BUY && new_sl_price <= current_sl) ||
+                  (type == POSITION_TYPE_SELL && new_sl_price >= current_sl))
+                 {
+                  Print("Lệnh bị từ chối: Không được phép dịch SL theo hướng bất lợi.");
+                  break;
+                 }
+
+               bool successful=m_trade.PositionModify(m_position.Ticket(),new_sl_price,m_position.TakeProfit());
                if(successful)
                   break;
 
@@ -5526,24 +5509,6 @@ void ModifySL(string symbol,string TREND,double sl_price)
                Sleep100();
               }
            }
-
-//   for(int i=OrdersTotal()-1; i>=0; i--)
-//      if(m_order.SelectByIndex(i))
-//         if(
-//            is_same_symbol(m_order.Symbol(),symbol) &&
-//            (is_same_symbol(m_order.Comment(),TREND) || is_same_symbol(m_order.TypeDescription(),TREND)))
-//           {
-//            int demm=1;
-//            while(demm<5)
-//              {
-//               bool successful=m_trade.OrderModify(m_order.Ticket(),m_order.PriceOpen(),sl_price,m_order.TakeProfit(),ORDER_TIME_DAY,0);
-//               if(successful)
-//                  break;
-//
-//               demm+=1;
-//               Sleep100();
-//              }
-//           }
 
   }
 //+------------------------------------------------------------------+
@@ -5629,6 +5594,48 @@ void ClosePositionByTrend(string symbol,string TREND)
                  }
               }
   }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double CloseLargestLosingPosition(string symbol)
+  {
+   double max_loss = 0.0;
+   ulong worst_ticket = 0;
+
+// Duyệt qua tất cả các vị thế mở
+   for(int i = 0; i < PositionsTotal(); i++)
+     {
+      if(is_same_symbol(PositionGetSymbol(i), symbol)==false)
+         continue;
+
+      ulong ticket = PositionGetInteger(POSITION_TICKET);
+      double profit = PositionGetDouble(POSITION_PROFIT);
+
+      // Tìm vị thế có số lỗ lớn nhất
+      if(profit < max_loss)
+        {
+         max_loss = profit;
+         worst_ticket = ticket;
+        }
+     }
+
+// Nếu không tìm thấy vị thế thua lỗ thì thoát
+   if(worst_ticket == 0)
+     {
+      Print("Không có vị thế thua lỗ nào để đóng cho ", symbol);
+      return max_loss;
+     }
+
+// Đóng vị thế có số lỗ lớn nhất
+   if(m_trade.PositionClose(worst_ticket))
+      PrintFormat("Đã đóng vị thế thua lỗ nhất của %s với Ticket: %d, Lỗ: %.2f",
+                  symbol, worst_ticket, max_loss);
+   else
+      PrintFormat("Lỗi khi đóng vị thế %s với Ticket: %d", symbol, worst_ticket);
+
+   return max_loss;
+  }
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -5864,7 +5871,7 @@ void CreateMessagesBtn(string BtnSeq___)
       string strCountBSL="";
       color clrBackground=is_same_symbol(lable,"$")? clrLightGray: clrWhite;
 
-      if(BtnSeq___!=BtnMsgR1C5_)
+      if(BtnSeq___!=BtnMsgR1C5_ && BtnSeq___!=BtnMsgR1C4_)
         {
          strCountBSL=CountBSL(symbol,total_comments);
          clrBackground = (strCountBSL!="")?clrLightGray:clrBackground;
@@ -8769,10 +8776,10 @@ string get_trend_by_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,int candle_i
 double Risk_1L()
   {
    double BALANCE = AccountInfoDouble(ACCOUNT_BALANCE);
-   if(BALANCE>50000)
-      return 200;
+   if(BALANCE>90000)
+      return 250;
    else
-      return 20;
+      return 50;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -8833,305 +8840,20 @@ int get_L(string TRADER,string trend,string last_comment)
 
    return 0;
   }
-////+------------------------------------------------------------------+
-////|                                                                  |
-////+------------------------------------------------------------------+
-//void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,double &amp_h1)
-//  {
-//   if(is_same_symbol(symbol,"XAUUSD"))
-//     {
-//      amp_w1=90.0;
-//      amp_d1=70.0;
-//      amp_h4=38.0;
-//      amp_h1=15.0;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"XAGUSD"))
-//     {
-//      amp_w1=1.3;
-//      amp_d1=0.45;
-//      amp_h4=0.2;
-//      amp_h1=0.2;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"USOIL") || is_same_symbol(symbol,"XTIUSD"))
-//     {
-//      amp_w1=4.5;
-//      amp_d1=1.8;
-//      amp_h4=0.8;
-//      amp_h1=0.5;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"BTCUSD"))
-//     {
-//      amp_w1=9500.00;
-//      amp_d1=7000.00;
-//      amp_h4=3865.00;
-//      amp_h1=1530.00;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"USTEC") || is_same_symbol(symbol,"NAS100"))
-//     {
-//      amp_w1=800.00;
-//      amp_d1=500.00;
-//      amp_h4=250.00;
-//      amp_h1=100.00;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"US30"))
-//     {
-//      amp_w1=1000.0;
-//      amp_d1=850.0;
-//      amp_h4=450.0;
-//      amp_h1=150.0;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"US500") ||is_same_symbol(symbol,"SP500"))
-//     {
-//      amp_w1=350.00;
-//      amp_d1=200.00;
-//      amp_h4=100.00;
-//      amp_h1=65.00;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"DE30"))
-//     {
-//      amp_w1=530.6;
-//      amp_d1=156.6;
-//      amp_h4=62.3;
-//      amp_h1=62.3;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"UK100"))
-//     {
-//      amp_w1=208.25;
-//      amp_d1=68.31;
-//      amp_h4=29.0;
-//      amp_h1=29.0;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"FR40") || is_same_symbol(symbol,"DAX40"))
-//     {
-//      amp_w1=650.00;
-//      amp_d1=350.00;
-//      amp_h4=100.00;
-//      amp_h1=80.00;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"JP225") || is_same_symbol(symbol,"JPN225"))
-//     {
-//      amp_w1=1800.00;
-//      amp_d1=1000.00;
-//      amp_h4=500.00;
-//      amp_h1=300.00;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"AUS200"))
-//     {
-//      amp_w1=204.43;
-//      amp_d1=67.52;
-//      amp_h4=29.93;
-//      amp_h1=29.93;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"AUDCHF"))
-//     {
-//      amp_w1=0.0123;
-//      amp_d1=0.0075;
-//      amp_h4=0.0055;
-//      amp_h1=0.0021;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"AUDNZD"))
-//     {
-//      amp_w1=0.01036;
-//      amp_d1=0.0065;
-//      amp_h4=0.0035;
-//      amp_h1=0.0025;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"AUDUSD"))
-//     {
-//      amp_w1=0.0128;
-//      amp_d1=0.0077;
-//      amp_h4=0.0055;
-//      amp_h1=0.0025;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"AUDJPY"))
-//     {
-//      amp_w1=2.950;
-//      amp_d1=1.465;
-//      amp_h4=0.282;
-//      amp_h1=0.282;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"CHFJPY"))
-//     {
-//      amp_w1=2.911;
-//      amp_d1=1.107;
-//      amp_h4=0.458;
-//      amp_h1=0.458;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"EURJPY"))
-//     {
-//      amp_w1=3.700;
-//      amp_d1=1.852;
-//      amp_h4=0.434;
-//      amp_h1=0.434;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"GBPJPY"))
-//     {
-//      amp_w1=5.0;
-//      amp_d1=2.7;
-//      amp_h4=1.5;
-//      amp_h1=1.0;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"NZDJPY"))
-//     {
-//      amp_w1=2.419;
-//      amp_d1=1.468;
-//      amp_h4=0.272;
-//      amp_h1=0.272;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"USDJPY"))
-//     {
-//      amp_w1=3.550;
-//      amp_d1=1.9;
-//      amp_h4=1.3;
-//      amp_h1=0.5;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"EURAUD"))
-//     {
-//      amp_w1=0.02550;
-//      amp_d1=0.0135;
-//      amp_h4=0.0075;
-//      amp_h1=0.0045;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"EURCAD"))
-//     {
-//      amp_w1=0.016;
-//      amp_d1=0.0095;
-//      amp_h4=0.0065;
-//      amp_h1=0.0045;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"EURCHF"))
-//     {
-//      amp_w1=0.01309;
-//      amp_d1=0.0070;
-//      amp_h4=0.0045;
-//      amp_h1=0.0025;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"EURGBP"))
-//     {
-//      amp_w1=0.0072;
-//      amp_d1=0.0055;
-//      amp_h4=0.0025;
-//      amp_h1=0.0016;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"EURNZD"))
-//     {
-//      amp_w1=0.0290;
-//      amp_d1=0.0135;
-//      amp_h4=0.0088;
-//      amp_h1=0.0055;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"EURUSD"))
-//     {
-//      amp_w1=0.0150;
-//      amp_d1=0.0095;
-//      amp_h4=0.0065;
-//      amp_h1=0.0035;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"GBPCHF"))
-//     {
-//      amp_w1=0.01905;
-//      amp_d1=0.0085;
-//      amp_h4=0.0035;
-//      amp_h1=0.0025;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"GBPNZD"))
-//     {
-//      amp_w1=0.0312;
-//      amp_d1=0.0165;
-//      amp_h4=0.0105;
-//      amp_h1=0.0062;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"GBPUSD"))
-//     {
-//      amp_w1=0.0195;
-//      amp_d1=0.011;
-//      amp_h4=0.0075;
-//      amp_h1=0.0055;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"NZDCAD"))
-//     {
-//      amp_w1=0.01459;
-//      amp_d1=0.0055;
-//      amp_h4=0.00216;
-//      amp_h1=0.00216;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"NZDUSD"))
-//     {
-//      amp_w1=0.0128;
-//      amp_d1=0.0095;
-//      amp_h4=0.0065;
-//      amp_h1=0.0045;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"USDCAD"))
-//     {
-//      amp_w1=0.01328;
-//      amp_d1=0.0115;
-//      amp_h4=0.0085;
-//      amp_h1=0.0065;
-//      return;
-//     }
-//   if(is_same_symbol(symbol,"USDCHF"))
-//     {
-//      amp_w1=0.0139;
-//      amp_d1=0.0095;
-//      amp_h4=0.0065;
-//      amp_h1=0.0045;
-//      return;
-//     }
-//
-//   amp_w1=calc_average_candle_height(PERIOD_W1,symbol,20);
-//   amp_d1=calc_average_candle_height(PERIOD_D1,symbol,30);
-//   amp_h4=calc_average_candle_height(PERIOD_H4,symbol,60);
-//   amp_h1=amp_d1;
-////SendAlert(INDI_NAME,"Get Amp Avg"," Get AmpAvg:"+(string)symbol+"   amp_w1: "+(string)amp_w1+"   amp_d1: "+(string)amp_d1+"   amp_h4: "+(string)amp_h4);
-//   return;
-//  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,double &amp_h1)
   {
-   if(is_same_symbol(symbol,"XAUUSD"))
+   if(is_same_symbol(symbol,"XAUUSD"))//AU
      {
-      amp_w1=83.539;
-      amp_d1=31.359;
-      amp_h4=9.5;    // ( 4295)H4
-      amp_h1=4.85;   // (15869)H1
+      amp_w1=82.5;
+      amp_d1=35.5;
+      amp_h4=17.5;
+      amp_h1=9.5;
       return;
      }
-   if(is_same_symbol(symbol,"XAGUSD"))
+   if(is_same_symbol(symbol,"XAGUSD"))//AG
      {
       amp_w1=1.3;
       amp_d1=0.45;
@@ -9139,44 +8861,44 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"USOIL"))
+   if(is_same_symbol(symbol,"USOIL"))//UL
      {
-      amp_w1=3.935;
-      amp_d1=1.656;
-      amp_h4=0.805;
-      amp_h1=0;
+      amp_w1=4.25;
+      amp_d1=1.77;
+      amp_h4=0.80;
+      amp_h1=0.41;
       return;
      }
-   if(is_same_symbol(symbol,"BTCUSD"))
+   if(is_same_symbol(symbol,"BTCUSD"))//BU
      {
-      amp_w1=7010.38;
-      amp_d1=2930.00;
-      amp_h4=789.1;
-      amp_h1=0;
+      amp_w1=8440;
+      amp_d1=4265;
+      amp_h4=2382;
+      amp_h1=1388;
       return;
      }
-   if(is_same_symbol(symbol,"USTEC"))
+   if(is_same_symbol(symbol,"USTEC") || is_same_symbol(symbol,"US100"))//U100
      {
-      amp_w1=785.89;
-      amp_d1=350.00;
-      amp_h4=81.16;
-      amp_h1=0;
+      amp_w1=800.0;
+      amp_d1=400.0;
+      amp_h4=200.0;
+      amp_h1=125;
       return;
      }
-   if(is_same_symbol(symbol,"US30"))
+   if(is_same_symbol(symbol,"US30"))//U30
      {
-      amp_w1=1037.8;
-      amp_d1=427.0;
-      amp_h4=119.5;
-      amp_h1=0;
+      amp_w1=1090.0;
+      amp_d1=529.0;
+      amp_h4=262.5;
+      amp_h1=165;
       return;
      }
-   if(is_same_symbol(symbol,"US500"))
+   if(is_same_symbol(symbol,"US500"))//U5
      {
-      amp_w1=150.5;
-      amp_d1=64.88;
-      amp_h4=16.93;
-      amp_h1=0;
+      amp_w1=160.0;
+      amp_d1=80.0;
+      amp_h4=41.0;
+      amp_h1=27.5;
       return;
      }
    if(is_same_symbol(symbol,"DE30"))
@@ -9200,7 +8922,7 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_w1=600.00;
       amp_d1=300.00;
       amp_h4=200.00;
-      amp_h1=150.00;
+      amp_h1=125.00;
       return;
      }
    if(is_same_symbol(symbol,"JP225"))
@@ -9219,7 +8941,7 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"AUDCHF"))
+   if(is_same_symbol(symbol,"AUDCHF"))//AF
      {
       amp_w1=0.01242;
       amp_d1=0.00500;
@@ -9227,7 +8949,7 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"AUDNZD"))
+   if(is_same_symbol(symbol,"AUDNZD"))//AN
      {
       amp_w1=0.01036;
       amp_d1=0.00495;
@@ -9235,71 +8957,71 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"AUDUSD"))
+   if(is_same_symbol(symbol,"AUDUSD"))//AU
      {
       amp_w1=0.01267;
-      amp_d1=0.00452;
-      amp_h4=0.00218;
-      amp_h1=0;
+      amp_d1=0.00562;
+      amp_h4=0.00238;
+      amp_h1=0.0015;
       return;
      }
-   if(is_same_symbol(symbol,"AUDJPY"))
+   if(is_same_symbol(symbol,"AUDJPY"))//AJ
      {
       amp_w1=2.950;
       amp_d1=1.165;
-      amp_h4=0.282;
-      amp_h1=0;
+      amp_h4=0.52;
+      amp_h1=0.35;
       return;
      }
-   if(is_same_symbol(symbol,"CHFJPY"))
+   if(is_same_symbol(symbol,"CHFJPY"))//CJ
      {
-      amp_w1=2.911;
+      amp_w1=4.911;
       amp_d1=1.107;
       amp_h4=0.458;
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"EURJPY"))
+   if(is_same_symbol(symbol,"EURJPY"))//EJ
      {
       amp_w1=3.700;
       amp_d1=1.642;
-      amp_h4=0.434;
-      amp_h1=0;
+      amp_h4=0.81;
+      amp_h1=0.52;
       return;
      }
-   if(is_same_symbol(symbol,"GBPJPY"))
+   if(is_same_symbol(symbol,"GBPJPY"))//GJ
      {
-      amp_w1=4.600;
-      amp_d1=2.115;
-      amp_h4=0.53;
-      amp_h1=0;
+      amp_w1=4.48;
+      amp_d1=1.95;
+      amp_h4=0.95;
+      amp_h1=0.60;
       return;
      }
-   if(is_same_symbol(symbol,"NZDJPY"))
+   if(is_same_symbol(symbol,"NZDJPY"))//NJ
      {
       amp_w1=2.419;
       amp_d1=1.068;
-      amp_h4=0.272;
-      amp_h1=0;
+      amp_h4=0.455;
+      amp_h1=0.282;
       return;
      }
-   if(is_same_symbol(symbol,"USDJPY"))
+   if(is_same_symbol(symbol,"USDJPY"))//UJ
      {
-      amp_w1=3.550;
-      amp_d1=1.659;
-      amp_h4=0.427;
-      amp_h1=1.5;
+      amp_w1=3.55;
+      amp_d1=1.55;
+      amp_h4=0.66;
+      amp_h1=0.50;
       return;
      }
-   if(is_same_symbol(symbol,"EURAUD"))
+   if(is_same_symbol(symbol,"EURAUD"))//EA
      {
-      amp_w1=0.02215;
-      amp_d1=0.00954;
-      amp_h4=0.00417;
-      amp_h1=0;
+      amp_w1=0.0238;
+      amp_d1=0.0105;
+      amp_h4=0.0047;
+      amp_h1=0.0030;
       return;
      }
-   if(is_same_symbol(symbol,"EURCAD"))
+   if(is_same_symbol(symbol,"EURCAD"))//EC
      {
       amp_w1=0.01382;
       amp_d1=0.00562;
@@ -9307,7 +9029,7 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"EURCHF"))
+   if(is_same_symbol(symbol,"EURCHF"))//UF
      {
       amp_w1=0.01309;
       amp_d1=0.00525;
@@ -9315,31 +9037,31 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"EURGBP"))
+   if(is_same_symbol(symbol,"EURGBP"))//EG
      {
-      amp_w1=0.00695;
-      amp_d1=0.00283;
-      amp_h4=0.00131;
-      amp_h1=0.00155;
+      amp_w1=0.00755;
+      amp_d1=0.00375;
+      amp_h4=0.00155;
+      amp_h1=0.00105;
       return;
      }
-   if(is_same_symbol(symbol,"EURNZD"))
+   if(is_same_symbol(symbol,"EURNZD"))//EN
      {
-      amp_w1=0.02402;
-      amp_d1=0.01128;
-      amp_h4=0.00478;
-      amp_h1=0;
+      amp_w1=0.0252;
+      amp_d1=0.0113;
+      amp_h4=0.0048;
+      amp_h1=0.0031;
       return;
      }
-   if(is_same_symbol(symbol,"EURUSD"))
+   if(is_same_symbol(symbol,"EURUSD"))//EU
      {
-      amp_w1=0.01257;
-      amp_d1=0.00456;
-      amp_h4=0.00239;
-      amp_h1=0.0035;
+      amp_w1=0.0156;
+      amp_d1=0.0085;
+      amp_h4=0.0055;
+      amp_h1=0.0025;
       return;
      }
-   if(is_same_symbol(symbol,"GBPCHF"))
+   if(is_same_symbol(symbol,"GBPCHF"))//GF
      {
       amp_w1=0.01905;
       amp_d1=0.00752;
@@ -9347,23 +9069,23 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"GBPNZD"))
+   if(is_same_symbol(symbol,"GBPNZD"))//GN
      {
-      amp_w1=0.02912;
-      amp_d1=0.01240;
-      amp_h4=0.00531;
-      amp_h1=0;
+      amp_w1=0.0295;
+      amp_d1=0.0142;
+      amp_h4=0.0055;
+      amp_h1=0.0033;
       return;
      }
-   if(is_same_symbol(symbol,"GBPUSD"))
+   if(is_same_symbol(symbol,"GBPUSD"))//GU
      {
-      amp_w1=0.01652;
-      amp_d1=0.00630;
-      amp_h4=0.00317;
-      amp_h1=0.00335;
+      amp_w1=0.01952;
+      amp_d1=0.01020;
+      amp_h4=0.00355;
+      amp_h1=0.00225;
       return;
      }
-   if(is_same_symbol(symbol,"NZDCAD"))
+   if(is_same_symbol(symbol,"NZDCAD"))//NC
      {
       amp_w1=0.01459;
       amp_d1=0.0055;
@@ -9371,28 +9093,28 @@ void GetAmpAvgL15(string symbol,double &amp_w1,double &amp_d1,double &amp_h4,dou
       amp_h1=0;
       return;
      }
-   if(is_same_symbol(symbol,"NZDUSD"))
+   if(is_same_symbol(symbol,"NZDUSD"))//NU
      {
-      amp_w1=0.01106;
-      amp_d1=0.00435;
+      amp_w1=0.0118;
+      amp_d1=0.0052;
       amp_h4=0.0021;
-      amp_h1=0;
+      amp_h1=0.0012;
       return;
      }
-   if(is_same_symbol(symbol,"USDCAD"))
+   if(is_same_symbol(symbol,"USDCAD"))//UC
      {
-      amp_w1=0.01328;
-      amp_d1=0.00462;
-      amp_h4=0.00252;
-      amp_h1=0;
+      amp_w1=0.0158;
+      amp_d1=0.0105;
+      amp_h4=0.0045;
+      amp_h1=0.0031;
       return;
      }
-   if(is_same_symbol(symbol,"USDCHF"))
+   if(is_same_symbol(symbol,"USDCHF"))//UF
      {
-      amp_w1=0.01397;
-      amp_d1=0.00569;
-      amp_h4=0.00235;
-      amp_h1=0.006;
+      amp_w1=0.0139;
+      amp_d1=0.0065;
+      amp_h4=0.0025;
+      amp_h1=0.0015;
       return;
      }
 
