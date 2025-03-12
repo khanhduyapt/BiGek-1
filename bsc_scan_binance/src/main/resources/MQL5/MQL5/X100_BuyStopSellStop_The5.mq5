@@ -195,9 +195,9 @@ string CENT_ACCOUNT = " ,Exness-MT5Real25:183264196";
 string ARR_SYMBOLS_CENT[] =
   {
    "XAUUSDc"
-   ,"AUDJPYc","NZDJPYc","EURJPYc","GBPJPYc","USDJPYc"
-   ,"AUDCHFc","AUDUSDc"
-   ,"EURAUDc","EURCADc","EURCHFc","GBPCHFc","EURNZDc","GBPNZDc"
+   ,"NZDJPYc","GBPJPYc","USDJPYc"//,"AUDJPYc","EURJPYc"
+   ,"AUDUSDc" //,"AUDCHFc","EURCHFc","GBPCHFc"
+   ,"EURAUDc","EURCADc","EURNZDc","GBPNZDc"
    ,"EURGBPc","EURUSDc","GBPUSDc","NZDUSDc"
    ,"USDCADc","USDCHFc"
    ,"BTCUSDc"
@@ -8610,6 +8610,10 @@ string get_trend_by_heiken(string symbol,ENUM_TIMEFRAMES TIME_FRAME,int candle_i
 //+------------------------------------------------------------------+
 double Risk_1L()
   {
+   long login=AccountInfoInteger(ACCOUNT_LOGIN);
+   if(is_same_symbol(CENT_ACCOUNT,(string)login))
+      return 1000;
+
    double BALANCE = AccountInfoDouble(ACCOUNT_BALANCE);
    if(BALANCE>90000)
       return 250;
