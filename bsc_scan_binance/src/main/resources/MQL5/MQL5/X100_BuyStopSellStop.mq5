@@ -575,7 +575,7 @@ void DrawButtons()
       createButton(BtnSetTimeHere+"2", "Move2C1", x1-65,5,80,20,clrBlack,clrYellow,7,1);
 
    int counter = 0;
-   int start_x=(int)(chart_width-50*8);
+   int start_x=(int)(chart_width-50*5);
    createButton(BtnResetTimeline,  "Rs.Fibo",   start_x+50*counter-15,y_dim,60,20,clrBlack,clrYellow,7,1);
    counter+=1;
 //createButton(BtnHideAngleMode,"Angle",       start_x+50*counter,y_dim,45,20,clrBlack,is_hide_angle?clrLightGray:clrLightCyan,7,1);
