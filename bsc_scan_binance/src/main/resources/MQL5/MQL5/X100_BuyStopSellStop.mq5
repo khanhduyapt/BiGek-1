@@ -572,17 +572,17 @@ void DrawButtons()
 
    int x1, y1, y_dim = 5;
    if(ChartTimePriceToXY(0,0,TimeCurrent(),SymbolInfoDouble(symbol,SYMBOL_BID),x1,y1))
-      createButton(BtnSetTimeHere+"2", "Entry.3N", x1-85,5,50,20,clrBlack,clrYellow,7,1);
+      createButton(BtnSetTimeHere+"2", "Move2C1", x1-65,5,80,20,clrBlack,clrYellow,7,1);
 
    int counter = 0;
-   int start_x=(int)(chart_width-50*9);
+   int start_x=(int)(chart_width-50*8);
    createButton(BtnResetTimeline,  "Rs.Fibo",   start_x+50*counter-15,y_dim,60,20,clrBlack,clrYellow,7,1);
    counter+=1;
 //createButton(BtnHideAngleMode,"Angle",       start_x+50*counter,y_dim,45,20,clrBlack,is_hide_angle?clrLightGray:clrLightCyan,7,1);
 //counter+=1;
    createButton(BtnMacdMode,"Macd",             start_x+50*counter,y_dim,45,20,clrBlack,IS_MACD_DOT?clrActiveBtn:clrWhite,7,1);
 
-   if(Period()>=PERIOD_H4)
+   if(false && Period()>=PERIOD_H4)
      {
       counter+=1;
       start_x+=30;
@@ -984,7 +984,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
    create_dragable_trendline(GLOBAL_VAR_SL,clrRed,  SL,STYLE_SOLID,2);
    create_dragable_trendline(GLOBAL_VAR_LM,clrGreen,LM,STYLE_SOLID,2);
 
-   create_dragable_trendline(LINE_RR_11,clrNavy,  rr11,STYLE_SOLID,1);
+   create_dragable_trendline(LINE_RR_11,clrNavy,  rr11,STYLE_SOLID,2);
    create_dragable_trendline(LINE_RR_12,clrBlack, rr12,STYLE_SOLID,1);
    create_dragable_trendline(LINE_RR_13,clrBlue,  rr13,STYLE_SOLID,1);
 
@@ -1052,8 +1052,12 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
       createButton(BtnSetTPHereR3,"TP."+getShortName(trend)+".3",x_start+50,y_start-10,100,20,clrBlack,clrWhite);
 
    if(ChartTimePriceToXY(0,0,time,LM,x,y_start))
+     {
       createButton(BtnOpenStop1L,trend + " Stop "+ DoubleToString(volme_by_amp_sl,2)+ "lot ~ Risk " + DoubleToString(risk,1)+"$"
-                   ,x_start-50,y_start-10,200,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
+                   ,x_start-50,y_start-12,200,25,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
+
+      createButton(BtnRevRR,"Reverse",x_start-120,y_start-12,60,25,clrBlack,clrYellow);
+     }
 
    if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
       createButton(BtnSetSLHere,"SL "+ DoubleToString(risk,1)+"$",x_start+50, y_start-10,100,20,clrBlack,clrYellow);
@@ -1102,11 +1106,26 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       string trend_by_seq_051020h4 = arrHeiken_Trading[1].trend_by_seq_051020;
 
       string msg_h4="";
-      if(msg_h4=="" && (arrHeiken_Trading[1].low<=arrHeiken_Trading[1].ma20) && (arrHeiken_Trading[1].ma20<=arrHeiken_Trading[1].high))
-         msg_h4 = symbol+" "+TF_TRADING+"xMa20 "  + arrHeiken_Trading[1].trend_by_ma20;
+      double close_1 = iClose(symbol,TradingPeriod,1);
+      double close_2 = iClose(symbol,TradingPeriod,2);
 
-      if(msg_h4=="" && (arrHeiken_Trading[1].low<=arrHeiken_Trading[1].ma50) && (arrHeiken_Trading[1].ma50<=arrHeiken_Trading[1].high))
-         msg_h4 = symbol+" "+TF_TRADING+"xMa50 "  + arrHeiken_Trading[1].trend_by_ma50;
+      bool cut_buy_10 = (close_2<arrHeiken_Trading[1].ma10) && (arrHeiken_Trading[1].ma10<close_1);
+      bool cut_sel_10 = (close_2>arrHeiken_Trading[1].ma10) && (arrHeiken_Trading[1].ma10>close_1);
+
+      bool cut_buy_20 = (close_2<arrHeiken_Trading[1].ma20) && (arrHeiken_Trading[1].ma20<close_1);
+      bool cut_sel_20 = (close_2>arrHeiken_Trading[1].ma20) && (arrHeiken_Trading[1].ma20>close_1);
+
+      bool cut_buy_50 = (close_2<arrHeiken_Trading[1].ma50) && (arrHeiken_Trading[1].ma50<close_1);
+      bool cut_sel_50 = (close_2>arrHeiken_Trading[1].ma50) && (arrHeiken_Trading[1].ma50>close_1);
+
+      if(msg_h4=="" && (cut_buy_20 || cut_sel_20))
+         msg_h4 = symbol+" "+TF_TRADING+" x Ma20 "  + arrHeiken_Trading[1].trend_by_ma20;
+
+      if(msg_h4==""  && (cut_buy_50 || cut_sel_50))
+         msg_h4 = symbol+" "+TF_TRADING+" x Ma50 "  + arrHeiken_Trading[1].trend_by_ma50;
+
+      if(msg_h4=="" && (cut_buy_10 || cut_sel_10) && TradingPeriod==PERIOD_D1)
+         msg_h4 = symbol+" "+TF_TRADING+" x Ma10 "  + arrHeiken_Trading[1].trend_by_ma10;
 
       if(msg_h4 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
         {
@@ -1717,13 +1736,13 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
      {
       if(LM>SL)//TREND_BUY
         {
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol, higest);
-         SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest);
+         SetGlobalVariable(GLOBAL_VAR_LM+symbol, iHigh(symbol,TF,candle_index1));//higest
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, iLow(symbol,TF,candle_index1));//lowest
         }
       else
         {
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol, lowest);
-         SetGlobalVariable(GLOBAL_VAR_SL+symbol, higest);
+         SetGlobalVariable(GLOBAL_VAR_LM+symbol, iLow(symbol,TF,candle_index1));//lowest
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, iHigh(symbol,TF,candle_index1));//higest
         }
 
       init_sl_tp_trendline(false);
@@ -1732,10 +1751,6 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
      }
    int count_d = candle_index1-candle_index2;
    create_label_simple("CoundCandleD1D2",""+IntegerToString(count_d)+" "+get_time_frame_name(TF),lowest,clrRed,(base_time_1+base_time_2)/2);
-
-   int x_start,y_start;
-   if(ChartTimePriceToXY(0,0,base_time_1,mid,x_start,y_start))
-      createButton(BtnRevRR,(LM>SL)?TREND_BUY:TREND_SEL,x_start-50,y_start-10,35,20,clrBlack,LM>SL?clrLightCyan:clrMistyRose);
 
 //---------------------------------------------------------------------------------------------------------------
    if(MathAbs(higest-lowest) > amp_w1)
@@ -1772,24 +1787,7 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
          ObjectSetInteger(0,name,OBJPROP_LEVELWIDTH,i,width);
         }
      }
-//---------------------------------------------------------------------------------------------------------------
-   ObjectDelete(0, fibo_name);
-   ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time_1, higest, base_time_2, higest);
 
-   ObjectSetInteger(0, fibo_name, OBJPROP_COLOR, clrNONE);
-   ObjectSetInteger(0, fibo_name, OBJPROP_BACK, false);
-
-   double levels[] = {0,1,2,3};
-   int levels_count = ArraySize(levels);
-   ObjectSetInteger(0, fibo_name, OBJPROP_LEVELS, levels_count);
-
-   for(int i = 0; i < levels_count; i++)
-     {
-      ObjectSetDouble(0, fibo_name, OBJPROP_LEVELVALUE, i, levels[i]);
-      ObjectSetInteger(0, fibo_name, OBJPROP_LEVELCOLOR, i, clrGray);
-      ObjectSetInteger(0, fibo_name, OBJPROP_LEVELSTYLE, i, STYLE_SOLID);
-      ObjectSetInteger(0, fibo_name, OBJPROP_LEVELWIDTH, i, 1);
-     }
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -6925,6 +6923,9 @@ void create_dragable_trendline(string name, color line_color, double price, ENUM
 void create_dragable_vertical_line(string name,datetime time, color line_color, ENUM_LINE_STYLE STYLE=STYLE_SOLID)
   {
    int width=3;
+   if(is_same_symbol(name,GLOBAL_LINE_TIMER_1))
+      width=5;
+
    ObjectDelete(0,name);
 
    if(ObjectFind(0, name) != 0)
@@ -7633,14 +7634,14 @@ void LoadTimelines(datetime &base_time_1, datetime &base_time_2, bool is_weekly)
 void ResetTimer3Candle(string symbol)
   {
    ENUM_TIMEFRAMES TF= Period();
-   datetime shift = TIME_OF_ONE_H1_CANDLE;
-   if(TF==PERIOD_H4)
-      shift = TIME_OF_ONE_H4_CANDLE;
-   if(TF>=PERIOD_D1)
-      shift = TIME_OF_ONE_D1_CANDLE;
+//datetime shift = TIME_OF_ONE_H1_CANDLE;
+//if(TF==PERIOD_H4)
+//   shift = TIME_OF_ONE_H4_CANDLE;
+//if(TF>=PERIOD_D1)
+//   shift = TIME_OF_ONE_D1_CANDLE;
 
-   create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,iTime(symbol,TF,2),clrFireBrick,STYLE_SOLID);
-   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,iTime(symbol,TF,0)+shift,clrGray,STYLE_SOLID);
+   create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,iTime(symbol,TF,1),clrFireBrick,STYLE_SOLID);
+   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,iTime(symbol,TF,1),clrGray,STYLE_SOLID);
 
    Sleep100();
    SaveTimelinesToFile(false);
