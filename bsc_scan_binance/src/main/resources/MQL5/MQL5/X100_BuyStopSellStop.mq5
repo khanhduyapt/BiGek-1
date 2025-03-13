@@ -572,7 +572,7 @@ void DrawButtons()
 
    int x1, y1, y_dim = 5;
    if(ChartTimePriceToXY(0,0,TimeCurrent(),SymbolInfoDouble(symbol,SYMBOL_BID),x1,y1))
-      createButton(BtnSetTimeHere+"2", "Move2C1", x1-65,5,80,20,clrBlack,clrYellow,7,1);
+      createButton(BtnSetTimeHere+"2", "Move2D1", x1-65,5,80,20,clrBlack,clrYellow,7,1);
 
    int counter = 0;
    int start_x=(int)(chart_width-50*5);
@@ -1039,7 +1039,8 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
       //createButton(BtnSetAmpTrade+"2D","2D", start_group_reverse+170+35*1,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       //createButton(BtnSetAmpTrade+"D1","D1", start_group_reverse+170+35*2,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
-      //createButton(BtnSetAmpTrade+"00","00", start_group_reverse+170+35*5,y_start-10,30,20,clrBlack,clrYellow);
+      createButton(BtnSetAmpTrade+"??","Amp", start_group_reverse+170+35*2,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
+      createButton(BtnSetAmpTrade+"00","00", start_group_reverse+170+35*5,y_start-10,30,20,clrBlack,clrYellow);
      }
 
    if(ChartTimePriceToXY(0,0,time,rr11,x,y_start))
@@ -1136,14 +1137,19 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          PushMessage(msg_h4,FILE_MSG_LIST_R1C1);
         }
 
-      double body = MathAbs(arrHeiken_Trading[1].open-arrHeiken_Trading[1].close);
-      double upper_beard = arrHeiken_Trading[1].high - MathMax(arrHeiken_Trading[1].open, arrHeiken_Trading[1].close);
-      double lower_beard = MathMin(arrHeiken_Trading[1].open, arrHeiken_Trading[1].close) - arrHeiken_Trading[1].low;
-      bool is_doji = (upper_beard>body*2) && (lower_beard>body*2);
+      double body_normal = MathAbs(iOpen(symbol,TradingPeriod,1)-iClose(symbol,TradingPeriod,1));
+      double upper_beard_normal = iHigh(symbol,TradingPeriod,1) - MathMax(iOpen(symbol,TradingPeriod,1), iClose(symbol,TradingPeriod,1));
+      double lower_beard_normal = MathMin(iOpen(symbol,TradingPeriod,1), iClose(symbol,TradingPeriod,1)) - iLow(symbol,TradingPeriod,1);
+      bool is_doji_normal = (upper_beard_normal>body_normal*2) && (lower_beard_normal>body_normal*2);
 
-      if(msg_h4 == "" && is_doji && allow_PushMessage(symbol,FILE_MSG_LIST_R1C2))
+      double body_heiken = MathAbs(arrHeiken_Trading[1].open-arrHeiken_Trading[1].close);
+      double upper_beard_heiken = arrHeiken_Trading[1].high - MathMax(arrHeiken_Trading[1].open, arrHeiken_Trading[1].close);
+      double lower_beard_heiken = MathMin(arrHeiken_Trading[1].open, arrHeiken_Trading[1].close) - arrHeiken_Trading[1].low;
+      bool is_doji_heiken = (upper_beard_heiken>body_heiken*2) && (lower_beard_heiken>body_heiken*2);
+
+      if(msg_h4 == "" && (is_doji_normal || is_doji_heiken) && allow_PushMessage(symbol,FILE_MSG_LIST_R1C2))
         {
-         msg_h4 = symbol+" "+TF_TRADING+".Doji "  + arrHeiken_Trading[1].trend_by_ma20;
+         msg_h4 = symbol+" "+TF_TRADING+".Doji "+(is_doji_normal?"(Nor)":"")+(is_doji_heiken?"(Hei)":"") +" "+ arrHeiken_Trading[1].trend_by_ma20;
 
          if(is_allow_alert && allow_alert)
             Alert(get_vnhour()+" "+msg_h4);
@@ -1736,13 +1742,13 @@ void DrawFiboTimeZone52H4(bool is_set_SL_LM=false)
      {
       if(LM>SL)//TREND_BUY
         {
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol, iHigh(symbol,TF,candle_index1));//higest
-         SetGlobalVariable(GLOBAL_VAR_SL+symbol, iLow(symbol,TF,candle_index1));//lowest
+         SetGlobalVariable(GLOBAL_VAR_LM+symbol, higest);//iHigh(symbol,TF,candle_index1));//higest
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest);//iLow(symbol,TF,candle_index1));//lowest
         }
       else
         {
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol, iLow(symbol,TF,candle_index1));//lowest
-         SetGlobalVariable(GLOBAL_VAR_SL+symbol, iHigh(symbol,TF,candle_index1));//higest
+         SetGlobalVariable(GLOBAL_VAR_LM+symbol, lowest);//iLow(symbol,TF,candle_index1));//lowest
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, higest);//iHigh(symbol,TF,candle_index1));//higest
         }
 
       init_sl_tp_trendline(false);
@@ -4525,9 +4531,9 @@ void OnChartEvent(const int     id,      // event ID
          if(is_same_symbol(sparam,BtnClearMessageRxCx))
            {
             string buttonLabel = ObjectGetString(0,sparam,OBJPROP_TEXT);
-            string msg = buttonLabel+"?\n";
-            int result = MessageBox(msg,"Confirm",MB_YESNOCANCEL);
-            if(result==IDYES)
+            //string msg = buttonLabel+"?\n";
+            //int result = MessageBox(msg,"Confirm",MB_YESNOCANCEL);
+            //if(result==IDYES)
               {
                WriteFileContent(FILE_MSG_LIST_R2C1,"");
                //WriteFileContent(FILE_MSG_LIST_R2C2,"");
@@ -4621,29 +4627,9 @@ void OnChartEvent(const int     id,      // event ID
 
 
          if(LM>SL) //TREND_BUY
-           {
             trend_now=TREND_BUY;
-
-            double entry = LM+spread;
-            if(bid>entry)
-              {
-               ResetTimer3Candle(symbol);
-               return;
-              }
-           }
-
          if(LM<SL) //TREND_SEL
-           {
             trend_now=TREND_SEL;
-
-            double entry = LM-spread;
-            if(ask<entry)
-              {
-               ResetTimer3Candle(symbol);
-               return;
-              }
-           }
-
 
          string str_cond = "";
          int total_objects = ObjectsTotal(0);
@@ -4685,7 +4671,14 @@ void OnChartEvent(const int     id,      // event ID
                double real_tp = entry+real_amp_sl;
                double volume = calc_volume_by_amp(symbol,real_amp_sl,risk);
 
-               m_trade.BuyStop(volume,entry,symbol,real_sl,real_tp, 0, 0,comment_mk1);
+               if(bid>entry)
+                 {
+                  m_trade.BuyLimit(volume,entry,symbol,real_sl,real_tp, 0, 0,comment_mk1);
+                 }
+               else
+                 {
+                  m_trade.BuyStop(volume,entry,symbol,real_sl,real_tp, 0, 0,comment_mk1);
+                 }
               }
 
             if(LM<SL) //TREND_SEL
@@ -4696,8 +4689,13 @@ void OnChartEvent(const int     id,      // event ID
                double real_tp = entry-real_amp_sl;
                double volume = calc_volume_by_amp(symbol,real_amp_sl,risk);
 
-               m_trade.SellStop(volume,entry,symbol,real_sl,real_tp, 0, 0,comment_mk1);
+               if(ask<entry)
+                  m_trade.SellLimit(volume,entry,symbol,real_sl,real_tp, 0, 0,comment_mk1);
+               else
+                  m_trade.SellStop(volume,entry,symbol,real_sl,real_tp, 0, 0,comment_mk1);
               }
+
+            DrawButtons();
            }
 
          return;
@@ -7633,15 +7631,15 @@ void LoadTimelines(datetime &base_time_1, datetime &base_time_2, bool is_weekly)
 //+------------------------------------------------------------------+
 void ResetTimer3Candle(string symbol)
   {
-   ENUM_TIMEFRAMES TF= Period();
+//ENUM_TIMEFRAMES TF= Period();
 //datetime shift = TIME_OF_ONE_H1_CANDLE;
 //if(TF==PERIOD_H4)
 //   shift = TIME_OF_ONE_H4_CANDLE;
 //if(TF>=PERIOD_D1)
 //   shift = TIME_OF_ONE_D1_CANDLE;
 
-   create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,iTime(symbol,TF,1),clrFireBrick,STYLE_SOLID);
-   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,iTime(symbol,TF,1),clrGray,STYLE_SOLID);
+   create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,iTime(symbol,PERIOD_D1,1),clrFireBrick,STYLE_SOLID);
+   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,iTime(symbol,PERIOD_D1,1),clrGray,STYLE_SOLID);
 
    Sleep100();
    SaveTimelinesToFile(false);
