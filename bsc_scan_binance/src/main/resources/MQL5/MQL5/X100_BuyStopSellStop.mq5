@@ -1075,7 +1075,8 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
       //createButton(BtnSetAmpTrade+"2D","2D", start_group_reverse+170+35*0,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
 
-      createButton(BtnSetAmpTrade+"??","Amp",start_group_reverse+170+35*2,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
+      createButton(BtnSetAmpTrade+"??","Amp",start_group_reverse+170+35*1,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
+      createButton(BtnSetAmpTrade+"W1","W1", start_group_reverse+170+35*3,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"D1","D1", start_group_reverse+170+35*4,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"00","00", start_group_reverse+170+35*5,y_start-10,30,20,clrBlack,clrYellow);
      }
@@ -1852,12 +1853,12 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM)
       if(LM>SL)//TREND_BUY
         {
          SetGlobalVariable(GLOBAL_VAR_LM+symbol, higest);//iHigh(symbol,TF,candle_index1));//higest
-         SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest);//iLow(symbol,TF,candle_index1));//lowest
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, MathMin(lowest, higest-amp_d1));//iLow(symbol,TF,candle_index1));//lowest
         }
       else
         {
          SetGlobalVariable(GLOBAL_VAR_LM+symbol, lowest);//iLow(symbol,TF,candle_index1));//lowest
-         SetGlobalVariable(GLOBAL_VAR_SL+symbol, higest);//iHigh(symbol,TF,candle_index1));//higest
+         SetGlobalVariable(GLOBAL_VAR_SL+symbol, MathMax(higest, lowest+amp_d1));//iHigh(symbol,TF,candle_index1));//higest
         }
 
       init_sl_tp_trendline(false);
@@ -4087,7 +4088,8 @@ void OnChartEvent(const int     id,      // event ID
          double amp_trade=amp_d1*2;
          if(is_same_symbol(sparam,"D1"))
             amp_trade=amp_d1;
-
+         if(is_same_symbol(sparam,"W1"))
+            amp_trade=amp_w1;
 
          if(LM>SL)//TREND_BUY
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM-amp_trade);
