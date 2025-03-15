@@ -447,7 +447,7 @@ void DrawButtons()
                   create_trend_line("Doji.C"+append1Zero(cIdx)
                                     ,iTime(symbol,curPeriod,cIdx),iLow(symbol,curPeriod,cIdx)
                                     ,iTime(symbol,curPeriod,cIdx),iHigh(symbol,curPeriod,cIdx)
-                                    ,clrFireBrick,STYLE_SOLID,5);
+                                    ,clrMistyRose,STYLE_SOLID,5);
 
                //string strOm="";
                //bool is_om2vs1 = is_Om(strOm,symbol,curPeriod,cIdx);
@@ -533,7 +533,7 @@ void DrawButtons()
       int fontSize = 7;
       if(is_cur_tab)
         {
-         fontSize = 8;
+         fontSize = 9;
          btn_heigh=index!=0?(int)(btn_heigh*1.2):btn_heigh;
         }
 
@@ -651,7 +651,7 @@ void DrawButtons()
 
    int x1, y1, y_dim = 5;
    if(ChartTimePriceToXY(0,0,TimeCurrent(),SymbolInfoDouble(symbol,SYMBOL_BID),x1,y1))
-      createButton(BtnSetTimeHere+"2", "Move2D1", x1-65,5,80,20,clrBlack,clrYellow,7,1);
+      createButton(BtnSetTimeHere+"2", "Move to C1", x1-65,5,80,20,clrBlack,clrYellow,7,1);
 
    int counter = 0;
    int start_x=(int)(chart_width-50*5);
@@ -1093,7 +1093,11 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
      }
 
    if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
-      createButton(BtnFindSL+"_H4","(H4)SL?",chart_width-55, y_start-10,50,20,clrBlack,clrYellow);
+     {
+      createButton(BtnFindSL+"_W1","(W1)SL",chart_width-55*3, y_start-10,50,20,clrBlack,clrLightGray);
+      createButton(BtnFindSL+"_D1","(D1)SL",chart_width-55*2, y_start-10,50,20,clrBlack,clrLightGray);
+      createButton(BtnFindSL+"_H4","(H4)SL",chart_width-55*1, y_start-10,50,20,clrBlack,clrLightGray);
+     }
 
 //if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
 //   createButton(BtnSetSLHere,"SL "+ DoubleToString(risk,1)+"$",x_start+50, y_start-10,100,20,clrBlack,clrYellow);
@@ -1192,7 +1196,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       //----------------------------------------------------------------------------------------------------
       string msg_r1c1="";
       if(msg_r1c1 =="" && arrHeiken_Tf[0].count_ma10<=3)
-         msg_r1c1 = symbol+" "+TF_TRADING+" Count.Ma10: " + IntegerToString(arrHeiken_Tf[0].count_ma10) + " " +arrHeiken_Tf[0].trend_by_ma10;
+         msg_r1c1 = symbol+" "+TF_TRADING+" Ma10: "+arrHeiken_Tf[0].trend_by_ma10+" "+IntegerToString(arrHeiken_Tf[0].count_ma10);
 
       if(msg_r1c1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
         {
@@ -1205,7 +1209,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       //----------------------------------------------------------------------------------------------------
       string msg_r1c2 = "";
       if(msg_r1c2 =="" && arrHeiken_Tf[0].count_ma20<=3)
-         msg_r1c2 = symbol+" "+TF_TRADING+" Count.Ma20: " + IntegerToString(arrHeiken_Tf[0].count_ma20) + " " +arrHeiken_Tf[0].trend_by_ma20;
+         msg_r1c2 = symbol+" "+TF_TRADING+" Ma20: "+arrHeiken_Tf[0].trend_by_ma20+" "+IntegerToString(arrHeiken_Tf[0].count_ma20);
 
       if(msg_r1c2 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
         {
@@ -1222,7 +1226,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
 
       string msg_r1c3 = "";
       if(msg_r1c3 =="" && count_histogram<=3)
-         msg_r1c3 = symbol+" "+TF_TRADING+" Count.His: " + IntegerToString(count_histogram) + " " +trend_histogram;
+         msg_r1c3 = symbol+" "+TF_TRADING+" (6,12,9): "+trend_histogram+" "+IntegerToString(count_histogram);
 
       if(msg_r1c3 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C3))
         {
@@ -1811,14 +1815,29 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM, bool includeC0=
 
    double lowest=DBL_MAX;
    double higest=0;
-   for(int idx=candle_index2; idx<=candle_index1; idx++)
+   if(includeC0)
      {
-      double low=iLow(symbol,TF,idx);
-      double hig=iHigh(symbol,TF,idx);
-      if(lowest>low)
-         lowest=low;
-      if(higest<hig)
-         higest=hig;
+      for(int idx=1; idx<=0; idx++)
+        {
+         double low=iLow(symbol,TF,idx);
+         double hig=iHigh(symbol,TF,idx);
+         if(lowest>low)
+            lowest=low;
+         if(higest<hig)
+            higest=hig;
+        }
+     }
+   else
+     {
+      for(int idx=candle_index2; idx<=candle_index1; idx++)
+        {
+         double low=iLow(symbol,TF,idx);
+         double hig=iHigh(symbol,TF,idx);
+         if(lowest>low)
+            lowest=low;
+         if(higest<hig)
+            higest=hig;
+        }
      }
    double mid = (lowest+higest)/2;
 //Alert(candle_index1, "  ", candle_index2);// ->  43  26
@@ -7879,13 +7898,13 @@ void LoadTimelines(datetime &base_time_1, datetime &base_time_2, bool is_weekly)
 //+------------------------------------------------------------------+
 void ResetTimer3Candle(string symbol)
   {
-   ENUM_TIMEFRAMES TradingPeriod = (ENUM_TIMEFRAMES)GetGlobalVariable(BtnOptionPeriod);
-   if(TradingPeriod<0)
-      TradingPeriod=PERIOD_H4;
-
-   create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,iTime(symbol,TradingPeriod,1),clrFireBrick,STYLE_SOLID);
-   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,iTime(symbol,TradingPeriod,1),clrGray,STYLE_SOLID);
-   ChartRedraw();
+//   ENUM_TIMEFRAMES TradingPeriod = (ENUM_TIMEFRAMES)GetGlobalVariable(BtnOptionPeriod);
+//   if(TradingPeriod<0)
+//      TradingPeriod=PERIOD_H4;
+//
+//   create_dragable_vertical_line(GLOBAL_LINE_TIMER_1,iTime(symbol,TradingPeriod,1),clrFireBrick,STYLE_SOLID);
+//   create_dragable_vertical_line(GLOBAL_LINE_TIMER_2,iTime(symbol,TradingPeriod,1),clrGray,STYLE_SOLID);
+//   ChartRedraw();
    SaveTimelinesToFile(false);
    Sleep100();
    DrawFiboTimeZone52H4(Period(),true, true);
