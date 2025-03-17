@@ -495,7 +495,7 @@ void DrawButtons()
         {count = 0; x = btn_width+45; y = 35; btn_heigh = 20;}
       if(index==11)
         {count = 0; x = btn_width+45; y = 65; btn_heigh = 20;}
-      if(index==16 || is_same_symbol(symbol, "BTCUSD")) //BTCUSD
+      if(index==16)  //BTCUSD
         {count = 0; x = btn_width+45; y = 95; btn_heigh = 20;}
 
       color clrText = clrBlack;
