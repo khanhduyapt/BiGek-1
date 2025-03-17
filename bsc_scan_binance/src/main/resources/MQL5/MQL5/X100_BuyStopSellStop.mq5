@@ -1188,19 +1188,11 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       //----------------------------------------------------------------------------------------------------
       int count_histogram =50;
       string trend_histogram = "";
-      get_trend_count_by_histogram(trend_histogram,count_histogram,symbol,TradingPeriod,6,12,9);
+      get_trend_count_by_histogram(trend_histogram,count_histogram,symbol,TradingPeriod,3,6,9);
 
       string msg_r1c3 = "";
-      if(msg_r1c3 == "" && count_histogram<=3)
-         msg_r1c3 = symbol+" "+TF_TRADING+" (6,12,9): "+trend_histogram+" "+IntegerToString(count_histogram);
-
-      if(msg_r1c3 == "")
-        {
-         get_trend_count_by_histogram(trend_histogram,count_histogram,symbol,TradingPeriod,3,6,9);
-
-         if(count_histogram<=1 && ((is_buy_only && trend_histogram==TREND_BUY) || (is_sel_only && trend_histogram==TREND_SEL)))
-            msg_r1c3 = symbol+" "+TF_TRADING+" (3,6,9): "+trend_histogram+" "+IntegerToString(count_histogram);
-        }
+      if(msg_r1c3 == "" && count_histogram<=2) // && ((is_buy_only && trend_histogram==TREND_BUY) || (is_sel_only && trend_histogram==TREND_SEL))
+         msg_r1c3 = symbol+" "+TF_TRADING+" (3,6,9): "+trend_histogram+" "+IntegerToString(count_histogram);
 
       if(msg_r1c3 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C3))
         {
