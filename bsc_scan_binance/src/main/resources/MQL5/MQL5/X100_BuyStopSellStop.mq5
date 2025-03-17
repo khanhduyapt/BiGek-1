@@ -139,9 +139,9 @@ const string TREND_BUY="BUY";
 const string TREND_SEL="SELL";
 const string TREND_LIMIT_BUY = "L.M.B.U.Y";
 const string TREND_LIMIT_SEL = "L.M.S.E.L";
-const string PRIFIX_MA = "(Ma)";
-const string PRIFIX_DOJI = "(Doji)";
-const string PRIFIX_OM = "(Om)";
+const string PRIFIX_MA10 = "(10)";
+const string PRIFIX_MA20 = "(20)";
+const string PRIFIX_MACD = "(Mc)";
 const string PRIFIX_SEQ_H4 = "(Sq)";
 const string MASK_NORMAL="";
 const string MASK_AUTO="(AT)";
@@ -1145,14 +1145,17 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
      {
       string symbol = getSymbolAtIndex(index);
 
-      bool is_allow_alert = allow_send_alert(symbol);
-      string total_comments="";
-      string strBSL=CountBSL(symbol,total_comments);
-      //----------------------------------------------------------------------------------------------------
       string key_trend_buy = symbol+"_W:"+TREND_BUY+"_D:"+TREND_BUY;
       string key_trend_sel = symbol+"_W:"+TREND_SEL+"_D:"+TREND_SEL;
       bool is_buy_only = (StringFind(strTrendWD,key_trend_buy)>0);
       bool is_sel_only = (StringFind(strTrendWD,key_trend_sel)>0);
+      if(!(is_buy_only || is_sel_only))
+         continue;
+      //----------------------------------------------------------------------------------------------------
+
+      bool is_allow_alert = allow_send_alert(symbol);
+      string total_comments="";
+      string strBSL=CountBSL(symbol,total_comments);
       //----------------------------------------------------------------------------------------------------
       CandleData arrHeiken_Tf[];
       get_arr_heiken(symbol,TradingPeriod,arrHeiken_Tf,55,true,true);
@@ -1206,23 +1209,6 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
 
          last_symbol=symbol;
          PushMessage(msg_r1c3,FILE_MSG_LIST_R1C3);
-        }
-      //----------------------------------------------------------------------------------------------------
-      //----------------------------------------------------------------------------------------------------
-      if(TradingPeriod>=PERIOD_D1)
-        {
-         bool is_doji_normal = is_Doji(symbol,TradingPeriod,1);
-         string msg_r1c4 = "";
-         if(msg_r1c4 == "" && is_doji_normal && allow_PushMessage(symbol,FILE_MSG_LIST_R1C4))
-           {
-            msg_r1c4 = symbol+" "+TF_TRADING+".Doji ";
-
-            if(is_allow_alert && allow_alert)
-               Alert(get_vnhour()+" "+msg_r1c4);
-
-            last_symbol=symbol;
-            PushMessage(msg_r1c4,FILE_MSG_LIST_R1C4);
-           }
         }
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
@@ -4726,12 +4712,12 @@ void OnChartEvent(const int     id,      // event ID
 
                   if(is_same_symbol(object_name, BtnMsg_) && is_same_symbol(object_name, temp_symbol))
                     {
-                     if(is_same_symbol(object_name, PRIFIX_MA))
-                        str_cond+=PRIFIX_MA;
-                     if(is_same_symbol(object_name, PRIFIX_DOJI))
-                        str_cond+=PRIFIX_DOJI;
-                     if(is_same_symbol(object_name, PRIFIX_OM))
-                        str_cond+=PRIFIX_OM;
+                     if(is_same_symbol(object_name, PRIFIX_MA10))
+                        str_cond+=PRIFIX_MA10;
+                     if(is_same_symbol(object_name, PRIFIX_MA20))
+                        str_cond+=PRIFIX_MA20;
+                     if(is_same_symbol(object_name, PRIFIX_MACD))
+                        str_cond+=PRIFIX_MACD;
                      if(is_same_symbol(object_name, PRIFIX_SEQ_H4))
                         str_cond+=PRIFIX_SEQ_H4;
                     }
@@ -4785,12 +4771,12 @@ void OnChartEvent(const int     id,      // event ID
 
             if(is_same_symbol(object_name, BtnMsg_) && is_same_symbol(object_name, symbol))
               {
-               if(is_same_symbol(object_name, PRIFIX_MA))
-                  str_cond+=PRIFIX_MA;
-               if(is_same_symbol(object_name, PRIFIX_DOJI))
-                  str_cond+=PRIFIX_DOJI;
-               if(is_same_symbol(object_name, PRIFIX_OM))
-                  str_cond+=PRIFIX_OM;
+               if(is_same_symbol(object_name, PRIFIX_MA10))
+                  str_cond+=PRIFIX_MA10;
+               if(is_same_symbol(object_name, PRIFIX_MA20))
+                  str_cond+=PRIFIX_MA20;
+               if(is_same_symbol(object_name, PRIFIX_MACD))
+                  str_cond+=PRIFIX_MACD;
                if(is_same_symbol(object_name, PRIFIX_SEQ_H4))
                   str_cond+=PRIFIX_SEQ_H4;
               }
@@ -5792,7 +5778,7 @@ void CreateMessagesBtn(string BtnSeq___)
    string FILE_NAME_MSG_LIST=FILE_MSG_LIST_R1C1;
    int x_position=COL_1; //+260
    int y_position=70;
-   string prifix=PRIFIX_MA;
+   string prifix=PRIFIX_MA10;
    color clrBgColor = clrWhite;
 
    if(BtnSeq___==BtnMsgR1C2_)
@@ -5800,7 +5786,7 @@ void CreateMessagesBtn(string BtnSeq___)
       BtnClearMessage=BtnClearMessageR1C2;
       FILE_NAME_MSG_LIST=FILE_MSG_LIST_R1C2;
       x_position=COL_2;
-      prifix=PRIFIX_DOJI;
+      prifix=PRIFIX_MA20;
       clrBgColor = clrYellow;
      }
 
@@ -5809,7 +5795,7 @@ void CreateMessagesBtn(string BtnSeq___)
       BtnClearMessage=BtnClearMessageR1C3;
       FILE_NAME_MSG_LIST=FILE_MSG_LIST_R1C3;
       x_position=COL_3;
-      prifix=PRIFIX_OM;
+      prifix=PRIFIX_MACD;
      }
 
    if(BtnSeq___==BtnMsgR1C4_)
