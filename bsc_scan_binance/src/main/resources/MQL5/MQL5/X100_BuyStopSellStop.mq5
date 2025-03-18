@@ -462,7 +462,9 @@ void DrawButtons()
                         DrawAndCountHistogram(arrHeiken_H4, symbol, PERIOD_H4, true, temp_price0, temp_price1-temp_space);
 
                         double trend_type = 0;
-                        if(is_same_symbol(histogram_w1,histogram_d1) && is_same_symbol(histogram_w1,arrHeiken_D1[0].trend_by_ma10))
+                        if(is_same_symbol(histogram_w1,histogram_d1)
+                           && is_same_symbol(histogram_w1,arrHeiken_W1[0].trend_by_ma10)
+                           && is_same_symbol(histogram_w1,arrHeiken_D1[0].trend_by_ma10))
                           {
                            if(is_same_symbol(histogram_w1,TREND_BUY))
                               trend_type=TYPE_BUY;
