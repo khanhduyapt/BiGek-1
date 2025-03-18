@@ -137,6 +137,8 @@ string telegram_url="https://api.telegram.org";
 const int MAXIMUM_OPENING=25;
 const string TREND_BUY="BUY";
 const string TREND_SEL="SELL";
+const double TYPE_BUY = 111;
+const double TYPE_SEL =-111;
 const string TREND_LIMIT_BUY = "L.M.B.U.Y";
 const string TREND_LIMIT_SEL = "L.M.S.E.L";
 const string PRIFIX_MA10 = "(10)";
@@ -155,7 +157,7 @@ const string MASK_COUNT_TRI= "(:3)";
 const string MASK_ALLOW_TRIPPLE="(3X)";
 const string MASK_POSITION="(P.O.S)";
 const string MASK_WEEKLY="(=W1)";
-#define STR_FILENAME_TREND_WD "TREND_WD.txt"
+//#define STR_FILENAME_TREND_WD "TREND_WD.txt"
 const int BTN_WIDTH_STANDA=180;
 int count_closed_today=0;
 double MAXIMUM_DOUBLE=999999999;
@@ -252,6 +254,8 @@ void OnTick()
 
    if((cur_minute%time_reload==0) && (cur_minute!=last_checked_minute))
      {
+      //CreateTrendWDH();
+
       LoadTradeBySeqEvery5min(false);
 
       LoadSLTPEvery5min();
@@ -266,8 +270,7 @@ void OnTick()
 //+------------------------------------------------------------------+
 int OnInit()
   {
-   CreateTrendWDH();
-
+//CreateTrendWDH();
    string cur_symbol=Symbol();
 
    long chartID=ChartFirst();
@@ -342,7 +345,7 @@ void DrawButtons()
    string arrNoticeSymbols_D[];
    ENUM_TIMEFRAMES curPeriod = Period();
 
-   string strTrendWD = ReadFileContent(STR_FILENAME_TREND_WD);
+//string strTrendWD = ReadFileContent(STR_FILENAME_TREND_WD);
 
    int count_wd=0;
    string total_comments="";
@@ -369,10 +372,6 @@ void DrawButtons()
 
       lblBtn10+=" "+strBSL;
       //----------------------------------------------------------------------------------------------------
-      string key_trend_buy = symbol+"_W:"+TREND_BUY+"_D:"+TREND_BUY;
-      string key_trend_sel = symbol+"_W:"+TREND_SEL+"_D:"+TREND_SEL;
-      bool is_buy_only = (StringFind(strTrendWD,key_trend_buy)>0);
-      bool is_sel_only = (StringFind(strTrendWD,key_trend_sel)>0);
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
       if(is_cur_tab)
@@ -426,20 +425,6 @@ void DrawButtons()
                                     ,iTime(symbol,curPeriod,cIdx),iLow(symbol,curPeriod,cIdx)
                                     ,iTime(symbol,curPeriod,cIdx),iHigh(symbol,curPeriod,cIdx)
                                     ,clrMistyRose,STYLE_SOLID,5);
-
-               //string strOm="";
-               //bool is_om2vs1 = is_Om(strOm,symbol,curPeriod,cIdx);
-               //if(is_om2vs1)
-               //   create_trend_line("OmC"+append1Zero(cIdx)
-               //                     ,iTime(symbol,curPeriod,cIdx),iLow(symbol,curPeriod,cIdx)
-               //                     ,iTime(symbol,curPeriod,cIdx),iHigh(symbol,curPeriod,cIdx)
-               //                     ,clrYellow,STYLE_SOLID,3);
-              }
-
-            if(is_buy_only || is_sel_only)
-              {
-               color clrColor = is_buy_only?clrBlue:clrRed;
-               create_label_simple("Today", "                         " + (is_buy_only?TREND_BUY:TREND_SEL) + " ONLY", iClose(symbol, Period(), 1), clrColor, TimeCurrent(), 0, 20);
               }
 
             if(Period() == PERIOD_H4 || Period() == PERIOD_D1)
@@ -452,8 +437,6 @@ void DrawButtons()
 
                DrawCandleIndex(arrHeiken_D1);
 
-               int count_h4, count_d1, count_w1;
-               string trend_histogram_h4, trend_histogram_d1, trend_histogram_w1, his_w1, his_h4, his_d1;
                if(is_cur_tab)
                  {
                   int sub_window, dheigh = 30;
@@ -472,11 +455,21 @@ void DrawButtons()
                         CandleData arrHeiken_H4[];
                         get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,55,true,false);
 
-                        his_w1 = DrawAndCountHistogram(arrHeiken_W1, trend_histogram_w1, count_w1, symbol, PERIOD_W1, true, temp_price2+temp_space, temp_price3);
+                        string histogram_w1 = DrawAndCountHistogram(arrHeiken_W1, symbol, PERIOD_W1, true, temp_price2+temp_space, temp_price3);
 
-                        his_d1 = DrawAndCountHistogram(arrHeiken_D1, trend_histogram_d1, count_d1, symbol, PERIOD_D1, true, temp_price1, temp_price2);
+                        string histogram_d1 = DrawAndCountHistogram(arrHeiken_D1, symbol, PERIOD_D1, true, temp_price1, temp_price2);
 
-                        his_h4 = DrawAndCountHistogram(arrHeiken_H4, trend_histogram_h4, count_h4, symbol, PERIOD_H4, true, temp_price0, temp_price1-temp_space);
+                        DrawAndCountHistogram(arrHeiken_H4, symbol, PERIOD_H4, true, temp_price0, temp_price1-temp_space);
+
+                        double trend_type = 0;
+                        if(is_same_symbol(histogram_w1,histogram_d1))
+                          {
+                           if(is_same_symbol(histogram_w1,TREND_BUY))
+                              trend_type=TYPE_BUY;
+                           if(is_same_symbol(histogram_w1,TREND_SEL))
+                              trend_type=TYPE_SEL;
+                          }
+                        SetGlobalVariable(symbol,trend_type);
                        }
                  }
               }
@@ -500,6 +493,9 @@ void DrawButtons()
 
       color clrText = clrBlack;
       color clrBackground=clrLightGray;
+
+      bool is_buy_only=GetGlobalVariable(symbol)==TYPE_BUY;
+      bool is_sel_only=GetGlobalVariable(symbol)==TYPE_SEL;
       if(is_buy_only || is_sel_only)
         {
          lblBtn10 = "("+(is_buy_only?TREND_BUY:TREND_SEL)+") " + lblBtn10;
@@ -1128,6 +1124,8 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
    WriteFileContent(FILE_MSG_LIST_R1C1,"");
    WriteFileContent(FILE_MSG_LIST_R1C2,"");
    WriteFileContent(FILE_MSG_LIST_R1C3,"");
+   WriteFileContent(FILE_MSG_LIST_R1C4,"");
+   WriteFileContent(FILE_MSG_LIST_R1C5,"");
 
    printf(get_vntime()+"Load Trade By Seq");
    double risk=Risk_1L();
@@ -1137,21 +1135,12 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       TradingPeriod=PERIOD_H4;
    string TF_TRADING = get_time_frame_name((ENUM_TIMEFRAMES)TradingPeriod);
 
-   string strTrendWD = ReadFileContent(STR_FILENAME_TREND_WD);
-
    string arr_touch_ma20[];
    string last_symbol="";
    int size = getArraySymbolsSize();
    for(int index = 0; index < size; index++)
      {
       string symbol = getSymbolAtIndex(index);
-
-      string key_trend_buy = symbol+"_W:"+TREND_BUY+"_D:"+TREND_BUY;
-      string key_trend_sel = symbol+"_W:"+TREND_SEL+"_D:"+TREND_SEL;
-      bool is_buy_only = (StringFind(strTrendWD,key_trend_buy)>0);
-      bool is_sel_only = (StringFind(strTrendWD,key_trend_sel)>0);
-      if(!(is_buy_only || is_sel_only))
-         continue;
       //----------------------------------------------------------------------------------------------------
 
       bool is_allow_alert = allow_send_alert(symbol);
@@ -1177,22 +1166,18 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       if(msg_r1c1 =="" && arrHeiken_Tf[0].count_ma20<=3)
          msg_r1c1 = symbol+" "+TF_TRADING+" Ma20: "+arrHeiken_Tf[0].trend_by_ma20+" "+IntegerToString(arrHeiken_Tf[0].count_ma20);
 
-      if(msg_r1c1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C2))
+      if(msg_r1c1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
         {
          if(is_allow_alert && allow_alert)
             Alert(get_vnhour()+" "+msg_r1c1);
 
          last_symbol=symbol;
-         PushMessage(msg_r1c1,FILE_MSG_LIST_R1C2);
+         PushMessage(msg_r1c1,FILE_MSG_LIST_R1C1);
         }
       //----------------------------------------------------------------------------------------------------
-      int count_histogram =50;
-      string trend_histogram = "";
-      get_trend_count_by_histogram(trend_histogram,count_histogram,symbol,TradingPeriod,3,6,9);
-
       string msg_r1c2 = "";
-      if(msg_r1c2 == "" && count_histogram<=2) // && ((is_buy_only && trend_histogram==TREND_BUY) || (is_sel_only && trend_histogram==TREND_SEL))
-         msg_r1c2 = symbol+" "+TF_TRADING+" (3,6,9): "+trend_histogram+" "+IntegerToString(count_histogram);
+      if(is_Doji(symbol,PERIOD_D1,1))
+         msg_r1c2 = symbol+" "+TF_TRADING+" Doji";
 
       if(msg_r1c2 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C2))
         {
@@ -3101,41 +3086,43 @@ void Draw_Heiken_MWD(string symbol)
 //bool is_buy_only = (StringFind(strTrendWD,key_trend_buy)>0);
 //bool is_sel_only = (StringFind(strTrendWD,key_trend_sel)>0);
 //+------------------------------------------------------------------+
-void CreateTrendWDH()
-  {
-   string strTrendWD = ReadFileContent(STR_FILENAME_TREND_WD);
-   string yyyymmdd = get_yyyymmddhh(TimeGMT());
-
-   if(StringFind(strTrendWD,yyyymmdd)<0)
-     {
-      string trend_wd = "TimeGMT: "+yyyymmdd+"; ";
-      int size = getArraySymbolsSize();
-      for(int index = 0; index < size; index++)
-        {
-         string symbol = getSymbolAtIndex(index);
-
-         CandleData arrHeiken_W1[];
-         get_arr_heiken(symbol,PERIOD_W1,arrHeiken_W1,55,true,false);
-
-         CandleData arrHeiken_D1[];
-         get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,55,true,false);
-
-         CandleData arrHeiken_H4[];
-         get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,55,true,false);
-
-         int  count_h4, count_d1, count_w1;
-         string trend_histogram_h4, trend_histogram_d1, trend_histogram_w1;
-         string his_w1 = DrawAndCountHistogram(arrHeiken_W1, trend_histogram_w1, count_w1, symbol, PERIOD_W1, false, 100, 900);
-         string his_d1 = DrawAndCountHistogram(arrHeiken_D1, trend_histogram_d1, count_d1, symbol, PERIOD_D1, false, 100, 900);
-         string his_h4 = DrawAndCountHistogram(arrHeiken_H4, trend_histogram_h4, count_h4, symbol, PERIOD_H4, false, 100, 900);
-
-         trend_wd += symbol+"_W:"+trend_histogram_w1+"_D:"+trend_histogram_d1+"_H4:"+trend_histogram_h4+"; ";
-        }
-      WriteFileContent(STR_FILENAME_TREND_WD,trend_wd);
-
-      printf(yyyymmdd + " Created " + STR_FILENAME_TREND_WD);
-     }
-  }
+//void CreateTrendWDH()
+//  {
+//   string yyyymmdd = get_yyyymmddhh(TimeGMT());
+//
+//   string trend_wd = "TimeGMT: "+yyyymmdd+"; ";
+//   int size = getArraySymbolsSize();
+//   for(int index = 0; index < size; index++)
+//     {
+//      string symbol = getSymbolAtIndex(index);
+//
+//      string trend_histogram_w1 = "";
+//        {
+//         CandleData arrHeiken_W1[];
+//         get_arr_heiken(symbol,PERIOD_W1,arrHeiken_W1,55,true,false);
+//
+//         trend_histogram_w1 = DrawAndCountHistogram(arrHeiken_W1, symbol, PERIOD_W1, true, 500, 900);
+//         Sleep100();
+//        }
+//
+//      string trend_histogram_d1 = "";
+//        {
+//         CandleData arrHeiken_D1[];
+//         get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,55,true,false);
+//
+//         trend_histogram_d1 = DrawAndCountHistogram(arrHeiken_D1, symbol, PERIOD_D1, true, 100, 500);
+//         Sleep100();
+//        }
+//
+//      string line = symbol+"_W:"+trend_histogram_w1+"_D:"+trend_histogram_d1+"; ";
+//      Print(line);
+//      trend_wd += line;
+//      ChartRedraw();
+//     }
+//   WriteFileContent(STR_FILENAME_TREND_WD,trend_wd);
+//
+//   Print(yyyymmdd + " Created " + STR_FILENAME_TREND_WD);
+//  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -5908,9 +5895,6 @@ void CreateMessagesBtn(string BtnSeq___)
    if(ArraySize(messageArray) > 0)
       createButton(BtnClearMessage,"Clear",x_position,y_position-20,50,18,clrBlack,clrWhite,6);
 
-
-   string strTrendWD = ReadFileContent(STR_FILENAME_TREND_WD);
-
    string total_comments="";
    int size = getArraySymbolsSize();
    for(int index = 0; index < ArraySize(messageArray); index++)
@@ -5923,12 +5907,8 @@ void CreateMessagesBtn(string BtnSeq___)
       if(BtnSeq___!=BtnMsgR1C5_)
          strCountBSL=CountBSL(symbol,total_comments);
 
-      string key_trend_buy = symbol+"_W:"+TREND_BUY+"_D:"+TREND_BUY;
-      string key_trend_sel = symbol+"_W:"+TREND_SEL+"_D:"+TREND_SEL;
-      bool is_buy_only = (StringFind(strTrendWD,key_trend_buy)>0);
-      bool is_sel_only = (StringFind(strTrendWD,key_trend_sel)>0);
 
-      color clrBackground=is_same_symbol(lable,"$")? clrLightGray: is_buy_only?clrActiveBtn:is_sel_only?clrActiveSell:clrWhite;
+      color clrBackground=is_same_symbol(lable,"$")? clrLightGray:clrWhite;
       clrBackground=is_same_symbol(strCountBSL,"$") || is_same_symbol(strCountBSL,"oB") || is_same_symbol(strCountBSL,"oS")? clrLightGray:clrBackground;
 
       color clrText=is_cur_tab?clrBlue:clrBlack;
@@ -9523,8 +9503,7 @@ void DrawCandleIndex(CandleData &arrHeiken_Cr[])
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-string DrawAndCountHistogram(CandleData &candleArray[], string &trend_histogram_, int &count_
-                             , string symbol, ENUM_TIMEFRAMES TF, bool allow_draw=false, double price_from=50000, double price_to=60000)
+string DrawAndCountHistogram(CandleData &candleArray[], string symbol, ENUM_TIMEFRAMES TF, bool allow_draw=false, double price_from=50000, double price_to=60000)
   {
    double closeArray[];
    datetime timeFrArr[];
@@ -9584,7 +9563,6 @@ string DrawAndCountHistogram(CandleData &candleArray[], string &trend_histogram_
    double mid = (price_from + price_to) / 2.0;
 
    string trendArrs[];
-   string trend_macd="";
    for(int i = MathMin(n-26,20); i > 0; i--)
      {
       if(macdValues[i] == EMPTY_VALUE || signalValues[i] == EMPTY_VALUE)
@@ -9607,7 +9585,6 @@ string DrawAndCountHistogram(CandleData &candleArray[], string &trend_histogram_
       int idx = ArraySize(trendArrs);
       ArrayResize(trendArrs,idx+1);
       trendArrs[idx]=mid>scaled_hist?TREND_SEL:TREND_BUY;
-      trend_macd=macdValues[i]>0?TREND_BUY:TREND_SEL;
      }
 
    ArrayReverse(trendArrs);
@@ -9642,27 +9619,16 @@ string DrawAndCountHistogram(CandleData &candleArray[], string &trend_histogram_
 
    if(ArraySize(countArr) > 0)
      {
-      trend_macd="." + getShortName(macdValues[1]>0?TREND_BUY:macdValues[1]<0?TREND_SEL:"");
-      trend_histogram_ = trendArrs[0];
-      count_ = countArr[0];
-
-      string Histogram = trend_macd+"."+trendArrs[0]+"_"+(string)countArr[0];
-
-      if(countArr[0]>=20)
-         Histogram = trendArrs[0]+">"+(string)countArr[0];
-
-
-      Histogram+="."+getShortName(trend_macd);
+      string Histogram = trendArrs[0]+"_"+(string)countArr[0];
 
       color clrColor = trendArrs[0]==TREND_SEL?clrRed:clrBlue;
       if(allow_draw)
          create_label_simple("lblHistogram_"+get_time_frame_name(TF),get_time_frame_name(TF)+" "+Histogram,mid,clrColor,timeFrArr[0]);
 
-      return Histogram;
+      Print(prefix+symbol+Histogram);
+      return trendArrs[0];
      }
 
-   trend_histogram_ = "";
-   count_ = 20;
    return "";
   }
 //+------------------------------------------------------------------+
