@@ -462,7 +462,7 @@ void DrawButtons()
                         DrawAndCountHistogram(arrHeiken_H4, symbol, PERIOD_H4, true, temp_price0, temp_price1-temp_space);
 
                         double trend_type = 0;
-                        if(is_same_symbol(histogram_w1,histogram_d1))
+                        if(is_same_symbol(histogram_w1,histogram_d1) && is_same_symbol(histogram_w1,arrHeiken_D1[0].trend_by_ma10))
                           {
                            if(is_same_symbol(histogram_w1,TREND_BUY))
                               trend_type=TYPE_BUY;
@@ -1149,12 +1149,13 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       //----------------------------------------------------------------------------------------------------
       CandleData arrHeiken_Tf[];
       get_arr_heiken(symbol,TradingPeriod,arrHeiken_Tf,55,true,true);
+      string trend_by_ma10d = arrHeiken_Tf[0].trend_by_ma10;
       //----------------------------------------------------------------------------------------------------
       string msg_r1c1="";
       if(msg_r1c1 =="" && arrHeiken_Tf[0].count_ma10<=3)
          msg_r1c1 = symbol+" "+TF_TRADING+" Ma10: "+arrHeiken_Tf[0].trend_by_ma10+" "+IntegerToString(arrHeiken_Tf[0].count_ma10);
 
-      if(msg_r1c1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
+      if(msg_r1c1 != "" && is_same_symbol(trend_by_ma10d, arrHeiken_Tf[0].trend_by_ma10) && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
         {
          if(is_allow_alert && allow_alert)
             Alert(get_vnhour()+" "+msg_r1c1);
@@ -1163,7 +1164,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          PushMessage(msg_r1c1,FILE_MSG_LIST_R1C1);
         }
 
-      if(msg_r1c1 =="" && arrHeiken_Tf[0].count_ma20<=3)
+      if(msg_r1c1 =="" && arrHeiken_Tf[0].count_ma20<=3 && is_same_symbol(trend_by_ma10d, arrHeiken_Tf[0].trend_by_ma10))
          msg_r1c1 = symbol+" "+TF_TRADING+" Ma20: "+arrHeiken_Tf[0].trend_by_ma20+" "+IntegerToString(arrHeiken_Tf[0].count_ma20);
 
       if(msg_r1c1 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
@@ -1200,7 +1201,8 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
 
          string msg_r1c3 = "";
            {
-            if(msg_r1c3=="" && count_histogram_061209<=2 && is_same_symbol(trend_histogram_061209, trend_histogram_030609))
+            if(msg_r1c3=="" && count_histogram_061209<=2 && is_same_symbol(trend_histogram_061209, trend_histogram_030609)
+               && is_same_symbol(trend_by_ma10d, trend_histogram_061209))
               {
                msg_r1c3 = symbol+" H4 (6,12,9): "+trend_histogram_061209+" "+IntegerToString(count_histogram_061209);
                if(is_allow_alert && allow_alert)
@@ -1213,7 +1215,8 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
 
          if(msg_r1c3=="")
            {
-            if(msg_r1c3=="" && count_histogram_030609<=2 && is_same_symbol(trend_histogram_061209, trend_histogram_030609))
+            if(msg_r1c3=="" && count_histogram_030609<=2 && is_same_symbol(trend_histogram_061209, trend_histogram_030609)
+               && is_same_symbol(trend_by_ma10d, trend_histogram_061209))
               {
                msg_r1c3 = symbol+" H4 (3,6,9): "+trend_histogram_030609+" "+IntegerToString(count_histogram_030609);
                if(is_allow_alert && allow_alert)
@@ -1238,7 +1241,8 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          string msg_r1c4 = "";
            {
             if(msg_r1c4=="" && (count_histogram_061209 <= 2 || count_histogram_030609 <= 2)
-               && is_same_symbol(trend_histogram_061209, trend_histogram_030609))
+               && is_same_symbol(trend_histogram_061209, trend_histogram_030609)
+               && is_same_symbol(trend_by_ma10d, trend_histogram_061209))
               {
                msg_r1c4 = symbol+" H1 (6,12,9): "+trend_histogram_061209;
                if(is_allow_alert && allow_alert)
