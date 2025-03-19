@@ -83,6 +83,7 @@ string telegram_url="https://api.telegram.org";
 #define BtnSuggestTrend             "BtnSuggestTrend"
 #define BtnTrendReverse             "BtnTrendReverse"
 #define BtnRevRR                    "BtnRevRR"
+#define BtnMid3d                    "BtnMid3d"
 #define BtnSetTPHereR1              "BtnSetTPHereR1"
 #define BtnSetTPHereR2              "BtnSetTPHereR2"
 #define BtnSetTPHereR3              "BtnSetTPHereR3"
@@ -320,6 +321,9 @@ int OnInit()
       Draw_Ma10(cur_symbol,PERIOD_D1,10,55);
    if(Period()==PERIOD_H1)
       Draw_Ma10(cur_symbol,PERIOD_H4,10,55);
+
+   double mid = getPriceMid3d(cur_symbol);
+   create_trend_line("mid_line_d3",iTime(cur_symbol,PERIOD_D1,2),mid,TimeCurrent()+TIME_OF_ONE_D1_CANDLE,mid,clrRed,STYLE_SOLID,1,false,false,true,false);
 
    Comment(GetComments());
    ChartRedraw();
@@ -1055,7 +1059,9 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
       createButton(BtnOpenStop1L,trend + " Stop "+ DoubleToString(volme_by_amp_sl,2)+ "lot ~ Risk " + DoubleToString(risk,1)+"$"
                    ,x_start-50,y_start-12,200,25,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
 
-      createButton(BtnRevRR,"Reverse",x_start-120,y_start-12,60,25,clrBlack,clrYellow);
+      createButton(BtnRevRR,"Reverse",x_start-110,y_start-12,50,25,clrBlack,clrYellow);
+
+      createButton(BtnMid3d,"Mid3d",x_start-120-40,y_start-12,40,25,clrBlack,clrYellow);
      }
 
    if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
@@ -1181,6 +1187,15 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       string msg_r1c2 = "";
       if(is_Doji(symbol,PERIOD_D1,1))
          msg_r1c2 = symbol+" "+TF_TRADING+" Doji";
+
+      if(msg_r1c2 == "")
+        {
+         int count_histogram_030609 =50;
+         string trend_histogram_030609 = "";
+         get_trend_count_by_histogram(trend_histogram_030609,count_histogram_030609,symbol,PERIOD_D1,3,6,9);
+         if(count_histogram_030609<=2 && is_same_symbol(trend_by_ma10d, trend_histogram_030609))
+            msg_r1c2= symbol+" D1 (3,6,9): "+trend_histogram_030609+" "+IntegerToString(count_histogram_030609);
+        }
 
       if(msg_r1c2 != "" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C2))
         {
@@ -1724,6 +1739,16 @@ void create_trend_angle(string lineName, datetime time1, double price1, datetime
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
+double getPriceMid3d(string cur_symbol)
+  {
+   double low3 =MathMin(iLow(cur_symbol,PERIOD_D1,2), MathMin(iLow(cur_symbol,PERIOD_D1,1),iLow(cur_symbol,PERIOD_D1,0)));
+   double hig3 =MathMax(iHigh(cur_symbol,PERIOD_D1,2), MathMax(iHigh(cur_symbol,PERIOD_D1,1),iHigh(cur_symbol,PERIOD_D1,0)));
+   double mid = (hig3+low3)/2;
+   return mid;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM, bool includeC0=false)
   {
    string symbol=Symbol();
@@ -1801,12 +1826,12 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM, bool includeC0=
       //string trend_ma = get_trend_by_ma(symbol,PERIOD_D1,10,1);
       if(LM>SL) //TREND_BUY is_same_symbol(trend_ma,TREND_BUY)
         {
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol, higest);
+         SetGlobalVariable(GLOBAL_VAR_LM+symbol, higest); //higest
          SetGlobalVariable(GLOBAL_VAR_SL+symbol, MathMin(MathMin(lowest, lowest_05_candles), higest-amp_d1));
         }
       else //TREND_SEL
         {
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol, lowest);
+         SetGlobalVariable(GLOBAL_VAR_LM+symbol, lowest); //lowest
          SetGlobalVariable(GLOBAL_VAR_SL+symbol, MathMax(MathMax(higest, higest_05_candles), lowest+amp_d1));
         }
 
@@ -1840,6 +1865,27 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM, bool includeC0=
          ObjectSetInteger(0,name,OBJPROP_LEVELSTYLE,i,STYLE_DOT);
          ObjectSetString(0,name,OBJPROP_LEVELTEXT,i,DoubleToString(1*MathAbs(levels_screen[i]),3)+"   ");
          ObjectSetInteger(0,name,OBJPROP_LEVELWIDTH,i,1);
+        }
+     }
+
+
+     {
+      ObjectDelete(0, fibo_name);
+      ObjectCreate(0, fibo_name, OBJ_FIBOTIMES, 0, base_time_1, higest, base_time_2, higest);
+
+      ObjectSetInteger(0, fibo_name, OBJPROP_COLOR, clrNONE);
+      ObjectSetInteger(0, fibo_name, OBJPROP_BACK, false);
+
+      double levels[] = {0,1,2,3};
+      int levels_count = ArraySize(levels);
+      ObjectSetInteger(0, fibo_name, OBJPROP_LEVELS, levels_count);
+
+      for(int i = 0; i < levels_count; i++)
+        {
+         ObjectSetDouble(0, fibo_name, OBJPROP_LEVELVALUE, i, levels[i]);
+         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELCOLOR, i, clrBlue);
+         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELSTYLE, i, STYLE_SOLID);
+         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELWIDTH, i, 1);
         }
      }
 //---------------------------------------------------------------------------------------------------------------
@@ -4066,6 +4112,16 @@ void OnChartEvent(const int     id,      // event ID
 
          init_sl_tp_trendline(false);
          OnInit();
+         return;
+        }
+
+      if(is_same_symbol(sparam,BtnMid3d))
+        {
+         double mid3d=getPriceMid3d(symbol);
+         SetGlobalVariable(GLOBAL_VAR_LM+symbol,mid3d);
+         init_sl_tp_trendline(false);
+         DrawFiboTimeZone52H4(Period(),false);
+         ChartRedraw();
          return;
         }
 
