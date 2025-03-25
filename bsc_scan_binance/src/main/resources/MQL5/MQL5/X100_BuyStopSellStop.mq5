@@ -319,6 +319,7 @@ int OnInit()
      {
       Draw_Ma10(cur_symbol,PERIOD_W1,10,75);
       Draw_Ma10(cur_symbol,PERIOD_MN1,15,25);
+      draw_trend_Stoc(cur_symbol,PERIOD_W1,3,3,3);
      }
    if(Period()==PERIOD_H4)
       Draw_Ma10(cur_symbol,PERIOD_D1,10,55);
@@ -6642,7 +6643,46 @@ string get_trend_by_stoc2(string symbol,ENUM_TIMEFRAMES timeframe,int inK=13,int
 
    return "";
   }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+string draw_trend_Stoc(string symbol,ENUM_TIMEFRAMES timeframe,int inK=3,int inD=3,int inS=3)
+  {
+   int handle_iStochastic=iStochastic(symbol,timeframe,inK,inD,inS,MODE_SMA,STO_LOWHIGH);
+   if(handle_iStochastic==INVALID_HANDLE)
+      return "";
 
+   double K[],D[];
+   ArraySetAsSeries(K,true);
+   ArraySetAsSeries(D,true);
+   CopyBuffer(handle_iStochastic,0,0,36,K);
+   CopyBuffer(handle_iStochastic,1,0,36,D);
+
+   int SUB_WINDOW = 2;
+   string name = "stoc_"+get_time_frame_name(timeframe);
+   int size = (int)(MathMin(ArraySize(K), ArraySize(D)))-1;
+   for(int i=0;i<size;i++)
+     {
+      datetime time0 = iTime(symbol,timeframe,i);
+      datetime time1 = iTime(symbol,timeframe,i+1);
+      create_trend_line(name+"_K"+append1Zero(i), time0, K[i], time1, K[i+1], clrBlue,     STYLE_SOLID,2,false,false,true,true,SUB_WINDOW);
+      create_trend_line(name+"_D"+append1Zero(i), time0, D[i], time1, D[i+1], clrFireBrick,STYLE_SOLID,3,false,false,true,true,SUB_WINDOW);
+     }
+
+
+   double _K=K[0];
+   double _D=D[0];
+   string result = "";
+   if(_K>_D)
+      result = TREND_BUY;
+   if(_K<_D)
+      result = TREND_SEL;
+
+   string lbl = get_time_frame_name(timeframe)+"("+IntegerToString(inK)+","+IntegerToString(inD)+","+IntegerToString(inS)+"): "+result;
+   create_label_simple(name+"_trend",lbl,K[0],result==TREND_BUY?clrBlue:clrRed,TimeCurrent(),SUB_WINDOW,10);
+
+   return result;
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
