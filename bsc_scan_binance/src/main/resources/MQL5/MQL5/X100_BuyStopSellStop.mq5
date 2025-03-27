@@ -346,8 +346,8 @@ void DrawButtons()
    int chart_width = (int) MathRound(ChartGetInteger(0,CHART_WIDTH_IN_PIXELS));
    int chart_heigh = (int) MathRound(ChartGetInteger(0,CHART_HEIGHT_IN_PIXELS));
 
-   createButton(BtnClearChart,"Clear Chart",chart_width/2-360+280+10+265+50,chart_heigh-35,105,30,clrBlack,clrYellow);
-   createButton(BtnHideDrawMode,"Buttons",chart_width/2-360+280+10+265+10+105+50,chart_heigh-35,80,30,clrBlack,is_hide_mode?clrYellow:clrWhite);
+   createButton(BtnClearChart,"Clear Chart",chart_width/2-360+280+10+265+50,0,105,25,clrBlack,clrYellow,7,1);
+   createButton(BtnHideDrawMode,"Buttons",chart_width/2-360+280+10+265+10+105+50,0,80,25,clrBlack,is_hide_mode?clrYellow:clrWhite,7,1);
 
    if(is_hide_mode)
       return;
@@ -587,36 +587,36 @@ void DrawButtons()
       CreateMessagesBtn(BtnMsgR1C4_);
      }
 //
-   int init_x=20;
-   int init_y=20;
-   int STOC_WINDOW=1;
-   string find_trend_H1=(string)GetGlobalVariable(BtnNoticeMaCross+symbol+"_H1");
-   string find_trend_H4=(string)GetGlobalVariable(BtnNoticeMaCross+symbol+"_H4");
+//int init_x=20;
+//int init_y=20;
+//int STOC_WINDOW=1;
+//string find_trend_H1=(string)GetGlobalVariable(BtnNoticeMaCross+symbol+"_H1");
+//string find_trend_H4=(string)GetGlobalVariable(BtnNoticeMaCross+symbol+"_H4");
 
 //string str_H1Ma10="(H1) Hei.Ma10"+(is_same_symbol(find_trend_H1,HeivsMa10_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa10_SEL)?" "+TREND_SEL:"");
-   string str_H1Ma20="(H1) Hei.Ma20"+(is_same_symbol(find_trend_H1,HeivsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa20_SEL)?" "+TREND_SEL:"");
-   string str_H1Ma50="(H1) Hei.Ma50"+(is_same_symbol(find_trend_H1,HeivsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa50_SEL)?" "+TREND_SEL:"");
+//string str_H1Ma20="(H1) Hei.Ma20"+(is_same_symbol(find_trend_H1,HeivsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa20_SEL)?" "+TREND_SEL:"");
+//string str_H1Ma50="(H1) Hei.Ma50"+(is_same_symbol(find_trend_H1,HeivsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa50_SEL)?" "+TREND_SEL:"");
 //string str_H11020="(H1) Hei.1020"+(is_same_symbol(find_trend_H1,HeivsMa10vsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa10vsMa20_SEL)?" "+TREND_SEL:"");
 //string str_H12050="(H1) Hei.2050"+(is_same_symbol(find_trend_H1,HeivsMa20vsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa20vsMa50_SEL)?" "+TREND_SEL:"");
 
 //string str_H4Ma10="(H4) Hei.Ma10"+(is_same_symbol(find_trend_H4,HeivsMa10_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa10_SEL)?" "+TREND_SEL:"");
-   string str_H4Ma20="(H4) Hei.Ma20"+(is_same_symbol(find_trend_H4,HeivsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa20_SEL)?" "+TREND_SEL:"");
-   string str_H4Ma50="(H4) Hei.Ma50"+(is_same_symbol(find_trend_H4,HeivsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa50_SEL)?" "+TREND_SEL:"");
+//string str_H4Ma20="(H4) Hei.Ma20"+(is_same_symbol(find_trend_H4,HeivsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa20_SEL)?" "+TREND_SEL:"");
+//string str_H4Ma50="(H4) Hei.Ma50"+(is_same_symbol(find_trend_H4,HeivsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa50_SEL)?" "+TREND_SEL:"");
 //string str_H41020="(H4) Hei.1020"+(is_same_symbol(find_trend_H4,HeivsMa10vsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa10vsMa20_SEL)?" "+TREND_SEL:"");
 //string str_H42050="(H4) Hei.2050"+(is_same_symbol(find_trend_H4,HeivsMa20vsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa20vsMa50_SEL)?" "+TREND_SEL:"");
 //
-   bool is_period_h1=Period()==PERIOD_H1;
-   int col_1=25,col_2=col_1+65+5*2,col_3=col_2+150+10,col_4=col_3+150+10,col_5=col_4+150+10,col_6=col_5+150+10,col_7=col_6+150+50;
+//bool is_period_h1=Period()==PERIOD_H1;
+//int col_1=25,col_2=col_1+65+5*2,col_3=col_2+150+10,col_4=col_3+150+10,col_5=col_4+150+10,col_6=col_5+150+10,col_7=col_6+150+50;
 //createButton(BtnResetMaCross+"_H1","[Msg] Del",     col_1,init_y+5,65,25,clrBlack,is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
 //createButton(BtnNoticeMaCross+"_H1Ma10", str_H1Ma10,col_2,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa10_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa10_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
-   createButton(BtnNoticeMaCross+"_H1Ma20", str_H1Ma20,col_3,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa20_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
-   createButton(BtnNoticeMaCross+"_H1Ma50", str_H1Ma50,col_4,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa50_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
+//createButton(BtnNoticeMaCross+"_H1Ma20", str_H1Ma20,col_3,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa20_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
+//createButton(BtnNoticeMaCross+"_H1Ma50", str_H1Ma50,col_4,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa50_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
 //
-   bool is_period_h4=Period()==PERIOD_H4;
+//bool is_period_h4=Period()==PERIOD_H4;
 //createButton(BtnResetMaCross+"_H4","[Msg] Del",     col_1,init_y+45,65,25,clrBlack,is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
 //createButton(BtnNoticeMaCross+"_H4Ma10", str_H4Ma10,col_2,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa10_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa10_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
-   createButton(BtnNoticeMaCross+"_H4Ma20", str_H4Ma20,col_3,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa20_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
-   createButton(BtnNoticeMaCross+"_H4Ma50", str_H4Ma50,col_4,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa50_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
+//createButton(BtnNoticeMaCross+"_H4Ma20", str_H4Ma20,col_3,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa20_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
+//createButton(BtnNoticeMaCross+"_H4Ma50", str_H4Ma50,col_4,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa50_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
 
 //--------------------------------------------------------------------------------------------
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
@@ -1119,7 +1119,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 //   createButton(BtnSetSLHere,"SL "+ DoubleToString(risk,1)+"$",x_start+50, y_start-10,100,20,clrBlack,clrYellow);
 
    createButton(BtnOpenStop1L,trend + " STOP "+ symbol + " " + DoubleToString(volme_by_amp_sl,2)+ "lot ~ R: " + DoubleToString(risk,1)+"$"
-                ,chart_width/2-360+280+10+265+50-260,chart_heigh-35,250,30,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
+                ,chart_width/2-360+280+10+265+50-260,0,250,25,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell,7,1);
 
    int opening=PositionsTotal();
    int btn_width=BTN_WIDTH_STANDA;
@@ -1127,11 +1127,12 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    ObjectDelete(0,BtnCloseLimit);
    if(is_same_symbol(strBSL,"oB") || is_same_symbol(strBSL,"oS"))
-      createButton(BtnCloseLimit,"Close Limit "+symbol,chart_width/2-660,chart_heigh-35,BTN_WIDTH_STANDA+100,30,clrBlack,clrLightGray,7);
+      createButton(BtnCloseLimit,"Close Limit "+symbol,chart_width/2-560,0,BTN_WIDTH_STANDA,25,clrBlack,clrLightGray,7,1);
 
    ObjectDelete(0,BtnCloseSymbol);
    if(is_same_symbol(strBSL,"$"))
-      createButton(BtnCloseSymbol,"Close "+symbol+" "+strBSL +"("+(string)opening+"/"+(string)MAXIMUM_OPENING+"L)  ",chart_width/2-360,chart_heigh-35,300,30,clrBlack,clrLightGray,7);
+      createButton(BtnCloseSymbol,"Close "+symbol+" "+strBSL +"("+(string)opening+"/"+(string)MAXIMUM_OPENING+"L)  "
+                   ,chart_width/2-370,0,300,25,clrBlack,clrLightGray,7,1);
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -3929,8 +3930,8 @@ void OnChartEvent(const int     id,      // event ID
    bool processing=GetGlobalVariable("PROCESSING")==AUTO_TRADE_ONN;
    if(processing)
      {
-      Alert("Đang xử lý, vui lòng chờ...");
-      return;
+      //Alert("Đang xử lý, vui lòng chờ...");
+      //return;
      }
    SetGlobalVariable("PROCESSING", AUTO_TRADE_ONN);
 
@@ -4864,10 +4865,6 @@ void OnChartEvent(const int     id,      // event ID
         {
          string buttonLabel = ObjectGetString(0,sparam,OBJPROP_TEXT);
          Print("The lparam=",sparam," dparam=",dparam," sparam=",sparam," buttonLabel=",buttonLabel," was clicked");
-
-         if(is_same_symbol(buttonLabel,symbol)==false)
-            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
-         return;
 
          //string msg = buttonLabel+"?\n";
          //int result = MessageBox(msg,"Confirm",MB_YESNOCANCEL);
