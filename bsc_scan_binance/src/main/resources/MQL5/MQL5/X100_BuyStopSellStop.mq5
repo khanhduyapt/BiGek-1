@@ -630,21 +630,14 @@ void DrawButtons()
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-
-   int x1, y1, y_dim = 5;
-   if(ChartTimePriceToXY(0,0,TimeCurrent(),SymbolInfoDouble(symbol,SYMBOL_BID),x1,y1))
-      createButton(BtnMid3d,"Mid3D", x1-65,0,80,25,clrBlack,clrYellow,7,1);
-
-   int counter = 0;
-   int start_x=(int)(chart_width-50*5);
-   createButton(BtnResetTimeline,  "Rs.Fibo",   start_x+50*counter-15,y_dim,60,20,clrBlack,clrYellow,7,1);
+   int counter = 0, y_dim = 0;
+   int start_x,y_start;
+   ChartTimePriceToXY(0,0,TimeCurrent(),LM,start_x,y_start);
+   createButton(BtnResetTimeline,  "Reset", start_x+50*counter-15,y_dim,60,25,clrBlack,clrYellow,7,1);
    counter+=1;
-//createButton(BtnHideAngleMode,"Angle",       start_x+50*counter,y_dim,45,20,clrBlack,is_hide_angle?clrLightGray:clrLightCyan,7,1);
-//counter+=1;
-   createButton(BtnMacdMode,"Macd",             start_x+50*counter,y_dim,45,20,clrBlack,IS_MACD_DOT?clrActiveBtn:clrWhite,7,1);
+   createButton(BtnMacdMode,"Macd",         start_x+50*counter,   y_dim,45,25,clrBlack,IS_MACD_DOT?clrActiveBtn:clrWhite,7,1);
    counter+=1;
-   createButton(BtnHorTrendline,   "-----",     start_x+50*counter,y_dim,40,20,clrBlack,clrWhite,7,1);
-
+   createButton(BtnHorTrendline,   "-----", start_x+50*counter,   y_dim,40,25,clrBlack,clrWhite,7,1);
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -663,7 +656,7 @@ void DrawButtons()
       createButton(BtnClearTrendline, "Delete",    start_x+50*counter,y_dim,40,20,clrBlack,clrLightGray,7,1);
      }
 //--------------------------------------------------------------------------------------------
-   createButton(BtnClearMessageRxCx,"Check",540+250+200,70-20,50,18,clrBlack,clrYellowGreen,6);
+   createButton(BtnClearMessageRxCx,"Checkmate",540+250+460,10,75,30,clrBlack,clrYellowGreen,8);
   }
 
 //+------------------------------------------------------------------+
@@ -1091,12 +1084,11 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
       if(strBSL!="")
          createButton(BtnReSetTPEntry,"Tp.Entry",start_group_reverse-270,y_start-10,60,20,clrBlack,clrWhite);
 
-      //createButton(BtnSetAmpTrade+"2D","2D", start_group_reverse+170+35*0,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
-
       createButton(BtnSetAmpTrade+"??","Amp",start_group_reverse+170+35*0,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"W1","W1 " + DoubleToString(volme_by_amp_w1,2)+" lot", start_group_reverse+170+35*1,y_start-10,30*3,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"D1","D1", start_group_reverse+170+35*4,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"00","00", start_group_reverse+170+35*5,y_start-10,30,20,clrBlack,clrYellow);
+      createButton(BtnRevRR,           "Rev",start_group_reverse+170+35*6,y_start-10,30,20,clrBlack,clrYellow);
      }
 
    if(ChartTimePriceToXY(0,0,time,rr11,x,y_start))
@@ -1110,12 +1102,10 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    if(ChartTimePriceToXY(0,0,time,LM,x,y_start))
      {
-      createButton(BtnOpenStop1L,trend + " Stop "+ DoubleToString(volme_by_amp_sl,2)+ "lot ~ Risk " + DoubleToString(risk,1)+"$"
-                   ,x_start-50,y_start-12,200,25,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
-
-      createButton(BtnRevRR,"Reverse",x_start-110,y_start-12,50,25,clrBlack,clrYellow);
-
-      createButton(BtnSetTimeHere+"2", "C1",x_start-120-40,y_start-12,40,25,clrBlack,clrYellow);
+      createButton(BtnSetTimeHere+".iHigh","Hig",chart_width-40*1,y_start-12,35,25,clrBlack,clrYellow);
+      createButton(BtnSetTimeHere+".iLow", "Low",chart_width-40*2,y_start-12,35,25,clrBlack,clrYellow);
+      createButton(BtnSetTimeHere+".C3",   "C.3",chart_width-40*3,y_start-12,35,25,clrBlack,clrYellow);
+      createButton(BtnMid3d,"Mid",               chart_width-40*4,y_start-12,35,25,clrBlack,clrYellow);
      }
 
    if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
@@ -1127,6 +1117,9 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
 //if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
 //   createButton(BtnSetSLHere,"SL "+ DoubleToString(risk,1)+"$",x_start+50, y_start-10,100,20,clrBlack,clrYellow);
+
+   createButton(BtnOpenStop1L,trend + " STOP "+ symbol + " " + DoubleToString(volme_by_amp_sl,2)+ "lot ~ R: " + DoubleToString(risk,1)+"$"
+                ,chart_width/2-360+280+10+265+50-260,chart_heigh-35,250,30,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
 
    int opening=PositionsTotal();
    int btn_width=BTN_WIDTH_STANDA;
@@ -1252,7 +1245,18 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
         }
       //----------------------------------------------------------------------------------------------------
       string msg_r1c2 = "";
-      if(is_Doji(symbol,PERIOD_D1,1))
+      if(msg_r1c2 == "")
+        {
+         if(iLow(symbol,PERIOD_D1,1) <= arrHeiken_Tf[0].ma10 && arrHeiken_Tf[0].ma10 <= iHigh(symbol,PERIOD_D1,1))
+            msg_r1c2 = symbol+" "+TF_TRADING+" Touch.Ma10";
+        }
+      if(msg_r1c2 == "")
+        {
+         if(iLow(symbol,PERIOD_D1,1) <= arrHeiken_Tf[0].ma20 && arrHeiken_Tf[0].ma20 <= iHigh(symbol,PERIOD_D1,1))
+            msg_r1c2 = symbol+" "+TF_TRADING+" Touch.Ma20";
+        }
+
+      if(msg_r1c2 == "" && is_Doji(symbol,PERIOD_D1,1))
          msg_r1c2 = symbol+" "+TF_TRADING+" Doji";
 
       if(msg_r1c2 == "")
@@ -1802,6 +1806,61 @@ void create_trend_angle(string lineName, datetime time1, double price1, datetime
    ObjectSetInteger(0, lineName, OBJPROP_RAY_RIGHT,is_ray);
    ObjectSetDouble(0, lineName, OBJPROP_ANGLE,angle);
    ObjectSetInteger(0, lineName, OBJPROP_STYLE,STYLE);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void setPriceMid3d(string symbol)
+  {
+   double mid3d=getPriceMid3d(symbol);
+   double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
+   double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
+
+   double amp_w1,amp_d1,amp_h4,amp_h1;
+   GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
+   string trend_stoc_w3 = get_trend_by_stoc2(symbol,PERIOD_W1,3,3,3,0);
+   double NEW_LM = mid3d;
+   if(trend_stoc_w3==TREND_BUY)
+      SL=NEW_LM-amp_w1;
+   else
+      SL=NEW_LM+amp_w1;
+
+   SetGlobalVariable(GLOBAL_VAR_LM+symbol,NEW_LM);
+   SetGlobalVariable(GLOBAL_VAR_SL+symbol,SL);
+
+   init_sl_tp_trendline(false);
+   DrawFiboTimeZone52H4(Period(),false);
+   ChartRedraw();
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void setPriceHigLowC1(string sparam, string symbol)
+  {
+   double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
+   double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
+   double amp_w1,amp_d1,amp_h4,amp_h1;
+   GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
+   string trend_stoc_w3 = get_trend_by_stoc2(symbol,PERIOD_W1,3,3,3,0);
+
+   double NEW_LM = LM;
+   if(is_same_symbol(sparam,".iHigh"))
+      NEW_LM = MathMax(iOpen(symbol,PERIOD_D1,1), iClose(symbol,PERIOD_D1,1));
+
+   if(is_same_symbol(sparam,".iLow"))
+      NEW_LM = MathMin(iOpen(symbol,PERIOD_D1,1), iClose(symbol,PERIOD_D1,1));
+
+   if(trend_stoc_w3==TREND_BUY)
+      SL=NEW_LM-amp_w1;
+   else
+      SL=NEW_LM+amp_w1;
+
+   SetGlobalVariable(GLOBAL_VAR_LM+symbol,NEW_LM);
+   SetGlobalVariable(GLOBAL_VAR_SL+symbol,SL);
+
+   init_sl_tp_trendline(false);
+   DrawFiboTimeZone52H4(Period(),false);
+   ChartRedraw();
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -3865,6 +3924,16 @@ void OnChartEvent(const int     id,      // event ID
                   const string& sparam    // string type event parameter
                  )
   {
+//Print("OnChartEvent:  "," lparam=",lparam," dparam=",dparam," sparam=",sparam);
+
+   bool processing=GetGlobalVariable("PROCESSING")==AUTO_TRADE_ONN;
+   if(processing)
+     {
+      Alert("Đang xử lý, vui lòng chờ...");
+      return;
+     }
+   SetGlobalVariable("PROCESSING", AUTO_TRADE_ONN);
+
    if(id==CHARTEVENT_OBJECT_DRAG)
      {
       if(is_same_symbol(sparam,GLOBAL_VAR_SL) || is_same_symbol(sparam,GLOBAL_VAR_LM))
@@ -3873,6 +3942,7 @@ void OnChartEvent(const int     id,      // event ID
          Print(sparam," was DRAG");
 
          CheckTrendlineUpdates(true);
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -3885,6 +3955,7 @@ void OnChartEvent(const int     id,      // event ID
          SaveTimelinesToFile(false);
          DrawFiboTimeZone52H4(Period(),true);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -3895,6 +3966,7 @@ void OnChartEvent(const int     id,      // event ID
          Print(sparam," was DRAG ", ObjectGetDouble(0,sparam,OBJPROP_PRICE));
 
          ChartRedraw();
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
 
 
@@ -3927,6 +3999,7 @@ void OnChartEvent(const int     id,      // event ID
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,SL-amp_moved);
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -3943,6 +4016,7 @@ void OnChartEvent(const int     id,      // event ID
 
          ObjectsDeleteAll(0);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -3951,6 +4025,7 @@ void OnChartEvent(const int     id,      // event ID
         {
          AddSupportResistance();
          ChartRedraw();
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -3958,6 +4033,7 @@ void OnChartEvent(const int     id,      // event ID
         {
          AddFiboline();
          ChartRedraw();
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -3965,6 +4041,7 @@ void OnChartEvent(const int     id,      // event ID
         {
          AddSword(sparam);
          ChartRedraw();
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -3972,6 +4049,7 @@ void OnChartEvent(const int     id,      // event ID
         {
          AddHorTrendline();
          ChartRedraw();
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -3979,6 +4057,7 @@ void OnChartEvent(const int     id,      // event ID
         {
          AddTrendline();
          ChartRedraw();
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -3990,6 +4069,7 @@ void OnChartEvent(const int     id,      // event ID
             SaveTimelinesToFile(true);
 
          ObjectsDeleteAll(0);
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -3997,31 +4077,8 @@ void OnChartEvent(const int     id,      // event ID
         {
          ClearTrendlinesFromFile();
          ObjectsDeleteAll(0);
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
-         return;
-        }
-
-      if(is_same_symbol(sparam,BtnSetTimeHere))
-        {
-         ResetTimer3Candle(symbol);
-
-         return;
-        }
-      if(is_same_symbol(sparam,BtnResetTimeline))
-        {
-         Reset_Fibo_Timelines(Period());
-         Sleep100();
-         SaveTimelinesToFile(false);
-         Sleep100();
-         DrawFiboTimeZone52H4(Period(),true);
-
-         // Chuyen vao thi khong tinh dc volume
-         double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
-         double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
-         SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM);
-         init_sl_tp_trendline(false);
-
-         DrawButtons();
          return;
         }
 
@@ -4037,6 +4094,7 @@ void OnChartEvent(const int     id,      // event ID
          else
             SetGlobalVariable(sparam,AUTO_TRADE_ONN);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4076,6 +4134,7 @@ void OnChartEvent(const int     id,      // event ID
 
          Draw_Schedule();
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -4099,6 +4158,7 @@ void OnChartEvent(const int     id,      // event ID
 
          OpenChartWindow(symbol,PERIOD);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
       //-----------------------------------------------------------------------
@@ -4115,6 +4175,7 @@ void OnChartEvent(const int     id,      // event ID
 
          init_sl_tp_trendline(false);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4151,6 +4212,7 @@ void OnChartEvent(const int     id,      // event ID
          FindSL(Period(), trend_revese, 15);
          init_sl_tp_trendline(false);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4197,44 +4259,65 @@ void OnChartEvent(const int     id,      // event ID
            }
 
          init_sl_tp_trendline(false);
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
+         return;
+        }
+
+      if(is_same_symbol(sparam,BtnResetTimeline))
+        {
+         Reset_Fibo_Timelines(Period());
+         Sleep100();
+         SaveTimelinesToFile(false);
+
+         string trend_stoc_w3 = get_trend_by_stoc2(symbol,PERIOD_W1,3,3,3,0);
+         string trend_stoc_d2 = get_trend_by_stoc2(symbol,PERIOD_D1,3,2,3,0);
+
+         ObjectSetInteger(0,BtnSetTimeHere+".iHigh",OBJPROP_BGCOLOR,clrYellow);
+         ObjectSetInteger(0,BtnSetTimeHere+".iLow",OBJPROP_BGCOLOR,clrYellow);
+         ObjectSetInteger(0,BtnMid3d,OBJPROP_BGCOLOR,clrYellow);
+
+         if(is_same_symbol(trend_stoc_w3, trend_stoc_d2))
+           {
+            setPriceMid3d(symbol);
+            ObjectSetInteger(0,BtnMid3d,OBJPROP_BGCOLOR,clrPaleTurquoise);
+           }
+
+         if(is_same_symbol(trend_stoc_w3, TREND_BUY) && is_same_symbol(trend_stoc_d2, TREND_SEL))
+           {
+            setPriceHigLowC1(BtnSetTimeHere+".iLow", symbol);
+            ObjectSetInteger(0,BtnSetTimeHere+".iLow",OBJPROP_BGCOLOR,clrPaleTurquoise);
+           }
+
+         if(is_same_symbol(trend_stoc_w3, TREND_SEL) && is_same_symbol(trend_stoc_d2, TREND_BUY))
+           {
+            setPriceHigLowC1(BtnSetTimeHere+".iHigh", symbol);
+            ObjectSetInteger(0,BtnSetTimeHere+".iHigh",OBJPROP_BGCOLOR,clrPaleTurquoise);
+           }
+
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
       if(is_same_symbol(sparam,BtnMid3d))
         {
-         double mid3d=getPriceMid3d(symbol);
-         double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
-         double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
-         string trend = (LM>SL)?TREND_BUY:TREND_SEL;
+         setPriceMid3d(symbol);
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
+         return;
+        }
 
-         double NEW_LM = mid3d;
-         if(NEW_LM>LM)
-            if(trend==TREND_BUY)
-               SL=SL-(NEW_LM-LM);
-            else
-               SL=SL+(NEW_LM-LM);
-         else
-            if(trend==TREND_BUY)
-               SL=SL+(NEW_LM-LM);
-            else
-               SL=SL-(NEW_LM-LM);
+      if(is_same_symbol(sparam,BtnSetTimeHere))
+        {
+         if(is_same_symbol(sparam,".C3"))
+           {
+            ResetTimer3Candle(symbol);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
+            return;
+           }
 
-         double amp_w1,amp_d1,amp_h4,amp_h1;
-         GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
-         string trend_stoc_w3 = get_trend_by_stoc2(symbol,PERIOD_W1,3,3,3,0);
+         setPriceHigLowC1(sparam, symbol);
 
-         if(trend_stoc_w3==TREND_BUY)
-            SL=NEW_LM-amp_w1;
-         else
-            SL=NEW_LM+amp_w1;
-
-         SetGlobalVariable(GLOBAL_VAR_LM+symbol,NEW_LM);
-         SetGlobalVariable(GLOBAL_VAR_SL+symbol,SL);
-
-         init_sl_tp_trendline(false);
-         DrawFiboTimeZone52H4(Period(),false);
-         ChartRedraw();
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -4251,6 +4334,7 @@ void OnChartEvent(const int     id,      // event ID
 
          init_sl_tp_trendline(false);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4263,6 +4347,7 @@ void OnChartEvent(const int     id,      // event ID
          if(is_same_symbol(sparam,"??"))
            {
             DrawFiboTimeZone52H4(Period(),true);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -4290,6 +4375,7 @@ void OnChartEvent(const int     id,      // event ID
               }
 
 
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
             return;
            }
@@ -4297,6 +4383,7 @@ void OnChartEvent(const int     id,      // event ID
          if(is_same_symbol(sparam,"00"))
            {
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
             return;
            }
@@ -4314,6 +4401,7 @@ void OnChartEvent(const int     id,      // event ID
          if(LM<SL)//TREND_SEL
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM+amp_trade);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4334,6 +4422,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             string msg=get_vnhour()+" "+symbol+" H4 (WDH) NotAllow "+find_trend;
             Alert(msg);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -4355,6 +4444,7 @@ void OnChartEvent(const int     id,      // event ID
                SetGlobalVariable(sparam+symbol,AUTO_TRADE_SEL);
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4389,9 +4479,11 @@ void OnChartEvent(const int     id,      // event ID
             LoadTradeBySeqEvery5min(false);
             LoadSLTPEvery5min(false);
 
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -4403,6 +4495,7 @@ void OnChartEvent(const int     id,      // event ID
          if(result==IDYES)
             ModifyTpEntry(symbol);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4428,6 +4521,7 @@ void OnChartEvent(const int     id,      // event ID
 
          ModifyTp(symbol,TREND,cur_price);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4446,6 +4540,7 @@ void OnChartEvent(const int     id,      // event ID
             else
                FindSL(PERIOD_W1, trend, 3);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4463,6 +4558,7 @@ void OnChartEvent(const int     id,      // event ID
 
          ModifySL(symbol,trend,SL);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4478,6 +4574,7 @@ void OnChartEvent(const int     id,      // event ID
          if(LM<SL)//TREND_SEL
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,SL+amp_sl);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4493,6 +4590,7 @@ void OnChartEvent(const int     id,      // event ID
             SetGlobalVariable(BtnWaitMacdM5ThenAutoTrade+temp_symbol,trade_type);
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4507,6 +4605,7 @@ void OnChartEvent(const int     id,      // event ID
             SetGlobalVariable(BtnWaitMacdM5ThenAutoTrade+temp_symbol,AUTO_TRADE_OFF);
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4521,6 +4620,7 @@ void OnChartEvent(const int     id,      // event ID
             SetGlobalVariable(BtnNoticeSeq102050M5+temp_symbol,AUTO_TRADE_OFF);
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4536,6 +4636,7 @@ void OnChartEvent(const int     id,      // event ID
             SetGlobalVariable(BtnNoticeSeq102050M5+temp_symbol,trade_type);
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4547,21 +4648,25 @@ void OnChartEvent(const int     id,      // event ID
          if((MathAbs(trade_type)==MathAbs(AUTO_TRADE_BUY)))
            {
             SetGlobalVariable(sparam+symbol,AUTO_TRADE_SEL);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
            }
          else
             if(MathAbs(trade_type)==MathAbs(AUTO_TRADE_SEL))
               {
                SetGlobalVariable(sparam+symbol,AUTO_TRADE_OFF);
+               SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
                OnInit();
               }
             else
                if(MathAbs(trade_type)==MathAbs(AUTO_TRADE_OFF))
                  {
                   SetGlobalVariable(sparam+symbol,AUTO_TRADE_BUY);
+                  SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
                   OnInit();
                  }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -4589,6 +4694,7 @@ void OnChartEvent(const int     id,      // event ID
 
          SetGlobalVariable(BtnCloseWhen_,value);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4650,6 +4756,7 @@ void OnChartEvent(const int     id,      // event ID
          SetGlobalVariable(BtnNoticeMaCross+symbol+"_H1",(double)find_trend_H1);
          SetGlobalVariable(BtnNoticeMaCross+symbol+"_H4",(double)find_trend_H4);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4662,6 +4769,7 @@ void OnChartEvent(const int     id,      // event ID
          if(is_same_symbol(sparam,BtnResetMaCross+"_H4"))
             SetGlobalVariable(BtnNoticeMaCross+symbol+"_H4",0.0);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4679,6 +4787,7 @@ void OnChartEvent(const int     id,      // event ID
 
          OpenChartWindow(buttonLabel,(ENUM_TIMEFRAMES)intPeriod);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -4704,6 +4813,7 @@ void OnChartEvent(const int     id,      // event ID
 
          OpenChartWindow(buttonLabel,(ENUM_TIMEFRAMES)intPeriod);
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -4716,6 +4826,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             CloseLimitOrder(symbol,TREND_BUY);
             CloseLimitOrder(symbol,TREND_SEL);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
             return;
            }
@@ -4734,7 +4845,8 @@ void OnChartEvent(const int     id,      // event ID
             string msg = buttonLabel+"?\n";
             int result = MessageBox(msg,"Confirm",MB_YESNOCANCEL);
             if(result!=IDYES)
-               return;
+               SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
+            return;
            }
 
          CloseLimitOrder(symbol,TREND_BUY);
@@ -4743,6 +4855,7 @@ void OnChartEvent(const int     id,      // event ID
          ClosePositionByTrend(symbol,TREND_SEL);
 
          ObjectsDeleteAll(0);
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
          return;
         }
@@ -4753,7 +4866,8 @@ void OnChartEvent(const int     id,      // event ID
          Print("The lparam=",sparam," dparam=",dparam," sparam=",sparam," buttonLabel=",buttonLabel," was clicked");
 
          if(is_same_symbol(buttonLabel,symbol)==false)
-            return;
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
+         return;
 
          //string msg = buttonLabel+"?\n";
          //int result = MessageBox(msg,"Confirm",MB_YESNOCANCEL);
@@ -4762,6 +4876,7 @@ void OnChartEvent(const int     id,      // event ID
             ClosePositivePosition(symbol,TREND_BUY);
             ClosePositivePosition(symbol,TREND_SEL);
 
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
             return;
            }
@@ -4783,6 +4898,7 @@ void OnChartEvent(const int     id,      // event ID
                CloseLimitOrder(temp_symbol,TREND_SEL);
               }
 
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
             return;
            }
@@ -4803,6 +4919,7 @@ void OnChartEvent(const int     id,      // event ID
                ClosePositivePosition(temp_symbol,TREND_SEL);
               }
 
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
             return;
            }
@@ -4842,6 +4959,7 @@ void OnChartEvent(const int     id,      // event ID
                   LoadSLTPEvery5min(false);
                  }
 
+               SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
                OnInit();
                return;
               }
@@ -4852,6 +4970,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             WriteFileContent(FILE_MSG_LIST_R2C1,"");
             CreateMessagesBtn(BtnMsgR2C1_);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -4859,6 +4978,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             WriteFileContent(FILE_MSG_LIST_R2C2,"");
             CreateMessagesBtn(BtnMsgR2C2_);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -4868,6 +4988,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             WriteFileContent(FILE_MSG_LIST_R1C5,"");
             CreateMessagesBtn(BtnMsgR1C5_);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -4875,6 +4996,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             WriteFileContent(FILE_MSG_LIST_R1C4,"");
             CreateMessagesBtn(BtnMsgR1C4_);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -4882,6 +5004,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             WriteFileContent(FILE_MSG_LIST_R1C3,"");
             CreateMessagesBtn(BtnMsgR1C3_);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -4889,6 +5012,7 @@ void OnChartEvent(const int     id,      // event ID
            {
             WriteFileContent(FILE_MSG_LIST_R1C2,"");
             CreateMessagesBtn(BtnMsgR1C2_);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -4896,9 +5020,11 @@ void OnChartEvent(const int     id,      // event ID
            {
             WriteFileContent(FILE_MSG_LIST_R1C1,"");
             CreateMessagesBtn(BtnMsgR1C1_);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -4951,6 +5077,7 @@ void OnChartEvent(const int     id,      // event ID
             //
             //            Alert("InCond: " + result2);
 
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
             return;
            }
@@ -5010,6 +5137,7 @@ void OnChartEvent(const int     id,      // event ID
             && is_same_symbol(trend_now,trend_stoc_w3)==false)
            {
             Alert("Hệ thống không cho đánh ngược xu hướng STOC_W3 và Ma10.D1[0] của "+symbol);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
 
@@ -5042,6 +5170,7 @@ void OnChartEvent(const int     id,      // event ID
          if(count_trade>1)
            {
             Alert("Maximum 2L: "+ symbol + "    "+last_comment);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             return;
            }
          //------------------------------------------------------------
@@ -5098,9 +5227,11 @@ void OnChartEvent(const int     id,      // event ID
                   m_trade.SellStop(volume,entry,symbol,real_sl,TP1, ORDER_TIME_SPECIFIED, expiration_time_25h,comment_mk1);
               }
 
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
            }
 
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          return;
         }
 
@@ -5193,7 +5324,7 @@ void OnChartEvent(const int     id,      // event ID
               {
                //string msg=get_vnhour()+" "+symbol+" H4(Hei|Ma10|Ma20|Ma50) || D0 NotAllow "+trend_now;
                //Alert(msg);
-               //return;
+               //SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);return;
               }
 
             amp_sl=MathAbs(bid-SL);
@@ -5236,6 +5367,7 @@ void OnChartEvent(const int     id,      // event ID
 
 
             ObjectsDeleteAll(0);
+            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
             OnInit();
             return;
            }
@@ -5244,10 +5376,11 @@ void OnChartEvent(const int     id,      // event ID
       //-----------------------------------------------------------------------
       ObjectSetInteger(0,sparam,OBJPROP_STATE,false);
       ChartRedraw();
+      SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
      }
+
+   SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
   }
-
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -5999,7 +6132,7 @@ void CreateMessagesBtn(string BtnSeq___)
    string BtnClearMessage=BtnClearMessageR1C1;
    string FILE_NAME_MSG_LIST=FILE_MSG_LIST_R1C1;
    int x_position=COL_1; //+260
-   int y_position=70;
+   int y_position=50;
    string prifix=PRIFIX_MA10;
    color clrBgColor = clrWhite;
 
@@ -6077,8 +6210,8 @@ void CreateMessagesBtn(string BtnSeq___)
         }
      }
 
-   if(ArraySize(messageArray) > 0)
-      createButton(BtnClearMessage,"Clear",x_position,y_position-20,50,18,clrBlack,clrWhite,6);
+//if(ArraySize(messageArray) > 0)
+//   createButton(BtnClearMessage,"Clear",x_position,y_position-20,50,18,clrBlack,clrWhite,6);
 
    string total_comments="";
    int size = getArraySymbolsSize();
