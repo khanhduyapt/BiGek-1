@@ -197,9 +197,9 @@ string ARR_SYMBOLS_CENT[] =
   {
    "XAUUSDc"
    ,"NZDJPYc","GBPJPYc","USDJPYc"//,"AUDJPYc","EURJPYc"
-   ,"AUDUSDc" //,"AUDCHFc","EURCHFc","GBPCHFc"
+   ,"AUDUSDc" //,"AUDCHFc","EURCHFc","GBPCHFc","EURUSDc"
    ,"EURAUDc","EURCADc","EURNZDc","GBPNZDc"
-   ,"EURGBPc","EURUSDc","GBPUSDc","NZDUSDc"
+   ,"EURGBPc","GBPUSDc","NZDUSDc"
    ,"USDCADc","USDCHFc"
    ,"BTCUSDc"
   };
@@ -208,7 +208,7 @@ string ARR_SYMBOLS_FTMO[] =
   {
    "XAUUSD"
    ,"NZDJPY","GBPJPY","USDJPY"//,"AUDJPY","EURJPY"
-   ,"AUDUSD","NZDUSD","EURAUD","EURNZD","EURGBP"
+   ,"AUDUSD","NZDUSD","EURAUD","EURGBP"//,"EURNZD"
    ,"GBPNZD","EURUSD","GBPUSD","USDCAD","USDCHF"
    ,"BTCUSD","USOIL.cash","US30.cash","US500.cash","US100.cash","GER40.cash","JP225.cash" //"USOIL","US30","US500","FR40","JP225","XAGUSD"
 //,"BTCUSD","XTIUSD","US30","SP500","NAS100","DAX40","JPN225" //"USOIL","US30","US500","FR40","JP225"
@@ -219,7 +219,7 @@ string ARR_SYMBOLS_THE5[] =
    "XAUUSD"
    ,"AUDJPY","GBPJPY","USDJPY"//,"NZDJPY","EURJPY","NZDUSD","EURGBP","USDCHF","GBPUSD","BTCUSD"
    ,"AUDUSD","EURAUD"//,"EURNZD"
-   ,"GBPNZD","EURUSD"//,"USDCAD"
+   ,"GBPNZD","GBPUSD"//,"USDCAD","EURUSD"
 //,"USOIL.cash","US30.cash","US500.cash","US100.cash","GER40.cash","JP225.cash" //"USOIL","US30","US500","FR40","JP225","XAGUSD"
    ,"BTCUSD","XTIUSD","SP500","JPN225"//,"US30","NAS100","DAX40" //"USOIL","US30","US500","FR40","JP225"
   };
@@ -1082,7 +1082,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
       ObjectDelete(0,BtnReSetTPEntry);
       if(strBSL!="")
-         createButton(BtnReSetTPEntry,"Tp.Entry",start_group_reverse-270,y_start-10,60,20,clrBlack,clrWhite);
+         createButton(BtnReSetTPEntry,"Tp.Entry",start_group_reverse-50,y_start-10,60,20,clrBlack,clrWhite);
 
       createButton(BtnSetAmpTrade+"??","Amp",start_group_reverse+170+35*0,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"W1","W1 " + DoubleToString(volme_by_amp_w1,2)+" lot", start_group_reverse+170+35*1,y_start-10,30*3,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
@@ -1131,7 +1131,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    ObjectDelete(0,BtnCloseSymbol);
    if(is_same_symbol(strBSL,"$"))
-      createButton(BtnCloseSymbol,"Close "+symbol+" "+strBSL +"("+(string)opening+"/"+(string)MAXIMUM_OPENING+"L)  "
+      createButton(BtnCloseSymbol,"Close(+) "+symbol+" "+strBSL +"("+(string)opening+"/"+(string)MAXIMUM_OPENING+"L)  "
                    ,chart_width/2-370,0,300,25,clrBlack,clrLightGray,7,1);
   }
 //+------------------------------------------------------------------+
@@ -1776,6 +1776,21 @@ void CheckTrendlineUpdates(bool re_draw=false)
       LM=lm_price;
       re_draw_rr=true;
       SetGlobalVariable(GLOBAL_VAR_LM+symbol,LM);
+     }
+
+
+   if(re_draw)
+     {
+      double amp_w1,amp_d1,amp_h4,amp_h1;
+      GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
+      if(LM>SL)
+         SL=LM-amp_w1;
+      if(LM<SL)
+         SL=LM+amp_w1;
+
+      SetGlobalVariable(GLOBAL_VAR_SL+symbol,SL);
+      init_sl_tp_trendline(false);
+      OnInit();
      }
   }
 //+------------------------------------------------------------------+
@@ -2587,13 +2602,15 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size, 
             if(histogram>0)
               {
                double low=iLow(symbol,timeframe,lowest_negative_index);
+               double entry_buy=iHigh(symbol,timeframe,lowest_negative_index);
                datetime time=iTime(symbol, timeframe, lowest_negative_index);
 
-               create_trend_line(TF+"MACD_LOW_L" + appendZero100(lowest_negative_index)+"_",time,low,time-amp_time,low,clrBlue,STYLE_SOLID,dot_size);
+               create_vertical_line(TF+"MACD_LOW_V_" + appendZero100(lowest_negative_index)+".",time,clrBlue,STYLE,vertical_width);
+
+               create_trend_line(TF+"MACD_ENTRY_BUY_"+TF+"_"+ appendZero100(lowest_negative_index)+"_",time,entry_buy,time+TIME_OF_ONE_W1_CANDLE,entry_buy,clrBlue,STYLE_SOLID,3);
+
                create_lable_simple2(TF+"MACD_LOW_B" + appendZero100(lowest_negative_index),"{"+StringSubstr(TF,0,3)+"}",low-candle_height,clrFireBrick,time,ANCHOR_CENTER);
 
-               if(draw_fan)
-                  create_vertical_line(TF+"MACD_LOW_V" + appendZero100(lowest_negative_index)+".",time,clrLightGreen,STYLE,vertical_width);
                if(timeframe==PERIOD_D1)
                   create_trend_line(TF+"MACD_LOW_D" + appendZero100(lowest_negative_index),time,low,time+1,low,clrDodgerBlue,STYLE_SOLID,dot); //
 
@@ -2627,13 +2644,15 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size, 
             if(histogram<0)
               {
                double hig=iHigh(symbol,timeframe,highest_positive_index);
+               double entry_sel = iLow(symbol,timeframe,highest_positive_index);
                datetime time=iTime(symbol, timeframe, highest_positive_index);
 
-               create_trend_line(TF+"MACD_HIG_L" + appendZero100(highest_positive_index)+"_",time,hig, time-amp_time,hig,clrRed,STYLE_SOLID,dot_size);
+               create_vertical_line(TF+"MACD_HIG_V_" + appendZero100(highest_positive_index)+".", time,clrRed,STYLE,vertical_width);
+
+               create_trend_line(TF+"MACD_ENTRY_SEL_"+TF+"_"+ appendZero100(highest_positive_index)+"_",time,entry_sel,time+TIME_OF_ONE_W1_CANDLE,entry_sel,clrRed,STYLE_SOLID,3);
+
                create_lable_simple2(TF+"MACD_HIG_S" + appendZero100(highest_positive_index),"{"+StringSubstr(TF,0,3)+"}",hig+candle_height,clrBlue,time,ANCHOR_CENTER);
 
-               if(draw_fan)
-                  create_vertical_line(TF+"MACD_HIG_V" + appendZero100(highest_positive_index)+".", time,clrPink,STYLE,vertical_width);
                if(timeframe==PERIOD_D1)
                   create_trend_line(TF+"MACD_HIG_D" + appendZero100(highest_positive_index),time,hig,time+1,hig,clrTomato,STYLE_SOLID,dot); //
 
@@ -2651,7 +2670,7 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size, 
         }
      }
 
-   if(false && draw_fan)
+   if(false)
      {
       double mid_price=(max_price+min_price)/2;
       int index_mid_price=(int)(MathAbs(index_max_price+index_min_price)/2);
@@ -2663,42 +2682,6 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size, 
 
       datetime time_date_max=MathMax(time_max_price,time_min_price);
       datetime time_date_min=MathMin(time_max_price,time_min_price);
-
-      create_vertical_line(TF+".MACD.V.HIGEST",time_max_price,clrBlue, STYLE_SOLID,1);
-      create_vertical_line(TF+".MACD.V.MIDERS",time_mid_price,clrGreen,STYLE_SOLID,1);
-      create_vertical_line(TF+".MACD.V.LOWEST",time_min_price,clrBlue, STYLE_SOLID,1);
-
-      int amp_index=index_mid_price-index_min;
-      datetime next_time=iTime(symbol,timeframe,index_min)-amp_time*amp_index;
-
-      //create_vertical_line(TF+".MACD.V.PRE",MathMax(time_min_price,time_max_price)-amp_time*amp_index,clrBlue, STYLE_SOLID,2);
-      //create_vertical_line(TF+".MACD.V.NEX",next_time,clrBlue, STYLE_SOLID,2);
-      DrawFibonacciTimeZones(TF+".MACD.V.NEX", time_mid_price,time_date_max,mid_price);
-
-      create_trend_line(TF+".MACD.HIGEST",time_min_price,max_price,time_max_price,max_price,clrBlue, STYLE_SOLID,1);
-      create_trend_line(TF+".MACD.MIDERS",time_min_price,mid_price,time_max_price,mid_price,clrGreen,STYLE_SOLID,1,true,true);
-      create_trend_line(TF+".MACD.LOWEST",time_min_price,min_price,time_max_price,min_price,clrBlue, STYLE_SOLID,1);
-
-      if(index_min_price>index_max_price)
-        {
-         DrawFibonacciFan(TF+"FIBO_FAN_S",iTime(symbol,timeframe,index_min_price),max_price,iTime(symbol,timeframe,index_max_price),mid_price,TREND_SEL);
-         DrawFibonacciFan(TF+"FIBO_FAN_B",iTime(symbol,timeframe,index_min_price),min_price,iTime(symbol,timeframe,index_max_price),(max_price+min_price)/2,TREND_BUY);
-        }
-      else
-        {
-         DrawFibonacciFan(TF+"FIBO_FAN_S",iTime(symbol,timeframe,index_max_price),max_price,iTime(symbol,timeframe,index_min_price),mid_price,TREND_SEL);
-         DrawFibonacciFan(TF+"FIBO_FAN_B",iTime(symbol,timeframe,index_max_price),min_price,iTime(symbol,timeframe,index_min_price),(max_price+min_price)/2,TREND_BUY);
-        }
-
-
-      string trendIdx1=m_buff_MACD_main[0]>0?TREND_BUY:TREND_SEL;
-
-      //if(trendIdx1==TREND_SEL)
-      DrawFibonacciRetracement("_Fibo_1",time_date_min,max_price,time_date_min,min_price);
-
-      //if(trendIdx1==TREND_BUY)
-      //   DrawFibonacciRetracement("_Fibo_1",date1,price1,date2,price2);
-
       //--------------------------------------------------------------------------------------------
       if(Period()<=PERIOD_D1)
         {
@@ -2712,7 +2695,6 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size, 
          datetime sub_time;
          double sub_price;
          ChartXYToTimePrice(0,10,y_start-25,sub_window,sub_time,sub_price);
-
 
          for(int i=index_min+265; i>=-265; i--)
            {
@@ -3937,14 +3919,25 @@ void OnChartEvent(const int     id,      // event ID
 
    if(id==CHARTEVENT_OBJECT_DRAG)
      {
-      if(is_same_symbol(sparam,GLOBAL_VAR_SL) || is_same_symbol(sparam,GLOBAL_VAR_LM))
+      if(is_same_symbol(sparam,GLOBAL_VAR_LM))
         {
          string objName = ObjectGetString(0,sparam,OBJPROP_NAME);
          Print(sparam," was DRAG");
 
          CheckTrendlineUpdates(true);
          SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
-         OnInit();
+
+         return;
+        }
+      if(is_same_symbol(sparam,GLOBAL_VAR_SL))
+        {
+         string objName = ObjectGetString(0,sparam,OBJPROP_NAME);
+         Print(sparam," was DRAG");
+
+         CheckTrendlineUpdates();
+         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
+         init_sl_tp_trendline(false);
+         //OnInit();
          return;
         }
 
