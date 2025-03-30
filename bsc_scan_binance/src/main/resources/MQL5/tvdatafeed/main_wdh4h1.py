@@ -341,21 +341,26 @@ def copy_files(source_folder, target_folder):
 
 if __name__ == "__main__":
     
-    output_folder_thinkpad_x1 = r"C:\Users\DellE5270\AppData\Roaming\MetaQuotes\Terminal\53785E099C927DB68A545C249CDBCE06\MQL5\Files"
-    output_folder_desktop_cty = r"C:\Users\Admin\AppData\Roaming\MetaQuotes\Terminal\53785E099C927DB68A545C249CDBCE06\MQL5\Files"
-    # Lấy thư mục hiện tại của chương trình
-    # current_folder = os.getcwd()
-    # output_folder = os.path.join(current_folder, "Files")
+    ea_output_folder_desktop_cty = r"C:\Users\Admin\AppData\Roaming\MetaQuotes\Terminal\53785E099C927DB68A545C249CDBCE06\MQL5\Files"
+    ea_output_folder_thinkpad_x1 = r"C:\Users\DellE5270\AppData\Roaming\MetaQuotes\Terminal\53785E099C927DB68A545C249CDBCE06\MQL5\Files"
+    ea_output_folder_c470 = r"C:\Users\Admin\AppData\Roaming\MetaQuotes\Terminal\37D62096151F7BC42432CE8CFF2333E3\MQL5\Files"
+
+    ea_output_folder = ea_output_folder_desktop_cty
     output_folder = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\Files"
     file_name = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
-    
+
     if not os.path.exists(output_folder):
         print(f"Folder not exists: {output_folder}. Creating it...")
         #os.makedirs(output_folder)
         output_folder = r"C:\BiGek-1\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\Files"
         file_name = r"C:\BiGek-1\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
+        ea_output_folder = ea_output_folder_thinkpad_x1
+        if not os.path.exists(output_folder):
+        	output_folder = r"C:\Users\Admin\Desktop\BiGek-1\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\Files"
+        	file_name = r"C:\Users\Admin\Desktop\BiGek-1\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
+        	ea_output_folder = ea_output_folder_c470
 
-    # # Danh sách các cặp tên sàn và mã cổ phiếu
+    # Danh sách các cặp tên sàn và mã cổ phiếu
     # default_symbols = [
     #     ("HOSE", "VNINDEX"),
     #     ("HOSE", "AGR"),
@@ -430,7 +435,4 @@ if __name__ == "__main__":
         # time.sleep(10)
 
     # Copy files to ThinkPad X1 folder if it exists
-    copy_files(output_folder, output_folder_thinkpad_x1)
-
-    # Copy files to Desktop Cty folder if it exists
-    copy_files(output_folder, output_folder_desktop_cty)
+    copy_files(output_folder, ea_output_folder)

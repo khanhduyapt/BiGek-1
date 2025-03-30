@@ -2,3 +2,11 @@ setuptools~=49.2.0
 pandas~=1.0.5
 websocket-client~=0.57.0
 requests
+
+
+
+pip install wheel
+pip install pandas
+pip install requests
+pip install websocket
+pip install websocket-client
