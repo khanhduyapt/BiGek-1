@@ -656,7 +656,7 @@ void DrawButtons()
       createButton(BtnClearTrendline, "Delete",    start_x+50*counter,y_dim,40,20,clrBlack,clrLightGray,7,1);
      }
 //--------------------------------------------------------------------------------------------
-   createButton(BtnClearMessageRxCx,"Checkmate",540+250+460,10,75,30,clrBlack,clrYellowGreen,8);
+   createButton(BtnClearMessageRxCx,"Check",540+250+460,10,75,30,clrBlack,clrYellowGreen,8);
   }
 
 //+------------------------------------------------------------------+
@@ -1246,14 +1246,16 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
         }
       //----------------------------------------------------------------------------------------------------
       string msg_r1c2 = "";
+      double low=iLow(symbol,PERIOD_D1,0);
+      double hig=iHigh(symbol,PERIOD_D1,0);
       if(msg_r1c2 == "")
         {
-         if(iLow(symbol,PERIOD_D1,1) <= arrHeiken_Tf[0].ma10 && arrHeiken_Tf[0].ma10 <= iHigh(symbol,PERIOD_D1,1))
+         if(low <= arrHeiken_Tf[0].ma10 && arrHeiken_Tf[0].ma10 <= hig)
             msg_r1c2 = symbol+" "+TF_TRADING+" Touch.Ma10";
         }
       if(msg_r1c2 == "")
         {
-         if(iLow(symbol,PERIOD_D1,1) <= arrHeiken_Tf[0].ma20 && arrHeiken_Tf[0].ma20 <= iHigh(symbol,PERIOD_D1,1))
+         if(low <= arrHeiken_Tf[0].ma20 && arrHeiken_Tf[0].ma20 <= hig)
             msg_r1c2 = symbol+" "+TF_TRADING+" Touch.Ma20";
         }
 
@@ -1278,7 +1280,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          PushMessage(msg_r1c2,FILE_MSG_LIST_R1C2);
         }
       //----------------------------------------------------------------------------------------------------
-      if(allow_PushMessage(symbol,FILE_MSG_LIST_R1C3))
+      if(false && allow_PushMessage(symbol,FILE_MSG_LIST_R1C3))
         {
          int count_histogram_061209 =50;
          string trend_histogram_061209 = "";
@@ -1317,7 +1319,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
            }
         }
       //----------------------------------------------------------------------------------------------------
-      if(allow_PushMessage(symbol,FILE_MSG_LIST_R1C4))
+      if(false && allow_PushMessage(symbol,FILE_MSG_LIST_R1C4))
         {
          int count_histogram_061209 =50;
          string trend_histogram_061209 = "";
@@ -2609,10 +2611,10 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size, 
 
                create_trend_line(TF+"MACD_ENTRY_BUY_"+TF+"_"+ appendZero100(lowest_negative_index)+"_",time,entry_buy,time+TIME_OF_ONE_W1_CANDLE,entry_buy,clrBlue,STYLE_SOLID,3);
 
-               create_lable_simple2(TF+"MACD_LOW_B" + appendZero100(lowest_negative_index),"{"+StringSubstr(TF,0,3)+"}",low-candle_height,clrFireBrick,time,ANCHOR_CENTER);
+               create_lable_simple2(TF+"MACD_LOW_B" + appendZero100(lowest_negative_index),"{"+StringSubstr(TF,0,3)+"}",low-candle_height,clrBlue,time,ANCHOR_CENTER);
 
                if(timeframe==PERIOD_D1)
-                  create_trend_line(TF+"MACD_LOW_D" + appendZero100(lowest_negative_index),time,low,time+1,low,clrDodgerBlue,STYLE_SOLID,dot); //
+                  create_trend_line(TF+"MACD_LOW_D" + appendZero100(lowest_negative_index),time,low,time+1,low,clrBlue,STYLE_SOLID,dot); //
 
                if(min_price==0 || min_price>low)
                  {
@@ -2651,10 +2653,10 @@ void Draw_MACD_Extremes(string symbol, ENUM_TIMEFRAMES timeframe, int dot_size, 
 
                create_trend_line(TF+"MACD_ENTRY_SEL_"+TF+"_"+ appendZero100(highest_positive_index)+"_",time,entry_sel,time+TIME_OF_ONE_W1_CANDLE,entry_sel,clrRed,STYLE_SOLID,3);
 
-               create_lable_simple2(TF+"MACD_HIG_S" + appendZero100(highest_positive_index),"{"+StringSubstr(TF,0,3)+"}",hig+candle_height,clrBlue,time,ANCHOR_CENTER);
+               create_lable_simple2(TF+"MACD_HIG_S" + appendZero100(highest_positive_index),"{"+StringSubstr(TF,0,3)+"}",hig+candle_height,clrRed,time,ANCHOR_CENTER);
 
                if(timeframe==PERIOD_D1)
-                  create_trend_line(TF+"MACD_HIG_D" + appendZero100(highest_positive_index),time,hig,time+1,hig,clrTomato,STYLE_SOLID,dot); //
+                  create_trend_line(TF+"MACD_HIG_D" + appendZero100(highest_positive_index),time,hig,time+1,hig,clrRed,STYLE_SOLID,dot); //
 
                if(max_price==0 || max_price<hig)
                  {
@@ -5123,13 +5125,13 @@ void OnChartEvent(const int     id,      // event ID
          if(is_same_symbol(trend_now,trend_stoc_w3)==false)
             msg+="\n\nChú ý: Đang đánh ngược xu hướng STOC_W3.";
 
-         if(is_same_symbol(trend_now,arrHeiken_D1[0].trend_by_ma10)==false
-            && is_same_symbol(trend_now,trend_stoc_w3)==false)
-           {
-            Alert("Hệ thống không cho đánh ngược xu hướng STOC_W3 và Ma10.D1[0] của "+symbol);
-            SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
-            return;
-           }
+         //if(is_same_symbol(trend_now,arrHeiken_D1[0].trend_by_ma10)==false
+         //   && is_same_symbol(trend_now,trend_stoc_w3)==false)
+         //  {
+         //   Alert("Hệ thống không cho đánh ngược xu hướng STOC_W3 và Ma10.D1[0] của "+symbol);
+         //   SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
+         //   return;
+         //  }
 
          double volume = calc_volume_by_amp(symbol,amp_sl,risk);
          //------------------------------------------------------------

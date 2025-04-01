@@ -345,9 +345,9 @@ if __name__ == "__main__":
     ea_output_folder_thinkpad_x1 = r"C:\Users\DellE5270\AppData\Roaming\MetaQuotes\Terminal\53785E099C927DB68A545C249CDBCE06\MQL5\Files"
     ea_output_folder_c470 = r"C:\Users\Admin\AppData\Roaming\MetaQuotes\Terminal\37D62096151F7BC42432CE8CFF2333E3\MQL5\Files"
 
-    ea_output_folder = ea_output_folder_desktop_cty
     output_folder = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\Files"
     file_name = r"D:\01_Projects\BiGek\bsc_scan_binance\src\main\resources\MQL5\tvdatafeed\symbols.json"
+    ea_output_folder = ea_output_folder_desktop_cty
 
     if not os.path.exists(output_folder):
         print(f"Folder not exists: {output_folder}. Creating it...")
