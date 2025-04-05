@@ -1,7 +1,5 @@
 [
     ["HOSE","VNINDEX"],
-    ["HOSE","MSB"],
-    ["HOSE","OCB"],
     ["HOSE","ACB"],
     ["HOSE","BID"],
     ["HOSE","CTG"],
@@ -11,7 +9,9 @@
     ["HOSE","HVN"],
     ["HOSE","LPB"],
     ["HOSE","MBB"],
+    ["HOSE","MSB"],
     ["HOSE","NAB"],
+    ["HOSE","OCB"],
     ["HOSE","POW"],
     ["HOSE","SHB"],
     ["HOSE","SSB"],
@@ -32,5 +32,19 @@
     ["UPCOM","PGB"],
     ["UPCOM","SGB"],
     ["UPCOM","VAB"],
-    ["UPCOM","VBB"] 
+    ["UPCOM","VBB"],
+    ["ICMARKETS","AUDUSD"],
+    ["ICMARKETS","BTCUSD"],
+    ["ICMARKETS","DE40"],
+    ["ICMARKETS","EURUSD"],
+    ["ICMARKETS","GBPUSD"],
+    ["ICMARKETS","JP225"],
+    ["ICMARKETS","NZDUSD"],
+    ["ICMARKETS","US30"],
+    ["ICMARKETS","US500"],
+    ["ICMARKETS","USDCAD"],
+    ["ICMARKETS","USDCHF"],
+    ["ICMARKETS","USDJPY"],
+    ["ICMARKETS","XAUUSD"],
+    ["ICMARKETS","XTIUSD"] 
 ]
