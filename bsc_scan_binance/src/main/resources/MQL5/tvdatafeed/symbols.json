@@ -33,18 +33,11 @@
     ["UPCOM","SGB"],
     ["UPCOM","VAB"],
     ["UPCOM","VBB"],
-    ["ICMARKETS","AUDUSD"],
     ["ICMARKETS","BTCUSD"],
     ["ICMARKETS","DE40"],
-    ["ICMARKETS","EURUSD"],
-    ["ICMARKETS","GBPUSD"],
     ["ICMARKETS","JP225"],
-    ["ICMARKETS","NZDUSD"],
     ["ICMARKETS","US30"],
     ["ICMARKETS","US500"],
-    ["ICMARKETS","USDCAD"],
-    ["ICMARKETS","USDCHF"],
-    ["ICMARKETS","USDJPY"],
     ["ICMARKETS","XAUUSD"],
     ["ICMARKETS","XTIUSD"] 
 ]
