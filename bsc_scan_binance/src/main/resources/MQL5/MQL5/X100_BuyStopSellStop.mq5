@@ -1933,12 +1933,12 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM, bool includeC0=
          if(is_same_symbol(trend_histogram_d1,TREND_BUY))
            {
             SetGlobalVariable(GLOBAL_VAR_LM+symbol, higest);
-            SetGlobalVariable(GLOBAL_VAR_SL+symbol, higest-amp_w1);
+            SetGlobalVariable(GLOBAL_VAR_SL+symbol, higest-amp_d1);
            }
          else
            {
             SetGlobalVariable(GLOBAL_VAR_LM+symbol, lowest);
-            SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest+amp_w1);
+            SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest+amp_d1);
            }
         }
       else
@@ -1954,7 +1954,7 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM, bool includeC0=
            {
             SetGlobalVariable(GLOBAL_VAR_LM+symbol, lowest); //lowest
             //SetGlobalVariable(GLOBAL_VAR_SL+symbol, MathMax(MathMax(higest, higest_05_candles), lowest+amp_w1));
-            SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest+amp_w1);
+            SetGlobalVariable(GLOBAL_VAR_SL+symbol, lowest+amp_d1);
            }
         }
 
