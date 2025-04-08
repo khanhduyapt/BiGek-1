@@ -193,22 +193,26 @@ string ACCOUNT_CENT = " ,Exness-MT5Real25:183264196";
 string ACCOUNT_FTMO = " ,FTMO-Server2:520188395";
 string ACCOUNT_THE5 = " ,FivePercentOnline-Real:24479729";
 
-string ARR_SYMBOLS_CENT[] =
-  {
-   "XAUUSDc", "BTCUSDc"
-   , "EURUSDc", "USDJPYc", "GBPUSDc", "USDCHFc", "AUDUSDc", "USDCADc", "NZDUSDc"
-  };
-
 string ARR_SYMBOLS_FTMO[] =
   {
-   "XAUUSD","USOIL.cash","BTCUSD","US30.cash","US500.cash","JP225.cash","GER40.cash"
-   ,"EURUSD", "USDJPY", "GBPUSD", "USDCHF", "AUDUSD", "USDCAD", "NZDUSD"
+   "XAUUSD"
+   , "NZDUSD", "EURUSD", "GBPUSD", "USDJPY", "USDCAD", "USDCHF"//, "AUDUSD"
+   , "USOIL.cash", "BTCUSD", "US30.cash", "US500.cash", "JP225.cash", "GER40.cash"
   };
 
 string ARR_SYMBOLS_THE5[] =
   {
-   "XAUUSD","XTIUSD","BTCUSD","US30","SP500","JPN225"
-   ,"EURUSD", "USDJPY", "GBPUSD", "USDCHF", "AUDUSD", "USDCAD", "NZDUSD"
+   "XAUUSD"
+   , "NZDUSD", "EURUSD", "GBPUSD", "USDJPY", "USDCAD", "USDCHF"//, "AUDUSD"
+   ,"XTIUSD","BTCUSD","US30","SP500","JPN225"
+  };
+
+
+string ARR_SYMBOLS_CENT[] =
+  {
+   "XAUUSDc"
+   , "NZDUSDc", "EURUSDc", "GBPUSDc", "USDJPYc", "USDCADc", "USDCHFc"//, "AUDUSDc"
+   , "BTCUSDc"
   };
 
 const string MAIN_PAIRS="US30,US500,SP500,US100,NAS100,DAX40,GER40, XAUUSD, USOIL, XTIUSD, BTCUSD, EURUSD, USDJPY, GBPUSD, USDCHF, AUDUSD, USDCAD, NZDUSD";
@@ -1277,7 +1281,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          CandleData arrHeiken_H1[];
          get_arr_heiken(symbol,PERIOD_H1,arrHeiken_H1,50,true,true);
 
-         if(is_same_symbol(trend_histogram_d1, arrHeiken_H1[0].trend_by_seq_102050))
+         if(is_same_symbol(trend_histogram_d1, arrHeiken_H1[0].trend_by_seq_102050) && arrHeiken_H1[0].count_ma10<=24)
            {
             string  msg_r1c3 = symbol+" H1 (Seq50) "+arrHeiken_H1[0].trend_by_seq_102050;
             if(is_allow_alert && allow_alert)
@@ -1294,7 +1298,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          CandleData arrHeiken_H4[];
          get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,50,true,true);
 
-         if(is_same_symbol(trend_histogram_d1, arrHeiken_H4[0].trend_by_seq_051020))
+         if(is_same_symbol(trend_histogram_d1, arrHeiken_H4[0].trend_by_seq_051020) && arrHeiken_H4[0].count_ma10<=7)
            {
             string  msg_r1c4 = symbol+" H4 (Seq20) "+arrHeiken_H4[0].trend_by_seq_051020;
             if(is_allow_alert && allow_alert)
