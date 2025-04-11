@@ -203,16 +203,14 @@ string ARR_SYMBOLS_FTMO[] =
 string ARR_SYMBOLS_THE5[] =
   {
    "XAUUSD"
-   , "NZDUSD", "EURUSD", "GBPUSD", "USDJPY", "USDCAD", "USDCHF"//, "AUDUSD"
-   ,"XTIUSD","BTCUSD","US30","SP500","JPN225", "XAGUSD"
+   , "NZDUSD", "EURUSD", "USDJPY", "USDCAD", "USDCHF"//, "AUDUSD", "GBPUSD"
+   ,"XTIUSD","BTCUSD","SP500","JPN225"//,"US30", "XAGUSD"
   };
-
 
 string ARR_SYMBOLS_CENT[] =
   {
-   "XAUUSDc"
-   , "NZDUSDc", "EURUSDc", "GBPUSDc", "USDJPYc", "USDCADc", "USDCHFc"//, "AUDUSDc"
-   , "BTCUSDc", "XAGUSDc"
+   "XAUUSDc", "XAGUSDc", "BTCUSDc"
+   , "NZDUSDc", "EURUSDc", "USDJPYc", "USDCADc"//, "AUDUSDc", "GBPUSDc", "USDCHFc"
   };
 
 const string MAIN_PAIRS="US30,US500,SP500,US100,NAS100,DAX40,GER40, XAUUSD, USOIL, XTIUSD, BTCUSD, EURUSD, USDJPY, GBPUSD, USDCHF, AUDUSD, USDCAD, NZDUSD";
@@ -434,52 +432,50 @@ void DrawButtons()
               {
                bool is_doji_normal = is_Doji(symbol,curPeriod,cIdx);
                if(is_doji_normal)
+                  //create_filled_rectangle("Doji.C"+append1Zero(cIdx)
+                  //                        ,iTime(symbol,curPeriod,cIdx),iLow(symbol,curPeriod,cIdx)
+                  //                        ,iTime(symbol,curPeriod,cIdx-1),iHigh(symbol,curPeriod,cIdx)
+                  //                        ,clrRed,false,false);
                   create_trend_line("Doji.C"+append1Zero(cIdx)
                                     ,iTime(symbol,curPeriod,cIdx),iLow(symbol,curPeriod,cIdx)
                                     ,iTime(symbol,curPeriod,cIdx),iHigh(symbol,curPeriod,cIdx)
-                                    ,clrMistyRose,STYLE_SOLID,5);
+                                    ,clrYellowGreen,STYLE_SOLID,7);
               }
 
-            if(Period() == PERIOD_H4 || Period() == PERIOD_D1)
+            if(is_cur_tab)
               {
-               //   //CandleData arrHeiken_Mn1[];
-               //   //get_arr_heiken(symbol,PERIOD_MN1,arrHeiken_Mn1,55,true,false);
-               //   //
                CandleData arrHeiken_W1[];
                get_arr_heiken(symbol,PERIOD_W1,arrHeiken_W1,55,true,false);
+               DrawCandleIndex(arrHeiken_W1);
 
-               //DrawCandleIndex(arrHeiken_D1);
+               int sub_window, dheigh = 30;
+               datetime temp_time;
+               double temp_space, temp_high, temp_price1, temp_price2, temp_price3, temp_price0, temp_price4;
 
-               if(is_cur_tab)
-                 {
-                  int sub_window, dheigh = 30;
-                  datetime temp_time;
-                  double temp_space, temp_high, temp_price1, temp_price2, temp_price3, temp_price0, temp_price4;
+               if(ChartXYToTimePrice(0, chart_width/2, chart_heigh-dheigh*2, sub_window, temp_time, temp_price1))
+                  if(ChartXYToTimePrice(0, chart_width/2, chart_heigh-dheigh*3, sub_window, temp_time, temp_price2))
+                    {
+                     temp_high = temp_price2-temp_price1;
+                     temp_space = temp_high/5;
+                     temp_price3 = temp_price2+temp_high;
+                     temp_price0 = temp_price1-temp_high;
+                     temp_price4 = temp_price3+temp_high;
 
-                  if(ChartXYToTimePrice(0, chart_width/2, chart_heigh-dheigh*2, sub_window, temp_time, temp_price1))
-                     if(ChartXYToTimePrice(0, chart_width/2, chart_heigh-dheigh*3, sub_window, temp_time, temp_price2))
-                       {
-                        temp_high = temp_price2-temp_price1;
-                        temp_space = temp_high/5;
-                        temp_price3 = temp_price2+temp_high;
-                        temp_price0 = temp_price1-temp_high;
-                        temp_price4 = temp_price3+temp_high;
+                     //CandleData arrHeiken_D1[];
+                     //get_arr_heiken(symbol,PERIOD_D1,arrHeiken_D1,55,true,false);
+                     //DrawCandleIndex(arrHeiken_D1);
 
-                        //CandleData arrHeiken_H4[];
-                        //get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,55,true,false);
+                     //string histogram_w1 = DrawAndCountHistogram(arrHeiken_W1, symbol, PERIOD_W1, true, temp_price2+temp_space, temp_price3);
+                     //string histogram_mn = DrawAndCountHistogram(arrHeiken_Mn1, symbol, PERIOD_MN1, true, temp_price1, temp_price2);
 
-                        //string histogram_w1 = DrawAndCountHistogram(arrHeiken_W1, symbol, PERIOD_W1, true, temp_price2+temp_space, temp_price3);
-
-                        //string histogram_mn = DrawAndCountHistogram(arrHeiken_Mn1, symbol, PERIOD_MN1, true, temp_price1, temp_price2);
-
-                        string histogram_w1 = DrawAndCountHistogram(arrHeiken_W1, symbol, PERIOD_W1, true, temp_price0, temp_price1-temp_space);
-                       }
-                 }
+                     string histogram_w1 = DrawAndCountHistogram(arrHeiken_W1, symbol, PERIOD_W1, true, temp_price0, temp_price1-temp_space);
+                    }
               }
+
            }
         }
       //----------------------------------------------------------------------------------
-      int btn_heigh = index==0?80:20;
+      int btn_heigh = index==0?80:(size<=7)?80:20;
       if(index==0 && size < 11)
          btn_heigh = 80;
       if(index==0 && size >= 11)
@@ -487,12 +483,12 @@ void DrawButtons()
 
       if(index==0)
         {}
-      if(index==6)
-        {count = 0; x = btn_width+45; y = 35; btn_heigh = 20;}
-      if(index==11)
-        {count = 0; x = btn_width+45; y = 65; btn_heigh = 20;}
-      if(index==16)  //BTCUSD
-        {count = 0; x = btn_width+45; y = 95; btn_heigh = 20;}
+      if(index==7)
+        {count = 0; x = btn_width+45; y = 35;}
+      if(index==12)
+        {count = 0; x = btn_width+45; y = 65;}
+      if(index==19)  //BTCUSD
+        {count = 0; x = btn_width+45; y = 95;}
 
       color clrText = clrBlack;
       color clrBackground=clrLightGray;
@@ -583,12 +579,12 @@ void DrawButtons()
       CreateMessagesBtn(BtnMsgR1C5_);
       CreateMessagesBtn(BtnMsgR1C4_);
      }
-//
-//int init_x=20;
-//int init_y=20;
-//int STOC_WINDOW=1;
+
+   int init_x=20;
+   int init_y=5;
+   int STOC_WINDOW=1;
 //string find_trend_H1=(string)GetGlobalVariable(BtnNoticeMaCross+symbol+"_H1");
-//string find_trend_H4=(string)GetGlobalVariable(BtnNoticeMaCross+symbol+"_H4");
+   string find_trend_H4=(string)GetGlobalVariable(BtnNoticeMaCross+symbol+"_H4");
 
 //string str_H1Ma10="(H1) Hei.Ma10"+(is_same_symbol(find_trend_H1,HeivsMa10_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa10_SEL)?" "+TREND_SEL:"");
 //string str_H1Ma20="(H1) Hei.Ma20"+(is_same_symbol(find_trend_H1,HeivsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa20_SEL)?" "+TREND_SEL:"");
@@ -596,24 +592,24 @@ void DrawButtons()
 //string str_H11020="(H1) Hei.1020"+(is_same_symbol(find_trend_H1,HeivsMa10vsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa10vsMa20_SEL)?" "+TREND_SEL:"");
 //string str_H12050="(H1) Hei.2050"+(is_same_symbol(find_trend_H1,HeivsMa20vsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H1,HeivsMa20vsMa50_SEL)?" "+TREND_SEL:"");
 
-//string str_H4Ma10="(H4) Hei.Ma10"+(is_same_symbol(find_trend_H4,HeivsMa10_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa10_SEL)?" "+TREND_SEL:"");
-//string str_H4Ma20="(H4) Hei.Ma20"+(is_same_symbol(find_trend_H4,HeivsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa20_SEL)?" "+TREND_SEL:"");
-//string str_H4Ma50="(H4) Hei.Ma50"+(is_same_symbol(find_trend_H4,HeivsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa50_SEL)?" "+TREND_SEL:"");
+   string str_H4Ma10="(H4) Hei.Ma10"+(is_same_symbol(find_trend_H4,HeivsMa10_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa10_SEL)?" "+TREND_SEL:"");
+   string str_H4Ma20="(H4) Hei.Ma20"+(is_same_symbol(find_trend_H4,HeivsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa20_SEL)?" "+TREND_SEL:"");
+   string str_H4Ma50="(H4) Hei.Ma50"+(is_same_symbol(find_trend_H4,HeivsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa50_SEL)?" "+TREND_SEL:"");
 //string str_H41020="(H4) Hei.1020"+(is_same_symbol(find_trend_H4,HeivsMa10vsMa20_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa10vsMa20_SEL)?" "+TREND_SEL:"");
 //string str_H42050="(H4) Hei.2050"+(is_same_symbol(find_trend_H4,HeivsMa20vsMa50_BUY)?" "+TREND_BUY:"")+(is_same_symbol(find_trend_H4,HeivsMa20vsMa50_SEL)?" "+TREND_SEL:"");
 //
 //bool is_period_h1=Period()==PERIOD_H1;
-//int col_1=25,col_2=col_1+65+5*2,col_3=col_2+150+10,col_4=col_3+150+10,col_5=col_4+150+10,col_6=col_5+150+10,col_7=col_6+150+50;
+   int btn_notice_width = 120;
+   int col_1=25,col_2=col_1+btn_notice_width+10,col_3=col_2+btn_notice_width+10,col_4=col_3+btn_notice_width+10,col_5=col_4+btn_notice_width+10,col_6=col_5+btn_notice_width+10,col_7=col_6+btn_notice_width+50;
 //createButton(BtnResetMaCross+"_H1","[Msg] Del",     col_1,init_y+5,65,25,clrBlack,is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
 //createButton(BtnNoticeMaCross+"_H1Ma10", str_H1Ma10,col_2,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa10_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa10_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
 //createButton(BtnNoticeMaCross+"_H1Ma20", str_H1Ma20,col_3,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa20_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
 //createButton(BtnNoticeMaCross+"_H1Ma50", str_H1Ma50,col_4,init_y+5,150,25,clrBlack,is_same_symbol(find_trend_H1,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H1,HeivsMa50_SEL)?clrActiveSell:is_period_h1?clrWhite:clrLightGray,7,STOC_WINDOW);
 //
-//bool is_period_h4=Period()==PERIOD_H4;
-//createButton(BtnResetMaCross+"_H4","[Msg] Del",     col_1,init_y+45,65,25,clrBlack,is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
-//createButton(BtnNoticeMaCross+"_H4Ma10", str_H4Ma10,col_2,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa10_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa10_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
-//createButton(BtnNoticeMaCross+"_H4Ma20", str_H4Ma20,col_3,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa20_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
-//createButton(BtnNoticeMaCross+"_H4Ma50", str_H4Ma50,col_4,init_y+45,150,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa50_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
+   bool is_period_h4=Period()==PERIOD_H4;
+   createButton(BtnNoticeMaCross+"_H4Ma10", str_H4Ma10,col_1,init_y,btn_notice_width,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa10_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa10_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
+   createButton(BtnNoticeMaCross+"_H4Ma20", str_H4Ma20,col_2,init_y,btn_notice_width,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa20_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa20_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
+   createButton(BtnNoticeMaCross+"_H4Ma50", str_H4Ma50,col_3,init_y,btn_notice_width,25,clrBlack,is_same_symbol(find_trend_H4,HeivsMa50_BUY)?clrActiveBtn:is_same_symbol(find_trend_H4,HeivsMa50_SEL)?clrActiveSell:is_period_h4?clrWhite:clrLightGray,7,STOC_WINDOW);
 
 //--------------------------------------------------------------------------------------------
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
@@ -661,6 +657,8 @@ void DrawButtons()
 //+------------------------------------------------------------------+
 void LoadSLTPEvery5min(bool allow_alert=true)
   {
+   return;
+
 //-------------------------------------------------------------------------------
    bool reload=false;
    double risk_1L = Risk_1L();
@@ -1029,7 +1027,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
    create_dragable_trendline(LINE_RR_13,clrBlue,  rr13,STYLE_SOLID,2);
 
 //bool is_hide_mode=GetGlobalVariable(BtnHideDrawMode)==AUTO_TRADE_ONN;
-   if(false)
+   if(true)
      {
       int _sub_windows;
       datetime _time;
@@ -1038,7 +1036,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
         {
          create_label_simple("Note_SL","SL",SL,clrBlack,time+TIME_OF_ONE_D1_CANDLE);
 
-         for(int rr=-5;rr<=5;rr++)
+         for(int rr=-3;rr<=6;rr++)
            {
             double rr14=trend==TREND_BUY?LM+amp_sl*rr:LM-amp_sl*rr;
             //if((SL>LM && rr14>LM) || (SL<LM && rr14<LM))
@@ -1104,13 +1102,14 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
      {
+      createButton(BtnSetSLHere,"Set SL",   chart_width/2, y_start-10,50,20,clrBlack,clrWhite);
       createButton(BtnFindSL+"_W1","(W1)SL",chart_width-55*3, y_start-10,50,20,clrBlack,clrLightGray);
-      createButton(BtnFindSL+"_D1","(D1)SL",chart_width-55*2, y_start-10,50,20,clrBlack,clrLightGray);
+      createButton(BtnFindSL+"_D1","(D1)SL",chart_width-55*2, y_start-10,50,20,clrBlack,clrYellow);
       createButton(BtnFindSL+"_H4","(H4)SL",chart_width-55*1, y_start-10,50,20,clrBlack,clrLightGray);
      }
 
 //if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
-//   createButton(BtnSetSLHere,"SL "+ DoubleToString(risk,1)+"$",x_start+50, y_start-10,100,20,clrBlack,clrYellow);
+//
 
    createButton(BtnOpenStop1L,trend + " STOP "+ symbol + " " + DoubleToString(volme_by_amp_sl,2)+ "lot ~ R: " + DoubleToString(risk,1)+"$"
                 ,chart_width/2-360+280+10+265+50-260,0,250,25,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell,7,1);
@@ -1191,12 +1190,28 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
    for(int index = 0; index < size; index++)
      {
       string symbol = getSymbolAtIndex(index);
-      string str_index = "("+append1Zero(index)+") ";
+      string str_index = "";//"("+append1Zero(index)+") ";
       //----------------------------------------------------------------------------------------------------
 
       bool is_allow_alert = allow_send_alert(symbol);
       string total_comments="";
       string strBSL=CountBSL(symbol,total_comments);
+      //----------------------------------------------------------------------------------------------------
+      string FILE_MSG_LIST_SL=FILE_MSG_LIST_R1C5;
+      CandleData arrHeiken_W1[];
+      get_arr_heiken(symbol,PERIOD_W1,arrHeiken_W1,20,true,false);
+
+      bool allow_msg_sl = allow_PushMessage(symbol,FILE_MSG_LIST_SL);
+      if(allow_msg_sl && is_same_symbol(arrHeiken_W1[0].trend_by_ma10, TREND_BUY) && is_same_symbol(strBSL, "$ S"))
+        {
+         string msg=" (SL_SELL by Ma10W "+arrHeiken_W1[0].trend_by_ma10+") "+ " "+symbol+" "+strBSL;
+         PushMessage(msg,FILE_MSG_LIST_SL);
+        }
+      if(allow_msg_sl && is_same_symbol(arrHeiken_W1[0].trend_by_ma10, TREND_SEL) && is_same_symbol(strBSL, "$ B"))
+        {
+         string msg=" (SL_BUY by Ma10W "+arrHeiken_W1[0].trend_by_ma10+") "+ " "+symbol+" "+strBSL;
+         PushMessage(msg,FILE_MSG_LIST_SL);
+        }
       //----------------------------------------------------------------------------------------------------
       CandleData arrHeiken_Tf[];
       get_arr_heiken(symbol,TradingPeriod,arrHeiken_Tf,55,true,true);
@@ -1262,7 +1277,8 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
          int count_histogram_030609 =50;
          string trend_histogram_030609 = "";
          get_trend_count_by_histogram(trend_histogram_030609,count_histogram_030609,symbol,PERIOD_D1,3,6,9);
-         if(count_histogram_030609<=1 && is_same_symbol(trend_by_ma10d, trend_histogram_030609))
+
+         if(count_histogram_030609<=1 && is_same_symbol(trend_histogram_d1+trend_histogram_h4, trend_histogram_030609))
             msg_r1c2= symbol+" D1 (3,6,9): "+trend_histogram_030609+" "+IntegerToString(count_histogram_030609);
         }
 
@@ -1308,7 +1324,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
             PushMessage(str_index+msg_r1c4,FILE_MSG_LIST_R1C4);
            }
 
-         if(arrHeiken_H4[0].count_ma20<=2)
+         if(arrHeiken_H4[0].count_ma20<=2 && is_same_symbol(trend_histogram_d1+trend_histogram_h4, arrHeiken_H4[0].trend_by_ma20))
            {
             string  msg_r1c4 = symbol+" H4 (Count20) "+arrHeiken_H4[0].trend_by_ma20+"."+IntegerToString(arrHeiken_H4[0].count_ma20);
             if(is_allow_alert && allow_alert)
@@ -1320,6 +1336,32 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
         }
 
       //----------------------------------------------------------------------------------------------------
+      if(allow_PushMessage(symbol,FILE_MSG_LIST_R2C1))
+        {
+         string msg_r2c1 = "";
+
+         if(arrHeiken_W1[0].count_ma10<=1)
+            msg_r2c1 = symbol+" Week "+arrHeiken_W1[0].trend_by_ma10 + "." +IntegerToString(arrHeiken_W1[0].count_ma10);
+
+         if(msg_r2c1 == "")
+           {
+            double low_w1=iLow(symbol,PERIOD_W1,0);
+            double hig_w1=iHigh(symbol,PERIOD_W1,0);
+            double ma10w = cal_MA_XX(symbol,PERIOD_W1,10,0);
+
+            if((low_w1 <= arrHeiken_W1[0].ma10 && arrHeiken_W1[0].ma10 <= hig_w1)
+               || (low_w1 <= ma10w && ma10w <= hig_w1))
+               msg_r2c1 = symbol+" Week Touch.Ma10";
+           }
+
+         if(msg_r2c1 != "")
+           {
+            if(is_allow_alert && allow_alert)
+               Alert(get_vnhour()+" "+msg_r2c1);
+
+            PushMessage(str_index+msg_r2c1,FILE_MSG_LIST_R2C1);
+           }
+        }
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
@@ -4142,7 +4184,7 @@ void OnChartEvent(const int     id,      // event ID
 
          Set_LM_SL(symbol, trend_by_ma10_d1);
 
-         FindSL(PERIOD_D1, trend_by_ma10_d1, 7);
+         FindSL(PERIOD_D1, trend_by_ma10_d1);
 
          init_sl_tp_trendline(false);
 
@@ -4180,7 +4222,7 @@ void OnChartEvent(const int     id,      // event ID
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM+amp_sl);
            }
 
-         FindSL(Period(), trend_revese, 15);
+         FindSL(Period(), trend_revese);
          init_sl_tp_trendline(false);
 
          SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
@@ -4204,7 +4246,7 @@ void OnChartEvent(const int     id,      // event ID
             string trend_by_ma10_w1 = arrHeiken_W1[0].trend_by_ma10;
 
             SetGlobalVariable(GLOBAL_VAR_LM+symbol, find_wait_price_ma20(symbol,PERIOD_W1,trend_by_ma10_w1,10));
-            FindSL(PERIOD_W1, trend_by_ma10_w1, 3);
+            FindSL(PERIOD_W1, trend_by_ma10_w1);
            }
 
          if(is_same_symbol(sparam, "(D1)20") || is_same_symbol(buttonLabel, "(D1)20"))
@@ -4215,7 +4257,7 @@ void OnChartEvent(const int     id,      // event ID
 
             SetGlobalVariable(GLOBAL_VAR_LM+symbol, find_wait_price_ma20(symbol,PERIOD_D1,trend_by_ma10_d1,20));
 
-            FindSL(PERIOD_D1, trend_by_ma10_d1,7);
+            FindSL(PERIOD_D1, trend_by_ma10_d1);
            }
 
          if(is_same_symbol(sparam, "(H4)20") || is_same_symbol(buttonLabel, "(H4)20"))
@@ -4226,7 +4268,7 @@ void OnChartEvent(const int     id,      // event ID
 
             SetGlobalVariable(GLOBAL_VAR_LM+symbol, find_wait_price_ma20(symbol,PERIOD_H4,trend_by_ma20_h4,20));
 
-            FindSL(PERIOD_H4, trend_by_ma20_h4, 10);
+            FindSL(PERIOD_H4, trend_by_ma20_h4);
            }
 
          init_sl_tp_trendline(false);
@@ -4266,9 +4308,9 @@ void OnChartEvent(const int     id,      // event ID
             ObjectSetInteger(0,BtnSetTimeHere+".iHigh",OBJPROP_BGCOLOR,clrPaleTurquoise);
            }
 
-         //FindSL(PERIOD_D1, trend_histogram_d1, 7);
-         //init_sl_tp_trendline(false);
-         //DrawFiboTimeZone52H4(Period(),false);
+         FindSL(Period(), trend_histogram_d1);
+         init_sl_tp_trendline(false);
+         DrawFiboTimeZone52H4(Period(),false);
 
          return;
         }
@@ -4507,12 +4549,12 @@ void OnChartEvent(const int     id,      // event ID
          string trend = (LM>SL)?TREND_BUY:TREND_SEL;
 
          if(is_same_symbol(sparam, "_H4"))
-            FindSL(PERIOD_H4, trend, 50);
+            FindSL(PERIOD_H4, trend);
          else
             if(is_same_symbol(sparam, "_D1"))
-               FindSL(PERIOD_D1, trend, 10);
+               FindSL(PERIOD_D1, trend);
             else
-               FindSL(PERIOD_W1, trend, 7);
+               FindSL(PERIOD_W1, trend);
 
          SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
@@ -5343,7 +5385,7 @@ void OnChartEvent(const int     id,      // event ID
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void FindSL(ENUM_TIMEFRAMES TF, string TREND, int size)
+void FindSL(ENUM_TIMEFRAMES TF, string TREND)
   {
    string symbol = Symbol();
    double SL=GetGlobalVariable(GLOBAL_VAR_SL+symbol);
@@ -5353,11 +5395,18 @@ void FindSL(ENUM_TIMEFRAMES TF, string TREND, int size)
    GetAmpAvgL15(symbol,amp_w1,amp_d1,amp_h4,amp_h1);
    double amp_trade = amp_d1;
 
+   int size = 7;
    if(TF==PERIOD_D1)
+     {
+      size = 10;
       amp_trade = amp_d1;
+     }
 
    if(TF==PERIOD_H4)
+     {
+      size = 50;
       amp_trade = amp_h4;
+     } ;
 
 
    CandleData arrHeiken_Cr[];
@@ -6168,8 +6217,8 @@ void CreateMessagesBtn(string BtnSeq___)
         }
      }
 
-//if(ArraySize(messageArray) > 0)
-//   createButton(BtnClearMessage,"Clear",x_position,y_position-20,50,18,clrBlack,clrWhite,6);
+   if(ArraySize(messageArray) > 0 && BtnSeq___==BtnMsgR2C2_)
+      createButton(BtnClearMessage,"Clear",x_position,y_position-20,50,18,clrBlack,clrWhite,6);
 
    string total_comments="";
    int size = getArraySymbolsSize();
@@ -6186,6 +6235,8 @@ void CreateMessagesBtn(string BtnSeq___)
 
       color clrBackground=is_same_symbol(lable,"$")? clrLightGray:clrWhite;
       clrBackground=is_same_symbol(strCountBSL,"$") || is_same_symbol(strCountBSL,"oB") || is_same_symbol(strCountBSL,"oS")? clrLightGray:clrBackground;
+      if(BtnSeq___==BtnMsgR1C5_)
+         clrBackground = clrBgColor;
 
       color clrText=is_cur_tab?clrBlue:clrBlack;
       string btnName = BtnSeq___+append1Zero(index)+"_"+prifix+"_"+symbol;
@@ -9778,30 +9829,28 @@ void DrawCandleIndex(CandleData &arrHeiken_Cr[])
    bool IS_MACD_DOT=GetGlobalVariable(BtnMacdMode)==AUTO_TRADE_ONN;
 
    int size_d1 = ArraySize(arrHeiken_Cr)-10;
-   bool allowDrawHeiken = Period() <= PERIOD_H4;
+//bool allowDrawHeiken = Period() <= PERIOD_H4;
    string boicuabay = ",0,7,13,21,27,34,52,";
    datetime time_shift = arrHeiken_Cr[1].time - arrHeiken_Cr[2].time;
-   for(int i = 0; i < size_d1; i++)
+
+   for(int i = 0; i < MathMin(size_d1-1,30); i++)
      {
       string key_ma10=","+IntegerToString(arrHeiken_Cr[i].count_ma10)+",";
 
       string lbl_Ma10="CountMa10D_"+appendZero100(i);
       color clrColor=is_same_symbol(arrHeiken_Cr[i].trend_by_ma10,TREND_BUY)?clrBlue:clrRed;
-      double mid = (arrHeiken_Cr[i].open+arrHeiken_Cr[i].close)/2;
+      double pos = arrHeiken_Cr[i].ma10;
+      //is_same_symbol(arrHeiken_Cr[i].trend_by_ma10,TREND_BUY)?arrHeiken_Cr[i].low:arrHeiken_Cr[i].high;
       datetime timeMid = arrHeiken_Cr[i].time+TIME_OF_ONE_D1_CANDLE/2-TIME_OF_ONE_H1_CANDLE;
       string key_hei =","+IntegerToString(arrHeiken_Cr[i].count_heiken)+",";
 
-      if(i==0 || is_same_symbol(boicuabay, key_ma10))
-         create_trend_line(lbl_Ma10+"_",timeMid,mid,timeMid+1,mid,clrYellow,STYLE_SOLID,7,false,false,true,false);
+      if(is_same_symbol(boicuabay, key_ma10))
+         create_trend_line(lbl_Ma10+"_",timeMid,pos,timeMid+1,pos,clrYellow,STYLE_SOLID,7,false,false,true,false);
 
+      create_label_simple(lbl_Ma10,IntegerToString(arrHeiken_Cr[i].count_ma10),pos,clrColor,timeMid,0,6);
 
-      if(IS_MACD_DOT && allowDrawHeiken && i<=MathMin(size_d1-1,30))
-        {
-         create_label_simple(lbl_Ma10,(allowDrawHeiken?getShortName(arrHeiken_Cr[i].trend_by_ma10):"")+IntegerToString(arrHeiken_Cr[i].count_ma10),mid,clrColor,timeMid);
-
-         create_heiken_candle("HeikenD"+append1Zero(i),arrHeiken_Cr[i].time,arrHeiken_Cr[i].time+TIME_OF_ONE_D1_CANDLE-TIME_OF_ONE_H1_CANDLE
-                              ,arrHeiken_Cr[i].open,arrHeiken_Cr[i].close,arrHeiken_Cr[i].low,arrHeiken_Cr[i].high,clrBlack);
-        }
+      //create_heiken_candle("HeikenD"+append1Zero(i),arrHeiken_Cr[i].time,arrHeiken_Cr[i].time+TIME_OF_ONE_D1_CANDLE-TIME_OF_ONE_H1_CANDLE
+      //                     ,arrHeiken_Cr[i].open,arrHeiken_Cr[i].close,arrHeiken_Cr[i].low,arrHeiken_Cr[i].high,clrBlack);
      }
   }
 //+------------------------------------------------------------------+
