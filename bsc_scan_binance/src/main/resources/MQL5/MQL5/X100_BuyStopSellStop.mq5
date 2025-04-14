@@ -202,9 +202,8 @@ string ARR_SYMBOLS_FTMO[] =
 
 string ARR_SYMBOLS_THE5[] =
   {
-   "XAUUSD"
-   , "NZDUSD", "EURUSD", "USDJPY", "USDCAD", "USDCHF"//, "AUDUSD", "GBPUSD"
-   ,"XTIUSD","BTCUSD","SP500","JPN225"//,"US30", "XAGUSD"
+   "XAUUSD", "SP500", "JPN225", "NZDUSD", "EURUSD", "USDJPY", "USDCHF"//, "AUDUSD", "GBPUSD", "USDCAD", "BTCUSD"
+//,"US30", "XAGUSD","XTIUSD"
   };
 
 string ARR_SYMBOLS_CENT[] =
@@ -9835,9 +9834,13 @@ void DrawCandleIndex(CandleData &arrHeiken_Cr[])
 
    for(int i = 0; i < MathMin(size_d1-1,30); i++)
      {
+      string lbl_Ma10="CountMa10D_"+appendZero100(i);
+
+      //create_trend_line(lbl_Ma10+".",arrHeiken_Cr[i+1].time,arrHeiken_Cr[i+1].ma10,arrHeiken_Cr[i].time,arrHeiken_Cr[i].ma10,clrDimGray,STYLE_SOLID,3);
+
       string key_ma10=","+IntegerToString(arrHeiken_Cr[i].count_ma10)+",";
 
-      string lbl_Ma10="CountMa10D_"+appendZero100(i);
+
       color clrColor=is_same_symbol(arrHeiken_Cr[i].trend_by_ma10,TREND_BUY)?clrBlue:clrRed;
       double pos = arrHeiken_Cr[i].ma10;
       //is_same_symbol(arrHeiken_Cr[i].trend_by_ma10,TREND_BUY)?arrHeiken_Cr[i].low:arrHeiken_Cr[i].high;

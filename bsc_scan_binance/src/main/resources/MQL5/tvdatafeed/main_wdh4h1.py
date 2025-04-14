@@ -407,8 +407,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     selected_interval = interval_mapping[interval_input]
-    # Tối đa chỉ được 55 dòng data, vượt quá thì MQL5 sẽ lỗi.
-    n_bars = 55# if selected_interval in [Interval.in_1_hour, Interval.in_4_hour, Interval.in_daily] else 35
+    n_bars = 65 if selected_interval in [Interval.in_1_hour, Interval.in_4_hour, Interval.in_daily, Interval.in_weekly] else 55
 
     # Lặp qua từng cặp tên sàn và mã cổ phiếu
     for market, symbol in symbols:
