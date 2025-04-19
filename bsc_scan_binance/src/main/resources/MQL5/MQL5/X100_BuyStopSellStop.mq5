@@ -208,7 +208,7 @@ string ARR_SYMBOLS_THE5[] =
 
 string ARR_SYMBOLS_CENT[] =
   {
-   "XAUUSDc", "XAGUSDc", "BTCUSDc", "NZDUSDc", "EURUSDc", "AUDJPY", "GBPJPY", "USDJPYc"//, "AUDUSDc", "GBPUSDc", "USDCADc", "USDCHFc"
+   "XAUUSDc", "XAGUSDc", "BTCUSDc", "NZDUSDc", "EURUSDc", "AUDJPYc", "GBPJPYc", "USDJPYc"//, "AUDUSDc", "GBPUSDc", "USDCADc", "USDCHFc"
   };
 
 const string MAIN_PAIRS="US30,US500,SP500,US100,NAS100,DAX40,GER40, XAUUSD, USOIL, XTIUSD, BTCUSD, EURUSD, USDJPY, GBPUSD, USDCHF, AUDUSD, USDCAD, NZDUSD";
@@ -378,19 +378,7 @@ void DrawButtons()
       //-----------------------------------------------------------------------------------------------
       //-----------------------------------------------------------------------------------------------
       string strBSL=CountBSL(symbol,total_comments);
-      string manual_trend_w=GetGlobalVariableTrend(BtnNoticeW1+symbol);
-      string lblBtn10=manual_trend_w+" ";
-
-      string trend_wait_rr11=GetGlobalVariableTrend(BtnWaitMacdM5ThenAutoTrade+symbol);
-      lblBtn10+=trend_wait_rr11!=""?"(At."+getShortName(trend_wait_rr11)+") ":"";
-
-      string wait_trend_m5=GetGlobalVariableTrend(BtnNoticeSeq102050M5+symbol);
-      lblBtn10+=wait_trend_m5!=""?"(M5.w."+getShortName(wait_trend_m5)+") ":"";
-
-      string wait_trend_h1=GetGlobalVariableTrend(BtnNoticeSeq102050H1+symbol);
-      lblBtn10+=wait_trend_h1!=""?"(H1.w."+getShortName(wait_trend_h1)+") ":"";
-
-      lblBtn10+=" "+strBSL;
+      string lblBtn10=strBSL;
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
@@ -400,9 +388,6 @@ void DrawButtons()
          ObjectSetString(0,BtnD10+symbol,OBJPROP_FONT,"Arial Bold");
 
          ObjectDelete(0,BtnTpPositiveThisSymbol);
-         //ObjectDelete(0,BtnColorMode);
-         //ObjectDelete(0,BtnNoticeSeq102050M5);
-         //ObjectDelete(0,BtnNoticeSeq102050H1);
 
          bool is_hide_mode=GetGlobalVariable(BtnHideDrawMode)==AUTO_TRADE_ONN;
          if(is_hide_mode == false)
@@ -418,16 +403,6 @@ void DrawButtons()
 
             createButton(BtnExitAllTrade,"Exit All",25,chart_heigh-35,48,30,clrBlack,clrLightGray);
 
-
-            //bool IS_MONOCHROME_MODE=GetGlobalVariable(BtnColorMode)==AUTO_TRADE_ONN;
-            //createButton(BtnColorMode,"Color",5+BTN_WIDTH_STANDA,chart_heigh-35,50,30,clrBlack,IS_MONOCHROME_MODE?clrLightGray:clrActiveBtn,6);
-            //
-            //color clr_notice_m5=wait_trend_m5==TREND_BUY?clrActiveBtn:wait_trend_m5==TREND_SEL?clrActiveSell:clrLightGray;
-            //createButton(BtnNoticeSeq102050M5,"[msg] M5 Seq "+wait_trend_m5,65+BTN_WIDTH_STANDA,chart_heigh-35,150,30,clrBlack,clr_notice_m5);
-            //
-            //color clr_notice_h1=wait_trend_h1==TREND_BUY?clrActiveBtn:wait_trend_h1==TREND_SEL?clrActiveSell:clrLightGray;
-            //createButton(BtnNoticeSeq102050H1,"[msg] H1 Seq "+wait_trend_h1,65+BTN_WIDTH_STANDA+160,chart_heigh-35,150,30,clrBlack,clr_notice_h1);
-
             ENUM_TIMEFRAMES TradingPeriod = (ENUM_TIMEFRAMES)GetGlobalVariable(BtnOptionPeriod);
             if(TradingPeriod<0)
                TradingPeriod=PERIOD_H4;
@@ -439,10 +414,6 @@ void DrawButtons()
               {
                bool is_doji_normal = is_Doji(symbol,curPeriod,cIdx);
                if(is_doji_normal)
-                  //create_filled_rectangle("Doji.C"+append1Zero(cIdx)
-                  //                        ,iTime(symbol,curPeriod,cIdx),iLow(symbol,curPeriod,cIdx)
-                  //                        ,iTime(symbol,curPeriod,cIdx-1),iHigh(symbol,curPeriod,cIdx)
-                  //                        ,clrRed,false,false);
                   create_trend_line("Doji.C"+append1Zero(cIdx)
                                     ,iTime(symbol,curPeriod,cIdx),iLow(symbol,curPeriod,cIdx)
                                     ,iTime(symbol,curPeriod,cIdx),iHigh(symbol,curPeriod,cIdx)
@@ -497,13 +468,13 @@ void DrawButtons()
       color clrText = clrBlack;
       color clrBackground=clrLightGray;
 
-      bool is_buy_only=GetGlobalVariable(symbol)==TYPE_BUY;
-      bool is_sel_only=GetGlobalVariable(symbol)==TYPE_SEL;
-      if(is_buy_only || is_sel_only)
-        {
-         lblBtn10 = "("+(is_buy_only?TREND_BUY:TREND_SEL)+") " + lblBtn10;
-         clrBackground = is_buy_only?clrActiveBtn:clrActiveSell;
-        }
+      //bool is_buy_only=GetGlobalVariable(symbol)==TYPE_BUY;
+      //bool is_sel_only=GetGlobalVariable(symbol)==TYPE_SEL;
+      //if(is_buy_only || is_sel_only)
+      //  {
+      //   lblBtn10 = "("+(is_buy_only?TREND_BUY:TREND_SEL)+") " + lblBtn10;
+      //   clrBackground = is_buy_only?clrActiveBtn:clrActiveSell;
+      //  }
 
       int fontSize = 7;
       if(is_cur_tab)
@@ -1271,6 +1242,7 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
             PushMessage(str_index+msg_R1C2,FILE_MSG_LIST_R1C2);
            }
         }
+        
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
