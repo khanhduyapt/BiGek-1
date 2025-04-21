@@ -197,18 +197,18 @@ string ARR_SYMBOLS_FTMO[] =
   {
    "XAUUSD"
    , "XAGUSD", "USOIL.cash", "BTCUSD", "US500.cash", "JP225.cash", "GER40.cash" //, "US30.cash"
-   , "NZDUSD", "EURUSD", "AUDJPY", "GBPJPY", "USDJPY", "USDCHF"//, "AUDUSD", "USDCAD"
+   , "NZDUSD", "EURUSD", "USDJPY", "USDCHF"//, "AUDUSD", "USDCAD", "AUDJPY", "GBPJPY"
   };
 
 string ARR_SYMBOLS_THE5[] =
   {
-   "XAUUSD", "SP500", "JPN225", "NZDUSD", "EURUSD", "AUDJPY", "GBPJPY", "USDJPY", "USDCHF"//, "AUDUSD", "GBPUSD", "USDCAD", "BTCUSD"
+   "XAUUSD", "SP500", "JPN225", "NZDUSD", "EURUSD", "USDJPY", "USDCHF"//, "AUDUSD", "AUDJPY", "GBPJPY", "GBPUSD", "USDCAD", "BTCUSD"
 //,"US30", "XAGUSD","XTIUSD"
   };
 
 string ARR_SYMBOLS_CENT[] =
   {
-   "XAUUSDc", "XAGUSDc", "BTCUSDc", "NZDUSDc", "EURUSDc", "AUDJPYc", "GBPJPYc", "USDJPYc"//, "AUDUSDc", "GBPUSDc", "USDCADc", "USDCHFc"
+   "XAUUSDc", "XAGUSDc", "BTCUSDc", "NZDUSDc", "EURUSDc", "USDJPYc"//, "AUDUSDc", "AUDJPYc", "GBPJPYc", "GBPUSDc", "USDCADc", "USDCHFc"
   };
 
 const string MAIN_PAIRS="US30,US500,SP500,US100,NAS100,DAX40,GER40, XAUUSD, USOIL, XTIUSD, BTCUSD, EURUSD, USDJPY, GBPUSD, USDCHF, AUDUSD, USDCAD, NZDUSD";
@@ -466,15 +466,15 @@ void DrawButtons()
         {count = 0; x = btn_width+45; y = 95;}
 
       color clrText = clrBlack;
-      color clrBackground=clrLightGray;
+      color clrBackground=clrWhite;
 
-      //bool is_buy_only=GetGlobalVariable(symbol)==TYPE_BUY;
-      //bool is_sel_only=GetGlobalVariable(symbol)==TYPE_SEL;
-      //if(is_buy_only || is_sel_only)
-      //  {
-      //   lblBtn10 = "("+(is_buy_only?TREND_BUY:TREND_SEL)+") " + lblBtn10;
-      //   clrBackground = is_buy_only?clrActiveBtn:clrActiveSell;
-      //  }
+      bool is_buy_only=GetGlobalVariable(symbol)==TYPE_BUY;
+      bool is_sel_only=GetGlobalVariable(symbol)==TYPE_SEL;
+      if(is_buy_only || is_sel_only)
+        {
+         lblBtn10 = "("+(is_buy_only?TREND_BUY:TREND_SEL)+") " + lblBtn10;
+         clrBackground = is_buy_only?clrActiveBtn:clrActiveSell;
+        }
 
       int fontSize = 7;
       if(is_cur_tab)
@@ -1165,18 +1165,33 @@ ENUM_TIMEFRAMES getOpenTfTrading(string comments)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-string getAlertOpenTradeMsg(string symbol, ENUM_TIMEFRAMES TradingPeriod)
+string getAlertOpenTradeMsg(string symbol, ENUM_TIMEFRAMES TradingPeriod, string TREND_REF="")
   {
    string  msg_r1c1 = "";
 
    int count_ma10_vs_ma20=0;
-   string trend_ma00_vs_ma10="", trend_ma00_vs_ma20="", trend_ma10_vs_ma20="", trend_ma20_vs_ma50="", trend_ma20_vs_ma200="";
-   CountMaCondition(symbol,TradingPeriod, count_ma10_vs_ma20,trend_ma00_vs_ma10,trend_ma00_vs_ma20,trend_ma10_vs_ma20,trend_ma20_vs_ma50,trend_ma20_vs_ma200);
+   string trend_ma00_vs_ma10="", trend_ma00_vs_ma20="", trend_ma10_vs_ma20="", trend_ma00_vs_ma50="", trend_ma10_vs_ma200="";
+   CountMaCondition(symbol,TradingPeriod, count_ma10_vs_ma20,trend_ma00_vs_ma10,trend_ma00_vs_ma20,trend_ma10_vs_ma20,trend_ma00_vs_ma50,trend_ma10_vs_ma200);
 
-   if(is_same_symbol(trend_ma10_vs_ma20, trend_ma00_vs_ma10) &&
+   if(TradingPeriod==PERIOD_H4)
+     {
+      if(is_same_symbol(trend_ma10_vs_ma200,TREND_BUY))
+         SetGlobalVariable(symbol,TYPE_BUY);
+
+      if(is_same_symbol(trend_ma10_vs_ma200,TREND_SEL))
+         SetGlobalVariable(symbol,TYPE_SEL);
+     }
+
+   bool is_allow = true;
+   if(is_same_symbol(TREND_REF,TREND_BUY) || is_same_symbol(TREND_REF,TREND_SEL))
+      if(is_same_symbol(trend_ma10_vs_ma20,TREND_REF)==false)
+         is_allow = false;
+
+   if(is_allow &&
+      is_same_symbol(trend_ma10_vs_ma20, trend_ma00_vs_ma10) &&
       is_same_symbol(trend_ma10_vs_ma20, trend_ma00_vs_ma20) &&
-      is_same_symbol(trend_ma10_vs_ma20, trend_ma20_vs_ma50) &&
-      is_same_symbol(trend_ma10_vs_ma20, trend_ma20_vs_ma200))
+      is_same_symbol(trend_ma10_vs_ma20, trend_ma00_vs_ma50) &&
+      is_same_symbol(trend_ma10_vs_ma20, trend_ma10_vs_ma200))
      {
       CandleData arrHeiken_Cr[];
       get_arr_heiken(symbol,TradingPeriod,arrHeiken_Cr,55,true,true);
@@ -1190,8 +1205,7 @@ string getAlertOpenTradeMsg(string symbol, ENUM_TIMEFRAMES TradingPeriod)
          is_same_symbol(trend_ma10_vs_ma20, arrHeiken_Cr[0].trend_by_ma50)
         )
         {
-         msg_r1c1 = symbol+" "+ get_time_frame_name((ENUM_TIMEFRAMES)TradingPeriod)+" (10,20,50,200) "+ trend_ma20_vs_ma200 + " " + IntegerToString(count_ma10_vs_ma20);
-
+         msg_r1c1 = symbol+" "+ get_time_frame_name((ENUM_TIMEFRAMES)TradingPeriod)+" (10,20,50,200) "+ trend_ma10_vs_ma200 + " " + IntegerToString(count_ma10_vs_ma20);
         }
      }
 
@@ -1231,9 +1245,13 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
            }
         }
 
+      bool is_buy_only=GetGlobalVariable(symbol)==TYPE_BUY;
+      bool is_sel_only=GetGlobalVariable(symbol)==TYPE_SEL;
+      string TREND_REF_H4_Ma20vs200=is_buy_only?TREND_BUY:is_sel_only?TREND_SEL:"";
+
       if(allow_PushMessage(symbol,FILE_MSG_LIST_R1C2))
         {
-         string  msg_R1C2 = getAlertOpenTradeMsg(symbol,PERIOD_H1);
+         string  msg_R1C2 = getAlertOpenTradeMsg(symbol,PERIOD_H1,TREND_REF_H4_Ma20vs200);
          if(msg_R1C2 != "")
            {
             if(allow_alert && CountBSL(symbol,total_comments)=="")
@@ -1242,7 +1260,18 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
             PushMessage(str_index+msg_R1C2,FILE_MSG_LIST_R1C2);
            }
         }
-        
+
+      if(allow_PushMessage(symbol,FILE_MSG_LIST_R1C3))
+        {
+         string  msg_R1C3 = getAlertOpenTradeMsg(symbol,PERIOD_M30,TREND_REF_H4_Ma20vs200);
+         if(msg_R1C3 != "")
+           {
+            if(allow_alert && CountBSL(symbol,total_comments)=="")
+               Alert(get_vnhour()+" "+msg_R1C3);
+
+            PushMessage(str_index+msg_R1C3,FILE_MSG_LIST_R1C3);
+           }
+        }
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
       //----------------------------------------------------------------------------------------------------
@@ -4093,14 +4122,14 @@ void OnChartEvent(const int     id,      // event ID
 
       if(is_same_symbol(sparam,BtnResetTimeline))
         {
-         ENUM_TIMEFRAMES PERIOD = Period();
+         ENUM_TIMEFRAMES PERIOD = PERIOD_H4;//Period();
          Reset_Fibo_Timelines(PERIOD);
          Sleep100();
          SaveTimelinesToFile(false);
 
          int count_ma10_vs_ma20=0;
-         string trend_ma00_vs_ma10="", trend_ma00_vs_ma20="", trend_ma10_vs_ma20="", trend_ma20_vs_ma50="", trend_ma20_vs_ma200="";
-         CountMaCondition(symbol,PERIOD, count_ma10_vs_ma20,trend_ma00_vs_ma10,trend_ma00_vs_ma20,trend_ma10_vs_ma20,trend_ma20_vs_ma50,trend_ma20_vs_ma200);
+         string trend_ma00_vs_ma10="", trend_ma00_vs_ma20="", trend_ma10_vs_ma20="", trend_ma00_vs_ma50="", trend_ma10_vs_ma200="";
+         CountMaCondition(symbol,PERIOD_H4, count_ma10_vs_ma20,trend_ma00_vs_ma10,trend_ma00_vs_ma20,trend_ma10_vs_ma20,trend_ma00_vs_ma50,trend_ma10_vs_ma200);
 
          double lowest_50=0.0,higest_50=0.0;
          for(int id=0; id<50; id++)
@@ -4113,14 +4142,20 @@ void OnChartEvent(const int     id,      // event ID
                higest_50=hig;
            }
 
-         if(is_same_symbol(trend_ma10_vs_ma20,TREND_BUY))
+         double bid=SymbolInfoDouble(symbol,SYMBOL_BID);
+         double ask=SymbolInfoDouble(symbol,SYMBOL_ASK);
+         double spread = MathAbs(ask-bid)*2;
+         double lowest_2d=MathMin(iLow(symbol,PERIOD_D1,1), iLow(symbol,PERIOD_D1,0)) -spread;
+         double higest_2d=MathMax(iHigh(symbol,PERIOD_D1,1),iHigh(symbol,PERIOD_D1,0))+spread;
+
+         if(is_same_symbol(trend_ma10_vs_ma200,TREND_BUY))
            {
-            SetGlobalVariable(GLOBAL_VAR_LM+symbol,higest_50);
+            SetGlobalVariable(GLOBAL_VAR_LM+symbol,higest_2d);
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,lowest_50);
            }
          else
            {
-            SetGlobalVariable(GLOBAL_VAR_LM+symbol,lowest_50);
+            SetGlobalVariable(GLOBAL_VAR_LM+symbol,lowest_2d);
             SetGlobalVariable(GLOBAL_VAR_SL+symbol,higest_50);
            }
 
@@ -4591,16 +4626,19 @@ void OnChartEvent(const int     id,      // event ID
          Print("The lparam=",lparam," dparam=",dparam," sparam=",sparam," buttonLabel=",buttonLabel," was clicked");
 
          int intPeriod = (int)GetGlobalVariable(BtnOptionPeriod);
-         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_D1)))
-            intPeriod = PERIOD_D1;
-         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_H4)))
-            intPeriod = PERIOD_H4;
-         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_H1)))
-            intPeriod = PERIOD_H1;
-         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_M30)))
-            intPeriod = PERIOD_M30;
-         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_M15)))
-            intPeriod = PERIOD_M15;
+         if(intPeriod<0)
+            intPeriod=PERIOD_H4;
+
+         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_D1)))
+         //   intPeriod = PERIOD_D1;
+         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_H4)))
+         //   intPeriod = PERIOD_H4;
+         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_H1)))
+         //   intPeriod = PERIOD_H1;
+         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_M30)))
+         //   intPeriod = PERIOD_M30;
+         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_M15)))
+         //   intPeriod = PERIOD_M15;
 
          OpenChartWindow(buttonLabel,(ENUM_TIMEFRAMES)intPeriod);
 
@@ -4854,7 +4892,7 @@ void OnChartEvent(const int     id,      // event ID
                   last_comment+="    "+m_order.Comment();
                  }
 
-         if(count_trade>=1)
+         if(count_trade>=2)
            {
             Alert("Maximum 2L: "+ symbol + "    "+last_comment);
             SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
@@ -7046,8 +7084,8 @@ void CountMaCondition(string symbol, ENUM_TIMEFRAMES PERIOD_ID
                       , string &trend_ma00_vs_ma10
                       , string &trend_ma00_vs_ma20
                       , string &trend_ma10_vs_ma20
-                      , string &trend_ma20_vs_ma50
-                      , string &trend_ma20_vs_ma200)
+                      , string &trend_ma00_vs_ma50
+                      , string &trend_ma10_vs_ma200)
   {
    int maLength = 200;
    double closePrices[];
@@ -7056,8 +7094,8 @@ void CountMaCondition(string symbol, ENUM_TIMEFRAMES PERIOD_ID
       closePrices[i] = iClose(symbol, PERIOD_ID, i);
 
    count_ma10_vs_ma20 = 0;
-   trend_ma20_vs_ma50 = "";
-   trend_ma20_vs_ma200 = "";
+   trend_ma00_vs_ma50 = "";
+   trend_ma10_vs_ma200 = "";
 
    int size = ArraySize(closePrices);
    int limit = size - 50;  // Đảm bảo đủ dữ liệu tính Ma50
@@ -7074,10 +7112,10 @@ void CountMaCondition(string symbol, ENUM_TIMEFRAMES PERIOD_ID
 
    trend_ma00_vs_ma10 = (ma00_0 > ma10_0) ?TREND_BUY:TREND_SEL;
    trend_ma00_vs_ma20 = (ma00_0 > ma20_0) ?TREND_BUY:TREND_SEL;
+   trend_ma00_vs_ma50 = (ma00_0 > ma50_0) ?TREND_BUY:TREND_SEL;
 
    trend_ma10_vs_ma20 = (ma10_0 > ma20_0) ?TREND_BUY:TREND_SEL;
-   trend_ma20_vs_ma50 = (ma20_0 > ma50_0) ?TREND_BUY:TREND_SEL;
-   trend_ma20_vs_ma200= (ma20_0 > ma200_0)?TREND_BUY:TREND_SEL;
+   trend_ma10_vs_ma200= (ma10_0 > ma200_0)?TREND_BUY:TREND_SEL;
 
    bool isAbove = ma10_0 > ma20_0;
    for(int i = 0; i < limit; i++)
