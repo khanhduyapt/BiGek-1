@@ -389,25 +389,32 @@ if __name__ == "__main__":
 
     # Map tham số thành giá trị của class Interval
     interval_mapping = {
-        "1H": Interval.in_1_hour,
-        "4H": Interval.in_4_hour,
-        "1D": Interval.in_daily,
-        "1W": Interval.in_weekly,
-        "1M": Interval.in_monthly
+        "m30": Interval.in_30_minute,
+        "1H" : Interval.in_1_hour,
+        "4H" : Interval.in_4_hour,
+        "1D" : Interval.in_daily,
+        "1W" : Interval.in_weekly,
+        "1M" : Interval.in_monthly
     }
     interval_naming = {
-        "1H": "1HOUR",
-        "4H": "4HOURS",
-        "1D": "DAILY",
-        "1W": "WEEKLY",
-        "1M": "MONTHLY"
+        "m30": "MINUTE30",
+        "1H" : "1HOUR",
+        "4H" : "4HOURS",
+        "1D" : "DAILY",
+        "1W" : "WEEKLY",
+        "1M" : "MONTHLY"
     }
     if interval_input not in interval_mapping:
-        print(f"Invalid interval '{interval_input}'. Supported intervals: 1H, 4H, 1D, 1W")
+        print(f"Invalid interval '{interval_input}'. Supported intervals: m30, 1H, 4H, 1D, 1W")
         sys.exit(1)
 
     selected_interval = interval_mapping[interval_input]
-    n_bars = 65 if selected_interval in [Interval.in_1_hour, Interval.in_4_hour, Interval.in_daily, Interval.in_weekly] else 55
+
+    n_bars = 55
+    if selected_interval == Interval.in_30_minute:
+        n_bars = 270
+    elif selected_interval in [Interval.in_1_hour, Interval.in_4_hour, Interval.in_daily, Interval.in_weekly]:
+        n_bars = 65
 
     # Lặp qua từng cặp tên sàn và mã cổ phiếu
     for market, symbol in symbols:
