@@ -967,7 +967,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
    create_dragable_trendline(GLOBAL_VAR_LM,clrGreen,LM,STYLE_SOLID,2);
 
    create_dragable_trendline(LINE_RR_11,clrNavy,  rr11,STYLE_SOLID,2);
-   create_dragable_trendline(LINE_RR_12,clrBlack, rr12,STYLE_SOLID,2);
+   create_dragable_trendline(LINE_RR_12,clrNavy,  rr12,STYLE_SOLID,2);
    create_dragable_trendline(LINE_RR_13,clrBlue,  rr13,STYLE_SOLID,2);
 
 //bool is_hide_mode=GetGlobalVariable(BtnHideDrawMode)==AUTO_TRADE_ONN;
@@ -1014,7 +1014,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
          EST_SL="  SL "+DoubleToString(loss,2)+"$";//+(string)amp_sl;
         }
 
-      int start_group_reverse=(int)chart_width*2/3-500;
+      int start_group_reverse=(int)chart_width*1/3-200;
 
       ObjectDelete(0,BtnReSetTPEntry);
       if(strBSL!="")
@@ -1046,10 +1046,12 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
 
    if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
      {
-      createButton(BtnSetSLHere,"Set SL",   chart_width/2, y_start-10,50,20,clrBlack,clrWhite);
-      createButton(BtnFindSL+"_W1","(W1)SL",chart_width-55*3, y_start-10,50,20,clrBlack,clrLightGray);
-      createButton(BtnFindSL+"_D1","(D1)SL",chart_width-55*2, y_start-10,50,20,clrBlack,clrYellow);
-      createButton(BtnFindSL+"_H4","("+get_time_frame_name(Period())+")SL",chart_width-55*1, y_start-10,50,20,clrBlack,clrActiveBtn);
+      createButton(BtnSetSLHere,"Set SL",   chart_width*1/3,  y_start-10,50,20,clrBlack,clrWhite);
+
+      createButton(BtnFindSL+"_W1","(W1)",chart_width-35*4, y_start-10,30,20,clrBlack,clrLightGray);
+      createButton(BtnFindSL+"_D1","(D1)",chart_width-35*3, y_start-10,30,20,clrBlack,clrYellow);
+      createButton(BtnFindSL+"_H4","("+get_time_frame_name(Period())+")",chart_width-35*2, y_start-10,30,20,clrBlack,clrActiveBtn);
+      createButton(BtnFindSL+"_H1","(H1)",chart_width-35*1, y_start-10,30,20,clrBlack,clrActiveBtn);
      }
 
 //if(ChartTimePriceToXY(0,0,time,SL,x,y_start))
@@ -1209,13 +1211,34 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
       //----------------------------------------------------------------------------------------------------
       if(allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
         {
-         string msg_R1C1 = getAlertOpenTradeMsg(symbol,TradingPeriod,"");
+         string msg_R1C1 = getAlertOpenTradeMsg(symbol,PERIOD_M30,"");
          if(msg_R1C1 != "")
            {
             if(allow_alert && CountBSL(symbol,total_comments)=="")
                Alert(get_vnhour()+" "+msg_R1C1);
 
             PushMessage(str_index+msg_R1C1,FILE_MSG_LIST_R1C1);
+           }
+        }
+      //----------------------------------------------------------------------------------------------------
+      bool allow_R1C2=allow_PushMessage(symbol,FILE_MSG_LIST_R1C2);
+      if(allow_R1C2)
+        {
+         CandleData arrHeiken_H4[];
+         get_arr_heiken(symbol,PERIOD_H4,arrHeiken_H4,55,true,true);
+
+         string  msg_R1C2 = "";
+         if(msg_R1C2=="" && arrHeiken_H4[0].count_ma10<=3)
+            msg_R1C2 = "H4.Ma10."+IntegerToString(arrHeiken_H4[0].count_ma10)+" "+arrHeiken_H4[0].trend_by_ma10;
+         if(msg_R1C2=="" && arrHeiken_H4[0].count_ma20<=3)
+            msg_R1C2 = "H4.Ma20."+IntegerToString(arrHeiken_H4[0].count_ma20)+" "+arrHeiken_H4[0].trend_by_ma20;
+
+         if(msg_R1C2 != "")
+           {
+            if(allow_alert && CountBSL(symbol,total_comments)=="")
+               Alert(get_vnhour()+" "+msg_R1C2);
+            allow_R1C2=false;
+            PushMessage(symbol+" "+msg_R1C2,FILE_MSG_LIST_R1C2);
            }
         }
       //----------------------------------------------------------------------------------------------------
@@ -1846,7 +1869,7 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM=false, bool incl
       ObjectSetInteger(0, fibo_name, OBJPROP_COLOR, clrNONE);
       ObjectSetInteger(0, fibo_name, OBJPROP_BACK, false);
 
-      double levels[] = {0,1,2,3};
+      double levels[] = {0,1,2,3, 1.618,2.618,3.618};
       int levels_count = ArraySize(levels);
       ObjectSetInteger(0, fibo_name, OBJPROP_LEVELS, levels_count);
 
@@ -1855,7 +1878,8 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM=false, bool incl
          ObjectSetDouble(0, fibo_name, OBJPROP_LEVELVALUE, i, levels[i]);
          ObjectSetInteger(0, fibo_name, OBJPROP_LEVELCOLOR, i, clrBlue);
          ObjectSetInteger(0, fibo_name, OBJPROP_LEVELSTYLE, i, STYLE_SOLID);
-         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELWIDTH, i, 1);
+         ObjectSetInteger(0, fibo_name, OBJPROP_LEVELWIDTH, i, 2);
+         ObjectSetString(0,fibo_name,OBJPROP_LEVELTEXT,i,DoubleToString(1*MathAbs(levels[i]),3)+"   ");
         }
      }
 //---------------------------------------------------------------------------------------------------------------
@@ -4140,7 +4164,7 @@ void OnChartEvent(const int     id,      // event ID
             if(cur_sl_buy>0)
                SetGlobalVariable(GLOBAL_VAR_SL+symbol, cur_sl_buy);
             else
-               FindSL(PERIOD_D1,TREND_BUY);
+               FindSL(Period(),TREND_BUY);
            }
          else
            {
@@ -4149,7 +4173,7 @@ void OnChartEvent(const int     id,      // event ID
             if(cur_sl_sel>0)
                SetGlobalVariable(GLOBAL_VAR_SL+symbol, cur_sl_sel);
             else
-               FindSL(PERIOD_D1,TREND_SEL);
+               FindSL(Period(),TREND_SEL);
            }
 
          init_sl_tp_trendline(false);
@@ -4205,9 +4229,15 @@ void OnChartEvent(const int     id,      // event ID
          double amp_trade=MathAbs(SL-LM);
 
          if(LM>SL)//TREND_BUY->TREND_SEL
-            SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM+amp_trade);
+           {
+            SetGlobalVariable(GLOBAL_VAR_LM+symbol,SL);
+            SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM);
+           }
          else //TREND_SEL->TREND_BUY
-            SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM-amp_trade);
+           {
+            SetGlobalVariable(GLOBAL_VAR_LM+symbol,SL);
+            SetGlobalVariable(GLOBAL_VAR_SL+symbol,LM);
+           }
 
          init_sl_tp_trendline(false);
 
@@ -4365,13 +4395,17 @@ void OnChartEvent(const int     id,      // event ID
          double LM=GetGlobalVariable(GLOBAL_VAR_LM+symbol);
          string trend = (LM>SL)?TREND_BUY:TREND_SEL;
 
-         if(is_same_symbol(sparam, "_H4"))
-            FindSL(Period(), trend);
+
+         if(is_same_symbol(sparam, "_H1"))
+            FindSL(PERIOD_H1, trend);
          else
-            if(is_same_symbol(sparam, "_D1"))
-               FindSL(PERIOD_D1, trend);
+            if(is_same_symbol(sparam, "_H4"))
+               FindSL(Period(), trend);
             else
-               FindSL(PERIOD_W1, trend);
+               if(is_same_symbol(sparam, "_D1"))
+                  FindSL(PERIOD_D1, trend);
+               else
+                  FindSL(PERIOD_W1, trend);
 
          SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
          OnInit();
@@ -4640,16 +4674,16 @@ void OnChartEvent(const int     id,      // event ID
          if(intPeriod<0)
             intPeriod=PERIOD_H4;
 
-         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_D1)))
-         //   intPeriod = PERIOD_D1;
-         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_H4)))
-         //   intPeriod = PERIOD_H4;
-         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_H1)))
-         //   intPeriod = PERIOD_H1;
-         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_M30)))
-         //   intPeriod = PERIOD_M30;
-         //if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_M15)))
-         //   intPeriod = PERIOD_M15;
+         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_D1)))
+            intPeriod = PERIOD_D1;
+         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_H4)))
+            intPeriod = PERIOD_H4;
+         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_H1)))
+            intPeriod = PERIOD_H1;
+         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_M30)))
+            intPeriod = PERIOD_M30;
+         if(is_same_symbol(buttonLabel,get_time_frame_name(PERIOD_M15)))
+            intPeriod = PERIOD_M15;
 
          OpenChartWindow(buttonLabel,(ENUM_TIMEFRAMES)intPeriod);
 
