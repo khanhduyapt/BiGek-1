@@ -303,20 +303,20 @@ int OnInit()
    Draw_Ma10(cur_symbol,PERIOD_W1,15,25);
    LoadTrendlines();
 
-   double mid = getPriceMid3d(cur_symbol);
-   create_trend_line("mid_line_d3",iTime(cur_symbol,PERIOD_D1,2),mid,TimeCurrent(),mid,clrRed,STYLE_SOLID,1,false,false,true,false);
+//double mid = getPriceMid3d(cur_symbol);
+//create_trend_line("mid_line_d3",iTime(cur_symbol,PERIOD_D1,2),mid,TimeCurrent(),mid,clrRed,STYLE_SOLID,1,false,false,true,false);
 
-   CandleData arrHeiken_Cr[];
-   get_arr_heiken(cur_symbol,Period(),arrHeiken_Cr,50,true,true);
-   color clrColorCr = clrBlack;
-   if(is_same_symbol(arrHeiken_Cr[0].trend_by_ma10+arrHeiken_Cr[0].trend_by_ma20+arrHeiken_Cr[0].trend_ma10vs20,TREND_SEL)==false)
-      clrColorCr = clrBlue;
-   if(is_same_symbol(arrHeiken_Cr[0].trend_by_ma10+arrHeiken_Cr[0].trend_by_ma20+arrHeiken_Cr[0].trend_ma10vs20,TREND_BUY)==false)
-      clrColorCr = clrRed;
-   create_label_simple("Cr", "        "+
-                       "Ma10[0] " + getShortName(arrHeiken_Cr[0].trend_by_ma10) + "."+ IntegerToString(arrHeiken_Cr[0].count_ma10) + "    "
-                       "Ma20[0] " + getShortName(arrHeiken_Cr[0].trend_by_ma20) + "."+ IntegerToString(arrHeiken_Cr[0].count_ma20) + "    "
-                       "Ma10.20 " + getShortName(arrHeiken_Cr[0].trend_ma10vs20), mid, clrColorCr, TimeCurrent());
+//CandleData arrHeiken_Cr[];
+//get_arr_heiken(cur_symbol,Period(),arrHeiken_Cr,50,true,true);
+//color clrColorCr = clrBlack;
+//if(is_same_symbol(arrHeiken_Cr[0].trend_by_ma10+arrHeiken_Cr[0].trend_by_ma20+arrHeiken_Cr[0].trend_ma10vs20,TREND_SEL)==false)
+//   clrColorCr = clrBlue;
+//if(is_same_symbol(arrHeiken_Cr[0].trend_by_ma10+arrHeiken_Cr[0].trend_by_ma20+arrHeiken_Cr[0].trend_ma10vs20,TREND_BUY)==false)
+//   clrColorCr = clrRed;
+//create_label_simple("Cr", "        "+
+//                    "Ma10[0] " + getShortName(arrHeiken_Cr[0].trend_by_ma10) + "."+ IntegerToString(arrHeiken_Cr[0].count_ma10) + "    "
+//                    "Ma20[0] " + getShortName(arrHeiken_Cr[0].trend_by_ma20) + "."+ IntegerToString(arrHeiken_Cr[0].count_ma20) + "    "
+//                    "Ma10.20 " + getShortName(arrHeiken_Cr[0].trend_ma10vs20), mid, clrColorCr, TimeCurrent());
 
 
 //int index3=GetEndIndexOfWave3(Symbol(),Period());
@@ -4913,7 +4913,7 @@ void OnChartEvent(const int     id,      // event ID
 
          string comment_mk1=create_comment(get_ddhh(),trend_now,count_trade+1,"");
 
-         if(count_trade>=1 && profit<=1)
+         if(count_trade>=2 && profit<=1)
            {
             Alert(DoubleToString(profit,2) + "$    Khong cho nhoi lenh: "+ symbol + "    "+comment_mk1);
             SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
@@ -5967,11 +5967,12 @@ string CountBSL(string symbol,string &total_comments, bool show_volume=false)
                //ObjectSetString(0,BtnSetSLHere,OBJPROP_TEXT,text);
 
                string lblProfit = "Profit"+(string)m_position.Ticket();
-               create_label_simple(lblProfit
-                                   ,"    "+getShortName(m_position.TypeDescription())+" "+DoubleToString(temp_profit,1)+"$"//+"    "+m_position.Comment()
-                                   ,m_position.PriceOpen(),temp_profit<0?clrRed:clrBlue,m_position.Time());
-               ObjectSetDouble(0,lblProfit,OBJPROP_ANGLE,180);
-               ChartRedraw();
+               string label = ".............................."
+                              +(is_same_symbol(m_position.TypeDescription(),TREND_BUY)?"Buy":"Sell")
+                              +" "+(temp_profit>0?"+":"")+DoubleToString(temp_profit,1)+" $";
+               create_label_simple(lblProfit,label,iLow(symbol,PERIOD_W1,0),temp_profit<0?clrRed:clrBlue,m_position.Time(),0,9);
+               ObjectSetDouble(0,lblProfit,OBJPROP_ANGLE,-90);
+               ObjectSetInteger(0,lblProfit,OBJPROP_ANCHOR,ANCHOR_CENTER);
 
                if(MathAbs(temp_profit)>0)
                  {
@@ -6046,9 +6047,10 @@ string CountBSL(string symbol,string &total_comments, bool show_volume=false)
 
             if(is_cur_tab)
               {
-               create_label_simple("Profit"+(string)m_order.Ticket()
-                                   ,"(LM)    "+m_order.Comment()
-                                   ,m_order.PriceOpen(),clrBlack,draw_time);
+               string lblName="Profit_"+(string)m_order.Ticket();
+               create_label_simple(lblName,"(LM)    "+m_order.Comment(),m_order.PriceOpen(),clrBlack,draw_time);
+               //ObjectSetDouble(0,lblName,OBJPROP_ANGLE,90);
+               //ObjectSetInteger(0,lblName,OBJPROP_ANCHOR,ANCHOR_CENTER);
 
                if(m_order.StopLoss()>0)
                  {
@@ -7759,8 +7761,8 @@ void LoadTrendlines()
          ObjectSetInteger(0, trendline_name, OBJPROP_SELECTABLE, true);
          ObjectSetInteger(0, trendline_name, OBJPROP_SELECTED, false);
 
-         ObjectSetInteger(0, trendline_name, OBJPROP_RAY_LEFT, true);
-         ObjectSetInteger(0, trendline_name, OBJPROP_RAY_RIGHT, true);
+         //ObjectSetInteger(0, trendline_name, OBJPROP_RAY_LEFT, true);
+         //ObjectSetInteger(0, trendline_name, OBJPROP_RAY_RIGHT, true);
         }
      }
 
