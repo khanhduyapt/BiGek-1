@@ -593,14 +593,16 @@ void DrawButtons()
    int start_x,y_start;
    ChartTimePriceToXY(0,0,iTime(symbol,Period(),0),LM,start_x,y_start);
 
-   createButton(BtnSetAmpTrade+"??","Amp",  start_x-50*2,5,60,25,clrBlack,clrYellow,7,1);
+   bool IS_FIBO_LINE=GetGlobalVariable(BtnFiboline)==AUTO_TRADE_ONN;
+
    createButton(BtnResetTimeline,  "Reset", start_x+50*0,5,60,25,clrBlack,clrYellow,7,1);
    createButton(BtnMacdMode,       "Macd",  start_x+50*2,5,45,25,clrBlack,IS_MACD_DOT?clrActiveBtn:clrWhite,7,1);
-   createButton(BtnHorTrendline+TREND_BUY,   "-----", start_x+50*3,5,45,25,clrBlue,clrWhite,30,1);
-   createButton(BtnHorTrendline+TREND_SEL,   "-----", start_x+50*4,5,45,25,clrRed,clrWhite, 30,1);
-   createButton(BtnSaveTrendline,  "Save",   start_x+50*5,5,45,25,clrBlack,clrPaleTurquoise,7,1);
-   createButton(BtnAddTrendline,   "Clone",  start_x+50*6,5,45,25,clrBlack,clrWhite,7,1);
-   createButton(BtnClearTrendline, "Delete", start_x+50*7,5,45,25,clrBlack,clrLightGray,7,1);
+   createButton(BtnFiboline,       "Fibo",            start_x+50*3,5,45,25,clrBlack,IS_FIBO_LINE?clrActiveBtn:clrWhite,7,1);
+   createButton(BtnHorTrendline+TREND_BUY,   "-----", start_x+50*4,5,45,25,clrBlue,clrWhite,30,1);
+   createButton(BtnHorTrendline+TREND_SEL,   "-----", start_x+50*5,5,45,25,clrRed,clrWhite, 30,1);
+   createButton(BtnSaveTrendline,  "Save",            start_x+50*6,5,45,25,clrBlack,clrPaleTurquoise,7,1);
+   createButton(BtnAddTrendline,   "Clone",           start_x+50*7,5,45,25,clrBlack,clrWhite,7,1);
+   createButton(BtnClearTrendline, "Delete",          start_x+50*8+15,5,45,25,clrBlack,clrLightGray,7,1);
 
 //--------------------------------------------------------------------------------------------
    createButton(BtnClearMessageRxCx,"Check",540+250+460,10,75,30,clrBlack,clrYellowGreen,8);
@@ -1020,6 +1022,7 @@ void init_sl_tp_trendline(bool is_reset_sl,bool reverse_ma10d1=false)
       createButton(BtnSetAmpTrade+"H4","H4", start_group_reverse+170+35*5,y_start-10,30,20,clrBlack,is_same_symbol(trend,TREND_BUY)?clrActiveBtn:clrActiveSell);
       createButton(BtnSetAmpTrade+"00","00", start_group_reverse+170+35*6,y_start-10,30,20,clrBlack,clrYellow);
       createButton(BtnRevRR,           "Rev",start_group_reverse+170+35*7,y_start-10,50,20,clrBlack,clrYellow);
+      createButton(BtnSetAmpTrade+"??","Amp",start_group_reverse+170+35*9,y_start-10,50,20,clrBlack,clrYellow);
      }
 
    if(ChartTimePriceToXY(0,0,time,rr11,x,y_start))
@@ -1207,13 +1210,13 @@ void LoadTradeBySeqEvery5min(bool allow_alert=true)
             SetGlobalVariable(symbol,0);
 
       //----------------------------------------------------------------------------------------------------
-      if(allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
+      if(trend_seq_102050_h4!="" && allow_PushMessage(symbol,FILE_MSG_LIST_R1C1))
         {
          string msg_R1C1 = getAlertOpenTradeMsg(symbol,PERIOD_M30,trend_seq_102050_h4);
          if(msg_R1C1 != "")
            {
-            if(allow_alert && CountBSL(symbol,total_comments)=="")
-               Alert(get_vnhour()+" "+msg_R1C1);
+            //if(allow_alert && CountBSL(symbol,total_comments)=="")
+            //   Alert(get_vnhour()+" "+msg_R1C1);
 
             PushMessage(str_index+msg_R1C1,FILE_MSG_LIST_R1C1);
            }
@@ -1767,6 +1770,59 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM=false, bool incl
          higest=hig;
      }
 
+   bool IS_FIBO_LINE=GetGlobalVariable(BtnFiboline)==AUTO_TRADE_ONN;
+   if(IS_FIBO_LINE)
+     {
+      double higest_fibo=0;
+      double lowest_fibo=DBL_MAX;
+      string trend_index3="";
+      int candle_index3=find_index_off_macd_extremes(symbol,TF,candle_index2,trend_index3);
+      for(int idx=candle_index3; idx<=candle_index2; idx++)
+        {
+         double low=iLow(symbol,TF,idx);
+         double hig=iHigh(symbol,TF,idx);
+         if(lowest_fibo>low)
+            lowest_fibo=low;
+         if(higest_fibo<hig)
+            higest_fibo=hig;
+        }
+      datetime time3=iTime(symbol,TF,candle_index3);
+      //Alert(trend_index3,candle_index3);
+      if(trend_index3==TREND_BUY)
+         create_trend_line("TREND_CUR",time3,lowest_fibo,time3,higest_fibo,clrBlue,STYLE_SOLID,3,false,false,false,false);
+      if(trend_index3==TREND_SEL)
+         create_trend_line("TREND_CUR",time3,lowest_fibo,time3,higest_fibo,clrRed,STYLE_SOLID,3,false,false,false,false);
+      ObjectSetInteger(0,"TREND_CUR",OBJPROP_SELECTABLE, true);
+      ObjectSetInteger(0,"TREND_CUR",OBJPROP_SELECTED, true);
+
+      double levels_cur[] = {0, 0.382, 0.5, 0.618, 0.786, 1
+                             , 1.382,-0.382
+                            };
+      string name_cur = "FIBO_CUR";
+      ObjectDelete(0,name_cur);
+      ObjectCreate(0,name_cur,OBJ_FIBO,0,base_time_2,lowest_fibo,TimeCurrent()+time_shift*20,higest_fibo);
+
+      ObjectSetInteger(0,name_cur,OBJPROP_COLOR,clrNONE);
+      ObjectSetInteger(0,name_cur,OBJPROP_RAY_LEFT,false);
+      ObjectSetInteger(0,name_cur,OBJPROP_RAY_RIGHT,false);
+
+      int size_screen = ArraySize(levels_cur);
+      ObjectSetInteger(0,name_cur,OBJPROP_LEVELS,size_screen);
+
+      for(int i=0; i<size_screen; i++)
+        {
+         ObjectSetDouble(0,name_cur,OBJPROP_LEVELVALUE,i,levels_cur[i]);
+         ObjectSetInteger(0,name_cur,OBJPROP_LEVELWIDTH,i,1);
+         ObjectSetInteger(0,name_cur,OBJPROP_LEVELCOLOR,i,clrGray);
+         if(levels_cur[i]== 0 || levels_cur[i]== 1)
+            ObjectSetInteger(0,name_cur,OBJPROP_LEVELSTYLE,i,STYLE_SOLID);
+         else
+            ObjectSetInteger(0,name_cur,OBJPROP_LEVELSTYLE,i,STYLE_DOT);
+         ObjectSetString(0,name_cur,OBJPROP_LEVELTEXT,i,DoubleToString(1*MathAbs(levels_cur[i]<0?levels_cur[i]-1:levels_cur[i]),3)+"   ");
+        }
+
+     }
+
    double mid = (lowest+higest)/2;
 //Alert(candle_index1, "  ", candle_index2);// ->  43  26
 
@@ -1798,7 +1854,7 @@ void DrawFiboTimeZone52H4(ENUM_TIMEFRAMES TF, bool is_set_SL_LM=false, bool incl
    if(count_d>10)
      {
       double levels_screen[] = {0, 0.113, 0.236, 0.382, 0.5, 0.618, 0.786, 0.886, 1
-                                , 1.236, 1.382, 1.618, 2,-0.236,-0.382,-0.618,-1,-1.618,-2,-2.618,-3,-3.618
+                                , 1.236, 1.382, 1.618, 2, 2.618, 3, 3.618,-0.236,-0.382,-0.618,-1,-1.618,-2,-2.618,-3,-3.618
                                };
       ObjectDelete(0,name);
       ObjectCreate(0,name,OBJ_FIBO,0,base_time_1,lowest,base_time_2,higest);
@@ -2016,7 +2072,7 @@ void FindFirstMA6vs10Cross(string symbol, ENUM_TIMEFRAMES timeframe, int ma_peri
 //+------------------------------------------------------------------+
 int GetEndIndexOfWave3(string symbol, ENUM_TIMEFRAMES timeframe)
   {
-   int m_handle_macd = iMACD(symbol, timeframe, 12, 26, 9, PRICE_CLOSE);
+   int m_handle_macd = iMACD(symbol, timeframe, 18, 36, 9, PRICE_CLOSE);
    if(m_handle_macd == INVALID_HANDLE)
      {
       printf("MACD handle is invalid.");
@@ -2039,7 +2095,7 @@ int GetEndIndexOfWave3(string symbol, ENUM_TIMEFRAMES timeframe)
    int end_wave1 = -1;
    int start_wave2 = -1;
    int start_wave3 = -1;
-   int MIN_CANDLE_COUNT=7;
+   int MIN_CANDLE_COUNT=13;
 
    for(int i = 2; i < len - 1; i++)
      {
@@ -2203,6 +2259,82 @@ string find_trend_by_macd_extremes(string symbol, ENUM_TIMEFRAMES timeframe)
      }
 
    return "300";
+  }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+int find_index_off_macd_extremes(string symbol, ENUM_TIMEFRAMES timeframe, int end_index, string &cur_trend)
+  {
+   cur_trend="";
+   int m_handle_macd = iMACD(symbol,timeframe,18,36,9,PRICE_CLOSE);
+   if(m_handle_macd == INVALID_HANDLE)
+     {
+      printf("MACD handle is invalid.");
+      return 5;
+     }
+
+   double m_buff_MACD_main[];
+   ArraySetAsSeries(m_buff_MACD_main, true);
+   int copied_main = CopyBuffer(m_handle_macd,0,0,end_index,m_buff_MACD_main); // Chỉ số 0: MACD Main Line
+   if(copied_main <= 0)
+     {
+      printf("Failed to copy MACD buffers.");
+      return 5;
+     }
+
+   int highest_positive_index = -1; // Chỉ số của nến có Histogram cao nhất khi dương
+   int lowest_negative_index = -1;  // Chỉ số của nến có Histogram thấp nhất khi âm
+
+   double cur_histogram = m_buff_MACD_main[0];
+   cur_trend=cur_histogram>0?TREND_BUY:TREND_SEL;
+
+   for(int i=0; i<copied_main;i++)
+     {
+      double macd_histogram = m_buff_MACD_main[i];
+
+      // Sóng ÂM
+      if(cur_trend==TREND_SEL)
+         if(macd_histogram<=0)
+           {
+            int lowest_negative_index=i;
+            double lowest=DBL_MAX;
+            for(int j=i;j<copied_main;j++)
+              {
+               double histogram = m_buff_MACD_main[j];
+               if(lowest>histogram)
+                 {
+                  lowest=histogram;
+                  lowest_negative_index=j;
+                 }
+
+               if(histogram>0)
+                  return lowest_negative_index;
+              }
+           }
+
+      // Sóng DƯƠNG
+      if(cur_trend==TREND_BUY)
+         if(macd_histogram>=0)
+           {
+            int highest_positive_index=i;
+            double highest=-DBL_MAX;
+            for(int j=i;j<copied_main;j++)
+              {
+               double histogram = m_buff_MACD_main[j];
+               if(highest<histogram)
+                 {
+                  highest=histogram;
+                  highest_positive_index=j;
+                 }
+
+               if(histogram<0)
+                  return highest_positive_index;
+              }
+           }
+     }
+
+   return 5;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -3895,14 +4027,6 @@ void OnChartEvent(const int     id,      // event ID
          return;
         }
 
-      if(is_same_symbol(sparam,BtnFiboline))
-        {
-         AddFiboline();
-         ChartRedraw();
-         SetGlobalVariable("PROCESSING", AUTO_TRADE_OFF);
-         return;
-        }
-
       if(is_same_symbol(sparam,BtnAddSword))
         {
          AddSword(sparam);
@@ -3949,7 +4073,8 @@ void OnChartEvent(const int     id,      // event ID
          return;
         }
 
-      if(is_same_symbol(sparam,BtnMacdMode) ||
+      if(is_same_symbol(sparam,BtnFiboline) ||
+         is_same_symbol(sparam,BtnMacdMode) ||
          is_same_symbol(sparam,BtnColorMode) ||
          is_same_symbol(sparam,BtnHideDrawMode) ||
          is_same_symbol(sparam,BtnHideAngleMode))
@@ -4160,7 +4285,7 @@ void OnChartEvent(const int     id,      // event ID
            }
 
          init_sl_tp_trendline(false);
-         DrawFiboTimeZone52H4(PERIOD);
+         DrawFiboTimeZone52H4(PERIOD,true);
 
          return;
         }
