@@ -1,0 +1,128 @@
+1) Phân tích bctc của BVB. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+### 1. **Phân tích báo cáo tài chính (BCTC) của BVB – Quý 1/2025**
+
+#### **Kết quả kinh doanh**
+
+* **Thu nhập lãi & DV**: Tăng trưởng đều, đạt **1.828,36 tỷ** (Q1/2025) từ **1.599,99 tỷ** (Q1/2024).
+* **Lợi nhuận từ lãi & DV**: Tăng từ **492,70 tỷ** (Q1/2024) lên **522,82 tỷ** (Q1/2025).
+* **LN từ HĐKD**: Tăng trưởng tốt, đạt **223,91 tỷ** (Q1/2025).
+* **LNST**: Đạt **64,11 tỷ**, gấp hơn **1.1 lần** so với Q1/2024 (**55,26 tỷ**).
+* **LNST dành cho cổ đông công ty mẹ**: **64,11 tỷ** – cùng giá trị với LNST, cho thấy không có lợi ích CĐTS thiểu số.
+
+📌 **Tăng trưởng lợi nhuận tốt, cải thiện hiệu quả hoạt động.**
+
+---
+
+#### **Bảng cân đối kế toán**
+
+* **Tổng tài sản**: Tăng mạnh từ **83.956 tỷ** (Q1/2024) → **110.118 tỷ** (Q1/2025).
+* **Cho vay khách hàng**: Tăng trưởng từ **56.234 tỷ** → **72.392 tỷ**.
+* **Tiền gửi khách hàng**: Tăng tương ứng từ **59.682 tỷ** → **71.012 tỷ**.
+* **Vốn chủ sở hữu**: Tăng từ **5.958 tỷ** → **6.219 tỷ**.
+
+📌 **Tài sản, tín dụng và vốn tăng đều, không đòn bẩy quá mức.**
+
+---
+
+#### **Các chỉ số tài chính**
+
+**Định giá:**
+
+* **P/E**: 22.43 – tương đối cao
+* **P/B**: 1.15 – hợp lý với ngân hàng
+* **EPS**: 580.05 đ – tăng trưởng ổn định
+
+**Khả năng sinh lợi:**
+
+* **ROE**: 5.26% – thấp, dưới trung bình ngành ngân hàng (>12%)
+* **ROA**: 0.33% – cũng thấp
+* **NIM**: 2.58% – mức trung bình thấp trong ngành (3–4% là tốt)
+* **CIR**: 57.99% – chi phí hoạt động còn cao
+
+**Tài chính:**
+
+* **LDR**: 99.73% – mức cao, tiềm ẩn rủi ro thanh khoản
+* **CAR (CTA)**: 1.49 – chưa rõ cách tính, nếu là hệ số an toàn vốn thì khá thấp
+* **Nợ xấu (NPL)**: 3.43% – gần ngưỡng báo động (>3%)
+* **PCL (dự phòng)**: 1.02% – chưa đủ cao nếu nợ xấu tăng
+
+📌 **Sinh lợi thấp, nợ xấu cao, nhưng vẫn đang tăng trưởng.**
+
+---
+
+### 2. **Định giá cổ phiếu BVB theo 3 phương pháp**
+
+#### **A. P/B – Giá trị sổ sách**
+
+* Vốn CSH Q1/2025: **6.219 tỷ**
+* Số lượng cổ phiếu ước tính: Giả sử **EPS = 580đ**, LNST \~64,11 tỷ ⇒ Số cổ phiếu ≈ `64.110 / 580 ≈ 110.5 triệu cp`
+
+✅ **Giá trị sổ sách mỗi cổ phiếu = 6.219 tỷ / 110.5 triệu ≈ 56.28 nghìn đồng**
+→ Giá trị theo P/B = 56.28 \* 1.15 ≈ **64.72 nghìn đồng**
+
+---
+
+#### **B. P/E – Trung bình ngành**
+
+* EPS: **580.05 đ/cp**
+* P/E ngành ngân hàng nhỏ (trung bình): **10x – 12x**
+  → Giá hợp lý theo P/E = 580 \* 10 = **5.800 đ/cp** đến **6.960 đ/cp**
+  → Lấy trung bình: **6.380 đ/cp**
+
+---
+
+#### **C. DCF – Giản lược**
+
+* Giả định LNST tăng trưởng 10%/năm trong 5 năm.
+* Chiết khấu: 12% (ngân hàng có rủi ro vừa).
+* DCF ≈ LNST \* (1 – (1 + g)^n / (1 + r)^n ) / (r – g)
+
+  * g = 10%, r = 12%, n = 5
+  * LNST \~ 64.11 tỷ
+  * PV ≈ 64.11 \* 3.79 ≈ **243 tỷ**
+  * Giá trị DCF/cp ≈ 243 tỷ / 110.5 triệu ≈ **22.0 nghìn đồng**
+
+---
+
+#### **Tổng hợp định giá**
+
+| Phương pháp | Giá trị (nghìn đ/cp) | Trọng số |
+| ----------- | -------------------- | -------- |
+| P/E         | 6.38                 | 50%      |
+| P/B         | 64.72                | 30%      |
+| DCF         | 22.00                | 20%      |
+
+✅ **Giá trị hợp lý = 6.38×0.5 + 64.72×0.3 + 22.00×0.2 ≈ 3.19 + 19.42 + 4.40 = \~27.0 nghìn đồng/cp**
+
+---
+
+### 3. **Xác định giá kỳ vọng**
+
+* Hiện tại, giá trị hợp lý BVB theo phân tích là **\~27.000 đ/cp**.
+* So sánh với giá thị trường:
+
+  * Nếu giá thị trường < 20.000đ: Cổ phiếu đang **rẻ**, có thể mua.
+  * Nếu giá \~27.000đ: Cổ phiếu đang **định giá hợp lý**.
+  * Nếu > 30.000đ: Đã bắt đầu **cao hơn giá trị thực**, nên cẩn trọng.
+
+📌 Với tình hình tăng trưởng lợi nhuận, cải thiện tài sản, **BVB có thể đạt vùng giá kỳ vọng \~27,000đ/cp** trong trung hạn (6–12 tháng), nếu:
+
+* Tiếp tục tăng trưởng tín dụng, kiểm soát nợ xấu
+* Cải thiện biên lãi ròng (NIM) và giảm CIR
+
+---
+
+Nếu bạn muốn tôi tạo **file Excel định giá cổ phiếu BVB theo mô hình này** hoặc mô hình chiết khấu chi tiết hơn (FCFE), hãy cho tôi biết.

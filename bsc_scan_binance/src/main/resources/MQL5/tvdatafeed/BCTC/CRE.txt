@@ -1,0 +1,113 @@
+Phân tích bctc của CRE. 
+Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành.
+Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+
+Dưới đây là phân tích báo cáo tài chính (BCTC) quý gần nhất của **CRE (CENLAND)** và định giá cổ phiếu theo 3 phương pháp.
+
+---
+
+## 🔍 1. Phân tích nhanh BCTC của CRE (Q1/2025)
+
+### ✅ **Kết quả kinh doanh (Quý gần nhất – Q1/2025):**
+
+| Chỉ tiêu                  | Giá trị (tỷ VND) |
+| ------------------------- | ---------------- |
+| Doanh thu thuần           | 154.34           |
+| Lợi nhuận gộp             | 45.82            |
+| LN từ HĐKD                | 5.94             |
+| Lợi nhuận sau thuế (LNST) | 5.13             |
+| LNST công ty mẹ           | 3.01             |
+
+➡️ **Biên lợi nhuận gộp**: 45.82 / 154.34 = **29.7%** (tốt)
+
+➡️ **Tỷ suất LNST/DT**: 5.13 / 154.34 = **3.32%** (thấp)
+
+➡️ **Lợi nhuận đang phục hồi nhưng vẫn rất thấp so với cùng kỳ 2022–2023.**
+
+---
+
+### ✅ **Cân đối kế toán – Q1/2025:**
+
+| Khoản mục            | Giá trị (tỷ VND)               |
+| -------------------- | ------------------------------ |
+| Tổng tài sản         | 7,289.45                       |
+| Nợ phải trả          | 7,289.45 – 5,686.61 = 1,602.84 |
+| Nguồn vốn chủ sở hữu | 5,686.61                       |
+
+➡️ **Tỷ lệ nợ/VCSH (D/E)**: 1,602.84 / 5,686.61 = **0.28** (rất thấp – an toàn tài chính cao)
+
+---
+
+### ✅ **Chỉ số tài chính (phải lưu ý):**
+
+| Chỉ số           | Giá trị                                   |
+| ---------------- | ----------------------------------------- |
+| **P/E**          | 109.14 (rất cao, do lợi nhuận thấp)       |
+| **P/B**          | 0.70 (thấp – cổ phiếu đang bị chiết khấu) |
+| **EPS trailing** | 78.16 đ/cp                                |
+| **ROE**          | 0.64%                                     |
+| **ROA**          | 0.51%                                     |
+| **ROIC**         | 1.65%                                     |
+
+➡️ Kết luận: **CRE đang ở vùng đáy kinh doanh**, cổ phiếu bị chiết khấu mạnh, tuy nhiên chưa có tín hiệu phục hồi rõ rệt về lợi nhuận.
+
+---
+
+## 📌 2. Định giá cổ phiếu CRE
+
+### 🔹 **Phương pháp 1: P/B (giá trị sổ sách)**
+
+* Vốn chủ sở hữu = **5,686.61 tỷ**
+* Ước số lượng cổ phiếu lưu hành: **ước tính \~130 triệu cp**
+* ⇒ **Book Value/CP = 5,686.61 / 130 ≈ 43,74K đồng**
+* Với mức P/B hợp lý từ 0.9 – 1.1 cho BĐS dịch vụ:
+
+  * **Giá hợp lý = 43,740 × 1 = \~43,700 đồng**
+
+---
+
+### 🔹 **Phương pháp 2: P/E trung bình ngành**
+
+* EPS trailing: **78.16 đồng/cp**
+* P/E trung bình ngành BĐS dịch vụ hiện tại ≈ **12–15**
+* ⇒ **Giá hợp lý = 78.16 × 13.5 ≈ 1,055 đồng**
+
+➡️ **Giá này quá thấp**, phản ánh rõ việc LNST đang quá bé, chưa phản ánh giá trị doanh nghiệp thật. Phương pháp P/E không phù hợp ở thời điểm đáy lợi nhuận.
+
+---
+
+### 🔹 **Phương pháp 3: DCF giản lược**
+
+Giả định:
+
+* LNST ước năm = 4 × 5.13 = **\~20.52 tỷ**
+* Số CP: 130 triệu
+* EPS forward = 158 đồng/cp
+* Giả sử tăng trưởng lợi nhuận \~12%/năm, chi phí vốn (WACC) = 14%
+
+→ **Giá hợp lý = 158 / (0.14 – 0.12) = 7,900 đồng**
+
+---
+
+## 🎯 3. Tổng kết – Giá mục tiêu hợp lý
+
+| Phương pháp                        | Giá hợp lý                                                         |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| P/B                                | 43,700 đ                                                           |
+| P/E                                | 1,055 đ                                                            |
+| DCF giản lược                      | 7,900 đ                                                            |
+| **Trung bình trọng số điều chỉnh** | **\~18,000 – 22,000 đ/cp** (giả định hồi phục lợi nhuận 2025–2026) |
+
+---
+
+## 📈 Kết luận
+
+* **CRE đang bị thị trường chiết khấu mạnh** do lợi nhuận sụt giảm lớn.
+* Tuy nhiên, **về tài sản và cấu trúc tài chính**, công ty vẫn vững mạnh (D/E thấp, P/B < 1).
+* Nếu lợi nhuận cải thiện trở lại mức 200–300 tỷ/năm như 2021–2022, cổ phiếu có thể tăng về vùng **35,000 – 40,000**.
+
+### 🔮 **Giá kỳ vọng hợp lý (trong 12–18 tháng)**: **\~18,000 – 22,000 đồng/cổ phiếu**
+
+---
+
+Nếu bạn muốn, tôi có thể dựng thêm bảng DCF chi tiết hơn dựa trên giả định dòng tiền từ kinh doanh và tỷ lệ tăng trưởng cụ thể từng năm. Bạn có muốn không?

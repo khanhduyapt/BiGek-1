@@ -1,0 +1,128 @@
+Phân tích bctc của DGC. 
+Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành.
+Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+
+
+
+Dưới đây là **phân tích báo cáo tài chính** và **định giá cổ phiếu DGC (Tập đoàn Hóa chất Đức Giang)** theo 3 phương pháp: **P/B, P/E ngành, và DCF giản lược**, dựa trên số liệu mới nhất Q1/2025.
+
+---
+
+## 🔍 1. **Phân tích tài chính DGC – Quý 1/2025**
+
+### ✅ **Kết quả kinh doanh Q1/2025:**
+
+| Chỉ tiêu        | Giá trị (tỷ VND) |
+| --------------- | ---------------- |
+| Doanh thu thuần | 2,810.31         |
+| Lợi nhuận gộp   | 980.17           |
+| LNST            | 836.79           |
+| LNST công ty mẹ | 809.33           |
+
+➡️ **Biên lợi nhuận gộp**: 980.17 / 2,810.31 = **34.88%** (rất tốt)
+➡️ **Tỷ suất LNST/DT**: 836.79 / 2,810.31 = **29.76%** (cao vượt trội)
+
+### ✅ **Tài chính Q1/2025:**
+
+| Chỉ tiêu        | Giá trị (tỷ VND)                              |
+| --------------- | --------------------------------------------- |
+| Tổng tài sản    | 16,516.12                                     |
+| Nợ phải trả     | 2,201.53                                      |
+| Vốn chủ sở hữu  | 14,314.60                                     |
+| D/E (nợ / VCSH) | 2,201.53 / 14,314.60 = **0.15** (rất an toàn) |
+
+➡️ **Chất lượng tài sản và bảng cân đối rất tốt**, gần như không vay nợ.
+
+### ✅ **Chỉ số tài chính:**
+
+| Chỉ số                        | Giá trị           |
+| ----------------------------- | ----------------- |
+| EPS trailing (4 quý gần nhất) | **8,229.92 đ/cp** |
+| ROE                           | **23.30%**        |
+| ROA                           | **20.18%**        |
+| ROIC                          | **22.85%**        |
+| P/E                           | **10.86**         |
+| P/B                           | **2.43**          |
+
+➡️ Khả năng sinh lời vượt chuẩn ngành, ổn định và có tính phòng thủ tốt.
+
+---
+
+## 📌 2. **Định giá cổ phiếu DGC**
+
+---
+
+### 🔹 **Phương pháp 1: P/B (giá trị sổ sách)**
+
+* Vốn CSH: **14,314.60 tỷ**
+* Ước số cổ phiếu lưu hành: \~ **174 triệu cp**
+* Book Value/cp = 14,314.60 / 174 ≈ **82,270 đ/cp**
+* Mức P/B hiện tại: **2.43**
+
+> Với doanh nghiệp ROE cao > 20%, mức P/B hợp lý có thể từ **2.2 – 2.5**
+
+→ **Giá hợp lý theo P/B = 82,270 × 2.35 ≈ 193,335 đ/cp**
+
+---
+
+### 🔹 **Phương pháp 2: P/E ngành**
+
+* EPS trailing = **8,229.92 đ/cp**
+* P/E trung bình ngành hóa chất cơ bản hiện tại: **12 – 14**
+* DGC có lợi thế cạnh tranh cao → áp dụng P/E \~13.5 là hợp lý
+
+→ **Giá hợp lý theo P/E = 8,229.92 × 13.5 ≈ 111,104 đ/cp**
+
+---
+
+### 🔹 **Phương pháp 3: DCF (giản lược)**
+
+#### Giả định:
+
+* LNST dự kiến năm 2025 = 4 quý gần nhất = **3,142.47 tỷ**
+* FCFE ≈ LNST vì gần như không có nợ
+* Số cổ phiếu: 174 triệu → FCFE/cp ≈ **18,064 đ**
+* WACC (chi phí vốn): **13%**
+* Tăng trưởng dài hạn (g): **6%** (bảo thủ)
+
+> **DCF value = FCFE × (1 + g) / (WACC – g)**
+> → Giá hợp lý = 18,064 × (1.06) / (0.13 – 0.06) ≈ **273,529 đ/cp**
+
+➡️ DCF cho kết quả **rất cao**, do doanh nghiệp có dòng tiền ổn định, biên lợi nhuận lớn, ít nợ → rủi ro thấp
+
+---
+
+## 🎯 3. Tổng hợp giá trị thật
+
+| Phương pháp | Giá hợp lý (đồng/cp) |
+| ----------- | -------------------- |
+| P/B         | \~193,000            |
+| P/E         | \~111,000            |
+| DCF         | \~273,000            |
+
+➡️ **Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)**
+→ **Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = \~159,200 đ/cp**
+
+---
+
+## 🔮 **Giá kỳ vọng hợp lý (6–12 tháng): \~155,000 – 165,000 đ/cp**
+
+---
+
+## 📌 Nhận định
+
+✅ **Lý do nên theo dõi hoặc mua tích lũy DGC**:
+
+* Biên lợi nhuận lớn, ROE vượt trội
+* Nợ vay cực thấp → an toàn chu kỳ
+* Dòng tiền ổn định, EPS cao
+* Thị trường hóa chất phốt pho, phân bón có tiềm năng tăng trưởng
+
+⚠️ **Rủi ro cần theo dõi**:
+
+* Giá hóa chất đầu ra biến động theo chu kỳ
+* Chính sách thương mại/phí môi trường có thể ảnh hưởng đến xuất khẩu
+
+---
+
+Bạn có muốn tôi dựng mô hình DCF chi tiết (bảng dòng tiền từng năm), hay phân tích sâu ngành hóa chất và thị trường của DGC không?

@@ -1,0 +1,136 @@
+
+Dưới đây là **phân tích báo cáo tài chính** và **định giá cổ phiếu PVS – Tổng Công ty Cổ phần Dịch vụ Kỹ thuật Dầu khí Việt Nam**, dựa trên số liệu bạn cung cấp từ ảnh:
+
+---
+
+## 📊 I. Phân tích Báo cáo Tài chính PVS
+
+---
+
+### 1. **Kết quả Kinh doanh (Theo quý)**
+
+*(Đơn vị: Tỷ VNĐ)*
+
+| Kỳ      | Doanh thu thuần | Lợi nhuận gộp | LNST   | LNST CĐ công ty mẹ |
+| ------- | --------------- | ------------- | ------ | ------------------ |
+| Q1/2024 | 3,709.59        | 258.46        | 304.74 | 300.68             |
+| Q2/2024 | 4,182.00        | 240.33        | 209.27 | 195.52             |
+| Q3/2024 | 4,820.02        | 333.76        | 192.70 | 134.85             |
+| Q4/2024 | 9,776.99        | 300.43        | 704.89 | 550.85             |
+| Q1/2025 | 6,013.68        | 257.06        | 299.64 | 331.53             |
+
+📌 **Nhận xét**:
+
+* **Doanh thu tăng mạnh** vào Q4/2024 và Q1/2025, khả năng đến từ hợp đồng EPC lớn hoặc dự án dầu khí biển.
+* **Lợi nhuận gộp ổn định**, dao động quanh mức 250–330 tỷ/quý.
+* **LNST quý IV/2024 đột biến** → đóng góp chính từ **công ty mẹ** (\~78%).
+* Tỷ lệ **LNST CĐ mẹ / LNST tổng** khá cao → cấu trúc công ty mẹ nắm vai trò chính.
+
+---
+
+### 2. **Chỉ số Định giá**
+
+| Chỉ số | Giá trị       | Đánh giá                               |
+| ------ | ------------- | -------------------------------------- |
+| P/E    | 13.08         | Hợp lý, thấp hơn trung bình thị trường |
+| P/S    | 0.61          | Rẻ – phản ánh kỳ vọng thận trọng       |
+| P/B    | 1.14          | Gần sát giá trị sổ sách                |
+| EPS    | 2,537.33 đ/cp | Ổn định và khá tốt                     |
+
+📌 **Kết luận:**
+→ PVS **được định giá khá hợp lý**, không bị định giá cao so với thị trường (P/E \~15–18).
+
+---
+
+### 3. **Khả năng Sinh lời**
+
+| Chỉ số                 | Giá trị | Nhận xét                           |
+| ---------------------- | ------- | ---------------------------------- |
+| Tỷ lệ Lãi ròng (%)     | 4.63    | Ổn định                            |
+| Biên lợi nhuận gộp (%) | 4.32    | Mỏng – đặc trưng ngành dịch vụ EPC |
+| Tỷ lệ EBIT (%)         | 6.81    | Khá tốt                            |
+| Tỷ lệ LN từ HĐKD (%)   | 4.25    | Ổn định                            |
+
+📌 **Kết luận:**
+→ Dù biên lợi nhuận không cao, PVS vẫn duy trì hiệu quả do **quy mô lớn và quản trị tốt.**
+
+---
+
+### 4. **Sức mạnh Tài chính**
+
+| Chỉ số               | Giá trị | Đánh giá |
+| -------------------- | ------- | -------- |
+| Thanh toán hiện hành | 1.70    | An toàn  |
+| Thanh toán nhanh     | 1.52    | Tốt      |
+| Khả năng trả lãi vay | 27.00   | Xuất sắc |
+| Nợ / Vốn CSH         | 1.34    | Hợp lý   |
+
+📌 **Kết luận:**
+→ PVS có **cơ cấu tài chính lành mạnh**, gần như không có áp lực nợ vay, khả năng thanh khoản cao.
+
+---
+
+### 5. **Hiệu quả Quản lý và Khả năng Hoạt động**
+
+| Chỉ số   | Giá trị | Nhận xét      |
+| -------- | ------- | ------------- |
+| ROA (%)  | 4.00    | Ổn            |
+| ROE (%)  | 8.37    | Tốt           |
+| ROIC (%) | 17.78   | Cao – rất tốt |
+| ROCE (%) | 9.35    | Ổn định       |
+
+📌 **Hiệu quả sử dụng vốn rất cao**, đặc biệt ROIC \~17.78% là mức đáng mơ ước với doanh nghiệp sử dụng vốn đầu tư lớn như EPC/Dầu khí.
+
+---
+
+### 6. **Khả năng Hoạt động**
+
+| Chỉ số                 | Giá trị | Nhận xét                     |
+| ---------------------- | ------- | ---------------------------- |
+| Vòng quay tài sản      | 0.86    | Trung bình                   |
+| Vòng quay hàng tồn kho | 14.31   | Cao – luân chuyển hàng nhanh |
+| Vòng quay KPT          | 9.62    | Rất hiệu quả                 |
+| Vòng quay TSNH         | 1.31    | Ổn định                      |
+
+📌 **Kết luận:**
+→ Doanh nghiệp có **dòng tiền lưu chuyển tốt**, không bị "chôn vốn" nhiều trong hàng tồn hay phải thu.
+
+---
+
+## 💰 II. Định giá cổ phiếu PVS – Giá trị hợp lý
+
+---
+
+### ✅ 1. Định giá theo P/E
+
+* EPS trailing = 2,537 đ/cp
+* P/E hợp lý ngành dầu khí dịch vụ = 10–12
+
+> 👉 Giá trị hợp lý = 2,537 × 12 = **\~30,444 đ/cp**
+
+### ✅ 2. Định giá theo P/B
+
+* BVPS (giá trị sổ sách trên mỗi cổ phiếu) ≈ 2,537 ÷ 0.114 ≈ **22,245 đ/cp**
+* Nếu P/B hợp lý = 1.5 → Giá trị hợp lý theo tài sản = **33,000 đ/cp**
+
+---
+
+## ✅ III. Tổng kết & Khuyến nghị
+
+| Tiêu chí             | Nhận định                      |
+| -------------------- | ------------------------------ |
+| Kết quả kinh doanh   | Ổn định, có tăng trưởng        |
+| Biên lợi nhuận       | Mỏng do đặc thù ngành          |
+| Cơ cấu tài chính     | Rất lành mạnh                  |
+| Hiệu quả sử dụng vốn | Cao                            |
+| Định giá thị trường  | Đang hợp lý, thậm chí hơi thấp |
+
+---
+
+### 🎯 **Giá trị thực tế hợp lý: 30,000 – 33,000 đ/cp**
+
+Nếu thị giá PVS hiện tại dưới vùng này → **có thể mua tích lũy trung hạn**.
+
+---
+
+Bạn có muốn mình so sánh PVS với GAS hoặc BSR không? Hoặc định giá chi tiết bằng phương pháp chiết khấu dòng tiền (DCF)?

@@ -1,0 +1,141 @@
+1) Phân tích bctc của SSI.  
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+
+Dưới đây là phân tích báo cáo tài chính (BCTC) của SSI dựa trên ảnh bạn cung cấp, bao gồm:
+
+---
+
+## **1. Phân tích Báo cáo Tài chính của SSI**
+
+### **a. Kết quả kinh doanh (Q1/2024 – Q1/2025)**
+
+| Chỉ tiêu                  | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024 | Q1/2025 |
+| ------------------------- | ------- | ------- | ------- | ------- | ------- |
+| **Doanh thu HĐ** (tỷ VND) | 1972.82 | 2307.04 | 2028.14 | 2221.27 | 2159.27 |
+| **LN HĐ**                 | 1376.58 | 1456.53 | 1392.30 | 1015.83 | 1533.99 |
+| **LN thuần (LNST)**       | 764.25  | 848.55  | 794.50  | 438.36  | 843.99  |
+
+📌 **Nhận xét:**
+
+* SSI có **doanh thu ổn định**, duy trì \~2,000 – 2,300 tỷ/quý.
+* **Lợi nhuận sau thuế (LNST)** dao động mạnh: cao nhất Q2/2024 (848 tỷ), thấp nhất Q4/2024 (438 tỷ) ⇒ cho thấy sự biến động trong chi phí/lợi nhuận tài chính.
+* Q1/2025 phục hồi ấn tượng về lợi nhuận.
+
+---
+
+### **b. Cân đối kế toán**
+
+| Chỉ tiêu             | Q1/2024   | Q2/2024   | Q3/2024   | Q4/2024   | Q1/2025   |
+| -------------------- | --------- | --------- | --------- | --------- | --------- |
+| **Tổng tài sản**     | 65,488 tỷ | 71,107 tỷ | 66,181 tỷ | 73,507 tỷ | 84,043 tỷ |
+| **Tổng nợ**          | 41,647 tỷ | 42,667 tỷ | 42,066 tỷ | 44,181 tỷ | 56,309 tỷ |
+| **Vốn CSH (Equity)** | 24,020 tỷ | 24,839 tỷ | 24,114 tỷ | 28,826 tỷ | 27,703 tỷ |
+
+📌 **Nhận xét:**
+
+* Tổng tài sản tăng mạnh từ Q4/2024 → Q1/2025 (+14.3%)
+* Tỷ lệ nợ/tổng tài sản \~67% ⇒ đòn bẩy tương đối cao, nhưng vẫn trong kiểm soát.
+* Vốn chủ sở hữu duy trì ở mức cao, hỗ trợ định giá theo P/B.
+
+---
+
+### **c. Các chỉ số tài chính chính**
+
+#### **Định giá**
+
+* **P/E**: 15.72 → định giá hợp lý với mức tăng trưởng.
+* **P/B**: 1.68 → cổ phiếu đang giao dịch cao hơn giá trị sổ sách.
+* **EPS**: 1,485.71 đ
+
+#### **Khả năng sinh lời**
+
+* **Biên LNST**: 33.44% → rất tốt cho công ty tài chính.
+* **Tỷ lệ lãi gộp**: 61.94%
+* **Tỷ lệ EBIT**: 60.08%
+
+#### **Hiệu quả quản lý**
+
+* **ROA**: 3.90%
+* **ROE**: 11.27%
+* **ROCE**: 20.19% → lợi nhuận sinh ra từ vốn sử dụng hiệu quả.
+
+#### **Sức mạnh tài chính**
+
+* **Đòn bẩy tài chính**: Nợ/VCSH = 2.03, Nợ/Tổng TS = 0.67
+* **Khả năng thanh toán hiện hành**: 1.45 (an toàn)
+* **Thanh toán lãi vay**: 3.3 lần (đủ khả năng trả lãi vay)
+
+---
+
+## **2. Định giá cổ phiếu SSI theo 3 phương pháp**
+
+### **a. Phương pháp P/B**
+
+* **BVPS (giá trị sổ sách/cp)** = Vốn CSH / Số lượng CP
+  → Giả sử SSI có 1.8 tỷ cp (ước lượng từ vốn hóa).
+  → BVPS ≈ 27,703 / 1,800 = \~15,390 đ/cp
+  → Giá hợp lý theo P/B = 15,390 × P/B ngành (\~1.25) = **\~19,240 đ**
+
+### **b. Phương pháp P/E**
+
+* **EPS trailing 4 quý**: 764.25 + 848.55 + 794.50 + 843.99 = **3,251.29 đ/cp**
+* **P/E trung bình ngành**: \~12 (ngành chứng khoán)
+* Giá hợp lý theo P/E = 3,251 × 12 = **\~39,012 đ**
+
+### **c. Phương pháp DCF (giản lược)**
+
+Giả sử:
+
+* FCF = LNST = 3,251 tỷ (xấp xỉ)
+* WACC = 12%, Tăng trưởng dài hạn (g) = 5%
+* Giá trị doanh nghiệp = FCF × (1 + g) / (WACC - g)
+  \= 3,251 × (1.05) / (0.12 – 0.05) ≈ 48,827 tỷ
+
+→ Giá trị mỗi cổ phiếu = 48,827 / 1.8 tỷ cp ≈ **\~27,126 đ**
+
+---
+
+### ✅ **Tổng hợp giá trị hợp lý (Trung bình trọng số)**
+
+| Phương pháp | Giá trị (đ/cp) | Trọng số |
+| ----------- | -------------- | -------- |
+| P/E         | 39,012         | 50%      |
+| P/B         | 19,240         | 30%      |
+| DCF         | 27,126         | 20%      |
+| **Tổng**    | **\~29,926** đ | 100%     |
+
+→ **💡 Giá trị hợp lý ước tính: \~29,900 đ/cp**
+
+---
+
+## **3. Giá kỳ vọng cổ phiếu SSI có thể đạt được**
+
+Dựa vào:
+
+* **Lợi nhuận cải thiện** trong Q1/2025
+* **Tài sản tăng trưởng mạnh**
+* **ROE > 11%, ROCE > 20%**
+* Định giá hiện tại P/E \~15.72 cao hơn ngành ⇒ thị trường đang kỳ vọng cao
+
+→ Nếu thị trường duy trì P/E = 15.72:
+Giá mục tiêu = EPS × 15.72 = 3,251 × 15.72 = **\~51,130 đ/cp**
+
+Tuy nhiên, để **bảo thủ**, bạn có thể kỳ vọng:
+
+* **Vùng giá mục tiêu trong năm 2025: 30,000 – 40,000 đ/cp**
+
+---
+
+Nếu bạn muốn, mình có thể xuất bản bảng định giá này thành file Excel/PDF. Bạn có muốn không?

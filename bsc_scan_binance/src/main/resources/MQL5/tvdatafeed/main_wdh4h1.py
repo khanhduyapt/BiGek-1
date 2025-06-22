@@ -416,6 +416,11 @@ if __name__ == "__main__":
     elif selected_interval in [Interval.in_1_hour, Interval.in_4_hour, Interval.in_daily, Interval.in_weekly]:
         n_bars = 65
 
+    error_log_path = "invalid_symbols.txt"  # Tên file ghi symbol lỗi
+    # Mở file ở chế độ ghi để xóa nội dung cũ
+    with open(error_log_path, 'w') as f:
+        pass  # Chỉ để xóa nội dung
+
     # Lặp qua từng cặp tên sàn và mã cổ phiếu
     for market, symbol in symbols:
         print(f"Fetching data for {market}:{symbol} with interval {selected_interval.value}...")
@@ -435,6 +440,9 @@ if __name__ == "__main__":
                 print(f"Data for {market}:{symbol} has less than 10 rows, skipping save to {filename}.")
         else:
             print(f"The data for {symbol} with interval {selected_interval.value} is not a DataFrame.")
+            # Ghi symbol lỗi vào file log
+            with open(error_log_path, 'a') as f:
+                f.write(f"{market}:{symbol}    https://www.tradingview.com/chart/r46Q5U5a/?interval=M&symbol={market}:{symbol}\n")
 
         # Nghỉ 30 giây giữa các lần gọi để tránh bị từ chối dịch vụ
         # print("Resting for 10 seconds...")

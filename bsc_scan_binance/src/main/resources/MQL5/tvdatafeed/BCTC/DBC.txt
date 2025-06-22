@@ -1,0 +1,132 @@
+Dưới đây là bản **phân tích báo cáo tài chính** của **DBC – CTCP Tập đoàn Dabaco Việt Nam**, cùng với **định giá giá trị hợp lý (fair value)** cho cổ phiếu này dựa trên ảnh bạn cung cấp.
+
+---
+
+## 📊 I. Phân tích báo cáo tài chính DBC
+
+---
+
+### 1. **Kết quả kinh doanh (đơn vị: tỷ VNĐ)**
+
+| Kỳ      | Doanh thu | Lợi nhuận gộp | LNST   | LNST CĐCT mẹ |
+| ------- | --------- | ------------- | ------ | ------------ |
+| Q1/2024 | 3,252.59  | 348.84        | 72.61  | 72.61        |
+| Q2/2024 | 3,184.67  | 430.51        | 145.44 | 145.44       |
+| Q3/2024 | 3,525.03  | 623.61        | 312.17 | 312.17       |
+| Q4/2024 | 3,611.23  | 529.24        | 238.86 | 238.86       |
+| Q1/2025 | 3,609.35  | 817.19        | 508.26 | 508.26       |
+
+📌 **Nhận xét:**
+
+* **Doanh thu ổn định quanh 3,200 – 3,600 tỷ/quý** → ổn định theo chu kỳ.
+* **LN gộp và LNST tăng mạnh từ Q3/2024 → Q1/2025**. Đặc biệt **Q1/2025 LNST đạt 508 tỷ** là mức rất cao, cho thấy doanh nghiệp đang **hồi phục mạnh mẽ**.
+* Đây là dấu hiệu cho thấy biên lợi nhuận cải thiện do giá đầu vào giảm hoặc chu kỳ ngành thuận lợi.
+
+---
+
+### 2. **Chỉ số định giá**
+
+| Chỉ số             | Giá trị    | Nhận xét                                          |
+| ------------------ | ---------- | ------------------------------------------------- |
+| **P/E**            | 8.50       | Rẻ hơn trung bình ngành (10–12)                   |
+| **P/S**            | 0.68       | Thấp → cổ phiếu chưa được thị trường định giá cao |
+| **P/B**            | 1.42       | Hơi cao, nhưng hợp lý nếu EPS tăng mạnh           |
+| **EPS (trailing)** | 3,599 đ/cp | Rất tốt nếu duy trì được                          |
+
+📌 **Nhận xét:** Định giá của DBC đang **rất hấp dẫn** với P/E chỉ 8.5 và EPS cao. Có thể đây là thời điểm đầu chu kỳ tăng trưởng.
+
+---
+
+### 3. **Khả năng sinh lời**
+
+| Chỉ số                | Giá trị | Nhận xét                           |
+| --------------------- | ------- | ---------------------------------- |
+| Tỷ lệ lãi ròng (%)    | 8.65    | Tốt cho ngành sản xuất nông nghiệp |
+| Tỷ lệ lãi gộp (%)     | 17.23   | Đã cải thiện đáng kể               |
+| Tỷ lệ EBIT (%)        | 11.32   | Ổn định                            |
+| Tỷ lệ lãi từ HĐKD (%) | 9.10    | Tích cực                           |
+
+📌 **Nhận xét:** Doanh nghiệp có **biên lợi nhuận tăng dần**, đặc biệt là lợi nhuận sau thuế tăng mạnh trong Q1/2025 → hiệu quả quản trị chi phí đang tốt lên rõ rệt.
+
+---
+
+### 4. **Sức mạnh tài chính**
+
+| Chỉ số                    | Giá trị | Nhận xét                                |
+| ------------------------- | ------- | --------------------------------------- |
+| **Thanh khoản hiện hành** | 1.32    | Đủ tốt                                  |
+| **Thanh toán nhanh**      | 0.41    | Hơi thấp – phụ thuộc nhiều vào hàng tồn |
+| **Nợ/vốn CSH**            | 0.99    | Ổn định – tỷ lệ nợ/vốn không quá cao    |
+| **Thanh toán lãi vay**    | 5.45    | Rất tốt                                 |
+
+📌 **Nhận xét:** Tài chính ổn định, không bị phụ thuộc vào nợ vay quá mức. Chất lượng dòng tiền ổn.
+
+---
+
+### 5. **Hiệu quả quản lý & hoạt động**
+
+| Chỉ số | Giá trị | Nhận xét |
+| ------ | ------- | -------- |
+| ROA    | 8.95%   | Rất tốt  |
+| ROE    | 20.12%  | Xuất sắc |
+| ROIC   | 13.11%  | Cao      |
+| ROCE   | 22.31%  | Cao      |
+
+📌 **Nhận xét:** ROE, ROCE vượt mức trung bình ngành → ban lãnh đạo vận hành hiệu quả vốn.
+
+---
+
+## 💰 II. Định giá cổ phiếu DBC
+
+---
+
+### ✅ 1. **Định giá theo P/E**
+
+* EPS trailing = 3,599 đ/cp
+* Giả định P/E hợp lý = **10–12** (trung bình ngành chăn nuôi, thực phẩm)
+
+> Giá trị hợp lý = 3,599 × 10 → **\~35,990 đ/cp**
+> Trường hợp lạc quan: 3,599 × 12 = **\~43,200 đ/cp**
+
+---
+
+### ✅ 2. **Định giá theo P/B**
+
+* BVPS = Tổng vốn CSH / số CP lưu hành
+
+  * Vốn CSH Q1/2025 = 7,234 tỷ
+  * Giả định số CP lưu hành \~200 triệu → BVPS ≈ **36,170 đ/cp**
+  * Với P/B ngành \~1.2–1.4 → Giá hợp lý = **43,000 – 50,000 đ/cp**
+
+📌 Cách này cho ra mức cao hơn vì doanh nghiệp đang tăng trưởng nhanh, và vốn chủ tăng mạnh.
+
+---
+
+### ✅ 3. **So sánh các phương pháp**
+
+| Phương pháp    | Giá trị hợp lý    |
+| -------------- | ----------------- |
+| P/E (bảo thủ)  | 36,000 đ          |
+| P/E (lạc quan) | 43,000 đ          |
+| P/B            | 43,000 – 50,000 đ |
+
+---
+
+## ✅ Kết luận & Khuyến nghị đầu tư
+
+| Tiêu chí              | Đánh giá                     |
+| --------------------- | ---------------------------- |
+| Doanh thu & lợi nhuận | Đang tăng trưởng rõ rệt      |
+| Biên lợi nhuận        | Cải thiện mạnh từ Q3/2024    |
+| Nợ & thanh khoản      | Ổn định, tài chính lành mạnh |
+| Hiệu quả hoạt động    | Rất cao (ROE > 20%)          |
+| Giá trị hợp lý        | **36,000 – 50,000 đ/cp**     |
+| P/E hiện tại          | 8.5 → định giá đang rẻ       |
+
+🎯 **Khuyến nghị:**
+→ **MUA** nếu giá thị trường < 35,000 đ/cp
+→ **NẮM GIỮ** nếu đã sở hữu, mục tiêu trung – dài hạn có thể đạt \~45,000 – 50,000 đ/cp nếu lợi nhuận tiếp tục duy trì ở mức Q1/2025.
+
+---
+
+Bạn muốn mình so sánh thêm với các đối thủ ngành (ví dụ: VSN, MML, HAG...) hay phân tích chi tiết dòng tiền và khả năng trả cổ tức không?

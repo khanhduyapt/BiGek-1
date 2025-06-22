@@ -1,0 +1,118 @@
+Dưới đây là **phân tích báo cáo tài chính (BCTC)** của CTCP Đầu tư và Phát triển Bất động sản An Gia (AGG) dựa trên dữ liệu bạn cung cấp. Sau đó, tôi sẽ tiến hành **định giá giá trị thật của cổ phiếu AGG** và **dự báo mức giá kỳ vọng**.
+
+---
+
+## 📊 **1. Phân tích tổng quan tài chính AGG (tính đến Q1/2025)**
+
+### 🔹 **Kết quả kinh doanh**
+
+| Chỉ tiêu                  | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024 | Q1/2025 |
+| ------------------------- | ------- | ------- | ------- | ------- | ------- |
+| Doanh thu thuần           | 1,312.8 | 169.0   | 268.4   | 163.2   | 191.8   |
+| Lợi nhuận sau thuế (LNST) | 214.2   | 1.56    | 24.16   | 21.11   | 8.07    |
+| LNST cổ đông công ty mẹ   | 200.3   | 25.5    | 24.3    | 27.5    | 10.3    |
+
+🔸 **Nhận xét**:
+
+* Doanh thu **đột biến trong Q1/2024** (1,312 tỷ), sau đó **giảm mạnh** về mức \~200 tỷ/quý.
+* Lợi nhuận sau thuế giảm mạnh từ Q1 (214 tỷ) xuống Q1/2025 chỉ còn \~8 tỷ.
+* Đây là mô hình đặc trưng của **doanh nghiệp bất động sản**: doanh thu/lợi nhuận biến động mạnh theo tiến độ bán hàng và bàn giao dự án.
+
+---
+
+### 🔹 **Bảng cân đối kế toán**
+
+| Chỉ tiêu              | Q1/2024    | Q1/2025    |
+| --------------------- | ---------- | ---------- |
+| Tổng tài sản          | 8,418.7 tỷ | 6,936.9 tỷ |
+| Vốn chủ sở hữu (VCSH) | 3,090.3 tỷ | 3,145.1 tỷ |
+
+🔸 **Nhận xét**:
+
+* Tổng tài sản giảm (\~1,500 tỷ) trong vòng 1 năm → doanh nghiệp có thể đang thu hẹp quy mô hoặc bán bớt tài sản.
+* Vốn chủ sở hữu **ổn định**, chứng tỏ doanh nghiệp không bị thua lỗ kéo dài.
+
+---
+
+### 🔹 **Các chỉ số tài chính**
+
+| Nhóm            | Chỉ số            | Giá trị | Đánh giá                    |
+| --------------- | ----------------- | ------- | --------------------------- |
+| **Định giá**    | P/E               | 25.71   | Cao, do LNST thấp           |
+|                 | P/B               | 0.89    | Rẻ (dưới 1)                 |
+|                 | EPS               | 661 đ   | Thấp (do lợi nhuận thấp)    |
+| **Lợi nhuận**   | Biên LNST         | 13.56%  | Tốt cho BĐS                 |
+| **Tài chính**   | Đòn bẩy (Nợ/VCSH) | 1.21    | Ổn định                     |
+| **Hiệu quả**    | ROE               | 3.45%   | Rất thấp                    |
+| **Thanh khoản** | Chỉ số hiện hành  | 0.91    | Dưới 1 → rủi ro thanh khoản |
+
+🔸 **Nhận xét**:
+
+* **P/B < 1**, phản ánh thị trường đang định giá thấp hơn giá trị sổ sách.
+* ROE và EPS đều yếu, cho thấy doanh nghiệp đang thiếu động lực sinh lời ngắn hạn.
+* Rủi ro thanh khoản **dưới mức an toàn**.
+
+---
+
+## 💰 **2. Định giá cổ phiếu AGG theo 3 phương pháp**
+
+---
+
+### ✅ **(1) Phương pháp P/B (giá trị sổ sách)**
+
+> Giá trị sổ sách (BVPS) = Vốn CSH / Số cổ phiếu lưu hành
+> \= 3,145 tỷ / 136 triệu cp (ước tính) ≈ **23,12 ngàn đồng/cp**
+> Với P/B mục tiêu = 1.2 ⇒ Giá hợp lý = **\~27,800 đ/cp**
+
+---
+
+### ✅ **(2) Phương pháp DCF (giản lược)**
+
+Giả định:
+
+* LNST năm 2024 = 260 tỷ
+* Tăng trưởng ổn định 5%/năm
+* Chiết khấu 15%/năm
+* Số cổ phiếu = 136 triệu
+
+Tính DCF 5 năm + Terminal Value:
+
+Tổng giá trị dòng tiền ≈ 1,735 tỷ
+→ Giá trị cổ phiếu = 1,735 tỷ / 136 triệu = **\~12,750 đ/cp**
+
+📌 *Giá DCF thấp vì LNST nhỏ & tăng trưởng yếu.*
+
+---
+
+### ✅ **(3) Phương pháp P/E trung bình ngành**
+
+Giả định:
+
+* EPS forward 2025 ≈ 800 đ
+* P/E trung bình ngành BĐS niêm yết \~10x
+  → Giá mục tiêu = 800 × 10 = **8,000 đ/cp**
+
+---
+
+## 🎯 **3. Kết luận định giá AGG**
+
+| Phương pháp       | Giá trị hợp lý    |
+| ----------------- | ----------------- |
+| P/B (0.89 - 1.2x) | 20,000 – 27,800 đ |
+| DCF               | \~12,750 đ        |
+| P/E               | \~8,000 đ         |
+
+👉 **Giá trị hợp lý khuyến nghị: khoảng 14,000 – 18,000 đ/cp**, tùy khẩu vị rủi ro.
+👉 Nếu doanh nghiệp công bố bàn giao dự án lớn, lợi nhuận tăng mạnh thì **giá có thể tăng lên vùng 20,000 – 24,000 đ**.
+
+---
+
+## 🔍 Bạn muốn tiếp tục?
+
+Tôi có thể:
+
+* Phân tích sâu về từng dự án đang triển khai của AGG.
+* Dự báo LNST tương lai theo tiến độ bàn giao.
+* So sánh AGG với các mã như NLG, KDH, DXG...
+
+Bạn muốn tôi làm phần nào tiếp?

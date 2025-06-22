@@ -1,0 +1,79 @@
+Phân tích bctc của HDG. 
+Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành.
+Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+
+
+Dưới đây là phân tích Báo cáo tài chính (BCTC) của HDG và định giá cổ phiếu theo 3 phương pháp:
+
+---
+
+### 🔍 **1. Phân tích nhanh BCTC HDG**
+
+#### ✅ Kết quả kinh doanh:
+
+* **Doanh thu thuần** Q1/2025: 598.58 tỷ (giảm so với Q4/2024: 754.58 tỷ)
+* **Lợi nhuận sau thuế (LNST)** Q1/2025: 206.94 tỷ (tăng nhẹ so với Q4/2024: 208.13 tỷ)
+* **Biên lợi nhuận gộp** duy trì khá cao: \~62–63%
+* **Tỷ suất sinh lời từ hoạt động kinh doanh (EBIT margin)**: 45.3%
+* **Tỷ lệ lãi từ HĐKD**: 34.46% (rất tốt so với mặt bằng chung)
+
+#### ✅ Cân đối kế toán:
+
+* **Tổng tài sản** Q1/2025: 13,868.99 tỷ
+* **Nguồn vốn chủ sở hữu (VCSH)**: 7,582.91 tỷ
+* **Nợ/vốn chủ sở hữu (D/E)** ≈ 0.83 (an toàn, không đòn bẩy quá lớn như VIC)
+
+#### ✅ Chỉ số tài chính:
+
+* **P/E**: 17.44
+* **P/B**: 1.42
+* **EPS trailing**: 1,516.51 đồng
+* **ROE**: 6.77% | ROA: 3.63% | ROIC: 8.22%
+* **Khả năng thanh toán nhanh**: 1.15 (ổn)
+
+---
+
+### 📌 **2. Định giá cổ phiếu HDG**
+
+#### 🔹 **Phương pháp 1: P/B (Book Value)**
+
+* Vốn chủ sở hữu: 7,582.91 tỷ
+* Số cổ phiếu đang lưu hành (ước tính): 150 triệu (cần xác thực)
+* ⇒ **Book Value/CP = 7,582.91 / 150 = \~50.55K đồng**
+* Với P/B hợp lý cho ngành BĐS ổn định \~1.2–1.5 ⇒ **Giá hợp lý = 50.55 × 1.3 = \~65,700 đồng**
+
+#### 🔹 **Phương pháp 2: P/E trung bình ngành**
+
+* EPS trailing = 1,516.51 đồng
+* Trung bình P/E ngành BĐS hiện nay ≈ 9–12
+* ⇒ **Giá hợp lý = 1,516.51 × 10.5 = \~15,943 đồng**
+
+→ Tuy nhiên, P/E thấp phản ánh ngành đang khó khăn. Với P/E hiện tại của HDG là 17.44 → thị trường đang kỳ vọng tăng trưởng.
+
+#### 🔹 **Phương pháp 3: DCF giản lược (dựa trên LNST tăng trưởng đều)**
+
+Giả sử:
+
+* LNST năm = 4 × 206.94 = \~827.76 tỷ
+* Tăng trưởng lợi nhuận: 8%/năm
+* Chi phí vốn (WACC): 12%
+* Số cổ phiếu: 150 triệu
+* ⇒ **Giá trị nội tại = EPS / (WACC - tăng trưởng) = (5,518 VND) / (0.12 - 0.08) = 137,950 VND**
+  → Thực tế DCF giản lược phản ánh kỳ vọng rất cao, chỉ phù hợp nếu tăng trưởng ổn định liên tục 5 năm.
+
+---
+
+### 🎯 **3. Kết luận – Giá kỳ vọng hợp lý**
+
+| Phương pháp               | Giá ước tính     |
+| ------------------------- | ---------------- |
+| P/B                       | \~65,700 VND     |
+| P/E TB ngành              | \~15,943 VND     |
+| DCF giản lược             | \~137,950 VND    |
+| **Trung bình điều chỉnh** | **\~73,200 VND** |
+
+➡️ **Giá mục tiêu kỳ vọng của HDG** trong điều kiện hoạt động ổn định, có thể vào khoảng **70,000–75,000 VND**/cổ phiếu.
+
+---
+
+Nếu bạn muốn, tôi có thể xây dựng mô hình chi tiết hơn dựa trên bảng DCF đầy đủ (dự báo LNST 5 năm, dòng tiền tự do FCF, chiết khấu WACC). Bạn có muốn tôi làm tiếp phần đó không?

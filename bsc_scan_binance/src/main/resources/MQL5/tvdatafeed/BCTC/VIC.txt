@@ -1,0 +1,107 @@
+Phân tích bctc của VIC. 
+Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành.
+Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+
+
+
+
+Dưới đây là phân tích chi tiết Báo cáo tài chính (BCTC) của VIC dựa trên các ảnh bạn đã cung cấp, bao gồm:
+
+---
+
+## 🧾 1. **Phân tích Kết quả Kinh doanh**
+
+### Doanh thu và lợi nhuận (2024 - Q1/2025):
+
+* **Doanh thu thuần**: tăng trưởng đều từ Q1/2024 (21.7 nghìn tỷ) đến Q1/2025 (84.0 nghìn tỷ).
+* **Lợi nhuận gộp**: tăng mạnh và chuyển từ âm (Q1/2024: -1,955 tỷ) sang dương rõ rệt (Q1/2025: 19,205 tỷ).
+* **Lợi nhuận thuần từ HĐKD**: cải thiện mạnh mẽ (Q1/2024: 2,937 tỷ → Q1/2025: 5,157 tỷ).
+* **Chi phí tài chính vẫn rất cao** (Q1/2025: 7,903 tỷ), chủ yếu là **lãi vay** (6,102 tỷ).
+* **LNST**: cải thiện rõ rệt từ lỗ đến lãi → Q1/2024 lãi nhỏ (1,335 tỷ), Q1/2025 lên đến **2,243 tỷ đồng**.
+
+👉 **Bất thường?**
+
+* **Tỷ lệ chi phí tài chính/EBITDA cao bất thường** (\~50–60%), cho thấy đòn bẩy nợ vẫn rất lớn, dù hoạt động kinh doanh cải thiện.
+* **LNST của cổ đông không kiểm soát** âm đều → có thể do các khoản lỗ từ công ty con ngoài tập đoàn mẹ.
+
+---
+
+## 📊 2. **Phân tích Cân đối Kế toán**
+
+### Tổng tài sản và cơ cấu vốn:
+
+* **Tài sản** tăng đều từ Q1/2024 (694 nghìn tỷ) đến Q1/2025 (823 nghìn tỷ).
+* **Nợ phải trả** chiếm tỷ lệ rất cao (\~80%), đặc biệt là:
+
+  * **Nợ ngắn hạn**: \~440 nghìn tỷ (chiếm hơn 53% tổng tài sản).
+  * **Nợ dài hạn** cũng tăng mạnh lên 225 nghìn tỷ → rủi ro tài chính cao.
+* **Vốn chủ sở hữu** gần như không tăng nhiều, giữ quanh mức \~157 nghìn tỷ.
+* **Tỷ lệ Nợ/VCSH \~4.23** → cực kỳ cao, **rủi ro tài chính rất lớn.**
+
+👉 **Bất thường?**
+
+* **Tỷ trọng nợ quá lớn** trong tổng tài sản, cho thấy VIC vẫn đang phụ thuộc mạnh vào vay vốn để vận hành và đầu tư.
+* **Không tăng vốn chủ sở hữu**, dẫn đến cấu trúc vốn mất cân đối.
+
+---
+
+## 📈 3. **Định giá cổ phiếu VIC theo 3 phương pháp**
+
+### A. P/B – Giá trị sổ sách
+
+* **Vốn CSH (Q1/2025)**: 157,452.59 tỷ
+* **Số cổ phiếu VIC** (ước tính): \~4,366 triệu CP
+* → **Giá trị sổ sách (BVPS)** ≈ 36,06 VNĐ/CP
+* Nếu P/B ngành = 2.0 → **Giá hợp lý theo P/B = 36.06 x 2 = 72.12 VNĐ/CP**
+
+---
+
+### B. P/E trung bình ngành
+
+* **EPS trailing** (2024+Q1/2025): \~2,819 VNĐ
+* **P/E ngành bất động sản VN**: 12–15
+* → **Giá hợp lý theo P/E** = 2,819 × 12 = 33,828 → ×15 = **42,285 VNĐ/CP**
+
+---
+
+### C. DCF giản lược (ước tính sơ bộ):
+
+Giả sử VIC có:
+
+* **FCF năm tới** ≈ 8,000 tỷ VNĐ (bảo thủ, lấy từ LNST + khấu hao ước tính)
+* **Tăng trưởng FCF trung bình**: 6%
+* **Chi phí vốn (WACC)**: 10%
+
+Áp dụng công thức Gordon:
+
+$$
+\text{Giá trị doanh nghiệp} = \frac{FCF \times (1 + g)}{WACC - g} = \frac{8,000 \times 1.06}{0.10 - 0.06} = 212,000 tỷ VNĐ
+$$
+
+→ Giá trị cổ phiếu = $\frac{212,000}{4,366}$ ≈ **48,55 VNĐ/CP**
+
+---
+
+## 🎯 4. **Kết luận và Giá kỳ vọng**
+
+| Phương pháp   | Giá hợp lý (ước tính) |
+| ------------- | --------------------- |
+| P/B           | 72.12 VNĐ/CP          |
+| P/E           | 33.8 – 42.3 VNĐ/CP    |
+| DCF giản lược | \~48.55 VNĐ/CP        |
+
+👉 **Giá kỳ vọng trung bình hợp lý** = **40 – 50k VNĐ/cổ phiếu**
+
+---
+
+## 📌 Tổng hợp điểm mạnh và rủi ro
+
+| Điểm mạnh                        | Rủi ro                                   |
+| -------------------------------- | ---------------------------------------- |
+| Doanh thu tăng trưởng nhanh      | Đòn bẩy tài chính quá cao                |
+| Biên lợi nhuận gộp cải thiện rõ  | Chi phí tài chính chiếm tỷ trọng rất lớn |
+| LNST tăng mạnh trong năm gần đây | Vốn chủ sở hữu gần như không tăng        |
+
+---
+
+Nếu bạn muốn file Excel hoặc bảng định giá chi tiết hơn (P/E, DCF chuẩn chỉnh, Sensitivity Table...), mình có thể hỗ trợ tạo file. Bạn muốn tiếp tục không?

@@ -1,0 +1,3 @@
+Phân tích bctc của VHM. 
+Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành.
+Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.

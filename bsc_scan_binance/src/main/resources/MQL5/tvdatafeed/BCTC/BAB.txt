@@ -1,0 +1,160 @@
+1) Phân tích bctc của BAB. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Dưới đây là **phân tích chi tiết Báo cáo tài chính Q1/2025 của BAB (Ngân hàng Bắc Á)** và **định giá cổ phiếu theo 3 phương pháp**:
+
+---
+
+## **1. Phân tích Báo cáo tài chính BAB (Q1/2025)**
+
+### 🔹 **Kết quả kinh doanh**
+
+| Quý         | Thu nhập lãi & DV | Lợi nhuận HĐKD | LNST (CĐNH)   |
+| ----------- | ----------------- | -------------- | ------------- |
+| Q1/2024     | 3,053.88 tỷ       | 339.30 tỷ      | 270.87 tỷ     |
+| Q2/2024     | 2,887.72 tỷ       | 324.47 tỷ      | 162.81 tỷ     |
+| Q3/2024     | 2,966.79 tỷ       | 312.30 tỷ      | 217.00 tỷ     |
+| Q4/2024     | 3,053.73 tỷ       | 435.62 tỷ      | 360.66 tỷ     |
+| **Q1/2025** | **3,238.95 tỷ**   | **421.44 tỷ**  | **293.21 tỷ** |
+
+📌 **Nhận xét:**
+
+* Doanh thu và lợi nhuận tăng trưởng tốt trong Q1/2025.
+* LNST quý 1/2025 tăng 8.2% so với Q1/2024 và tăng mạnh so với Q2, Q3.
+* Lợi nhuận ổn định cho thấy chất lượng thu nhập cải thiện.
+
+---
+
+### 🔹 **Cân đối kế toán**
+
+| Quý     | Tổng tài sản      | Cho vay KH        | Tiền gửi KH       | Vốn CSH          |
+| ------- | ----------------- | ----------------- | ----------------- | ---------------- |
+| Q1/2024 | 149,352.57 tỷ     | 93,686.11 tỷ      | 118,124.71 tỷ     | 11,139.13 tỷ     |
+| Q1/2025 | **173,585.54 tỷ** | **109,795.25 tỷ** | **124,794.49 tỷ** | **12,075.66 tỷ** |
+
+📌 **Nhận xét:**
+
+* Tài sản tăng mạnh (\~16% YoY).
+* Vốn CSH tăng khoảng 8.4%.
+* Cho vay tăng 17.2% → tăng trưởng tín dụng nhanh hơn tăng trưởng huy động.
+* **LDR = 89.09%** → khá hợp lý, đảm bảo an toàn thanh khoản.
+
+---
+
+### 🔹 **Chỉ số tài chính**
+
+#### ✅ **Hiệu quả sinh lời:**
+
+* **ROE = 8.81%**, **ROA = 0.64%** → hiệu quả sinh lời thấp so với mặt bằng ngành.
+* **CIR = 60.47%** → khá cao, chi phí hoạt động lớn.
+* **NIM = 2.59%** → thấp hơn trung bình ngành (thường 3–4%).
+
+#### ✅ **Định giá:**
+
+* **P/E = 10.84**, **P/B = 0.93**, **EPS trailing = 1,078.99 đ/cp**
+* Giá cổ phiếu hiện tại ước khoảng \~11,700–12,000 đ.
+
+#### ✅ **Chất lượng tín dụng:**
+
+* **Tỷ lệ nợ xấu = 1.26%** → tốt, kiểm soát rủi ro tín dụng hiệu quả.
+* **PCL = 0.19%** → trích lập dự phòng thấp → tiềm năng cải thiện lợi nhuận nếu rủi ro thấp.
+
+---
+
+## **2. Định giá cổ phiếu BAB**
+
+### 🔸 **Phương pháp P/B (Giá trị sổ sách)**
+
+* Vốn CSH = 12,075.66 tỷ
+* Số lượng cổ phiếu lưu hành ước tính: \~1,118 triệu cp (theo EPS: 293.21 tỷ / EPS 1,078.99 ≈ 271.8 triệu cổ tức ¼ năm → nhân 4 → EPS năm \~1,100 → khớp với 1,118 triệu cổ phiếu)
+* **Book Value/CP = 12,075.66 / 1,118 = \~10,800 đ/CP**
+* Với P/B = 0.93 → Giá trị hợp lý = 10,800 / 0.93 = **\~11,600 đ/CP**
+
+🔹 **P/B Value ≈ 11,600 đ/CP**
+
+---
+
+### 🔸 **Phương pháp P/E trung bình ngành (khoảng 8.5 lần)**
+
+* EPS trailing = 1,078.99 đ
+* Giá trị hợp lý = 1,078.99 × 8.5 = **\~9,171 đ/CP**
+
+🔹 **P/E Value ≈ 9,200 đ/CP**
+
+---
+
+### 🔸 **Phương pháp DCF giản lược**
+
+Giả sử:
+
+* LNST năm 2025 = 293.21 × 4 = **1,172.84 tỷ**
+* WACC = 12%, Tăng trưởng dài hạn g = 5%
+* FCFE ≈ LNST →
+
+$$
+DCF = \frac{1,172.84}{0.12 - 0.05} = 16,755.1 tỷ
+$$
+
+* DCF/CP = 16,755.1 / 1,118 = **\~14,985 đ/CP**
+
+🔹 **DCF Value ≈ 15,000 đ/CP**
+
+---
+
+## **3. Tính giá trị hợp lý cổ phiếu**
+
+Áp dụng trọng số:
+
+* P/E 50%, P/B 30%, DCF 20%
+
+$$
+\text{Giá trị hợp lý} = (9,200 × 0.5) + (11,600 × 0.3) + (15,000 × 0.2) = 4,600 + 3,480 + 3,000 = \boxed{11,080 \text{ đ/CP}}
+$$
+
+---
+
+## **4. Xác định giá kỳ vọng**
+
+### 🔸 Cơ sở:
+
+* ROE đang tăng nhưng vẫn thấp (8.81%).
+* LNST tăng trưởng dương, nợ xấu thấp, tín dụng mở rộng.
+* Tăng trưởng lợi nhuận ổn định, nhưng hiệu quả hoạt động chưa cao (CIR > 60%).
+
+### 🔸 Giá kỳ vọng:
+
+* Nếu tiếp tục duy trì tăng trưởng và cải thiện hiệu quả sinh lời:
+  → **Giá kỳ vọng trong 6–12 tháng tới: 12,000 – 13,500 đ/CP**
+
+---
+
+## ✅ **Kết luận**
+
+| Tiêu chí              | Đánh giá                    |
+| --------------------- | --------------------------- |
+| Định giá hiện tại     | Hợp lý đến hơi cao          |
+| Tăng trưởng lợi nhuận | Ổn định                     |
+| ROE / ROA             | Thấp                        |
+| Rủi ro tín dụng       | Thấp (nợ xấu kiểm soát tốt) |
+| Biên lãi              | Thấp hơn ngành              |
+| Chi phí hoạt động     | Cao (CIR \~60%)             |
+
+📌 **Khuyến nghị:**
+
+* **Nắm giữ hoặc mua khi giá giảm** về \~10,000–10,500 đ để tối đa hóa lợi nhuận.
+* Không nên mua đuổi nếu giá đã vượt 12,500 đ mà chưa có cải thiện đáng kể về ROE hoặc CIR.
+
+---
+
+Bạn có muốn mình **vẽ biểu đồ định giá** của cổ phiếu BAB hoặc so sánh với các ngân hàng tương tự như TPB, ACB, VIB không?

@@ -1,0 +1,132 @@
+Dưới đây là **phân tích báo cáo tài chính quý của SHS** (Công ty Cổ phần Chứng khoán Sài Gòn – Hà Nội) dựa trên số liệu từ ảnh bạn cung cấp, cùng với **ước tính giá trị hợp lý (fair value)** cho cổ phiếu SHS.
+
+---
+
+## 📊 **I. Phân tích báo cáo tài chính SHS**
+
+### 1. **Kết quả kinh doanh**
+
+| Kỳ      | Doanh thu (tỷ) | LNST (tỷ) | LNST CĐCTM (tỷ) |
+| ------- | -------------- | --------- | --------------- |
+| Q1/2024 | 564.56         | 356.30    | 356.30          |
+| Q2/2024 | 550.42         | 354.16    | 354.16          |
+| Q3/2024 | 276.10         | 68.99     | 68.99           |
+| Q4/2024 | 551.22         | 232.47    | 232.47          |
+| Q1/2025 | 561.53         | 262.75    | 262.75          |
+
+📌 **Nhận xét:**
+
+* LNST duy trì ổn định quanh \~**350 tỷ** trong nửa đầu 2024, giảm nhẹ Q3/2024, sau đó phục hồi mạnh.
+* **Q1/2025 LNST đạt 262.75 tỷ** là mức rất tích cực.
+* Doanh thu đều >500 tỷ/quý, cho thấy SHS đang vận hành với quy mô khá tốt.
+
+---
+
+### 2. **Chỉ số định giá**
+
+| Chỉ số  | Giá trị                          | Nhận xét                                  |
+| ------- | -------------------------------- | ----------------------------------------- |
+| **P/E** | 14.02                            | Hợp lý với cổ phiếu tài chính             |
+| **P/S** | 6.64                             | Cao ⇒ thị trường kỳ vọng lớn              |
+| **P/B** | 1.11                             | Hơi cao so với trung bình ngành (0.8–1.0) |
+| **EPS** | 1,129 đ/cp (quý) → \~4,516 đ/năm | Tốt nếu duy trì                           |
+
+📌 **Nhận xét:** SHS đang được thị trường định giá tương đối cao, thể hiện qua P/S và P/B vượt mức trung bình ngành, nhưng **EPS cao và ổn định** cho thấy công ty có nền tảng lợi nhuận vững.
+
+---
+
+### 3. **Khả năng sinh lời**
+
+| Chỉ số                | Giá trị | Nhận xét                      |
+| --------------------- | ------- | ----------------------------- |
+| Tỷ lệ lãi ròng (%)    | 47.36   | Rất cao                       |
+| Tỷ lệ lãi gộp (%)     | 67.79   | Cao                           |
+| Tỷ lệ EBIT (%)        | 61.61   | Tốt                           |
+| Tỷ lệ lãi từ HĐKD (%) | 57.44   | Hoạt động kinh doanh hiệu quả |
+
+📌 **Nhận xét:** Các tỷ suất sinh lời đều rất cao → SHS là một doanh nghiệp có **biên lợi nhuận vượt trội** trong ngành chứng khoán.
+
+---
+
+### 4. **Cân đối tài chính**
+
+| Kỳ      | Tổng tài sản (tỷ) | Nợ phải trả (tỷ) | Vốn chủ sở hữu (tỷ) |
+| ------- | ----------------- | ---------------- | ------------------- |
+| Q1/2025 | 15,257.95         | 3,620.77         | 11,637.18           |
+
+| Chỉ số                | Giá trị | Nhận xét                    |
+| --------------------- | ------- | --------------------------- |
+| Thanh khoản hiện hành | 4.33    | Tốt, thanh khoản mạnh       |
+| Nợ/VCSH               | 0.31    | An toàn, đòn bẩy thấp       |
+| Nợ/Tổng tài sản       | 0.24    | Rất thấp, an toàn tài chính |
+
+📌 **Nhận xét:** SHS có tình hình tài chính **cực kỳ lành mạnh**, nợ thấp, vốn chủ lớn.
+
+---
+
+### 5. **Hiệu quả hoạt động & Quản trị**
+
+| Chỉ số                | Giá trị | Nhận xét                          |
+| --------------------- | ------- | --------------------------------- |
+| **ROA**               | 6.76%   | Ổn định                           |
+| **ROE**               | 8.24%   | Chưa cao, do vốn chủ lớn          |
+| **ROIC**              | 7.85%   | Tốt                               |
+| **Vòng quay tài sản** | 0.14    | Thấp – do ngành đặc thù tài chính |
+
+📌 **Nhận xét:** ROE chưa quá hấp dẫn, nhưng ROIC và ROA tốt trong bối cảnh ngành tài chính.
+
+---
+
+## 💰 **II. Định giá trị thật cổ phiếu SHS**
+
+### ✅ 1. **Phương pháp P/E**
+
+* EPS trung bình năm = 4,516 đ/cp
+* P/E trung bình ngành chứng khoán Việt Nam: **10–12**
+* Giá trị hợp lý = EPS × P/E = 4,516 × 10 → 45,160 VNĐ
+
+> 🎯 **Giá trị hợp lý ước tính: \~45,000 VNĐ/cp**
+
+---
+
+### ✅ 2. **Phương pháp P/B**
+
+* BVPS = VCSH / số cổ phiếu
+
+  * VCSH = 11,637.18 tỷ
+  * Ước tính số CP lưu hành \~1 tỷ ⇒ **BVPS ≈ 11,637 đ/cp**
+* Giá hợp lý theo P/B \~1.1–1.2 ⇒ khoảng **12,800 – 14,000 VNĐ**
+
+---
+
+### ✅ 3. **So sánh giá trị thực**
+
+| Phương pháp | Ước tính giá trị hợp lý |
+| ----------- | ----------------------- |
+| P/E         | 45,000 VNĐ/cp           |
+| P/B         | 13,000 VNĐ/cp           |
+
+📌 Sự chênh lệch lớn do **EPS hiện tại rất cao** ⇒ Nếu SHS duy trì lợi nhuận hiện tại ổn định hoặc tăng, thì **định giá P/E sẽ hợp lý hơn**.
+
+---
+
+## ✅ **Kết luận & Khuyến nghị đầu tư**
+
+| Tiêu chí               | Đánh giá                                 |
+| ---------------------- | ---------------------------------------- |
+| Nền tảng tài chính     | Mạnh, nợ thấp, thanh khoản cao           |
+| Lợi nhuận              | Cao, đều đặn                             |
+| Hiệu quả hoạt động     | Tốt                                      |
+| Định giá hiện tại      | P/E 14 ⇒ không quá đắt                   |
+| Giá trị hợp lý         | 13,000 – 45,000 VNĐ tùy phương pháp      |
+| **Khuyến nghị đầu tư** | **NÊN XEM XÉT MUA nếu giá < 30,000 VNĐ** |
+
+---
+
+🔔 **Bạn có thể gửi thêm:**
+
+* Giá thị trường hiện tại của SHS
+* Mục tiêu đầu tư (lướt sóng hay dài hạn)
+* Dữ liệu báo cáo năm 2023
+
+… để mình giúp bạn định giá và đưa ra chiến lược cụ thể hơn. Bạn muốn mình hỗ trợ tiếp không?

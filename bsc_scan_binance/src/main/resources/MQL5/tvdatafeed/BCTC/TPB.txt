@@ -1,0 +1,139 @@
+1) Phân tích bctc của TPB. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Dựa vào **báo cáo tài chính quý Q1/2025** và các chỉ số bạn cung cấp từ hình ảnh của TPBank (TPB), ta có thể phân tích và định giá cổ phiếu như sau:
+
+---
+
+## **1. Phân tích Báo cáo tài chính TPB (Q1/2025)**
+
+### 🔹 **Kết quả kinh doanh**
+
+* **Thu nhập lãi & DV:** 7,977.24 tỷ đồng → Tăng nhẹ so với Q1/2024 (7,480.29).
+* **LN từ HĐKD:** 2,598.49 tỷ đồng → Giảm nhẹ so với Q4/2024 (3,327.44).
+* **LNST (CĐNH):** 1,686.69 tỷ đồng → Tăng trưởng 15.3% so với Q4/2024 (1,463 tỷ).
+
+📌 **Nhận xét:** LNST tăng trưởng ổn định theo quý, thể hiện hoạt động kinh doanh cốt lõi vẫn duy trì hiệu quả, mặc dù có biến động nhẹ theo chu kỳ.
+
+---
+
+### 🔹 **Cân đối kế toán**
+
+* **Tổng tài sản:** 388,891.5 tỷ đồng → Tăng 9.3% so với Q1/2024.
+* **Vốn chủ sở hữu:** 39,491.5 tỷ đồng → Tăng 15.6%.
+* **Cho vay KH:** 249,826.07 tỷ đồng.
+* **Tiền gửi KH:** 233,114.65 tỷ đồng.
+
+📌 **Nhận xét:** Vốn chủ tăng nhanh hơn tổng tài sản → dấu hiệu tích cực. Tuy nhiên, **LDR = 112.60%** là khá cao → ngân hàng đang cho vay vượt mức huy động, tiềm ẩn rủi ro thanh khoản nếu không kiểm soát tốt.
+
+---
+
+### 🔹 **Các chỉ số tài chính**
+
+#### ✅ **Hiệu quả sinh lời:**
+
+* **ROE = 17.09%** → Mức cao, hiệu quả sử dụng vốn tốt.
+* **ROA = 1.69%** → Ổn định so với mặt bằng ngành.
+* **Biên lãi ròng (NIM) = 3.68%** → Tốt.
+
+#### ✅ **Định giá:**
+
+* **P/E = 5.94** → Thấp, định giá rẻ.
+* **P/B = 0.95** → Định giá thấp hơn giá trị sổ sách → tiềm năng tăng giá.
+* **EPS = 2,383.64** (trong 4 quý) → lợi nhuận cao trên mỗi cổ phần.
+
+#### ⚠️ **Thanh khoản & hoạt động:**
+
+* **LDR = 112.6%** → cần chú ý rủi ro thanh khoản.
+* **CIR = 36.37%** → quản trị chi phí tốt (thấp hơn 40% là rất tốt).
+* **Tỷ lệ nợ xấu (NPL) = 2.27%** → vẫn trong giới hạn an toàn (<3%).
+
+---
+
+## **2. Định giá cổ phiếu TPB**
+
+### 🔸 **Giá trị sổ sách (P/B):**
+
+* Vốn CSH Q1/2025 = 39,491.50 tỷ
+* Giả sử số lượng CP đang lưu hành = \~414 triệu CP
+  → **Book Value/CP = 39,491.5 / 414 = \~95,387 đ/CP**
+  → Với P/B = 0.95 → Giá trị hợp lý = 95,387 / 0.95 = **\~100,400 đ/CP**
+
+🔹 Làm tròn P/B value: **\~100,000 đ/CP**
+
+---
+
+### 🔸 **P/E trung bình ngành ngân hàng (\~8-10):**
+
+* EPS trailing = **2,383.64 đ/CP**
+* Trung bình P/E ngành = **8.5**
+  → Giá trị hợp lý = 2,383.64 × 8.5 = **\~20,261 đ/CP**
+
+🔹 Làm tròn P/E value: **\~20,000 đ/CP**
+
+---
+
+### 🔸 **DCF giản lược (ước tính):**
+
+* **LNST Q1/2025 = 1,686.69 tỷ**, giả định tăng trưởng 10%/năm
+* WACC = 12%, tăng trưởng dài hạn g = 5%
+* LNST năm = 1,686.69 × 4 = 6,746.76 tỷ
+* FCFE ≈ LNST, DCF = FCFE / (WACC - g) = 6,746.76 / (0.12 - 0.05) ≈ **96,382 tỷ**
+* Giá trị DCF/CP = 96,382 / 414 = **\~232,800 đ/CP**
+
+🔹 Làm tròn DCF value: **\~230,000 đ/CP**
+
+---
+
+## **3. Giá trị hợp lý tổng hợp (trung bình trọng số)**
+
+Áp dụng trọng số:
+
+* **P/E: 50%**, **P/B: 30%**, **DCF: 20%**
+
+Tính:
+
+$$
+\text{Giá trị hợp lý} = (20,000 × 0.5) + (100,000 × 0.3) + (230,000 × 0.2) = 10,000 + 30,000 + 46,000 = \boxed{86,000 \text{ đ/CP}}
+$$
+
+---
+
+## **4. Giá kỳ vọng cổ phiếu TPB**
+
+Dựa vào:
+
+* ROE cao (17%), P/B thấp (0.95), NIM và CIR tốt.
+* Giá hiện tại (nếu < 25,000 đ) → **đang thấp hơn rất nhiều so với giá trị hợp lý (\~86,000 đ)**.
+
+📌 **Giá kỳ vọng có thể đạt trong 1-2 năm tới:**
+→ **70,000 – 90,000 đ/CP**, nếu không có biến động lớn về vĩ mô hoặc nợ xấu.
+
+---
+
+## ✅ Kết luận đầu tư
+
+| Chỉ tiêu              | Đánh giá                   |
+| --------------------- | -------------------------- |
+| Định giá hiện tại     | Rẻ (P/B < 1, P/E < 6)      |
+| Hiệu quả kinh doanh   | Tốt                        |
+| Tăng trưởng lợi nhuận | Ổn định                    |
+| Rủi ro                | Tỷ lệ cho vay/huy động cao |
+
+📌 **Khuyến nghị:** Có thể đầu tư dài hạn với kỳ vọng cao, phù hợp với nhà đầu tư giá trị.
+
+---
+
+Bạn muốn mình vẽ biểu đồ định giá và so sánh giá thực tế/giá trị hợp lý không?
+

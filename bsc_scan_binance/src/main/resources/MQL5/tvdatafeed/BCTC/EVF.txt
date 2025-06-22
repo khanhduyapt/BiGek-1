@@ -1,0 +1,101 @@
+Dưới đây là **phân tích báo cáo tài chính và định giá giá trị hợp lý của cổ phiếu EVF – Công ty Tài chính Cổ phần Điện lực** (EVNFinance), dựa trên hình ảnh bạn cung cấp:
+
+---
+
+## 🧾 **1. Phân tích kết quả kinh doanh theo quý**
+
+| Chỉ tiêu                    | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024 | Q1/2025 |
+| --------------------------- | ------- | ------- | ------- | ------- | ------- |
+| Thu nhập lãi & DV tài chính | 1150.72 | 1079.57 | 1099.67 | 1021.61 | 1233.41 |
+| LN từ lãi & DV              | 398.76  | 406.86  | 400.03  | 278.94  | 435.55  |
+| LN từ HĐKD                  | 314.49  | 491.40  | 264.30  | 371.83  | 372.63  |
+| LNST                        | 131.13  | 117.89  | 180.80  | 131.01  | 240.48  |
+| LNST CĐ công ty mẹ          | 131.13  | 117.89  | 180.80  | 131.01  | 240.48  |
+
+📌 **Nhận xét:**
+
+* **Doanh thu tài chính (lãi + DV)** ổn định và tăng trưởng nhẹ → nền tảng thu nhập vững.
+* **LNST quý 1/2025 tăng mạnh**, gần gấp đôi quý trước và là mức cao nhất 5 quý → tích cực.
+* Biên lợi nhuận duy trì tốt: **LN ròng/thu nhập ≈ 15–20%**.
+
+---
+
+## 📊 **2. Phân tích bảng cân đối kế toán**
+
+| Chỉ tiêu            | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024 | Q1/2025 |
+| ------------------- | ------- | ------- | ------- | ------- | ------- |
+| Tổng tài sản (tỷ)   | 47,989  | 50,594  | 51,447  | 55,998  | 61,206  |
+| Vốn CSH (tỷ)        | 8,573   | 8,682   | 8,875   | 9,007   | 9,247   |
+| Cho vay khách hàng  | 30,745  | 37,607  | 39,442  | 46,306  | 44,399  |
+| Tiền gửi khách hàng | 34,437  | 41,751  | 44,810  | 102,010 | 113,823 |
+
+📌 **Nhận xét:**
+
+* **Tăng trưởng tài sản 27.5% trong 1 năm** → mở rộng quy mô nhanh chóng.
+* **Cho vay khách hàng chiếm \~72% tài sản** → đúng đặc thù công ty tài chính.
+* **Tiền gửi khách hàng tăng mạnh Q4/2024–Q1/2025** → mở rộng huy động vốn tốt.
+* **Vốn chủ sở hữu tăng chậm** → phần lớn tài trợ bằng nợ (đòn bẩy cao nhưng chưa vượt ngưỡng nguy hiểm).
+
+---
+
+## 🧮 **3. Chỉ số tài chính & hiệu quả hoạt động**
+
+### 📌 **Định giá (Valuation):**
+
+| Chỉ số  | Giá trị  | Nhận xét                                               |
+| ------- | -------- | ------------------------------------------------------ |
+| **P/E** | 12.26    | Hơi cao với ngành tài chính nếu không tăng trưởng mạnh |
+| **P/B** | 0.89     | ✅ **Dưới 1**, cổ phiếu đang thấp hơn giá trị sổ sách   |
+| **EPS** | 881.15 đ | Khá tốt với nhóm mid-cap tài chính                     |
+| **P/S** | 1.08     | Trung tính                                             |
+
+### 💰 **Khả năng sinh lời:**
+
+| Chỉ số        | Giá trị | Nhận xét                                  |
+| ------------- | ------- | ----------------------------------------- |
+| Tỷ lệ LN ròng | 15.11%  | Tốt, duy trì đều                          |
+| NIM           | 3.07%   | Ổn định, phù hợp mô hình                  |
+| ROA           | 1.23%   | Tạm chấp nhận                             |
+| ROE           | 7.52%   | Khá thấp → chưa tận dụng hiệu quả vốn CSH |
+
+### 🧱 **Sức mạnh tài chính:**
+
+| Chỉ số                              | Giá trị | Nhận xét                    |
+| ----------------------------------- | ------- | --------------------------- |
+| LAR (nợ vay/tổng tài sản)           | 73.34%  | Ổn với công ty tài chính    |
+| Tỷ lệ nợ xấu (NPL)                  | 1.66%   | ✅ Tốt, dưới mức cảnh báo 3% |
+| PCL (dự phòng)                      | 1.48%   | Hợp lý                      |
+| ELR (Tỷ lệ bao phủ rủi ro tín dụng) | 20.60%  | Cần nâng cao                |
+
+---
+
+## 💰 **4. Định giá cổ phiếu EVF**
+
+### ✔️ Phương pháp 1: P/E
+
+* **EPS TTM**: 881 đ
+* P/E ngành tài chính trung bình \~8–10 (do tăng trưởng thấp, cạnh tranh cao)
+* ➤ **Giá trị hợp lý = 881 × 9 = \~7.930 đ/cp**
+
+### ✔️ Phương pháp 2: P/B
+
+* BVPS = Vốn CSH / SLCP ≈ 9,247 tỷ / \~1,040 triệu cp = \~8.89K đ/cp
+* P/B trung bình ngành tài chính phi ngân hàng là **1.0 – 1.2**
+* ➤ **Giá hợp lý theo P/B = 8.890 × 1.0 = \~8.900 đ/cp**
+
+---
+
+## ✅ **Tổng hợp và Khuyến nghị**
+
+| Yếu tố                           | Đánh giá                       |
+| -------------------------------- | ------------------------------ |
+| **Tăng trưởng tài sản**          | Tốt, quy mô mở rộng liên tục   |
+| **Lợi nhuận**                    | Ổn định, không đột biến        |
+| **Nợ xấu**                       | ✅ Kiểm soát tốt                |
+| **Đòn bẩy tài chính**            | Hợp lý trong ngành tài chính   |
+| **Giá trị hợp lý**               | **\~7.900 – 8.900 đ/cp**       |
+| **Giá hiện tại (nếu dưới 7.5K)** | 🟢 Có thể mua đầu tư trung hạn |
+
+---
+
+Bạn có muốn mình so sánh EVF với MBS, SHS, TCBF hoặc các cổ phiếu tài chính tương tự không? Hoặc vẽ biểu đồ kỹ thuật để xác định vùng mua vào/lướt sóng?

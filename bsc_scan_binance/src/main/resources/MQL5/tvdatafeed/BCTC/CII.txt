@@ -1,0 +1,128 @@
+Dưới đây là bản phân tích báo cáo tài chính và định giá **CII – Công ty Cổ phần Đầu tư Hạ tầng Kỹ thuật TP.HCM**, dựa trên số liệu bạn cung cấp từ ảnh.
+
+---
+
+## 📊 I. Phân tích Báo cáo Tài chính CII
+
+---
+
+### 1. **Kết quả Kinh doanh (Theo quý, Đơn vị: Tỷ VNĐ)**
+
+| Kỳ      | Doanh thu thuần | LN từ HĐKD | LNST   | LNST CĐ công ty mẹ |
+| ------- | --------------- | ---------- | ------ | ------------------ |
+| Q1/2024 | 878.05          | 341.97     | 322.88 | 259.43             |
+| Q2/2024 | 699.29          | 136.42     | 82.67  | 6.50               |
+| Q3/2024 | 706.56          | 134.30     | 95.47  | 5.95               |
+| Q4/2024 | 756.65          | 51.45      | 99.83  | 5.95               |
+| Q1/2025 | 695.62          | 128.75     | 95.61  | 18.07              |
+
+📌 **Nhận định:**
+
+* **Doanh thu ổn định** quanh \~700–800 tỷ mỗi quý.
+* **LNST quý I/2024 đột biến** (322.88 tỷ), nhưng các quý sau giảm mạnh, đặc biệt phần lợi nhuận về **CĐ công ty mẹ rất thấp**.
+* Từ Q2/2024 đến Q1/2025, LNST CĐ mẹ dao động rất thấp (\~6–18 tỷ) → cho thấy **LN thuộc về cổ đông thiểu số rất lớn**, cần lưu ý cấu trúc đầu tư liên doanh liên kết.
+
+---
+
+### 2. **Chỉ số Định giá**
+
+| Chỉ số | Giá trị    | Nhận xét                                                 |
+| ------ | ---------- | -------------------------------------------------------- |
+| P/E    | **223.94** | Quá cao – cổ phiếu bị định giá vượt xa khả năng sinh lời |
+| P/S    | 1.82       | Chấp nhận được với doanh nghiệp hạ tầng                  |
+| P/B    | 0.97       | Gần sát giá trị sổ sách – ổn định                        |
+| EPS    | 65.64 đ/cp | Rất thấp, kém hấp dẫn với nhà đầu tư EPS                 |
+
+📌 **Tổng kết:**
+→ Với EPS \~66 đ/cp và P/E \~224 → thị giá cổ phiếu đang cao hơn rất nhiều so với sức sinh lời.
+
+---
+
+### 3. **Khả năng Sinh lời**
+
+| Chỉ số               | Giá trị | Nhận xét                                                       |
+| -------------------- | ------- | -------------------------------------------------------------- |
+| Tỷ lệ Lãi ròng (%)   | 1.26    | Rất thấp                                                       |
+| Biên LN gộp (%)      | 57.24   | Ổn định, nhưng không phản ánh hết hiệu quả                     |
+| Tỷ lệ EBIT (%)       | 56.36   | Cao bất thường → kiểm tra lại lợi nhuận từ hoạt động tài chính |
+| Tỷ lệ LN từ HĐKD (%) | 15.78   | Chấp nhận được với ngành hạ tầng                               |
+
+---
+
+### 4. **Sức mạnh Tài chính**
+
+| Chỉ số               | Giá trị | Nhận xét                    |
+| -------------------- | ------- | --------------------------- |
+| Thanh toán hiện hành | 1.02    | Vừa đủ trả nợ ngắn hạn      |
+| Thanh toán nhanh     | 0.72    | Hơi yếu                     |
+| Khả năng trả lãi vay | 1.32    | Tạm đủ nhưng cần cải thiện  |
+| Nợ / VCSH            | 2.21    | Cao – đòn bẩy tài chính lớn |
+
+📌 **Tổng kết:**
+→ CII đang sử dụng nhiều **vốn vay**, áp lực trả lãi cao. Tuy nhiên, vẫn đủ khả năng xoay vòng vốn ngắn hạn.
+
+---
+
+### 5. **Hiệu quả Quản lý và Khả năng Hoạt động**
+
+| Chỉ số         | Giá trị | Nhận xét                    |
+| -------------- | ------- | --------------------------- |
+| ROA            | 0.10%   | Rất kém                     |
+| ROE            | 0.34%   | Rất thấp – lãng phí vốn chủ |
+| ROIC           | 4.21%   | Kém hấp dẫn                 |
+| ROCE           | 5.74%   | Trung bình                  |
+| Vòng quay TS   | 0.08    | Quá chậm                    |
+| Vòng quay HTK  | 0.54    | Bình thường                 |
+| Vòng quay KPT  | 3.78    | Khá ổn                      |
+| Vòng quay TSNH | 0.31    | Yếu                         |
+
+📌 **Kết luận:**
+→ CII đầu tư tài sản lớn nhưng **hiệu suất sinh lời rất thấp**, cho thấy vốn bị "giam" trong các dự án dài hạn hoặc đầu tư không hiệu quả.
+
+---
+
+## 💰 II. Định giá Cổ phiếu CII – Giá trị hợp lý
+
+---
+
+### ✅ 1. Định giá theo EPS và P/E hợp lý
+
+* EPS trailing = 65.64 đ/cp
+* P/E hợp lý cho nhóm hạ tầng = **10 – 12**
+
+> 👉 Giá trị hợp lý = 65.64 × 10 ≈ **656 đ/cp**
+
+### ✅ 2. Định giá theo P/B
+
+* P/B hiện tại = 0.97 → sát với giá trị sổ sách.
+* Nếu định giá lại về mức hấp dẫn (P/B = 0.7):
+
+> 👉 Giá trị hợp lý = BVPS × 0.7 ≈ **giá thị trường × 0.72**
+
+→ Nếu thị giá hiện tại là 20,000 đ → giá trị hợp lý chỉ khoảng **14,000–15,000 đ**
+
+---
+
+## ✅ III. Kết luận & Khuyến nghị
+
+| Tiêu chí                | Nhận định                                                            |
+| ----------------------- | -------------------------------------------------------------------- |
+| Kết quả kinh doanh      | Không ổn định, nhiều quý LN rất thấp                                 |
+| Tài chính               | Đòn bẩy cao, dòng tiền yếu                                           |
+| Hiệu quả sử dụng vốn    | Rất kém (ROE, ROA thấp)                                              |
+| Định giá                | Quá cao nếu xét trên P/E và EPS                                      |
+| Giá trị hợp lý cổ phiếu | **600–1,500 đ/cp**, thấp hơn nhiều so với giá thị trường (nếu > 10k) |
+
+📌 **Khuyến nghị đầu tư:**
+
+* **Không mua nếu giá > 10,000 đ/cp** trừ khi có đột biến dòng tiền hoặc thông tin tích cực về thu hồi vốn từ dự án BOT.
+* **Chỉ nên nắm giữ nếu mục tiêu là trung–dài hạn (hơn 2 năm)** và kỳ vọng chính sách hỗ trợ đầu tư công, hạ tầng.
+
+---
+
+Bạn có muốn mình phân tích thêm:
+
+* Tình hình vay nợ trái phiếu/Dự án BOT lớn của CII?
+* So sánh CII với các doanh nghiệp hạ tầng khác như HHV, LCG, FCN?
+
+Chỉ cần nói “Có” là mình phân tích tiếp.

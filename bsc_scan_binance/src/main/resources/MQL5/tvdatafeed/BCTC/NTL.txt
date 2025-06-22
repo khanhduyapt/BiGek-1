@@ -1,0 +1,129 @@
+Phân tích bctc của NTL. 
+Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành.
+Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+
+
+Dưới đây là **phân tích báo cáo tài chính (BCTC)** và **định giá cổ phiếu NTL (CTCP Phát triển Đô thị Từ Liêm)** dựa trên hình ảnh bạn cung cấp.
+
+---
+
+## 📊 **1. Phân tích tài chính NTL đến Q1/2025**
+
+---
+
+### 🔹 **Kết quả kinh doanh (tính theo quý)**
+
+| Chỉ tiêu          | Q1/2024 | Q2/2024  | Q3/2024 | Q4/2024 | Q1/2025 |
+| ----------------- | ------- | -------- | ------- | ------- | ------- |
+| Doanh thu thuần   | 36.78   | 1,379.52 | 3.76    | 21.25   | 3.48    |
+| Lợi nhuận gộp     | 21.39   | 845.53   | 1.05    | 12.60   | 1.01    |
+| Lợi nhuận từ HĐKD | 6.46    | 813.26   | 0.85    | 10.23   | 0.89    |
+| LNST (công ty mẹ) | 5.28    | 646.66   | 3.58    | -47.96  | 6.35    |
+
+🔸 **Nhận xét**:
+
+* Quý 2/2024 là **giai đoạn bùng nổ** khi ghi nhận doanh thu đột biến (\~1.380 tỷ) và LNST rất cao (\~647 tỷ).
+* Các quý còn lại khá trầm lắng → đặc trưng mô hình BĐS: lợi nhuận ghi nhận khi bàn giao dự án.
+* Quý 4/2024 có khoản lỗ khá lớn (-48 tỷ), cần kiểm tra nguyên nhân chi tiết.
+
+---
+
+### 🔹 **Bảng cân đối kế toán**
+
+| Chỉ tiêu     | Q1/2024  | Q2/2024  | Q3/2024  | Q4/2024  | Q1/2025  |
+| ------------ | -------- | -------- | -------- | -------- | -------- |
+| Tổng tài sản | 1,689.39 | 2,463.73 | 2,359.20 | 2,178.12 | 1,971.08 |
+| Nợ phải trả  | 221.94   | 527.58   | 419.48   | 432.72   | 206.61   |
+| Vốn CSH      | 1,467.46 | 1,936.15 | 1,939.73 | 1,745.39 | 1,764.28 |
+
+🔸 **Nhận xét**:
+
+* Vốn chủ sở hữu duy trì ở mức cao và ổn định (\~1.750 – 1.900 tỷ).
+* Nợ vay thấp và giảm mạnh trong Q1/2025 → **công ty có cấu trúc tài chính rất an toàn**.
+* NTL gần như **không phụ thuộc vốn vay**, lợi thế lớn trong bối cảnh lãi suất cao.
+
+---
+
+### 🔹 **Các chỉ số tài chính**
+
+| Nhóm                   | Chỉ số                | Giá trị | Đánh giá                      |
+| ---------------------- | --------------------- | ------- | ----------------------------- |
+| **Định giá**           | P/E                   | 3.63    | Rất hấp dẫn                   |
+|                        | P/B                   | 1.25    | Hơi cao, nhưng ổn             |
+|                        | EPS                   | 4,989 đ | Rất cao (theo 4 quý gần nhất) |
+| **Khả năng sinh lời**  | Biên LNST             | 43.23%  | Xuất sắc                      |
+|                        | ROE                   | 37.67%  | Rất tốt                       |
+| **Tài chính**          | Nợ/VCSH               | 0.12    | Cực kỳ an toàn                |
+|                        | Thanh khoản hiện hành | 9.76    | Rất cao                       |
+| **Hiệu quả hoạt động** | Vòng quay TS          | 0.77    | Trung bình thấp               |
+|                        | Vòng quay KPT         | 91.42   | Tốt                           |
+
+🔸 **Nhận xét**:
+
+* ROE, ROA, ROCE rất cao → quản trị vốn hiệu quả.
+* P/E chỉ \~3.6 → **định giá cực kỳ hấp dẫn** nếu lợi nhuận tiếp tục duy trì.
+
+---
+
+## 💰 **2. Định giá cổ phiếu NTL theo 3 phương pháp**
+
+---
+
+### ✅ **(1) Phương pháp P/B (giá trị sổ sách)**
+
+* Vốn CSH = 1,764 tỷ
+* Số lượng cổ phiếu đang lưu hành \~129 triệu
+  → **BVPS = 13,676 đ/cp**
+  → Với P/B hợp lý = 1.5 ⇒ Giá mục tiêu = **\~20,500 đ/cp**
+
+---
+
+### ✅ **(2) Phương pháp DCF (giản lược)**
+
+Giả định:
+
+* LNST bình quân năm = \~400 tỷ
+* Tăng trưởng ổn định: 5%/năm
+* Tỷ lệ chiết khấu: 13%
+* Số cổ phiếu: 129 triệu
+
+👉 Dòng tiền chiết khấu 5 năm + terminal value: ≈ 6,400 tỷ
+→ Giá trị hợp lý = 6,400 / 129 = **\~49,600 đ/cp**
+
+---
+
+### ✅ **(3) Phương pháp P/E ngành**
+
+* EPS trailing (TTM) = 4,989 đ
+* P/E trung bình ngành bất động sản hiện tại: \~8 – 10x
+  → Giá mục tiêu:
+
+  * P/E = 8 ⇒ **39,900 đ**
+  * P/E = 10 ⇒ **49,890 đ**
+
+---
+
+## 🎯 **3. Giá trị hợp lý và khuyến nghị đầu tư**
+
+| Phương pháp | Giá trị hợp lý    |
+| ----------- | ----------------- |
+| P/B         | 20,500 đ          |
+| DCF         | 49,600 đ          |
+| P/E         | 40,000 – 50,000 đ |
+
+### ✅ **Giá kỳ vọng khuyến nghị: 40,000 – 45,000 đ/cp**
+
+* Nếu lợi nhuận Q2/2024 là do bàn giao dự án lớn, và còn tiếp tục trong 2025 → giá có thể vượt 50,000 đ.
+* Nếu thu nhập đột biến không lặp lại, vùng giá hợp lý là 35,000 – 40,000 đ.
+
+---
+
+## 📌 Bạn muốn tôi tiếp tục?
+
+Tôi có thể:
+
+* Dự báo lợi nhuận từng quý 2025 nếu bạn cung cấp tiến độ dự án.
+* So sánh NTL với các mã như KDH, HDG, DIG.
+* Vẽ biểu đồ định giá theo các kịch bản tăng trưởng.
+
+Bạn muốn chọn phần nào?

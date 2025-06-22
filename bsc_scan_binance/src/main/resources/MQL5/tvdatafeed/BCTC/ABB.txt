@@ -1,0 +1,92 @@
+Phân tích bctc của ABB. Đinh giá trị thật của cổ phiếu này. Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+
+Dưới đây là **phân tích báo cáo tài chính** của **Ngân hàng TMCP An Bình (ABB)** dựa trên hình ảnh bạn cung cấp, kèm theo **định giá giá trị hợp lý** của cổ phiếu:
+
+---
+
+## 🔍 **1. Phân tích kết quả kinh doanh ABB**
+
+| Quý     | Thu nhập lãi & DV (tỷ) | Lợi nhuận sau thuế (tỷ) | LNST CĐNH (tỷ) |
+| ------- | ---------------------- | ----------------------- | -------------- |
+| Q1/2024 | 2,481.71               | 153.76                  | 153.76         |
+| Q2/2024 | 2,354.96               | 265.33                  | 265.33         |
+| Q3/2024 | 2,361.32               | -284.74                 | -284.74        |
+| Q4/2024 | 2,713.85               | 430.27                  | 430.27         |
+| Q1/2025 | 2,871.01               | 332.53                  | 332.53         |
+
+🔹 **Nhận xét:**
+
+* Thu nhập từ lãi và dịch vụ ổn định và tăng trưởng đều → hoạt động cốt lõi vững.
+* **Q3/2024 lỗ lớn** do yếu tố bất thường (có thể là trích lập dự phòng hoặc rủi ro tín dụng).
+* Q4/2024 và Q1/2025 hồi phục mạnh mẽ → khả năng kiểm soát rủi ro tốt dần trở lại.
+
+---
+
+## 🏦 **2. Phân tích bảng cân đối kế toán**
+
+| Mục          | Q1/2024    | Q1/2025    |
+| ------------ | ---------- | ---------- |
+| Tổng tài sản | 144,772 tỷ | 185,753 tỷ |
+| Cho vay KH   | 77,884 tỷ  | 96,332 tỷ  |
+| Tiền gửi KH  | 83,542 tỷ  | 97,848 tỷ  |
+| Vốn CSH      | 13,632 tỷ  | 14,356 tỷ  |
+
+🔹 **Nhận xét:**
+
+* **Tăng trưởng tổng tài sản gần 30%** trong 5 quý → mạnh và mở rộng quy mô tốt.
+* **Cho vay và huy động tăng trưởng ổn định**, duy trì **LDR (tỷ lệ cho vay / huy động) > 100%** → ngân hàng tận dụng vốn hiệu quả, nhưng cần kiểm soát rủi ro thanh khoản.
+
+---
+
+## 📊 **3. Các chỉ số tài chính chính**
+
+| **Nhóm**     | **Chỉ số**                              | **Ý nghĩa**                                  |
+| ------------ | --------------------------------------- | -------------------------------------------- |
+| Định giá     | P/E = 11.00<br>P/B = 0.57<br>P/S = 0.79 | → Rẻ so với giá trị sổ sách                  |
+| Sinh lời     | ROE = 5.31%<br>ROA = 0.45%              | → Còn thấp so với trung bình ngành ngân hàng |
+| Tín dụng     | Tỷ lệ nợ xấu = 3.80%                    | → **Tăng cao**, cần trích lập thêm dự phòng  |
+| NIM = 2.04%  | Biên lãi gộp thấp, do chi phí vốn cao   |                                              |
+| CIR = 49.32% | Hiệu quả chi phí tốt (dưới 50%)         |                                              |
+| LLR = 1.75   | Dự phòng bao phủ thấp (rủi ro cao)      |                                              |
+
+---
+
+## 💰 **4. Định giá giá trị thật cổ phiếu ABB**
+
+### 🧮 **EPS trailing 4 quý**:
+
+* 153.76 + 265.33 - 284.74 + 430.27 = **564.62 đồng**
+* EPS ghi nhận là **718.23 đồng/cp**, có thể đã loại ảnh hưởng bất thường quý 3.
+
+### 📌 Giả định:
+
+* P/E hợp lý ngành ngân hàng: **\~9 – 11**
+* ROE cải thiện, LNST tăng trưởng ổn định → chọn mức P/E mục tiêu **11.5**.
+
+👉 **Giá trị hợp lý (theo P/E)**:
+
+> **EPS x P/E = 718 x 11.5 ≈ 8,257 đồng/cổ phiếu**
+
+---
+
+## 🎯 **5. Kỳ vọng giá cổ phiếu ABB**
+
+* Nếu **nợ xấu giảm** và **LN tiếp tục cải thiện như Q4/2024–Q1/2025**, EPS năm 2025 có thể đạt \~**900–1,000 đồng/cp**.
+* Khi đó, **giá kỳ vọng cuối 2025**:
+
+  > **1,000 x 11.5 = 11,500 đồng/cp**
+
+---
+
+## ✅ **Kết luận & Khuyến nghị**
+
+| Tiêu chí                    | Đánh giá                                                                      |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| **Giá trị hợp lý hiện tại** | **8,000 – 8,500 đ/cp**                                                        |
+| **Giá kỳ vọng cuối 2025**   | **10,000 – 11,500 đ/cp**                                                      |
+| **Rủi ro cần theo dõi**     | Tỷ lệ nợ xấu 3.8%, LLR thấp, LDR > 100%                                       |
+| **Điểm mạnh**               | Tăng trưởng tài sản và lợi nhuận mạnh mẽ quý gần nhất, chi phí hoạt động thấp |
+
+👉 **Khuyến nghị đầu tư:** Nếu giá thị trường dưới **8,000 đ**, có thể **mua tích lũy trung hạn**.
+
+Bạn có muốn mình định giá theo phương pháp **chiết khấu dòng tiền (DCF)** hoặc **so sánh P/B với ngân hàng cùng quy mô** không?

@@ -1,0 +1,149 @@
+Dưới đây là **phân tích báo cáo tài chính** và **định giá cổ phiếu LTG – CTCP Tập đoàn Lộc Trời**, dựa trên hình ảnh bạn cung cấp:
+
+---
+
+## 🧾 **1. Kết quả kinh doanh (Tỷ đồng)**
+
+| Chỉ tiêu         | Q1/2023 | Q2/2023 | Q3/2023 | Q4/2023 | Q1/2024 |
+| ---------------- | ------- | ------- | ------- | ------- | ------- |
+| **DT thuần**     | 2,452   | 3,335   | 4,461   | 5,819   | 3,848   |
+| **LN gộp**       | 273     | 524     | 152     | 152     | 245     |
+| **LN từ HĐKD**   | -78     | 407     | -328    | 360     | -133    |
+| **LNST**         | -81     | 425     | -327    | 248     | -97     |
+| **LNST CĐCT mẹ** | -80     | 427     | -328    | 247     | -96     |
+
+📌 **Nhận xét nổi bật:**
+
+* **Lợi nhuận biến động mạnh**, các quý lỗ đậm (Q1, Q3, Q1/2024), xen kẽ các quý có lãi (Q2, Q4).
+* **Doanh thu có xu hướng tăng**, nhưng **biên lợi nhuận không ổn định**.
+* Q1/2024 lại ghi nhận **lỗ lớn**, cho thấy **rủi ro chu kỳ cao**, hoặc phụ thuộc vào thời vụ.
+
+---
+
+## 📊 **2. Cân đối kế toán (Tỷ đồng)**
+
+| Chỉ tiêu         | Q1/2023 | Q2/2023 | Q3/2023 | Q4/2023 | Q1/2024 |
+| ---------------- | ------- | ------- | ------- | ------- | ------- |
+| **Tổng tài sản** | 10,936  | 12,187  | 12,611  | 12,106  | 11,912  |
+| **Tổng nợ**      | 7,869   | 8,794   | 9,110   | 8,395   | 8,938   |
+| **Nguồn VCSH**   | 3,067   | 3,393   | 3,071   | 3,314   | 2,974   |
+
+📌 **Nhận xét nổi bật:**
+
+* Vốn chủ sở hữu **giảm dần** do thua lỗ liên tục → ảnh hưởng đến sức khỏe tài chính.
+* **Nợ vay cao**: chiếm \~75% tổng tài sản → đòn bẩy tài chính lớn, rủi ro khi lãi suất tăng.
+* Tài sản không tăng đáng kể → tăng trưởng chậm.
+
+---
+
+## 📈 **3. Chỉ số tài chính**
+
+### 📌 **Định giá**
+
+| Chỉ số  | Giá trị | Nhận xét                               |
+| ------- | ------- | -------------------------------------- |
+| **P/E** | 3.35    | ✅ Rẻ (nếu lợi nhuận duy trì)           |
+| **P/B** | 0.28    | ✅ Rất thấp, thị trường chiết khấu mạnh |
+| **P/S** | 0.05    | ✅ Rất thấp                             |
+| **EPS** | 2,476 đ | Tạm ổn (nhưng biến động theo quý)      |
+
+> ⚠️ Cần thận trọng với P/E vì **LNST biến động lớn** – chỉ nên tham khảo.
+
+---
+
+### 💰 **Khả năng sinh lời**
+
+| Chỉ số                  | Giá trị | Nhận xét                         |
+| ----------------------- | ------- | -------------------------------- |
+| Tỷ suất LN gộp          | 13.99%  | Trung bình với ngành nông nghiệp |
+| Tỷ suất Lợi nhuận thuần | 1.43%   | Thấp                             |
+| Tỷ lệ EBIT              | 5.6%    | Tạm ổn                           |
+| Tỷ lệ LN HĐKD           | 1.76%   | Thấp                             |
+
+→ Công ty hoạt động biên lợi nhuận thấp, **dễ bị ảnh hưởng bởi giá đầu vào, tỷ giá, mùa vụ**.
+
+---
+
+### 💪 **Sức mạnh tài chính**
+
+| Chỉ số               | Giá trị | Nhận xét                         |
+| -------------------- | ------- | -------------------------------- |
+| Thanh toán hiện hành | 1.11    | Trung bình                       |
+| Thanh toán nhanh     | 0.77    | Dưới mức an toàn                 |
+| Thanh toán lãi vay   | 1.62    | Tạm ổn                           |
+| Nợ/VCSH              | 3.01    | ❌ Rất cao → rủi ro tài chính lớn |
+
+---
+
+### ⚙️ **Hiệu quả quản lý**
+
+| Chỉ số   | Giá trị | Nhận xét              |
+| -------- | ------- | --------------------- |
+| **ROA**  | 2.18%   | Thấp                  |
+| **ROE**  | 8.26%   | Tạm chấp nhận         |
+| **ROIC** | 7.48%   | Trung bình            |
+| **ROCE** | 31.43%  | ✅ Cao (nếu chính xác) |
+
+---
+
+### 🔄 **Khả năng hoạt động**
+
+| Chỉ số            | Giá trị | Nhận xét       |
+| ----------------- | ------- | -------------- |
+| Vòng quay tài sản | 1.53    | Trung bình khá |
+| Vòng quay HTK     | 5.37    | ✅ Hiệu quả     |
+| Vòng quay KPT     | 3.31    | ✅ Khá tốt      |
+| Vòng quay TSNH    | 1.93    | Trung bình     |
+
+---
+
+## 💸 **4. Định giá hợp lý cổ phiếu LTG**
+
+### ✔️ Phương pháp 1: **P/B**
+
+* P/B hiện tại: **0.28**
+* Vốn chủ sở hữu Q1/2024: \~2,974 tỷ đồng
+* Số lượng cổ phiếu lưu hành (ước tính): \~300 triệu cp
+  → **BVPS ≈ 9,913 đ/cp**
+
+→ Nếu định giá theo **P/B = 1**:
+→ Giá hợp lý = **\~9,900 đ/cp**
+
+→ Nếu dùng **P/B = 0.6 – 0.7** cho ngành nông nghiệp có rủi ro:
+→ Giá hợp lý = **\~6,000 – 7,000 đ/cp**
+
+---
+
+### ✔️ Phương pháp 2: **P/E trung bình ngành (8–10)**
+
+* EPS trailing: \~2,476 đ
+* Nếu thị trường chấp nhận P/E = 8–10:
+  → Giá hợp lý = **\~19,800 – 24,700 đ/cp**
+
+> ⚠️ Nhưng do lợi nhuận không ổn định → nên **chiết khấu 50%**:
+> → Giá mục tiêu hợp lý: **\~10,000 – 12,000 đ/cp**
+
+---
+
+## ✅ **Tổng kết và Khuyến nghị**
+
+| Yếu tố                  | Đánh giá                                  |
+| ----------------------- | ----------------------------------------- |
+| **Lợi nhuận**           | Biến động, rủi ro thời vụ                 |
+| **Cơ cấu tài chính**    | ❌ Đòn bẩy cao, cần cải thiện              |
+| **Hiệu quả kinh doanh** | Trung bình, không bền vững                |
+| **Định giá**            | ✅ Rẻ, P/B = 0.28; có biên an toàn         |
+| **Rủi ro**              | ❗ Thời vụ, hàng tồn kho, biến động tỷ giá |
+
+🔍 **Khuyến nghị đầu tư:**
+
+* **Ngắn hạn**: Chỉ dành cho nhà đầu tư chấp nhận rủi ro cao.
+* **Dài hạn**:
+
+  * ✅ **Có thể mua tích lũy nếu giá LTG < 6,500 đ/cp**
+  * 🎯 Mục tiêu 1–2 năm: **\~9,000 – 10,000 đ/cp** (khi kết quả kinh doanh ổn định hơn)
+  * 📌 Ưu tiên theo dõi quý II/2024: nếu có lợi nhuận tốt → có thể xác nhận chu kỳ tăng mới.
+
+---
+
+Bạn có muốn mình cập nhật thêm **biểu đồ kỹ thuật** hoặc **so sánh LTG với HAG, BAF, DCM** không?

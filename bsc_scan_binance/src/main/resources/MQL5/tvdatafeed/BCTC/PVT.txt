@@ -1,0 +1,84 @@
+Dưới đây là **phân tích báo cáo tài chính** của **PVT – Tổng Công ty Cổ phần Vận tải Dầu khí**, cùng với **ước tính giá trị hợp lý** (giá trị thật) của cổ phiếu này dựa trên các chỉ số tài chính hiện tại:
+
+---
+
+## 🧾 **1. Tổng quan hoạt động kinh doanh (2024 – Q1/2025)**
+
+| Chỉ tiêu                | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024 | Q1/2025 |
+| ----------------------- | ------- | ------- | ------- | ------- | ------- |
+| Doanh thu thuần (tỷ)    | 2,536   | 2,988   | 2,934   | 3,347   | 2,790   |
+| Lợi nhuận gộp (tỷ)      | 526     | 711     | 632     | 577     | 493     |
+| LNST (tỷ)               | 306     | 373     | 522     | 271     | 277     |
+| LNST cổ đông công ty mẹ | 231     | 289     | 364     | 210     | 215     |
+
+📌 **Nhận xét:**
+
+* **Doanh thu và LNST quý tăng trưởng tốt, đặc biệt Q3/2024 là cao nhất** do có thể trùng vào mùa vận tải sôi động hoặc ký được hợp đồng lớn.
+* Biên lợi nhuận gộp ổn định quanh mức \~20%.
+* **LNST quý trung bình > 300 tỷ/quý**, tương đương \~1.200 tỷ/năm.
+
+---
+
+## 🧮 **2. Chỉ số định giá**
+
+| Chỉ số  | Giá trị | Đánh giá                        |
+| ------- | ------- | ------------------------------- |
+| P/E     | 7.56    | ⭐ Rẻ so với mặt bằng thị trường |
+| P/B     | 1.03    | 🟡 Gần bằng giá trị sổ sách     |
+| EPS     | 3.030 đ | ⭐ Cao, doanh nghiệp lãi lớn     |
+| ROE     | 10.78%  | 🟡 Ổn nhưng chưa xuất sắc       |
+| ROA     | 5.81%   | ⭐ Khá tốt                       |
+| Nợ/VCSH | 0.83    | ⭐ Cơ cấu vốn lành mạnh          |
+
+➡️ **=> Cổ phiếu này đang được định giá rẻ và tài chính lành mạnh**.
+
+---
+
+## 📈 **3. Sức mạnh tài chính & hiệu quả quản trị**
+
+| Chỉ tiêu               | Giá trị        | Đánh giá                    |
+| ---------------------- | -------------- | --------------------------- |
+| Thanh toán hiện hành   | 1.99           | ⭐ Tốt                       |
+| Lãi gộp (%)            | 20.00          | ⭐ Ổn định & hợp lý          |
+| Tỷ suất LNST từ HĐKD   | 13.70          | ⭐ Cao đối với ngành vận tải |
+| ROIC / ROCE            | 12.12 / 14.74  | ⭐ Hiệu quả sử dụng vốn tốt  |
+| Vòng quay hàng tồn kho | 34.86 vòng/năm | ⭐ Hiệu quả                  |
+
+📌 **=> PVT thể hiện là một doanh nghiệp quản trị tốt, vốn hóa khỏe, vòng quay vốn nhanh.**
+
+---
+
+## 📊 **4. Định giá nội tại cổ phiếu PVT (Giá trị hợp lý)**
+
+### Phương pháp 1: **P/E mục tiêu**
+
+* **EPS trailing** = 3.030 đ
+* **P/E hợp lý ngành logistics/vận tải** = 10–12
+* ➤ **Giá trị hợp lý = 3.030 × 10 \~ 12 = 30.300 – 36.360 đ**
+
+### Phương pháp 2: **P/B + ROE trung hạn**
+
+* P/B hiện tại = 1.03
+* ROE = 10.78%
+* Với mức ROE này, **giá trị sổ sách tăng đều → P/B hợp lý có thể 1.3–1.5**
+* ➤ **Giá trị hợp lý = BV × 1.3 \~ 1.5 = 29.000 – 33.000 đ** (dựa trên book value xấp xỉ 22.000 đ)
+
+---
+
+## 🎯 **Kết luận & Khuyến nghị đầu tư**
+
+| Tiêu chí                    | Đánh giá                    |
+| --------------------------- | --------------------------- |
+| **Tăng trưởng lợi nhuận**   | Tốt, ổn định quanh 15–18%   |
+| **Tình hình tài chính**     | Lành mạnh, không nợ vay lớn |
+| **Biên lợi nhuận**          | Ổn định                     |
+| **Định giá hiện tại**       | Rẻ, thấp hơn giá trị hợp lý |
+| **Giá trị hợp lý ước tính** | **30.000 – 36.000 đ/cp**    |
+
+✅ **Phù hợp với nhà đầu tư trung – dài hạn**
+✅ Có tiềm năng **tăng giá 20–30% so với vùng giá hiện tại (khoảng 24.x–25.x)**
+📌 Nếu thị trường điều chỉnh, vùng mua hợp lý: **22.5 – 24 đ/cp**
+
+---
+
+Bạn muốn mình cập nhật thêm biểu đồ kỹ thuật PVT, hoặc so sánh với GMD, HAH, VOS, hoặc nhóm cảng biển – vận tải khác không?

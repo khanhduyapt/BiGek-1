@@ -1,0 +1,170 @@
+1) Phân tích bctc của SCR. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Dưới đây là phân tích **Báo cáo tài chính (BCTC)** và **định giá cổ phiếu SCR (Công ty CP Địa ốc Sài Gòn Thương Tín)** theo 3 phương pháp: **P/B, P/E ngành, DCF giản lược**, dựa trên ảnh báo cáo tài chính bạn cung cấp.
+
+---
+
+## 1. 🔍 **Phân tích BCTC SCR – quý 1/2025**
+
+### 📊 **Kết quả kinh doanh:**
+
+| Chỉ tiêu (tỷ VND)    | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024 | Q1/2025 |
+| -------------------- | ------- | ------- | ------- | ------- | ------- |
+| **DT thuần**         | 68.97   | 75.27   | 184.42  | 470.46  | 109.90  |
+| **LN gộp**           | 27.90   | 17.83   | -7.36   | 102.45  | 44.14   |
+| **LN từ HĐKD**       | 11.13   | 10.95   | -8.28   | 16.19   | 8.31    |
+| **LNST**             | 4.76    | -4.10   | 0.83    | 2.76    | 1.90    |
+| **LNST (CĐ cty mẹ)** | 4.91    | -3.70   | 0.61    | 1.51    | 1.51    |
+
+➡️ **Doanh thu Q1/2025 tăng tốt** so với cùng kỳ Q1/2024 (\~60%),
+➡️ Nhưng **LNST vẫn thấp (1.9 tỷ)** → Biên lợi nhuận yếu, hiệu quả chưa phục hồi sau các quý lỗ.
+
+---
+
+### 📉 **Chỉ số tài chính:**
+
+#### Định giá:
+
+| Chỉ số  | Giá trị              |
+| ------- | -------------------- |
+| **P/E** | -7107.92 (vì EPS âm) |
+| **P/B** | **0.63**             |
+| **P/S** | **3.70**             |
+| **EPS** | **-1.07 đ/cp**       |
+
+➡️ EPS âm, P/E không có ý nghĩa → phải dùng P/B & DCF để định giá
+
+#### Khả năng sinh lời:
+
+| Chỉ số           | Giá trị |
+| ---------------- | ------- |
+| Tỷ lệ lãi ròng   | -0.05%  |
+| Tỷ lệ lãi gộp    | -3.94%  |
+| Tỷ lệ EBIT       | 37.88%  |
+| Tỷ lệ LN từ HĐKD | 3.23%   |
+
+➡️ **Biên lợi nhuận gộp Q3 âm, Q4 phục hồi nhẹ**, biên LN ròng & từ hoạt động chưa ổn định
+
+#### Hiệu quả quản lý:
+
+| Chỉ số | Giá trị |
+| ------ | ------- |
+| ROA    | -0.00%  |
+| ROE    | -0.01%  |
+| ROIC   | 0.52%   |
+| ROCE   | 4.23%   |
+
+➡️ **ROE, ROA âm** → chưa sinh lời, có dấu hiệu tích lũy hoặc tái cấu trúc
+
+#### Cơ cấu tài sản:
+
+| Q1/2025 (tỷ VND)  | Giá trị                        |
+| ----------------- | ------------------------------ |
+| **Tổng tài sản**  | 11,867.19                      |
+| **Nợ phải trả**   | 6,400.10                       |
+| **Vốn CSH**       | 5,467.09                       |
+| **D/E** (Nợ/VCSH) | 6,400.10 / 5,467.09 ≈ **1.17** |
+
+➡️ **D/E > 1** → đòn bẩy cao, SCR đang dùng nợ khá nhiều
+
+---
+
+## 2. 📈 **Định giá cổ phiếu SCR**
+
+---
+
+### 🔹 **(1) P/B – Giá trị sổ sách:**
+
+* **Vốn chủ sở hữu:** 5,467.09 tỷ
+
+* **Số cổ phiếu đang lưu hành:** \~500 triệu cp (ước tính từ dữ liệu trước)
+  → **Giá trị sổ sách BV/cp = 5,467.09 / 500 = \~10,934 đ/cp**
+
+* Hiện P/B = **0.63**
+  → Giá thị trường hiện tại ≈ **6,895 đ/cp**
+
+> Nếu SCR quay về P/B = 1 (giá trị sổ sách)
+
+→ **Giá hợp lý theo P/B = 10,934 đ/cp**
+
+---
+
+### 🔹 **(2) P/E – Dựa trên kỳ vọng phục hồi ngành**
+
+* Hiện tại EPS = **-1.07 đ/cp** → không dùng được P/E trực tiếp
+* Tuy nhiên, nếu SCR phục hồi theo kịch bản ngành BĐS khả quan hơn 2025–2026
+* EPS kỳ vọng 2026 ≈ **500 – 700 đ/cp** (bảo thủ)
+* P/E ngành BĐS hiện khoảng **10–12**
+
+→ Giá hợp lý theo P/E = 600 × 11 = **6,600 đ/cp**
+
+> Đây là mức **giá khi phục hồi**, vẫn thấp hơn giá trị sổ sách
+
+---
+
+### 🔹 **(3) DCF – Giản lược (FCFE):**
+
+Giả định:
+
+* LNST kỳ vọng cả năm 2025 = 15 tỷ (bảo thủ)
+* FCFE = 15 tỷ / 500 triệu cp = **30 đ/cp**
+* WACC = 13%, g = 5%
+
+→ **DCF = 30 × (1.05) / (0.13 – 0.05) ≈ 393.75 đ/cp**
+
+> Rất thấp do dòng tiền hiện tại yếu, không tạo dòng tiền tự do đáng kể
+
+---
+
+## 📌 3. ✅ **Tổng hợp định giá cổ phiếu SCR**
+
+| Phương pháp | Giá trị (đ/cp) |
+| ----------- | -------------- |
+| **P/B**     | \~10,934       |
+| **P/E**     | \~6,600        |
+| **DCF**     | \~394          |
+
+➡️ **Giá hợp lý trung bình trọng số (50% P/E + 30% P/B + 20% DCF):**
+\= (6,600 × 0.5) + (10,934 × 0.3) + (394 × 0.2)
+\= 3,300 + 3,280.2 + 78.8
+\= **\~6,659 đ/cp**
+
+---
+
+## 🎯 4. **Giá kỳ vọng trong 6–12 tháng: \~6,500 – 7,000 đ/cp**
+
+### 📌 Điều kiện để đạt giá này:
+
+* Doanh nghiệp tiếp tục lãi đều các quý
+* Tái cấu trúc tài chính hiệu quả (giảm nợ, tăng thanh khoản)
+* Thị trường BĐS phục hồi nhẹ
+
+---
+
+## ⚠️ Lưu ý đầu tư:
+
+✅ Điểm mạnh:
+
+* Tài sản lớn (gần 12 nghìn tỷ), có thể "phục hồi theo chu kỳ"
+* Giá thấp hơn giá trị sổ sách → hấp dẫn về định giá
+
+⚠️ Rủi ro:
+
+* Lợi nhuận chưa ổn định, ROE/ROA vẫn âm
+* Tỷ lệ nợ cao → áp lực tài chính nếu thị trường xấu
+
+---
+
+Bạn có muốn tôi xây bảng dòng tiền chi tiết DCF hoặc so sánh SCR với các cổ phiếu cùng ngành như DIG, NLG, LDG không?

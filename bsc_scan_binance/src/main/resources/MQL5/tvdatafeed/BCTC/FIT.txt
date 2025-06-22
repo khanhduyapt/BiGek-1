@@ -1,0 +1,147 @@
+Phân tích bctc của FIT. 
+Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành.
+Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+
+
+Dưới đây là **phân tích chi tiết Báo cáo tài chính (BCTC) của CTCP Tập đoàn F.I.T (mã FIT)** và **định giá cổ phiếu** theo 3 phương pháp kinh điển: P/B, DCF giản lược và P/E ngành.
+
+---
+
+## 📊 **1. Phân tích tài chính FIT đến Q1/2025**
+
+---
+
+### 🔹 **Kết quả kinh doanh (đơn vị: tỷ đồng)**
+
+| Chỉ tiêu          | Q1/24  | Q2/24  | Q3/24  | Q4/24  | Q1/25  |
+| ----------------- | ------ | ------ | ------ | ------ | ------ |
+| Doanh thu thuần   | 408.85 | 468.30 | 390.82 | 678.49 | 515.31 |
+| Lợi nhuận gộp     | 93.78  | 93.68  | 88.91  | 116.19 | 126.58 |
+| Lợi nhuận HĐKD    | 83.74  | 52.60  | 35.11  | 53.35  | 64.00  |
+| LNST (Công ty mẹ) | 54.23  | 35.97  | 23.65  | 5.41   | 16.19  |
+
+🔸 **Nhận xét**:
+
+* Doanh thu tăng tốt Q4/2024 nhưng LNST công ty mẹ lại **sụt mạnh**, chỉ còn \~5.4 tỷ (có thể do chi phí bất thường hoặc hoạt động không hiệu quả).
+* Q1/2025 có sự phục hồi lợi nhuận → xu hướng tích cực nhưng **chưa ổn định**.
+* Biên LNST công ty mẹ rất thấp (\~3.1% trên doanh thu Q1/25).
+
+---
+
+### 🔹 **Bảng cân đối kế toán (tỷ đồng)**
+
+| Chỉ tiêu       | Q1/24 | Q2/24 | Q3/24 | Q4/24 | Q1/25 |
+| -------------- | ----- | ----- | ----- | ----- | ----- |
+| Tổng tài sản   | 7,389 | 7,423 | 7,632 | 7,637 | 7,936 |
+| Tổng nợ        | 1,523 | 1,516 | 1,694 | 1,806 | 1,959 |
+| Vốn chủ sở hữu | 5,866 | 5,908 | 5,938 | 5,940 | 5,976 |
+
+🔸 **Nhận xét**:
+
+* **Tổng tài sản duy trì ổn định** (\~7.4–7.9 ngàn tỷ).
+* **Nợ vay đang tăng lên**, từ 1.5K tỷ lên 1.96K tỷ → cần theo dõi khả năng trả nợ.
+* Vốn chủ sở hữu tăng chậm, cho thấy tích lũy nội lực chậm.
+
+---
+
+### 🔹 **Các chỉ số tài chính chính (bên phải ảnh)**
+
+| Nhóm          | Chỉ số         | Giá trị  | Nhận định               |
+| ------------- | -------------- | -------- | ----------------------- |
+| **Định giá**  | P/E            | 18.62    | Không rẻ                |
+|               | P/B            | 0.39     | Rất thấp, hấp dẫn       |
+|               | EPS            | 238.95 đ | Tương đương \~960 đ/năm |
+| **Sinh lời**  | ROE            | 1.37%    | Rất thấp                |
+|               | ROA            | 1.06%    | Thấp                    |
+| **Tài chính** | Nợ/VCSH        | 0.33     | Rất an toàn             |
+|               | Thanh khoản HT | 3.67     | Rất cao                 |
+| **Hoạt động** | Vòng quay HTK  | 3.67     | Ổn                      |
+|               | Vòng quay KPT  | 4.79     | Trung bình              |
+
+---
+
+## 💰 **2. Định giá cổ phiếu FIT theo 3 phương pháp**
+
+---
+
+### ✅ **(1) Phương pháp P/B (giá trị sổ sách)**
+
+* Vốn CSH Q1/2025 = **5,976 tỷ**
+* Giả sử số lượng cổ phiếu lưu hành = **1.5 tỷ cp**
+  → **BVPS = 5,976 / 1.5 = 3,984 đ/cp**
+
+Áp dụng hệ số P/B:
+
+| Hệ số P/B | Giá hợp lý |
+| --------- | ---------- |
+| 0.5       | \~1,990 đ  |
+| 0.7       | \~2,790 đ  |
+| 1.0       | \~3,984 đ  |
+
+Hiện tại P/B = 0.39 → **có thể bị định giá thấp nếu doanh nghiệp phục hồi**.
+
+---
+
+### ✅ **(2) Phương pháp DCF (giản lược)**
+
+Giả định:
+
+* LNST thường niên ước khoảng: **200 – 250 tỷ** (kịch bản phục hồi trung bình)
+* Tăng trưởng: 5%
+* Chiết khấu: 13%
+* Số lượng cổ phiếu: 1.5 tỷ
+
+→ Tổng giá trị doanh nghiệp:
+
+$$
+\text{DCF value} \approx \frac{250 \times (1 + 5\%)}{13\% - 5\%} = 3,281 tỷ
+$$
+
+→ Giá trị mỗi cổ phiếu:
+
+$$
+3,281 / 1,500 = **2,187 đ/cp**
+$$
+
+---
+
+### ✅ **(3) Phương pháp P/E ngành**
+
+* EPS trailing = 239 đ
+* Giả định EPS phục hồi về **600 – 800 đ/cp** trong 1-2 năm
+* P/E ngành trung bình: 10x
+
+| EPS (giả định)   | Giá hợp lý (P/E = 10) |
+| ---------------- | --------------------- |
+| 600 đ            | 6,000 đ               |
+| 800 đ            | 8,000 đ               |
+| 239 đ (hiện tại) | \~2,390 đ             |
+
+**→ Cổ phiếu sẽ chỉ thực sự hấp dẫn nếu EPS cải thiện đáng kể.**
+
+---
+
+## 🎯 **3. Giá kỳ vọng cổ phiếu FIT**
+
+| Phương pháp          | Giá trị hợp lý (đồng/cp) |
+| -------------------- | ------------------------ |
+| P/B (0.7x)           | 2,800                    |
+| DCF                  | \~2,200                  |
+| P/E (trong phục hồi) | 6,000 – 8,000            |
+
+---
+
+## ✅ **Định giá kỳ vọng khuyến nghị: 2,500 – 3,000 đ/cp (hiện tại)**
+
+* Nếu lợi nhuận tiếp tục cải thiện (EPS > 500 đ), giá có thể hướng tới 5,000 – 6,000 đ.
+* Nếu không cải thiện → vùng giá 2,200 – 2,800 đ là vùng **an toàn và hấp dẫn đầu tư giá trị**.
+
+---
+
+Bạn có muốn tôi:
+
+* Ước tính chi tiết DCF theo dòng tiền từng năm?
+* So sánh FIT với doanh nghiệp cùng ngành như HAI, DCL?
+* Tư vấn chiến lược mua/bán FIT theo chu kỳ lợi nhuận?
+
+Bạn muốn làm tiếp phần nào?

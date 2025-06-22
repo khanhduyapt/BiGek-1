@@ -1,0 +1,106 @@
+Dưới đây là **phân tích báo cáo tài chính của DLG – Công ty Cổ phần Tập đoàn Đức Long Gia Lai**, cùng với **định giá sơ bộ giá trị hợp lý (giá trị thật)** của cổ phiếu này:
+
+---
+
+## 🧾 **1. Phân tích kết quả kinh doanh theo quý**
+
+| Chỉ tiêu                | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024 | Q1/2025 |
+| ----------------------- | ------- | ------- | ------- | ------- | ------- |
+| Doanh thu thuần (tỷ)    | 266.42  | 328.31  | 220.31  | 216.94  | 153.11  |
+| Lợi nhuận gộp (tỷ)      | 69.24   | 84.46   | 32.64   | 78.03   | 77.95   |
+| LN từ HĐKD (tỷ)         | 42.50   | 49.77   | 64.42   | -193.47 | 49.31   |
+| LNST (tỷ)               | 35.51   | 25.54   | 64.16   | 124.62  | 36.01   |
+| LNST CĐ công ty mẹ (tỷ) | 27.68   | 19.56   | 52.48   | 111.36  | 28.39   |
+
+📌 **Nhận xét:**
+
+* Doanh thu Q1/2025 sụt giảm đáng kể so với cùng kỳ và quý trước.
+* Quý 4/2024 có lợi nhuận đột biến do khoản thu nhập bất thường (có thể từ thanh lý tài sản hoặc hoàn nhập dự phòng).
+* LNST bình quân quý chỉ đạt **\~30–35 tỷ**, tương đương khoảng **120–140 tỷ/năm** → EPS tương ứng rất thấp.
+
+---
+
+## 📊 **2. Phân tích bảng cân đối kế toán**
+
+| Chỉ tiêu          | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024 | Q1/2025 |
+| ----------------- | ------- | ------- | ------- | ------- | ------- |
+| Tổng tài sản (tỷ) | 5019.82 | 5105.06 | 4859.74 | 4314.86 | 4314.63 |
+| Nợ phải trả (tỷ)  | 4455.32 | 4507.09 | 4260.44 | 3559.90 | 3522.03 |
+| Vốn CSH (tỷ)      | 564.50  | 597.96  | 599.30  | 754.14  | 792.93  |
+
+📌 **Nhận xét:**
+
+* Tài sản giảm dần → thể hiện quy mô hoạt động bị thu hẹp.
+* **Nợ/VCSH = 4.44** lần 🔴 rất cao → đòn bẩy tài chính cực kỳ rủi ro.
+* Vốn chủ sở hữu cải thiện quý gần nhất, có thể do tăng vốn hoặc lợi nhuận bất thường.
+
+---
+
+## ⚙️ **3. Phân tích chỉ số tài chính**
+
+### 📉 **Định giá**
+
+| Chỉ số  | Giá trị | Nhận xét                                   |
+| ------- | ------- | ------------------------------------------ |
+| **P/E** | 3.35    | Rất thấp, nhưng cần thận trọng do EPS thấp |
+| **P/B** | 1.14    | Trên giá trị sổ sách 1 chút                |
+| **EPS** | 707.6 đ | Tạm ổn nếu duy trì được                    |
+
+### 🧮 **Khả năng sinh lời**
+
+| Chỉ số         | Giá trị | Nhận xét                                  |
+| -------------- | ------- | ----------------------------------------- |
+| Tỷ lệ LN ròng  | 23.05%  | Tốt (nhưng có thể do thu nhập bất thường) |
+| Tỷ suất LN gộp | 33.48%  | Tốt                                       |
+| Tỷ lệ EBIT     | 56.47%  | Rất cao                                   |
+| LN từ HĐKD (%) | -3.26%  | 🔴 **Âm**, cảnh báo rủi ro tiềm ẩn        |
+
+### 💰 **Sức mạnh tài chính**
+
+| Chỉ số               | Giá trị | Nhận xét          |
+| -------------------- | ------- | ----------------- |
+| Thanh toán hiện hành | 0.75    | Yếu               |
+| Thanh toán nhanh     | 0.69    | Yếu               |
+| Thanh toán lãi vay   | 2.01    | Tạm chấp nhận     |
+| Nợ/VCSH              | 4.44    | 🔴 Rủi ro cực cao |
+
+### 📈 **Hiệu quả quản lý & hoạt động**
+
+| Chỉ số      | Giá trị         | Nhận xét                            |
+| ----------- | --------------- | ----------------------------------- |
+| ROA         | 4.54%           | Thấp                                |
+| ROE         | 31.20%          | Ảo do đòn bẩy tài chính             |
+| ROIC / ROCE | 16.48% / 22.79% | Tốt nếu loại bỏ thu nhập bất thường |
+
+---
+
+## 🧮 **4. Định giá giá trị hợp lý (Fair Value)**
+
+### ✔️ Phương pháp 1: P/E định giá
+
+* **EPS thực tế**: 707.6 đ
+* **P/E mục tiêu hợp lý**: 7–8 (do rủi ro tài chính cao)
+* ➤ **Giá trị hợp lý = 707.6 × 7 \~ 8 = \~4.950 – 5.660 đ/cp**
+
+### ✔️ Phương pháp 2: P/B định giá
+
+* Book Value (BV) = \~700 đ/cp
+* Với mức P/B hợp lý 1.0 → Giá hợp lý khoảng **7.000 đ**, nhưng thực tế DLG chưa thể hiện hiệu quả sinh lời ổn định → P/B hợp lý có thể chỉ \~0.7–0.9
+* ➤ **Giá trị hợp lý = 700 × 0.8 = \~5.600 đ/cp**
+
+---
+
+## ✅ **Kết luận & Khuyến nghị**
+
+| Tiêu chí                 | Đánh giá                                           |
+| ------------------------ | -------------------------------------------------- |
+| **Tình hình kinh doanh** | Biến động, phụ thuộc nhiều vào thu nhập bất thường |
+| **Tài chính**            | Rất yếu, nợ cao, thanh khoản thấp                  |
+| **Lợi nhuận**            | Không bền vững                                     |
+| **Giá trị hợp lý**       | **4.950 – 5.600 đ/cp**                             |
+| **Đầu tư ngắn hạn**      | Có thể có sóng đầu cơ                              |
+| **Đầu tư dài hạn**       | ⚠️ Không phù hợp nếu chưa cải tổ mạnh mẽ           |
+
+---
+
+Bạn có muốn mình so sánh DLG với các cổ phiếu đầu cơ khác như FLC, TGG, ROS cũ, hay muốn xem phân tích kỹ thuật vùng kháng cự – hỗ trợ để lướt sóng không?

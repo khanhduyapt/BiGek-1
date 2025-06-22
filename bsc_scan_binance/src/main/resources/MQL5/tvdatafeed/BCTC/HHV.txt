@@ -1,0 +1,70 @@
+Dựa trên hình ảnh báo cáo tài chính của công ty HHV, ta có thể phân tích và ước lượng giá trị hợp lý (giá trị thực) của cổ phiếu như sau:
+
+---
+
+## **1. Phân tích báo cáo tài chính HHV**
+
+### **Kết quả kinh doanh (theo quý)**
+
+* **Doanh thu thuần** ổn định và có xu hướng tăng, đặc biệt Q4/2024 đạt 1.009,99 tỷ đồng.
+* **Lợi nhuận gộp** cao, tỷ suất lợi nhuận gộp đạt **41.61%**, cho thấy biên lợi nhuận tốt.
+* **LN từ HĐKD** và **LNST** cải thiện liên tục, đặc biệt quý gần nhất Q1/2025 có LNST công ty mẹ đạt **146.24 tỷ**, là mức cao nhất 5 quý.
+* EPS trailing là **1,053.05** đồng/cổ phiếu => Tương đối tốt nếu so với các công ty xây dựng hạ tầng cùng ngành.
+
+---
+
+## **2. Phân tích bảng cân đối kế toán**
+
+* **Tổng tài sản** tăng từ 37.660 tỷ (Q1/2024) lên **39.260 tỷ đồng (Q1/2025)** ⇒ Tăng trưởng bền vững.
+* **Tổng nợ** chiếm khoảng 71–72% tổng tài sản ⇒ Dùng đòn bẩy khá cao.
+* **Nguồn vốn chủ sở hữu** tăng đều ⇒ Tích lũy lợi nhuận tốt.
+
+Tuy nhiên:
+
+* **Chỉ số thanh toán hiện hành = 0.36**, thanh toán nhanh = 0.32 ⇒ Khả năng thanh toán ngắn hạn yếu, cần theo dõi.
+
+---
+
+## **3. Các chỉ số tài chính quan trọng**
+
+| **Nhóm chỉ số** | **Chỉ số**                            | **Đánh giá**                      |
+| --------------- | ------------------------------------- | --------------------------------- |
+| **Định giá**    | P/E = 11.54                           | Hợp lý                            |
+|                 | P/B = 0.54                            | Rẻ                                |
+|                 | P/S = 1.54                            | Chấp nhận được                    |
+| **Sinh lời**    | ROE = 4.32%, ROA = 1.18%              | Trung bình, cần cải thiện         |
+|                 | Biên EBIT = 42.56%                    | Rất cao                           |
+| **Tài chính**   | Nợ/VCSH = 2.48                        | Cao ⇒ có rủi ro tài chính         |
+| **Hiệu quả**    | Vòng quay HTK = 17.37, Tài sản = 0.09 | Hiệu quả sử dụng tài sản còn thấp |
+
+---
+
+## **4. Định giá cổ phiếu HHV**
+
+Dựa trên phương pháp **P/E**:
+
+* **EPS trailing 4 quý**: 96.01 + 109.45 + 104.01 + 146.24 = **455.71**
+* Dự báo EPS forward 1 năm = **\~1,100 – 1,200 đồng/cp** (tăng trưởng tốt từ nền 455 => 1,053 EPS đã ghi nhận)
+
+### Định giá:
+
+* Mức P/E trung bình ngành hạ tầng, xây dựng: khoảng **10–12**
+* Giá trị hợp lý = EPS x P/E = **1,100 x 11.5 = 12,650 đồng/cp**
+
+---
+
+## **5. Kết luận**
+
+* **Giá trị hợp lý cổ phiếu HHV**: khoảng **12,000 – 13,000 đồng/cổ phiếu**
+* **Khuyến nghị**:
+
+  * Nếu giá thị trường < 11,000 ⇒ **mua tích lũy**
+  * Nếu giá > 13,000 ⇒ **cần xem xét rủi ro tài chính và sức khỏe thanh khoản**
+
+Nếu bạn cung cấp thêm:
+
+* Giá thị trường hiện tại của HHV
+* Tình hình dự án/dòng tiền cụ thể
+  ⇒ Mình có thể điều chỉnh định giá chi tiết hơn.
+
+Bạn có muốn mình định giá bằng phương pháp chiết khấu dòng tiền (DCF) không?
