@@ -1,0 +1,115 @@
+Cảm ơn bạn đã cung cấp BCTC của **Ngân hàng TMCP Phương Đông (OCB)**. Dưới đây là:
+
+---
+
+## 🧾 **1. Phân tích BCTC của OCB (theo quý Q1/2024–Q1/2025)**
+
+### **1.1. Kết quả kinh doanh**
+
+| Chỉ tiêu          | Q1/2024 | Q2/2024 | Q3/2024 | Q4/2024   | Q1/2025 |
+| ----------------- | ------- | ------- | ------- | --------- | ------- |
+| Thu nhập lãi & DV | 4,424   | 4,383   | 4,393   | 5,159     | 5,060   |
+| LN từ HĐKD        | 1,418   | 1,371   | 1,373   | 2,156     | 1,271   |
+| LNST (CĐNH)       | **954** | 717     | 347     | **1,157** | 712     |
+
+✅ **Điểm mạnh**:
+
+* Lợi nhuận sau thuế phục hồi mạnh Q4/2024 (tăng hơn gấp 3 lần Q3).
+* Thu nhập lãi tăng dần, ổn định hơn về dài hạn.
+
+⚠️ **Điểm yếu**:
+
+* LNST Q3/2024 rất thấp (chỉ 347 tỷ), cho thấy biến động lợi nhuận vẫn khá lớn.
+
+---
+
+### **1.2. Bảng cân đối kế toán**
+
+| Chỉ tiêu     | Q1/2024    | Q1/2025    |
+| ------------ | ---------- | ---------- |
+| Tổng tài sản | 236,979 tỷ | 280,966 tỷ |
+| Cho vay KH   | 148,649 tỷ | 172,738 tỷ |
+| Tiền gửi KH  | 126,679 tỷ | 151,153 tỷ |
+| Vốn CSH      | 24,955 tỷ  | 32,388 tỷ  |
+
+✅ **Tăng trưởng tài sản & cho vay mạnh mẽ (\~20%)**, vốn chủ sở hữu tăng đều → nội lực ổn định, tiềm năng mở rộng.
+
+---
+
+### **1.3. Chỉ số tài chính**
+
+#### ✅ **Khả năng sinh lời**
+
+* ROE: **9.48%**, ROA: **1.12%** – khá tốt trong nhóm ngân hàng.
+* Tỷ lệ Lãi ròng: **15.44%** → biên lợi nhuận khá ổn.
+* CIR (Tỷ lệ chi phí/thu nhập): **39.16%** → hiệu quả quản lý tốt.
+
+#### ⚠️ **Rủi ro tín dụng & thanh khoản**
+
+* LDR (cho vay/huy động): **115.87%** → khá cao, áp lực thanh khoản.
+* Tỷ lệ nợ xấu: **3.91%** – **cao hơn mức an toàn <3%**, cần lưu ý.
+* LLRNPL (dự phòng/nợ xấu): **47.14%** → mức bao phủ rủi ro còn yếu.
+
+---
+
+## 📊 **2. Định giá cổ phiếu OCB**
+
+### **Cơ sở số liệu:**
+
+* **EPS**: 1,189.45 đ/cp
+* **P/E hiện tại**: 9.5
+* **P/B hiện tại**: 1.37
+* **BVPS (giá trị sổ sách)** = Vốn CSH / Số lượng cổ phiếu ≈ 32,388 tỷ / 1.72 tỷ cp = \~18,829 đ/cp
+
+---
+
+### 🔍 **Định giá theo 3 phương pháp:**
+
+#### 1. **P/E (giá trị theo thu nhập)**
+
+* Với P/E trung bình ngành ngân hàng \~12x
+  → Giá trị = 1,189.45 × 12 = **14,273 đ/cp**
+
+#### 2. **P/B (giá trị theo sổ sách)**
+
+* Với P/B ngành \~1.5
+  → Giá trị = 18,829 × 1.5 = **28,243 đ/cp**
+
+#### 3. **DCF (giản lược)**
+
+* EPS tăng trưởng bền vững 8–10%, chiết khấu 12%
+  → Giá trị ước tính DCF = **\~21,000 đ/cp**
+
+---
+
+### 🎯 **Giá trị hợp lý (trung bình trọng số)**
+
+```markdown
+Giá trị hợp lý = 0.5×P/E + 0.3×P/B + 0.2×DCF
+               = 14,273×0.5 + 28,243×0.3 + 21,000×0.2
+               ≈ 7,136 + 8,473 + 4,200 = **~19,809 đ/cp**
+```
+
+---
+
+## 🚀 **3. Giá kỳ vọng cổ phiếu OCB**
+
+| Nội dung                         | Giá trị (VNĐ/cp) |
+| -------------------------------- | ---------------- |
+| Giá trị hợp lý trung bình        | \~19,800         |
+| Vùng mua hợp lý (chiết khấu 15%) | \~16,800         |
+| Vùng bán/trốt lời                | >22,000          |
+
+---
+
+## ✅ **Tổng kết khuyến nghị**
+
+| Tiêu chí                  | Đánh giá                |
+| ------------------------- | ----------------------- |
+| Nội lực tài chính         | Tốt                     |
+| ROE, EPS                  | Khá ổn                  |
+| Nợ xấu, LDR               | Cần kiểm soát           |
+| Giá thị trường vs giá trị | Nếu đang <17k → hấp dẫn |
+
+➡️ **OCB là cổ phiếu tốt dài hạn**, nhưng cần theo dõi **diễn biến nợ xấu và quản trị rủi ro tín dụng** trong các quý tiếp theo.
+Bạn có thể hỏi mình cập nhật định giá lại nếu có thêm báo cáo quý mới hoặc giá cổ phiếu thay đổi đáng kể.

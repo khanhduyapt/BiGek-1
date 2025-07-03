@@ -1,0 +1,96 @@
+1) Phân tích bctc của STB. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+
+
+### 📘 1. Phân tích BCTC của STB (Ngân hàng Sacombank)
+
+#### ✅ Kết quả kinh doanh (Tăng trưởng tốt):
+
+| Chỉ tiêu              | Q1/24  | Q2/24  | Q3/24  | Q4/24  | Q1/25         |
+| --------------------- | ------ | ------ | ------ | ------ | ------------- |
+| **Thu nhập lãi & DV** | 13.842 | 13.886 | 14.056 | 14.325 | **15.082** ⬆️ |
+| **LN từ HĐKD**        | 3.331  | 3.153  | 3.950  | 4.259  | **3.869**     |
+| **LNST (CĐNH)**       | 2.111  | 2.178  | 2.201  | 3.598  | **2.896**     |
+
+→ **Lợi nhuận ròng tăng trưởng đều**, đặc biệt quý 4/2024 tăng đột biến.
+
+#### ✅ Bảng cân đối kế toán:
+
+* **Tổng tài sản**: tăng từ 693 nghìn tỷ → **757 nghìn tỷ** (tăng trưởng ổn định).
+* **Vốn CSH**: từ 47.900 → **57.800 tỷ** (tăng \~20.7% sau 5 quý).
+* **Cho vay KH**: từ 492.000 → **553.000 tỷ**.
+* **Tiền gửi KH**: tăng nhẹ → thể hiện hoạt động huy động ổn định.
+
+#### ✅ Các chỉ số tài chính:
+
+* **EPS**: 5.767 đ → Tốt.
+* **ROE**: 20.56% → Rất cao, chứng tỏ hiệu quả sử dụng vốn tốt.
+* **ROA**: 1.50% → Tương đối tốt với ngành ngân hàng.
+* **P/E**: 8.08 —> Rẻ
+* **P/B**: 1.52 —> Hơi cao nhưng chấp nhận được khi ROE cao.
+* **Tỷ lệ nợ xấu (NPL)**: 2.51% —> Trong ngưỡng an toàn.
+
+---
+
+### 📗 2. Định giá cổ phiếu STB theo 3 phương pháp:
+
+#### 🔹 (1) P/E (Giá trị theo thu nhập):
+
+* EPS = **5,767**
+* Trung bình ngành P/E \~ **9.5**
+* → Giá trị hợp lý theo P/E = 5,767 × 9.5 = **54,786 đ/cp**
+
+#### 🔹 (2) P/B (Giá trị sổ sách):
+
+* BVPS (Giá trị sổ sách trên mỗi cổ phiếu) = Vốn CSH / SLCP
+  → Vốn CSH Q1/2025 = **57,823 tỷ**
+  Giả sử số lượng CP \~ **1,880 triệu CP** (ước lượng từ báo cáo)
+  → BVPS ≈ 30,770 đ/cp
+  → Giá trị theo P/B: 30,770 × 1.52 = **46,771 đ/cp**
+
+#### 🔹 (3) DCF (giản lược, tăng trưởng 8%, chiết khấu 12%):
+
+* DCF = EPS × (1 + g) / (r - g)
+* \= 5,767 × (1 + 0.08) / (0.12 - 0.08) = **155,776 đ/cp**
+
+---
+
+### ✅ Tính giá trị hợp lý trung bình:
+
+Công thức: **(P/E × 0.5 + P/B × 0.3 + DCF × 0.2)**
+
+→ (54.786 × 0.5) + (46.771 × 0.3) + (155.776 × 0.2)
+→ = 27.393 + 14.031 + 31.155 = **72.579 đ/cp**
+
+---
+
+### 📈 3. Giá kỳ vọng:
+
+* **Hiện tại STB đang giao dịch quanh \~31,000 đ/cp**
+* So với giá trị hợp lý ước tính **\~72,579 đ/cp**, cổ phiếu **đang chiết khấu mạnh \~57%**.
+
+---
+
+### 🟢 Kết luận:
+
+| Tiêu chí             | Đánh giá                                                      |
+| -------------------- | ------------------------------------------------------------- |
+| **Tăng trưởng LNST** | Tốt                                                           |
+| **ROE / ROA**        | Cao                                                           |
+| **Nợ xấu (NPL)**     | An toàn                                                       |
+| **Định giá**         | Đang rẻ (P/E thấp, EPS cao)                                   |
+| **Khuyến nghị**      | ✅ **Nên MUA và nắm giữ dài hạn** nếu thị trường chung ổn định |
+
+Cần hỗ trợ chi tiết hơn về định giá nâng cao (FCFE, chiết khấu lợi nhuận tăng trưởng nhiều giai đoạn...), bạn cứ nói nhé!

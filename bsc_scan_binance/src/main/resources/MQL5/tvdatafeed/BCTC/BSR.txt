@@ -1,0 +1,146 @@
+1) Phân tích bctc của BSR. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Dưới đây là phân tích chi tiết báo cáo tài chính của **BSR** (Công ty Lọc – Hóa dầu Bình Sơn) kèm theo định giá cổ phiếu:
+
+---
+
+## **1. Phân tích báo cáo tài chính của BSR**
+
+### **A. Kết quả kinh doanh**
+
+| Chỉ tiêu          | Q1/2024   | Q2/2024   | Q3/2024   | Q4/2024   | Q1/2025   |
+| ----------------- | --------- | --------- | --------- | --------- | --------- |
+| Doanh thu thuần   | 30,689.34 | 24,423.59 | 31,945.86 | 35,698.28 | 31,894.59 |
+| Lợi nhuận gộp     | 1,255.60  | -146.69   | -1,469.60 | 152.07    | 382.34    |
+| LNST              | 1,115.45  | 768.51    | -1,209.49 | -89.13    | 399.45    |
+| LNST (công ty mẹ) | 1,143.82  | 781.57    | -1,210.17 | -89.84    | 398.72    |
+
+📌 **Nhận xét:**
+
+* **KQKD biến động mạnh**: Doanh thu duy trì ở mức cao nhưng biên LN gộp và LNST biến động mạnh, thể hiện rõ chu kỳ giá dầu ảnh hưởng trực tiếp.
+* **Q3/2024 và Q4/2024 lỗ**: LNST âm do giá nguyên liệu cao, chênh lệch crack spread thấp.
+* **Q1/2025 hồi phục trở lại**: LNST \~400 tỷ → Tín hiệu tốt nếu được duy trì.
+
+---
+
+### **B. Cân đối kế toán**
+
+| Chỉ tiêu       | Q1/2025      |
+| -------------- | ------------ |
+| Tổng tài sản   | 76.971,87 tỷ |
+| Tổng nợ        | 21.034,41 tỷ |
+| Vốn chủ sở hữu | 55.937,46 tỷ |
+
+📌 **Cơ cấu tài chính lành mạnh**:
+
+* **Tỷ lệ Nợ/VCSH \~0.38** → thấp, ít rủi ro tài chính.
+* Tài sản duy trì ổn định, không có dấu hiệu đòn bẩy mạnh.
+
+---
+
+### **C. Các chỉ số tài chính**
+
+**Định giá:**
+
+* **EPS**: -38.61 → âm do lỗ các quý giữa năm 2024
+* **P/E**: -475.22 → không còn ý nghĩa
+* **P/B**: 1.02 → gần bằng giá trị sổ sách
+* **P/S**: 0.46 → thấp
+
+**Khả năng sinh lời:**
+
+* **ROE**: -0.06% | **ROA**: -0.16% | **Tỷ suất LNST**: -0.10%
+  → Hiện tại đang kém, nhưng có thể do chu kỳ ngành dầu khí.
+
+**Thanh khoản:**
+
+* **Thanh toán hiện hành**: 3.01 → tốt
+* **Thanh toán lãi vay**: 0.55 → dưới 1 → cảnh báo
+
+**Hiệu quả hoạt động:**
+
+* **Vòng quay hàng tồn kho (HTK)**: 11.81
+* **Vòng quay tổng tài sản**: 1.64 → khá
+
+📌 Tổng kết: **BSR là doanh nghiệp dầu khí có vốn mạnh, nhưng lợi nhuận biến động theo chu kỳ dầu.**
+
+---
+
+## **2. Định giá cổ phiếu BSR**
+
+Giả định EPS trung bình dài hạn khi ổn định = \~**1.500 đ/cp**, dựa vào trung bình 2023–2025.
+
+**Số lượng cổ phiếu ước tính**:
+Giả sử LNST Q1/2025 = 400 tỷ → EPS = -38.6 đ → Số lượng CP ≈ 400,000 / 38.6 ≈ **\~10.4 tỷ cp**
+→ Vốn chủ sở hữu = 55.937 tỷ → **Giá trị sổ sách = \~5.37 nghìn đ/cp**
+
+---
+
+### A. **Định giá theo P/B**
+
+* P/B hiện tại = 1.02
+  → Giá trị hợp lý = 5.37 \* 1.02 = **5.48 nghìn đ/cp**
+
+---
+
+### B. **Định giá theo P/E**
+
+* EPS kỳ vọng: 1.500 đ
+* P/E ngành dầu khí: \~8x – 10x (trung bình)
+  → Giá hợp lý = 1.500 \* 9 = **13.500 đ/cp**
+
+---
+
+### C. **Định giá theo DCF (giản lược)**
+
+Giả định:
+
+* LNST ổn định 5 năm: 3.000 tỷ/năm
+* Số CP: 10.4 tỷ → EPS \~288 đ
+* Chiết khấu r = 12%, tăng trưởng g = 5%
+
+→ DCF = EPS × (1 + g) / (r – g) = 288 × 1.05 / (0.12 – 0.05) = 302.4 / 0.07 ≈ **4.32 nghìn đ/cp**
+
+---
+
+### ✅ Tổng hợp định giá
+
+| Phương pháp | Giá trị (nghìn đ/cp) | Trọng số |
+| ----------- | -------------------- | -------- |
+| P/E         | 13.50                | 50%      |
+| P/B         | 5.48                 | 30%      |
+| DCF         | 4.32                 | 20%      |
+
+➡️ **Giá trị hợp lý = 13.50×0.5 + 5.48×0.3 + 4.32×0.2 = 6.75 + 1.64 + 0.86 ≈ 9.25 nghìn đ/cp**
+
+---
+
+## **3. Giá kỳ vọng của cổ phiếu BSR**
+
+📌 **Giá hợp lý: \~9.250 đ/cp**
+
+Tuy hiện tại EPS âm, nhưng nếu BSR hồi phục như Q1/2025 thì thị trường sẽ kỳ vọng quay lại vùng giá **9.000–11.000 đ**.
+
+**Giá kỳ vọng trung hạn (6–12 tháng):**
+
+* Nếu giá dầu duy trì >80 USD/thùng
+* Lợi nhuận các quý tới dương
+* Giữ vững vị thế dẫn đầu lọc dầu
+
+➡️ **Vùng giá mục tiêu: 9.000 – 10.500 đ/cp**
+
+---
+
+Nếu bạn cần mình dựng file định giá chi tiết BSR bằng mô hình Excel hoặc tạo biểu đồ định giá – cứ nói nhé!

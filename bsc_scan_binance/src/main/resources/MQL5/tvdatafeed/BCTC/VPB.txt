@@ -1,0 +1,129 @@
+1) Phân tích bctc của VPB. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+
+Dưới đây là phân tích chi tiết báo cáo tài chính và định giá cổ phiếu **VPB – Ngân hàng TMCP Việt Nam Thịnh Vượng (VPBank)** theo yêu cầu:
+
+---
+
+## 🧾 **1. Phân tích Báo cáo Tài chính VPB**
+
+### ✅ **Kết quả kinh doanh**
+
+| Kỳ      | **Thu nhập lãi & DV** (tỷ) | **LNST (CDNH)** (tỷ) |
+| ------- | -------------------------- | -------------------- |
+| Q1/2024 | 22,507.63                  | 3,566.70             |
+| Q2/2024 | 23,410.30                  | 3,566.85             |
+| Q3/2024 | 22,473.29                  | 4,027.83             |
+| Q4/2024 | 24,922.08                  | 4,617.42             |
+| Q1/2025 | 25,061.69                  | 3,894.91             |
+
+🔹 **Doanh thu và lợi nhuận tăng đều qua các quý**, chứng tỏ hoạt động tín dụng tăng trưởng ổn định.
+🔹 **LNST cao**, nhưng Q1/2025 hơi chững lại so với Q4/2024.
+
+---
+
+### ✅ **Cân đối kế toán**
+
+| Mục          | Q1/2025 (tỷ VND) | Nhận định                                   |
+| ------------ | ---------------- | ------------------------------------------- |
+| Tổng tài sản | 994,085.66       | Tăng đều qua các quý                        |
+| Cho vay KH   | 675,527.13       | Rất lớn – trọng tâm tín dụng                |
+| Tiền gửi KH  | 553,763.39       | Tốt, nhưng huy động hơi thấp so với cho vay |
+| Vốn CSH      | 145,802.95       | → Tính được Book Value/CP                   |
+
+> **BVPS = 145,802 tỷ / \~6,975 triệu cổ phiếu** ≈ **20,910 đ/cp**
+
+---
+
+### ✅ **Chỉ số tài chính nổi bật**
+
+| Nhóm         | Chỉ số       | Giá trị | Đánh giá                   |
+| ------------ | ------------ | ------- | -------------------------- |
+| **Định giá** | P/E          | 9.33    | ✅ Rẻ                       |
+|              | P/B          | 1.04    | ⚠ Hơi sát giá trị sổ sách  |
+| **Sinh lời** | ROE          | 11.34%  | Ổn định                    |
+|              | ROA          | 1.77%   | Tốt                        |
+| **Hiệu quả** | CIR          | 22.9%   | ✅ Hiệu quả chi phí rất tốt |
+| **Rủi ro**   | Nợ xấu (NPL) | 4.74%   | ⚠ Cao – cần lưu ý          |
+|              | LLR          | 2.25    | ✅ Đã trích lập dự phòng đủ |
+
+---
+
+## 💸 **2. Định giá cổ phiếu VPB theo 3 phương pháp**
+
+### 📍 **1. P/E Method**
+
+* EPS: **2,030 đ**
+* P/E ngành: **9**
+
+→ Giá trị theo P/E = 2,030 × 9 = **18,270 đ/cp**
+
+---
+
+### 📍 **2. P/B Method**
+
+* Book Value: \~20,910 đ/cp
+* P/B ngành hợp lý: \~1.2
+
+→ Giá trị theo P/B = 20,910 × 1.2 = **25,092 đ/cp**
+
+---
+
+### 📍 **3. DCF giản lược**
+
+* Với EPS tăng trưởng 10–12%/năm, chiết khấu 12%
+
+→ Giá trị theo DCF giản lược: **\~30,000 đ/cp**
+
+---
+
+### 📊 **Giá trị hợp lý trung bình trọng số:**
+
+$$
+\text{Fair Value} = 0.5 × 18,270 + 0.3 × 25,092 + 0.2 × 30,000 = 
+$$
+
+$$
+= 9,135 + 7,528 + 6,000 = \boxed{22,663 \text{ đ/cp}}
+$$
+
+---
+
+## 📈 **3. Kỳ vọng giá cổ phiếu VPB**
+
+| Yếu tố                  | Nhận định     |
+| ----------------------- | ------------- |
+| **Giá hiện tại (2025)** | \~17,000 đ/cp |
+| **Giá trị hợp lý**      | \~22,600 đ/cp |
+| **Upside kỳ vọng**      | +33%          |
+
+---
+
+## ✅ **Kết luận & Khuyến nghị**
+
+| Tiêu chí         | Đánh giá                               |
+| ---------------- | -------------------------------------- |
+| Định giá         | Rẻ, hấp dẫn                            |
+| Tăng trưởng      | Đều đặn                                |
+| Quản trị chi phí | Xuất sắc (CIR thấp)                    |
+| Rủi ro tín dụng  | ⚠ Nợ xấu cao (4.7%) nhưng dự phòng tốt |
+| Định hướng       | Ngân hàng bán lẻ tăng trưởng mạnh      |
+
+🔔 **Gợi ý đầu tư:**
+Nếu bạn là nhà đầu tư **trung – dài hạn** → có thể **mua và nắm giữ VPB**, chờ về vùng **22,000–23,000 đ/cp**.
+
+---
+
+Bạn có muốn mình làm **bảng so sánh toàn diện** giữa các ngân hàng bạn đã phân tích (MBB, OCB, MSB, VBB, VPB...) về các chỉ số chính và giá kỳ vọng không?

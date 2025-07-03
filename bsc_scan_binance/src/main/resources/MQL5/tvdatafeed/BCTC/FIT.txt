@@ -145,3 +145,87 @@ Bạn có muốn tôi:
 * Tư vấn chiến lược mua/bán FIT theo chu kỳ lợi nhuận?
 
 Bạn muốn làm tiếp phần nào?
+
+
+
+
+Dưới đây là phân tích chi tiết về **F.I.T Group (mã FIT)** dựa trên báo cáo tài chính quý gần đây, cùng các thông tin đáng chú ý:
+
+---
+
+## 📊 1. Phân tích BCTC Q1/2025 (Nguồn bạn cung cấp)
+
+* **Doanh thu 515 tỷ**, lợi nhuận sau thuế của cổ đông công ty mẹ đạt **16 tỷ**.
+* **Biên lợi nhuận gộp \~20.6%**, tỷ lệ lợi nhuận sau thuế \~**3.9%**.
+* ROA cỡ **1.06%**, ROE chỉ **1.37%** → mức thu hồi vốn kém, có thể do quy mô vốn chủ sở hữu còn lớn trong khi lợi nhuận nhỏ.
+* **Cơ cấu tài sản – nợ**:
+
+  * Tổng tài sản \~7,936 tỷ, trong đó nợ phải trả \~1,960 tỷ (nợ/VCSH \~0.33). Công ty vốn mạnh, nợ nhẹ – điểm tích cực.
+  * Lưu chuyển tiền mặt (trong bảng cân đối): tiền và tương đương tiền quý đạt \~33 tỷ, tăng từ quý trước (\~101 tỷ Q4, đã dùng đầu tư vào dự án mới).
+
+**→ Khung cơ bản**: hoạt động ổn định, doanh thu và lợi nhuận đều có nhưng còn mờ nhạt so với quy mô vốn. Liquidity tốt, nợ thấp.
+
+---
+
+## 🗞️ 2. Tin tức mới (gần Q1/2025)
+
+Từ nguồn hãng:
+
+* F.I.T Group vừa khánh thành **nhà máy sản xuất thiết bị y tế Benovas tại Vĩnh Long** với vốn đầu tư **16 triệu USD (giai đoạn 1)**, quy mô 10.800 m², công suất 258 triệu đơn vị/năm. Giai đoạn 2 (10 triệu USD) dự kiến hoàn thành giữa năm 2026. ([fitgroup.com.vn][1], [dnse.com.vn][2], [nguoiquansat.vn][3])
+* Được vinh danh là **Top 10 Thương hiệu Quốc gia 2025**, làm tăng độ nhận diện thương hiệu ([fitgroup.com.vn][4]).
+
+**Ý nghĩa**:
+
+* Dòng tiền đầu tư mạnh mẽ vào mảng y tế – R\&D và mở rộng quy mô công nghiệp.
+* Tín hiệu tăng trưởng dài hạn rõ ràng qua nâng cấp hạ tầng sản xuất.
+* Dễ hiểu vì sao biểu đồ kỹ thuật có "buy signal" – vì kỳ vọng dòng tiền tích cực từ dự án mới.
+
+---
+
+## 💡 3. Dòng tiền và lợi nhuận FIT đến từ đâu?
+
+* Báo cáo Q1 cho thấy:
+
+  * Lợi nhuận khoảng **64 tỷ trước thuế** từ mảng kinh doanh chính (dược phẩm, FMCG, thiết bị y tế...) ([fitgroup.com.vn][5]).
+* **Dòng tiền sử dụng**:
+
+  * **Tiền mặt sụt mạnh sau Q4** (101 tỷ → 33 tỷ) vì dùng vốn để đầu tư vào nhà máy Benovas và các thành viên.
+  * Là dấu hiệu cho thấy công ty đang **nước rút chiến lược**, ưu tiên đầu tư chiều sâu hơn trả cổ tức.
+
+---
+
+## 🎯 4. Có nên mua ở giá 4.500 đ?
+
+**Ưu điểm**
+
+* Dự án lớn, mở rộng sản xuất, tăng khả năng sinh lời dài hạn.
+* Mô hình kinh doanh đa ngành: y tế, FMCG, bất động sản… giảm rủi ro tập trung.
+* Mức định giá hợp lý – P/B chỉ \~0.39 (cách rất xa 1x).
+* Nợ rủi ro thấp, dòng tiền đầu tư rõ ràng, tín hiệu kỹ thuật đẹp → "buy signal" xuất hiện.
+
+**Khó khăn**
+
+* Dòng tiền hiện tại âm khi mở rộng nhà máy.
+* Biên lợi nhuận mỏng, hệ số ROE/ROA thấp.
+* Rủi ro tiềm năng nếu mở rộng thất bại hoặc chậm trễ hoàn thiện dây chuyền.
+
+**Tổng kết**
+
+* Nếu bạn là nhà đầu tư **đầu tư giá trị dài hạn** và tin vào chiến lược đa ngành cùng chuyển dịch mạnh vào y tế – FMCG, mức giá 4.500 có vẻ khá hấp dẫn.
+* Nếu bạn theo trường phái **ngắn hạn – lướt sóng**, hãy chờ xác nhận dòng tiền từ lợi nhuận Q2-Q3 khi dự án hiện hữu.
+* **Ưu tiên**: phù hợp cho nhà đầu tư chấp thuận rủi ro đầu tư tài sản dài hạn, không nên mua "all-in" mà nên chốt tỷ trọng nhỏ – thêm theo dần khi thấy hiệu quả dự án và cải thiện lợi nhuận.
+
+---
+
+**👉 Kết luận**: F.I.T đang ở giai đoạn "đầu tư để tăng trưởng." Giá 4.500 thấp, tiềm năng cho dòng tiền dài hạn. Bạn có thể xem là vị thế **mua thêm từng phần**, ưu tiên nếu bạn tin vào chiến lược tăng trưởng kép (mở rộng sản xuất + thương hiệu quốc gia).
+
+---
+
+Bạn muốn mình tính định giá theo phương pháp P/B, DCF hay PE? Hay xem kỹ hơn vào dòng tiền tự do (FCF) cho năm 2025 – 2026 để ra chiến lược cụ thể hơn?
+
+[1]: https://fitgroup.com.vn/f-i-t-group-inaugurates-26-million-factory-on-the-18th-anniversary-of-its-establishment/?utm_source=chatgpt.com "F.I.T Group Inaugurates $26 Million Factory on the 18th Anniversary of ..."
+[2]: https://www.dnse.com.vn/senses/tin-tuc/tap-doan-fit-doanh-thu-tang-12-lai-sau-thue-178-ty-dong-34094896?utm_source=chatgpt.com "Tập đoàn F.I.T: Doanh thu tăng 12%, lãi sau thuế 178 tỷ đồng"
+[3]: https://nguoiquansat.vn/tap-doan-f-i-t-doanh-thu-tang-12-lai-sau-thue-178-ty-dong-195968.html?utm_source=chatgpt.com "Tập đoàn F.I.T: Doanh thu tăng 12%, lãi sau thuế 178 tỷ đồng"
+[4]: https://fitgroup.com.vn/news/?utm_source=chatgpt.com "News - F.I.T Group"
+[5]: https://fitgroup.com.vn/tap-doan-f-i-t-loi-nhuan-sau-thue-quy-i2023-tang-hon-176-ty-dong-so-voi-cung-ky/?utm_source=chatgpt.com "Tập đoàn F.I.T: Lợi nhuận sau thuế Quý I/2023 ... - F.I.T Group"
+

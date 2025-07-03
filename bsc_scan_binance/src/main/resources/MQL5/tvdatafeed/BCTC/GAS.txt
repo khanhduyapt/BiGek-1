@@ -1,0 +1,145 @@
+1) Phân tích bctc của GAS. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Dưới đây là **phân tích báo cáo tài chính của GAS – Tổng công ty Khí Việt Nam**, cùng với **định giá cổ phiếu theo 3 phương pháp (P/E, P/B, DCF giản lược)** và **giá kỳ vọng**:
+
+---
+
+## **1. Phân tích Báo cáo tài chính GAS**
+
+### A. **Kết quả kinh doanh theo quý**
+
+| Quý     | Doanh thu (tỷ) | LNST (tỷ) | LNST CĐ (tỷ) |
+| ------- | -------------- | --------- | ------------ |
+| Q1/2024 | 23,315.00      | 2,543.61  | 2,511.66     |
+| Q2/2024 | 30,052.00      | 3,416.07  | 3,320.82     |
+| Q3/2024 | 25,252.01      | 2,578.11  | 2,521.79     |
+| Q4/2024 | 24,945.12      | 2,052.34  | 2,044.10     |
+| Q1/2025 | 25,675.43      | 2,762.78  | 2,756.53     |
+
+📌 **Nhận xét:**
+
+* **Doanh thu dao động quanh \~25.000 – 30.000 tỷ/quý**, cực kỳ lớn.
+* **LNST rất ổn định**, duy trì hơn 2.500 tỷ/quý → biên lợi nhuận ròng duy trì mức \~10%.
+* **EPS trung bình cao (\~4.543 đ)** → cổ phiếu **có nền tảng lợi nhuận rất vững chắc**.
+
+---
+
+### B. **Bảng cân đối kế toán**
+
+| Quý     | Tổng tài sản (tỷ) | Tổng nợ (tỷ) | Vốn CSH (tỷ) |
+| ------- | ----------------- | ------------ | ------------ |
+| Q1/2025 | 82,020.78         | 17,693.59    | 64,327.19    |
+
+📌 **Nhận xét:**
+
+* **Vốn chủ sở hữu cực lớn (\~64.000 tỷ)** → doanh nghiệp quy mô hàng đầu.
+* **Tổng nợ/VCSH = 0.28** → **cực kỳ an toàn về tài chính**.
+* Tài sản ổn định qua các quý, cho thấy hoạt động bền vững.
+
+---
+
+### C. **Các chỉ số tài chính chính**
+
+**Định giá:**
+
+* P/E: 14.20 (**hợp lý với ngành năng lượng khí**)
+* P/B: 2.40 (cao nhưng xứng đáng với chất lượng tài sản)
+* EPS: 4,543 đ → **EPS hàng đầu VN30**
+
+**Khả năng sinh lời:**
+
+* Biên lợi nhuận ròng: 10.05% (rất tốt)
+* ROE: 16.10% | ROCE: 18.83% → **rất hiệu quả**
+
+**Tài chính:**
+
+* Thanh toán hiện hành: 4.86
+* Thanh toán lãi vay: 51.68 (rất cao, gần như không nợ vay)
+
+**Hiệu quả hoạt động:**
+
+* Vòng quay tài sản: 1.22
+* Vòng quay hàng tồn: 30.52 → cực kỳ nhanh
+* Vòng quay các khoản phải thu: 7.32 → thu tiền hiệu quả
+
+📌 **Tóm tắt**: GAS là **doanh nghiệp lớn, sinh lời cao, tài chính cực kỳ vững**, hoạt động hiệu quả trên mọi chỉ tiêu.
+
+---
+
+## **2. Định giá cổ phiếu GAS theo 3 phương pháp**
+
+---
+
+### A. **Định giá theo P/E**
+
+* EPS: 4,543 đ
+* P/E trung bình ngành khí: **14 – 15**
+
+→ Giá trị hợp lý = 4,543 × 14.5 = **\~65,870 đ/cp**
+
+---
+
+### B. **Định giá theo P/B**
+
+* Vốn CSH = 64,327 tỷ
+* Ước số cổ phiếu lưu hành ≈ LNST / EPS = 2,756 / 4.543 ≈ **\~607 triệu cp**
+
+→ Book value = 64,327 / 607 = **\~105,900 đ/cp**
+→ P/B = 2.4 → Giá trị hợp lý = 105,900 × 2.4 = **\~254,160 đ/cp**
+
+(hoặc thận trọng hơn: dùng trực tiếp Book Value = **\~105,900 đ/cp**)
+
+---
+
+### C. **DCF giản lược**
+
+Giả định:
+
+* EPS = 4,543 đ
+* Tăng trưởng dài hạn g = 5%
+* Chiết khấu r = 10%
+
+→ DCF = 4,543 × (1 + 0.05) / (0.10 – 0.05) ≈ 4,770 / 0.05 = **\~95,400 đ/cp**
+
+---
+
+## ✅ Tổng hợp định giá:
+
+| Phương pháp | Giá trị (đ/cp) | Trọng số |
+| ----------- | -------------- | -------- |
+| P/E         | 65,870         | 50%      |
+| P/B         | 105,900        | 30%      |
+| DCF         | 95,400         | 20%      |
+
+👉 **Giá trị hợp lý =**
+\= 65,870 × 0.5 + 105,900 × 0.3 + 95,400 × 0.2
+\= 32,935 + 31,770 + 19,080 = **\~83,785 đ/cp**
+
+---
+
+## **3. Giá kỳ vọng cổ phiếu GAS**
+
+📌 Với kết quả kinh doanh và bảng cân đối mạnh như trên, cổ phiếu GAS có thể:
+
+* **Tiếp tục chi trả cổ tức tiền mặt đều hàng năm**
+* **Hưởng lợi từ giá khí tăng trở lại và nhu cầu năng lượng phục hồi**
+* **Ít rủi ro tài chính** → phù hợp đầu tư giá trị và cổ tức
+
+👉 **Mức giá kỳ vọng hợp lý trong 6–12 tháng tới: \~83,000 – 88,000 đ/cp**
+Nếu giá khí thế giới tích cực trở lại, có thể vượt **90,000 đ/cp**
+
+---
+
+Nếu bạn cần thêm định giá so sánh với các mã khác như PVD, DPM (bạn đã hỏi trước đó) để lập danh mục tối ưu, mình có thể hỗ trợ bảng Excel hoặc gợi ý phân bổ nhé!

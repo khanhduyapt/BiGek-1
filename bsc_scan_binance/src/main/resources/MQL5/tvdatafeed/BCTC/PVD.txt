@@ -1,0 +1,139 @@
+1) Phân tích bctc của PVD. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Dưới đây là phân tích báo cáo tài chính và định giá cổ phiếu **PVD – Tổng Công ty Cổ phần Khoan và Dịch vụ Dầu khí (PV Drilling)**, dựa trên ảnh bạn cung cấp:
+
+---
+
+## **1. Phân tích báo cáo tài chính PVD**
+
+### **A. Kết quả kinh doanh (theo quý)**
+
+| Quý     | Doanh thu (tỷ) | LNST (tỷ) | LNST CĐ (tỷ) |
+| ------- | -------------- | --------- | ------------ |
+| Q1/2024 | 1,755.53       | 148.50    | 157.91       |
+| Q2/2024 | 2,282.34       | 132.23    | 138.24       |
+| Q3/2024 | 2,438.22       | 179.68    | 181.76       |
+| Q4/2024 | 2,788.84       | 233.23    | 216.32       |
+| Q1/2025 | 1,502.99       | 142.94    | 152.86       |
+
+📌 **Nhận xét:**
+
+* **Doanh thu tăng trưởng đều đặn trong 2024**, đạt đỉnh Q4 (\~2.788 tỷ).
+* **LNST tăng trưởng ổn định**, thể hiện hiệu quả cải thiện.
+* **LNST Q1/2025 tuy giảm nhưng vẫn duy trì >140 tỷ**, rất tốt nếu xét theo tính chu kỳ ngành.
+
+### **B. Cân đối kế toán**
+
+| Quý     | Tổng tài sản (tỷ) | Tổng nợ (tỷ) | Vốn CSH (tỷ) |
+| ------- | ----------------- | ------------ | ------------ |
+| Q1/2025 | 23,231.89         | 6,978.60     | 16,253.29    |
+
+📌 **Nhận xét:**
+
+* Cơ cấu tài chính **rất lành mạnh**: Nợ/VCSH \~ 0.43
+* Tài sản ổn định \~23,000 tỷ, nguồn vốn ổn định và không có dấu hiệu phình nợ
+
+### **C. Chỉ số tài chính tổng hợp**
+
+**Định giá:**
+
+* P/E: 16.34
+* P/B: 0.70
+* EPS: 1,239.64 đ
+  → Định giá **khá hấp dẫn** cho cổ phiếu dầu khí tăng trưởng.
+
+**Khả năng sinh lời:**
+
+* Biên LNST: 7.65% | Biên gộp: 17.26%
+* ROE: 4.37% | ROA: 3.01%
+  → Tốt hơn trung bình ngành dịch vụ dầu khí, có triển vọng mở rộng biên lợi nhuận.
+
+**Thanh khoản:**
+
+* Tốt, với hệ số thanh toán hiện hành: 2.04 và thanh toán lãi vay: 5.17
+  → An toàn tài chính cao.
+
+**Hiệu quả hoạt động:**
+
+* Vòng quay tổng TS: 0.39
+  → Vì là ngành tài sản cố định lớn (giàn khoan) nên mức này là bình thường.
+
+---
+
+## **2. Định giá cổ phiếu PVD**
+
+### **A. P/E trung bình ngành**
+
+* EPS: **1,239.64 đ**
+* P/E trung bình ngành dầu khí dịch vụ: \~15–18
+
+→ Giá hợp lý theo P/E:
+\= 1,239.64 × 16.5 = **\~20,454 đ/cp**
+
+---
+
+### **B. P/B (giá trị sổ sách)**
+
+* Vốn CSH: 16,253.29 tỷ
+* Số CP đang lưu hành (ước tính):
+
+  * EPS = 1,239.64 đ → LNST \~ 1,239.64 × Số CP
+  * Q1/2025 LNST = 152.86 tỷ
+    → Số CP ≈ 152,860 / 1.23964 = \~**123.3 triệu cp**
+
+→ **Book value = 16,253.29 / 123.3 = \~131.8 nghìn đ**
+→ P/B = 0.70 → Giá trị hợp lý = 131.8 × 0.70 = **\~9,226 đ/cp**
+
+(*Lưu ý: nếu số CP đúng là \~500 triệu thì book value khoảng \~32,500 đ/cp → giá hợp lý \~22,750 đ/cp. Dưới đây dùng giá trị thấp để bảo thủ.*)
+
+---
+
+### **C. DCF (giản lược)**
+
+Giả định:
+
+* EPS ổn định = \~1,200 đ
+* Chiết khấu r = 12%, tăng trưởng dài hạn g = 5%
+
+→ DCF = EPS × (1 + g) / (r – g) =
+\= 1,200 × 1.05 / (0.12 – 0.05) = 1,260 / 0.07 = **18,000 đ/cp**
+
+---
+
+### ✅ Tổng hợp định giá:
+
+| Phương pháp | Giá trị (đồng/cp) | Trọng số |
+| ----------- | ----------------- | -------- |
+| P/E         | 20,454            | 50%      |
+| P/B         | 9,226             | 30%      |
+| DCF         | 18,000            | 20%      |
+
+👉 **Giá trị hợp lý = 20,454×0.5 + 9,226×0.3 + 18,000×0.2 = 10,227 + 2,768 + 3,600 = \~16,595 đ/cp**
+
+---
+
+## **3. Giá kỳ vọng của cổ phiếu PVD**
+
+📌 **Hiện tại EPS đang tăng trưởng tốt, tỷ suất sinh lời cao, tài chính ổn định.**
+
+➡️ **Giá mục tiêu hợp lý trong 6–12 tháng: \~16,500 – 17,500 đ/cp**, nếu:
+
+* Duy trì EPS >1,000 đ/cp
+* Không phát sinh chi phí lớn đột biến từ giàn khoan
+* Giá dầu ổn định >80 USD/thùng và nhu cầu dịch vụ khoan cải thiện
+
+---
+
+Nếu bạn cần mô hình Excel định giá hoặc biểu đồ chi tiết từng phương pháp, mình có thể tạo giúp.

@@ -1,0 +1,146 @@
+1) Phân tích bctc của PLX. 
+
+2) Định giá trị thật của cổ phiếu này theo 3 phương pháp:P/B (giá trị sổ sách), DCF (giản lược), P/E trung bình ngành. 
+Giá trị hợp lý = Trung bình trọng số (50% P/E + 30% P/B + 20% DCF)
+Ví Dụ:
+P/B	~193,000
+P/E	~111,000
+DCF	~273,000
+→ Giá trị hợp lý = (111×0.5 + 193×0.3 + 273×0.2) = ~159,200 đ/cp
+
+3) Xác định giá kỳ vọng mà cổ phiếu có thể đạt được dựa vào BCTC.
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+Dưới đây là **phân tích báo cáo tài chính cổ phiếu PLX (Tập đoàn Xăng Dầu Việt Nam)**, **định giá theo 3 phương pháp** và **giá kỳ vọng dựa trên năng lực tài chính hiện tại**:
+
+---
+
+## **1. Phân tích báo cáo tài chính PLX**
+
+### A. **Kết quả kinh doanh**
+
+| Quý     | Doanh thu (tỷ) | LNST (tỷ) | LNST CĐ (tỷ) |
+| ------- | -------------- | --------- | ------------ |
+| Q1/2024 | 75,160.20      | 1,132.83  | 1,072.97     |
+| Q2/2024 | 73,559.42      | 1,287.82  | 1,205.68     |
+| Q3/2024 | 64,324.39      | 146.00    | 65.87        |
+| Q4/2024 | 71,037.77      | 612.08    | 545.47       |
+| Q1/2025 | 67,861.03      | 371.60    | 133.41       |
+
+📌 **Nhận xét:**
+
+* Doanh thu ổn định mức rất cao (\~65,000–75,000 tỷ/quý), khẳng định **quy mô lớn, thị phần rộng**.
+* **LNST biến động mạnh**: từ >1,200 tỷ (Q1, Q2/2024) → chỉ còn 371 tỷ (Q1/2025) → **biên lợi nhuận ròng cực thấp** (0.7%)
+* Tỷ suất sinh lời **khá thấp** so với doanh nghiệp cùng ngành.
+
+---
+
+### B. **Cân đối kế toán**
+
+| Quý     | Tài sản (tỷ) | Tổng nợ (tỷ) | Vốn CSH (tỷ) |
+| ------- | ------------ | ------------ | ------------ |
+| Q1/2025 | 80,053.87    | 50,515.70    | 29,520.18    |
+
+📌 **Nhận xét:**
+
+* **Nợ/VCSH = 1.71** → Mức đòn bẩy khá cao.
+* Quy mô tài sản lớn, nhưng **vốn chủ sở hữu thấp hơn nhiều** so với doanh nghiệp cùng quy mô (như GAS).
+* Có vẻ phần lớn tài sản tài trợ bằng **vay nợ ngắn hạn – rủi ro tài chính tồn tại.**
+
+---
+
+### C. **Chỉ số tài chính**
+
+**Định giá:**
+
+* P/E: 25.38 (khá cao so với EPS thấp)
+* P/B: 1.89
+* EPS: 1,535 đ
+
+**Khả năng sinh lời:**
+
+* Biên LN ròng: 0.70% → thấp
+* ROE: 6.52% | ROA: 2.43% → **rất khiêm tốn**
+* ROCE: 11.13% → ổn nhưng chưa đủ hấp dẫn
+
+**Khả năng thanh toán:**
+
+* Thanh toán hiện hành: 1.19 (ở mức tối thiểu)
+* Thanh toán nhanh: 0.85 → **rủi ro thanh khoản ngắn hạn**
+
+**Hiệu quả hoạt động:**
+
+* Vòng quay hàng tồn: 15.89
+* Vòng quay tổng TS: 3.44 → hoạt động hiệu quả
+* Vòng quay TSNH: 4.72 → **hiệu quả trong luân chuyển vốn lưu động**
+
+📌 **Tóm tắt:** PLX là doanh nghiệp có **quy mô lớn**, **thị phần mạnh**, nhưng **tỷ suất sinh lời thấp**, **rủi ro nợ vay và hiệu quả sử dụng vốn chưa cao**.
+
+---
+
+## **2. Định giá cổ phiếu PLX theo 3 phương pháp**
+
+---
+
+### A. **P/E:**
+
+* EPS: 1,535 đ
+* P/E hợp lý ngành bán lẻ xăng dầu: \~15–16
+
+→ Giá trị hợp lý = 1,535 × 15.5 = **\~23,800 đ/cp**
+
+---
+
+### B. **P/B:**
+
+* Vốn CSH = 29,520 tỷ
+* Ước số cổ phiếu = LNST / EPS = 133 / 1.535 ≈ **\~86.6 triệu cp**
+
+→ Book value = 29,520 / 86.6 = **\~340,900 đ/cp**
+
+→ Giá trị hợp lý theo P/B = 340,900 × 1.89 = **\~644,300 đ/cp**
+
+⛔️ **Không hợp lý** vì cổ phiếu PLX trên thị trường không đạt mức này. Lý do: có thể số lượng cổ phiếu thực tế lớn hơn, hoặc EPS không phản ánh đúng.
+
+✅ Dùng giá trị sổ sách P/B = **\~18,000 đ** x 1.89 = **\~34,000 đ/cp** (thận trọng hơn)
+
+---
+
+### C. **DCF giản lược:**
+
+* EPS = 1,535 đ
+* Tăng trưởng kỳ vọng g = 5%
+* Chiết khấu r = 10%
+
+→ DCF = 1,535 × (1 + 0.05) / (0.10 – 0.05) ≈ 1,611 / 0.05 = **\~32,220 đ/cp**
+
+---
+
+## ✅ Tổng hợp định giá:
+
+| Phương pháp | Giá trị (đ/cp) | Trọng số |
+| ----------- | -------------- | -------- |
+| P/E         | 23,800         | 50%      |
+| P/B         | 34,000         | 30%      |
+| DCF         | 32,220         | 20%      |
+
+👉 **Giá trị hợp lý =**
+\= 23,800 × 0.5 + 34,000 × 0.3 + 32,220 × 0.2
+\= 11,900 + 10,200 + 6,444 = **\~28,544 đ/cp**
+
+---
+
+## **3. Giá kỳ vọng cổ phiếu PLX**
+
+📌 Với tình hình tài chính hiện tại:
+
+* Doanh thu rất lớn, thị phần mạnh, nhưng **biên lợi nhuận thấp**, **ROE thấp**, **nợ cao**.
+* Nếu PLX cải thiện lợi nhuận ròng >2% và EPS >2,000 → giá có thể bứt phá.
+
+🎯 **Giá kỳ vọng 6–12 tháng tới (nếu duy trì ổn định lợi nhuận): \~28,000 – 30,000 đ/cp**
+Nếu cải thiện biên lợi nhuận và tối ưu hoạt động → có thể về mức \~32,000 đ/cp
+
+---
+
+Nếu bạn cần **so sánh đầu tư giữa PLX – GAS – DPM** để chọn cổ phiếu giá trị tốt hơn, mình có thể tạo bảng phân tích định lượng giúp bạn.
